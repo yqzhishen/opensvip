@@ -71,7 +71,7 @@ class OpenSvipSongTempo:
         self.Position: int = 0
         self.BPM: float = 0.
 
-    def decode(self, tempo):
+    def decode(self, tempo: SongTempo):
         self.Position = tempo.get_Pos()
         self.BPM = tempo.get_Tempo() / 100.
         return self
@@ -94,7 +94,7 @@ class OpenSvipTimeSignature:
         self.Numerator: int = 0
         self.Denominator: int = 0
 
-    def decode(self, beat):
+    def decode(self, beat: SongBeat):
         self.BarIndex = beat.get_BarIndex()
         frac = beat.get_BeatSize()
         self.Numerator = frac.get_X()
@@ -125,7 +125,7 @@ class OpenSvipTrack:
         self.Volume: float = 0.
         self.Pan: float = 0.
 
-    def decode(self, track):
+    def decode(self, track: ITrack):
         self.Title = track.get_Name()
         self.Muted = track.get_Mute()
         self.Solo = track.get_Solo()
@@ -165,7 +165,7 @@ class OpenSvipSingingTrack(OpenSvipTrack):
         self.NoteList: List[OpenSvipNote] = []
         self.EditedParams: OpenSvipParams = OpenSvipParams()
 
-    def decode(self, track):
+    def decode(self, track: SingingTrack):
         super().decode(track)
         self.AISingerId = track.get_AISingerId()
         self.ReverbPreset = OpenSvipReverbPresets.get_name(track.get_ReverbPreset())
@@ -205,7 +205,7 @@ class OpenSvipInstrumentalTrack(OpenSvipTrack):
         self.AudioFilePath: str = ''
         self.Offset: int = 0
 
-    def decode(self, track):
+    def decode(self, track: InstrumentTrack):
         super().decode(track)
         self.AudioFilePath = track.get_InstrumentFilePath()
         self.Offset = track.get_OffsetInPos()
@@ -235,7 +235,7 @@ class OpenSvipNote:
         self.Pronunciation: str = ''
         self.EditedPhones: OpenSvipPhones = None
 
-    def decode(self, note):
+    def decode(self, note: Note):
         self.StartPos = note.get_ActualStartPos()
         self.Length = note.get_WidthPos()
         self.KeyNumber = note.get_KeyIndex() - 12
@@ -276,7 +276,7 @@ class OpenSvipPhones:
         self.HeadLengthInSecs: float = -1.0
         self.MidRatioOverTail: float = -1.0
 
-    def decode(self, phone):
+    def decode(self, phone: NotePhoneInfo):
         self.HeadLengthInSecs = phone.get_HeadPhoneTimeInSec()
         self.MidRatioOverTail = phone.get_MidPartOverTailPartRatio()
         return self
@@ -301,7 +301,7 @@ class OpenSvipParams:
         self.Gender: OpenSvipParamLine = OpenSvipParamLine()
         self.Strength: OpenSvipParamLine = OpenSvipParamLine()
 
-    def decode(self, track):
+    def decode(self, track: SingingTrack):
         self.Pitch.decode(track.get_EditedPitchLine(), op=lambda x: x - 1150 if x > 1050 else -100)
         self.Volume.decode(track.get_EditedVolumeLine())
         self.Breath.decode(track.get_EditedBreathLine())
@@ -332,7 +332,7 @@ class OpenSvipParamLine:
         self.TotalPointsCount: int = 0
         self.PointList: List[Tuple[int]] = []
 
-    def decode(self, line, op=lambda x: x):
+    def decode(self, line: LineParam, op=lambda x: x):
         self.TotalPointsCount = line.Length()
         point = line.get_Begin()
         for _ in range(self.TotalPointsCount):
