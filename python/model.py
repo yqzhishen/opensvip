@@ -21,9 +21,6 @@ class OpenSvipModel:
 
     def decode(self, version: str, model: AppModel):
         self.Version = version
-        self.SongTempoList = []
-        self.TimeSignatureList = []
-        self.TrackList = []
         for tempo in model.get_TempoList():
             self.SongTempoList.append(OpenSvipSongTempo().decode(tempo))
         for beat in model.get_BeatList():
@@ -319,7 +316,7 @@ class OpenSvipVibrato:
             self.StartPercent = percent.get_StartPercent()
             self.EndPercent = percent.get_EndPercent()
         elif note.get_VibratoPercent() > 0:
-            self.StartPercent = 1 - note.get_VibratoPercent()
+            self.StartPercent = 1. - note.get_VibratoPercent() / 100.
             self.EndPercent = 1.
         vibrato = note.get_Vibrato()
         self.IsAntiPhase = vibrato.get_IsAntiPhase()
@@ -341,8 +338,8 @@ class OpenSvipVibrato:
         percent.set_EndPercent(self.EndPercent)
         vibrato = VibratoStyle()
         vibrato.set_IsAntiPhase(self.IsAntiPhase)
-        vibrato.AmpLine = self.Amplitude.encode(left=-1, right=100000)
-        vibrato.FreqLine = self.Frequency.encode(left=-1, right=100000)
+        vibrato.AmpLine = self.Amplitude.encode(left=-1, right=100001)
+        vibrato.FreqLine = self.Frequency.encode(left=-1, right=100001)
         return percent, vibrato
 
 

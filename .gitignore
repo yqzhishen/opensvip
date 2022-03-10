@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# CSharp
+bin/
+obj/
+Properties/
+
 # Distribution / packaging
 .Python
 build/
@@ -57,6 +62,11 @@ coverage.xml
 
 # PyCharm
 .idea/
+
+# Visual Studio
+.vs/
+*.sln
+*.csproj
 
 # Django stuff:
 *.log
@@ -139,3 +149,4 @@ test.py
 *.wav
 @*
 GPUCache/
+/csharp/OpenSvip.sln.DotSettings.user
