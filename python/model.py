@@ -5,7 +5,7 @@ import clr
 from System.Collections.Generic import List as CSharpList
 
 clr.AddReference(r'C:\Users\YQ之神\AppData\Local\warp\packages\XStudioSinger_2.0.0_beta2.exe\SingingTool.Model.dll')
-from SingingTool.Model import AppModel, ITrack, SingingTrack, InstrumentTrack, Note, NotePhoneInfo
+from SingingTool.Model import AppModel, ITrack, SingingTrack, InstrumentTrack, Note, NotePhoneInfo, VibratoStyle, VibratoPercentInfo
 from SingingTool.Model.SingingGeneralConcept import SongTempo, SongBeat
 from SingingTool.Model.Line import LineParam, LineParamNode
 
@@ -232,8 +232,9 @@ class OpenSvipNote:
         self.KeyNumber: int = 0
         self.HeadTag: str = None
         self.Lyric: str = ''
-        self.Pronunciation: str = ''
+        self.Pronunciation: str = None
         self.EditedPhones: OpenSvipPhones = None
+        self.Vibrato: OpenSvipVibrato = None
 
     def decode(self, note: Note):
         self.StartPos = note.get_ActualStartPos()
@@ -241,10 +242,15 @@ class OpenSvipNote:
         self.KeyNumber = note.get_KeyIndex() - 12
         self.HeadTag = OpenSvipNoteHeadTags.get_name(note.get_HeadTag())
         self.Lyric = note.get_Lyric()
-        self.Pronunciation = note.get_Pronouncing()
+        pronunciation = note.get_Pronouncing()
+        if pronunciation != '':
+            self.Pronunciation = pronunciation
         phone = note.get_NotePhoneInfo()
         if phone is not None:
             self.EditedPhones = OpenSvipPhones().decode(phone)
+        vibrato = note.get_Vibrato()
+        if vibrato is not None:
+            self.Vibrato = OpenSvipVibrato().decode(note)
         return self
 
     def dedict(self, obj: dict):
@@ -256,6 +262,8 @@ class OpenSvipNote:
         self.Pronunciation = obj['Pronunciation']
         if obj['EditedPhones'] is not None:
             self.EditedPhones = OpenSvipPhones().dedict(obj['EditedPhones'])
+        if obj['Vibrato'] is not None:
+            self.Vibrato = OpenSvipVibrato().dedict(obj['Vibrato'])
         return self
 
     def encode(self) -> Note:
@@ -268,6 +276,10 @@ class OpenSvipNote:
         note.set_Pronouncing(self.Pronunciation)
         if self.EditedPhones is not None:
             note.set_NotePhoneInfo(self.EditedPhones.encode())
+        if self.Vibrato is not None:
+            percent, vibrato = self.Vibrato.encode()
+            note.set_VibratoPercentInfo(percent)
+            note.set_Vibrato(vibrato)
         return note
 
 
@@ -291,6 +303,47 @@ class OpenSvipPhones:
         phone.set_HeadPhoneTimeInSec(self.HeadLengthInSecs)
         phone.set_MidPartOverTailPartRatio(self.MidRatioOverTail)
         return phone
+
+
+class OpenSvipVibrato:
+    def __init__(self):
+        self.StartPercent: float = 0.
+        self.EndPercent: float = 0.
+        self.IsAntiPhase: bool = False
+        self.Amplitude: OpenSvipParamLine = OpenSvipParamLine()
+        self.Frequency: OpenSvipParamLine = OpenSvipParamLine()
+
+    def decode(self, note: Note):
+        percent = note.get_VibratoPercentInfo()
+        if percent is not None:
+            self.StartPercent = percent.get_StartPercent()
+            self.EndPercent = percent.get_EndPercent()
+        elif note.get_VibratoPercent() > 0:
+            self.StartPercent = 1 - note.get_VibratoPercent()
+            self.EndPercent = 1.
+        vibrato = note.get_Vibrato()
+        self.IsAntiPhase = vibrato.get_IsAntiPhase()
+        self.Amplitude.decode(vibrato.get_AmpLine())
+        self.Frequency.decode(vibrato.get_FreqLine())
+        return self
+
+    def dedict(self, obj: dict):
+        self.StartPercent = obj['StartPercent']
+        self.EndPercent = obj['EndPercent']
+        self.IsAntiPhase = obj['IsAntiPhase']
+        self.Amplitude.dedict(obj['Amplitude'])
+        self.Frequency.dedict(obj['Frequency'])
+        return self
+
+    def encode(self) -> Tuple[VibratoPercentInfo, VibratoStyle]:
+        percent = VibratoPercentInfo()
+        percent.set_StartPercent(self.StartPercent)
+        percent.set_EndPercent(self.EndPercent)
+        vibrato = VibratoStyle()
+        vibrato.set_IsAntiPhase(self.IsAntiPhase)
+        vibrato.AmpLine = self.Amplitude.encode(left=-1, right=100000)
+        vibrato.FreqLine = self.Frequency.encode(left=-1, right=100000)
+        return percent, vibrato
 
 
 class OpenSvipParams:
@@ -347,12 +400,10 @@ class OpenSvipParamLine:
             self.PointList.append((ele[0], ele[1]))
         return self
 
-    def encode(self, op=lambda x: x, default=0) -> LineParam:
+    def encode(self, op=lambda x: x, left=-192000, right=1073741823, default=0) -> LineParam:
         line = LineParam()
         length = max(0, min(self.TotalPointsCount, len(self.PointList)))
         points = sorted(self.PointList, key=lambda x: x[0])[:length]
-        left = -192000
-        right = 1073741823
         for p in points:
             if left <= p[0] <= right:
                 node = LineParamNode()
