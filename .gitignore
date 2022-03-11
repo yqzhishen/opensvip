@@ -65,7 +65,6 @@ coverage.xml
 
 # Visual Studio
 .vs/
-*.sln
 *.csproj
 
 # Django stuff:
@@ -150,3 +149,5 @@ test.py
 @*
 GPUCache/
 /csharp/OpenSvip.sln.DotSettings.user
+*.csproj.user
+/csharp/OpenSvip.sln.DotSettings
