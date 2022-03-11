@@ -45,7 +45,7 @@ public static class Json
     public static Project Load(string path)
     {
         var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-        var reader = new StreamReader(stream, Encoding.UTF8);
+        var reader = new StreamReader(stream, new UTF8Encoding(false));
         var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
         stream.Close();
         reader.Close();

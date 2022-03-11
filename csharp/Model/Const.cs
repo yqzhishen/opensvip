@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,7 +46,7 @@ public static class Singers
 
 public static class ReverbPresets
 {
-    private static readonly Hashtable Presets = new()
+    private static readonly Dictionary<SingingTool.Library.Audio.ReverbPreset, string> Presets = new()
     {
         { SingingTool.Library.Audio.ReverbPreset.NONE, "干声" },
         { SingingTool.Library.Audio.ReverbPreset.DEFAULT, "浮光" },
@@ -61,14 +60,14 @@ public static class ReverbPresets
 
     public static string GetName(SingingTool.Library.Audio.ReverbPreset index)
     {
-        return (string) Presets[index];
+        return Presets.ContainsKey(index) ? Presets[index] : null;
     }
 
     public static SingingTool.Library.Audio.ReverbPreset GetIndex(string name)
     {
-        foreach (var entry in Presets.Cast<object>().Where(entry => name.Equals(Presets[entry])))
+        foreach (var preset in Presets.Where(preset => preset.Value.Equals(name)))
         {
-            return (SingingTool.Library.Audio.ReverbPreset) entry;
+            return preset.Key;
         }
         return SingingTool.Library.Audio.ReverbPreset.NONE;
     }

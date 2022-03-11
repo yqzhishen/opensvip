@@ -178,6 +178,7 @@ public class SingingTrack: Track
         base.Decode(track);
         AISingerName = Singers.GetName(track.AISingerId);
         ReverbPreset = ReverbPresets.GetName(track.ReverbPreset);
+        Console.Write(ReverbPreset + ": " + track.ReverbPreset);
         foreach (var note in track.NoteList)
         {
             NoteList.Add(new Note().Decode(note));
@@ -248,7 +249,7 @@ public class Note
         KeyNumber = note.KeyIndex - 12;
         HeadTag = NoteHeadTags.GetName(note.HeadTag);
         Lyric = note.Lyric;
-        if (!note.Pronouncing.Equals(""))
+        if (!"".Equals(note.Pronouncing))
         {
             Pronunciation = note.Pronouncing;
         }
@@ -354,19 +355,34 @@ public class Vibrato
 
 public class Params
 {
-    public ParamLine Pitch { get; set; } = new ParamLine();
-    public ParamLine Volume { get; set; } = new ParamLine();
-    public ParamLine Breath { get; set; } = new ParamLine();
-    public ParamLine Gender { get; set; } = new ParamLine();
-    public ParamLine Strength { get; set; } = new ParamLine();
+    public ParamLine Pitch { get; set; } = new();
+    public ParamLine Volume { get; set; } = new();
+    public ParamLine Breath { get; set; } = new();
+    public ParamLine Gender { get; set; } = new();
+    public ParamLine Strength { get; set; } = new();
 
     public Params Decode(SingingTool.Model.SingingTrack track)
     {
-        Pitch.Decode(track.EditedPitchLine, op: x => x > 1050 ? x - 1150 : -100);
-        Volume.Decode(track.EditedVolumeLine);
-        Breath.Decode(track.EditedBreathLine);
-        Gender.Decode(track.EditedGenderLine);
-        Strength.Decode(track.EditedPowerLine);
+        if (track.EditedPitchLine != null)
+        {
+            Pitch.Decode(track.EditedPitchLine, op: x => x > 1050 ? x - 1150 : -100);
+        }
+        if (track.EditedVolumeLine != null)
+        {
+            Volume.Decode(track.EditedVolumeLine);
+        }
+        if (track.EditedBreathLine != null)
+        {
+            Breath.Decode(track.EditedBreathLine);
+        }
+        if (track.EditedGenderLine != null)
+        {
+            Gender.Decode(track.EditedGenderLine);
+        }
+        if (track.EditedPowerLine != null)
+        {
+            Strength.Decode(track.EditedPowerLine);
+        }
         return this;
     }
 
@@ -387,7 +403,7 @@ public class ParamLine
 {
     public int TotalPointsCount { get; set; }
     [JsonConverter(typeof(PointListJsonConverter))]
-    public List<Tuple<int, int>> PointList { get; set; } = new List<Tuple<int, int>>();
+    public List<Tuple<int, int>> PointList { get; set; } = new();
 
     public ParamLine Decode(
         SingingTool.Model.Line.LineParam line,

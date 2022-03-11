@@ -351,11 +351,16 @@ class OpenSvipParams:
         self.Strength: OpenSvipParamLine = OpenSvipParamLine()
 
     def decode(self, track: SingingTrack):
-        self.Pitch.decode(track.get_EditedPitchLine(), op=lambda x: x - 1150 if x > 1050 else -100)
-        self.Volume.decode(track.get_EditedVolumeLine())
-        self.Breath.decode(track.get_EditedBreathLine())
-        self.Gender.decode(track.get_EditedGenderLine())
-        self.Strength.decode(track.get_EditedPowerLine())
+        if track.get_EditedPitchLine() is not None:
+            self.Pitch.decode(track.get_EditedPitchLine(), op=lambda x: x - 1150 if x > 1050 else -100)
+        if track.get_EditedVolumeLine() is not None:
+            self.Volume.decode(track.get_EditedVolumeLine())
+        if track.get_EditedBreathLine() is not None:
+            self.Breath.decode(track.get_EditedBreathLine())
+        if track.get_EditedGenderLine() is not None:
+            self.Gender.decode(track.get_EditedGenderLine())
+        if track.get_EditedPowerLine() is not None:
+            self.Strength.decode(track.get_EditedPowerLine())
         return self
 
     def dedict(self, obj: dict):
