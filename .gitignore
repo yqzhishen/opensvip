@@ -9,7 +9,6 @@ __pycache__/
 # CSharp
 bin/
 obj/
-Properties/
 
 # Distribution / packaging
 .Python
@@ -65,7 +64,6 @@ coverage.xml
 
 # Visual Studio
 .vs/
-*.csproj
 
 # Django stuff:
 *.log
