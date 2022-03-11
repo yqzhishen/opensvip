@@ -243,7 +243,7 @@ public class Note
 
     public Note Decode(SingingTool.Model.Note note)
     {
-        StartPos = note.StartPos;
+        StartPos = note.ActualStartPos;
         Length = note.WidthPos;
         KeyNumber = note.KeyIndex - 12;
         HeadTag = NoteHeadTags.GetName(note.HeadTag);
@@ -267,8 +267,12 @@ public class Note
 
     public SingingTool.Model.Note Encode()
     {
-        var note = new SingingTool.Model.Note(StartPos, Length, KeyNumber + 12, Lyric)
+        var note = new SingingTool.Model.Note
         {
+            ActualStartPos = StartPos,
+            WidthPos = Length,
+            KeyIndex = KeyNumber + 12,
+            Lyric = Lyric,
             HeadTag = NoteHeadTags.GetIndex(HeadTag),
             Pronouncing = Pronunciation
         };
