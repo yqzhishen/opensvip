@@ -16,11 +16,7 @@ public class Project
 
     public List<TimeSignature> TimeSignatureList { get; set; } = new();
 
-    public List<Track> TrackList
-    {
-        get;
-        set;
-    } = new List<Track>();
+    public List<Track> TrackList { get; set; } = new();
 
     public Project Decode(string version, SingingTool.Model.AppModel model)
     {
@@ -170,17 +166,17 @@ public class Track
 [JsonConverter(typeof(TrackJsonConverter))]
 public class SingingTrack: Track
 {
-    public string AISingerId { get; set; } = "";
+    public string AISingerName { get; set; } = "";
     public string ReverbPreset { get; set; } = "";
-    public List<Note> NoteList { get; set; } = new List<Note>();
-    public Params EditedParams { get; set; } = new Params();
+    public List<Note> NoteList { get; set; } = new();
+    public Params EditedParams { get; set; } = new();
 
     public SingingTrack() : base("Singing") { }
 
     public SingingTrack Decode(SingingTool.Model.SingingTrack track)
     {
         base.Decode(track);
-        AISingerId = track.AISingerId;
+        AISingerName = Singers.GetName(track.AISingerId);
         ReverbPreset = ReverbPresets.GetName(track.ReverbPreset);
         foreach (var note in track.NoteList)
         {
@@ -193,7 +189,7 @@ public class SingingTrack: Track
     public override SingingTool.Model.ITrack Encode()
     {
         var track = (SingingTool.Model.SingingTrack) base.Encode();
-        track.AISingerId = AISingerId;
+        track.AISingerId = Singers.GetId(AISingerName);
         track.ReverbPreset = ReverbPresets.GetIndex(ReverbPreset);
         foreach (var note in NoteList)
         {
@@ -284,9 +280,9 @@ public class Note
         {
             return note;
         }
-        var tuple = Vibrato.Encode();
-        note.VibratoPercentInfo = tuple.Item1;
-        note.Vibrato = tuple.Item2;
+        var (percent, vibrato) = Vibrato.Encode();
+        note.VibratoPercentInfo = percent;
+        note.Vibrato = vibrato;
         return note;
     }
 }

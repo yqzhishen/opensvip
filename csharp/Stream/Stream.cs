@@ -46,7 +46,12 @@ public static class Json
     {
         var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
         var reader = new StreamReader(stream, Encoding.UTF8);
-        return JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
+        var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
+        stream.Close();
+        reader.Close();
+        stream.Dispose();
+        reader.Dispose();
+        return project;
     }
 
     public static void Dump(string path, Project project, bool indented = false)

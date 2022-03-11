@@ -52,6 +52,6 @@ def json_to_svip(input_path: str, output_path: str):
 
 
 if __name__ == '__main__':
-    svip_to_json('../test/黏黏黏黏.svip', 'test/黏黏黏黏.json', indent=2)
-    json_to_svip('../test/黏黏黏黏.json', 'test/out.svip')
+    svip_to_json('../test/黏黏黏黏.svip', '../test/黏黏黏黏.json', indent=2)
+    # json_to_svip('../test/测试.json', '../test/test.svip')
     pass

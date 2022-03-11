@@ -1,11 +1,53 @@
-﻿using System.Collections;
+﻿using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace OpenSvip.Const;
 
+public static class Singers
+{
+    private static readonly Dictionary<string, string> SingerNames;
+    static Singers()
+    {
+        var stream = new FileStream(@".\OpenSvip.Const.Singers.json", FileMode.Open, FileAccess.Read);
+        var reader = new StreamReader(stream, Encoding.UTF8);
+        SingerNames = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd());
+        stream.Close();
+        reader.Close();
+        stream.Dispose();
+        reader.Dispose();
+    }
+
+    public static string GetName(string id)
+    {
+        if (SingerNames[id] != null)
+        {
+            return SingerNames[id];
+        }
+        if (Regex.IsMatch(id, "[FM]\\d+"))
+        {
+            return "$(" + id + ")";
+        }
+        return "";
+    }
+
+    public static string GetId(string name)
+    {
+        foreach (var singer in SingerNames.Where(singer => singer.Value.Equals(name)))
+        {
+            return singer.Key;
+        }
+        return Regex.IsMatch(name, "\\$\\([FM]\\d+\\)") ? name.Substring(2, name.Length - 3) : "";
+    }
+}
+
 public static class ReverbPresets
 {
-    private static readonly Hashtable Presets = new Hashtable
+    private static readonly Hashtable Presets = new()
     {
         { SingingTool.Library.Audio.ReverbPreset.NONE, "干声" },
         { SingingTool.Library.Audio.ReverbPreset.DEFAULT, "浮光" },
@@ -50,14 +92,11 @@ public static class NoteHeadTags
 
     public static SingingTool.Model.NoteHeadTag GetIndex(string name)
     {
-        switch (name)
+        return name switch
         {
-            case "0":
-                return SingingTool.Model.NoteHeadTag.SilTag;
-            case "V":
-                return SingingTool.Model.NoteHeadTag.SpTag;
-            default:
-                return SingingTool.Model.NoteHeadTag.NoTag;
-        }
+            "0" => SingingTool.Model.NoteHeadTag.SilTag,
+            "V" => SingingTool.Model.NoteHeadTag.SpTag,
+            _ => SingingTool.Model.NoteHeadTag.NoTag
+        };
     }
 }

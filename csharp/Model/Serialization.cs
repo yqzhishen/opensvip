@@ -24,7 +24,7 @@ public class TrackJsonConverter : JsonConverter
         switch (track)
         {
             case SingingTrack singingTrack:
-                dict["AISingerId"] = singingTrack.AISingerId;
+                dict["AISingerName"] = singingTrack.AISingerName;
                 dict["ReverbPreset"] = singingTrack.ReverbPreset;
                 dict["NoteList"] = singingTrack.NoteList;
                 dict["EditedParams"] = singingTrack.EditedParams;
@@ -51,7 +51,7 @@ public class TrackJsonConverter : JsonConverter
             case "Singing":
                 track = new SingingTrack
                 {
-                    AISingerId = obj.Value<string>("AISingerId"),
+                    AISingerName = obj.Value<string>("AISingerName"),
                     ReverbPreset = obj.Value<string>("ReverbPreset"),
                     NoteList = obj.Value<JArray>("NoteList").ToObject<List<Note>>(),
                     EditedParams = obj.Value<JObject>("EditedParams").ToObject<Params>()
