@@ -12,7 +12,7 @@ public class TrackJsonConverter : JsonConverter
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {
         var track = (Track) value;
-        Dictionary<string, object> dict = new Dictionary<string, object>
+        var dict = new Dictionary<string, object>
         {
             {"Type", track.Type},
             {"Title", track.Title},
@@ -53,8 +53,8 @@ public class TrackJsonConverter : JsonConverter
                 {
                     AISingerName = obj.Value<string>("AISingerName"),
                     ReverbPreset = obj.Value<string>("ReverbPreset"),
-                    NoteList = obj.Value<JArray>("NoteList").ToObject<List<Note>>(),
-                    EditedParams = obj.Value<JObject>("EditedParams").ToObject<Params>()
+                    NoteList = obj.Value<JArray>("NoteList")?.ToObject<List<Note>>(),
+                    EditedParams = obj.Value<JObject>("EditedParams")?.ToObject<Params>()
                 };
                 break;
             case "Instrumental":
