@@ -24,7 +24,7 @@ public static class Singers
 
     public static string GetName(string id)
     {
-        if (SingerNames[id] != null)
+        if (SingerNames.ContainsKey(id))
         {
             return SingerNames[id];
         }
