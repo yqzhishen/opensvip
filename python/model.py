@@ -1,7 +1,6 @@
-from typing import List, Tuple, Union, Dict
+from typing import List, Tuple, Dict
 
 import clr
-
 from System.Collections.Generic import List as CSharpList
 
 clr.AddReference(r'C:\Users\YQ之神\AppData\Local\warp\packages\XStudioSinger_2.0.0_beta2.exe\SingingTool.Model.dll')
@@ -9,7 +8,7 @@ from SingingTool.Model import AppModel, ITrack, SingingTrack, InstrumentTrack, N
 from SingingTool.Model.SingingGeneralConcept import SongTempo, SongBeat
 from SingingTool.Model.Line import LineParam, LineParamNode
 
-from const import OpenSvipReverbPresets, OpenSvipNoteHeadTags
+from const import OpenSvipSingers, OpenSvipReverbPresets, OpenSvipNoteHeadTags
 
 
 class OpenSvipModel:
@@ -139,7 +138,7 @@ class OpenSvipTrack:
         self.Pan = obj['Pan']
         return self
 
-    def encode(self) -> Union[SingingTrack, InstrumentTrack]:
+    def encode(self) -> ITrack:
         if self.Type == 'Singing':
             track = SingingTrack()
         elif self.Type == 'Instrumental':
@@ -157,14 +156,14 @@ class OpenSvipTrack:
 class OpenSvipSingingTrack(OpenSvipTrack):
     def __init__(self):
         super().__init__('Singing')
-        self.AISingerId: str = ''
+        self.AISingerName: str = ''
         self.ReverbPreset: str = ''
         self.NoteList: List[OpenSvipNote] = []
         self.EditedParams: OpenSvipParams = OpenSvipParams()
 
     def decode(self, track: SingingTrack):
         super().decode(track)
-        self.AISingerId = track.get_AISingerId()
+        self.AISingerName = OpenSvipSingers.get_name(track.get_AISingerId())
         self.ReverbPreset = OpenSvipReverbPresets.get_name(track.get_ReverbPreset())
         for note in track.get_NoteList():
             self.NoteList.append(OpenSvipNote().decode(note))
@@ -173,7 +172,7 @@ class OpenSvipSingingTrack(OpenSvipTrack):
 
     def dedict(self, obj: dict):
         super().dedict(obj)
-        self.AISingerId = obj['AISingerId']
+        self.AISingerName = obj['AISingerName']
         self.ReverbPreset = obj['ReverbPreset']
         for ele in obj['NoteList']:
             self.NoteList.append(OpenSvipNote().dedict(ele))
@@ -182,7 +181,7 @@ class OpenSvipSingingTrack(OpenSvipTrack):
 
     def encode(self) -> SingingTrack:
         track = super().encode()
-        track.set_AISingerId(self.AISingerId)
+        track.set_AISingerId(OpenSvipSingers.get_id(self.AISingerName))
         track.set_ReverbPreset(OpenSvipReverbPresets.get_index(self.ReverbPreset))
         note_list = track.get_NoteList()
         for note in self.NoteList:

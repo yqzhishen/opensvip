@@ -1,3 +1,30 @@
+import json
+import re
+
+
+class OpenSvipSingers:
+    singers: dict
+    with open('OpenSvipSingers.json', 'r', encoding='utf-8') as f:
+        singers = json.load(f)
+
+    @staticmethod
+    def get_name(id_: str):
+        if id_ in OpenSvipSingers.singers:
+            return OpenSvipSingers.singers[id_]
+        if re.match(r'[FM]\d+', id_) is not None:
+            return f'$({id_})'
+        return ''
+
+    @staticmethod
+    def get_id(name: str):
+        for id_ in OpenSvipSingers.singers:
+            if OpenSvipSingers.singers[id_] == name:
+                return id_
+        if re.match(r'\$\([FM]\d+\)', name) is not None:
+            return name[2:-1]
+        return ''
+
+
 class OpenSvipReverbPresets:
     presets = {
         -1: '干声',
