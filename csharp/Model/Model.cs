@@ -68,12 +68,12 @@ public class Project
 public class SongTempo
 {
     public int Position { get; set; }
-    public double BPM { get; set; }
+    public float BPM { get; set; }
 
     public SongTempo Decode(SingingTool.Model.SingingGeneralConcept.SongTempo tempo)
     {
         Position = tempo.Pos;
-        BPM = tempo.Tempo / 100.0;
+        BPM = tempo.Tempo / 100.0f;
         return this;
     }
 
@@ -120,7 +120,7 @@ public class Track
 {
     public readonly string Type;
     public string Title { get; set; } = "";
-    public bool Muted { get; set; }
+    public bool Mute { get; set; }
     public bool Solo { get; set; }
     public double Volume { get; set; }
     public double Pan { get; set; }
@@ -133,7 +133,7 @@ public class Track
     protected Track Decode(SingingTool.Model.ITrack track)
     {
         Title = track.Name;
-        Muted = track.Mute;
+        Mute = track.Mute;
         Solo = track.Solo;
         Volume = track.Volume;
         Pan = track.Pan;
@@ -155,7 +155,7 @@ public class Track
                 return null;
         }
         track.Name = Title;
-        track.Mute = Muted;
+        track.Mute = Mute;
         track.Solo = Solo;
         track.Volume = Volume;
         track.Pan = Pan;

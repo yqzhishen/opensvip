@@ -16,7 +16,7 @@ public class TrackJsonConverter : JsonConverter
         {
             {"Type", track.Type},
             {"Title", track.Title},
-            {"Muted", track.Muted},
+            {"Mute", track.Mute},
             {"Solo", track.Solo},
             {"Volume", track.Volume},
             {"Pan", track.Pan}
@@ -68,7 +68,7 @@ public class TrackJsonConverter : JsonConverter
                 return null;
         }
         track.Title = obj.Value<string>("Title");
-        track.Muted = obj.Value<bool>("Muted");
+        track.Mute = obj.Value<bool>("Mute");
         track.Solo = obj.Value<bool>("Solo");
         track.Volume = obj.Value<double>("Volume");
         track.Pan = obj.Value<double>("Pan");

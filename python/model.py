@@ -116,14 +116,14 @@ class OpenSvipTrack:
     def __init__(self, ty):
         self.Type: str = ty
         self.Title: str = ''
-        self.Muted: bool = False
+        self.Mute: bool = False
         self.Solo: bool = False
         self.Volume: float = 0.
         self.Pan: float = 0.
 
     def decode(self, track: ITrack):
         self.Title = track.get_Name()
-        self.Muted = track.get_Mute()
+        self.Mute = track.get_Mute()
         self.Solo = track.get_Solo()
         self.Volume = track.get_Volume()
         self.Pan = track.get_Pan()
@@ -132,7 +132,7 @@ class OpenSvipTrack:
     def dedict(self, obj: dict):
         self.Type = obj['Type']
         self.Title = obj['Title']
-        self.Muted = obj['Muted']
+        self.Mute = obj['Mute']
         self.Solo = obj['Solo']
         self.Volume = obj['Volume']
         self.Pan = obj['Pan']
@@ -146,7 +146,7 @@ class OpenSvipTrack:
         else:
             return None
         track.set_Name(self.Title)
-        track.set_Mute(self.Muted)
+        track.set_Mute(self.Mute)
         track.set_Solo(self.Solo)
         track.set_Volume(self.Volume)
         track.set_Pan(self.Pan)
