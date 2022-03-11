@@ -178,7 +178,6 @@ public class SingingTrack: Track
         base.Decode(track);
         AISingerName = Singers.GetName(track.AISingerId);
         ReverbPreset = ReverbPresets.GetName(track.ReverbPreset);
-        Console.Write(ReverbPreset + ": " + track.ReverbPreset);
         foreach (var note in track.NoteList)
         {
             NoteList.Add(new Note().Decode(note));
