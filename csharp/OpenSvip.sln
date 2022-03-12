@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Console", "Console
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Stream", "Stream\OpenSvip.Stream.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Adapter", "Adapter\OpenSvip.Adapter.csproj", "{1A025CF4-6CE6-42F9-AD09-16E56D840D95}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A025CF4-6CE6-42F9-AD09-16E56D840D95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A025CF4-6CE6-42F9-AD09-16E56D840D95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A025CF4-6CE6-42F9-AD09-16E56D840D95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A025CF4-6CE6-42F9-AD09-16E56D840D95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

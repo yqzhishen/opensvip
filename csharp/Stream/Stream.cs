@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Model;
@@ -11,32 +9,16 @@ public static class Binary
 {
     public static Project Read(string path)
     {
-        var reader = new FileStream(path, FileMode.Open, FileAccess.Read);
-        var buffer = new byte[9];
-        reader.ReadByte();
-        reader.Read(buffer, 0, 4);
-        reader.ReadByte();
-        reader.Read(buffer, 4, 5);
-        var version = Encoding.Default.GetString(buffer);
-        var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(reader);
-        reader.Close();
-        reader.Dispose();
-        return new Project().Decode(version, model);
+        var converter = new BinarySvipConverter();
+        var model = converter.Load(path);
+        return converter.Parse(model);
     }
 
     public static void Write(string path, Project project)
     {
-        var (version, model) = project.Encode();
-        var buffer = Encoding.Default.GetBytes(version);
-        var writer = new FileStream(path, FileMode.Create, FileAccess.Write);
-        writer.WriteByte(4);
-        writer.Write(buffer, 0, 4);
-        writer.WriteByte(5);
-        writer.Write(buffer, 4, 5);
-        new BinaryFormatter().Serialize(writer, model);
-        writer.Flush();
-        writer.Close();
-        writer.Dispose();
+        var converter = new BinarySvipConverter();
+        var model = converter.Build(project);
+        converter.Save(path, model);
     }
 }
 

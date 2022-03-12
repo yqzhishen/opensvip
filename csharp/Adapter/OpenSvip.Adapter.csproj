@@ -4,15 +4,14 @@
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}</ProjectGuid>
+        <ProjectGuid>{1A025CF4-6CE6-42F9-AD09-16E56D840D95}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>OpenSvip.Stream</RootNamespace>
-        <AssemblyName>OpenSvip.Stream</AssemblyName>
+        <RootNamespace>Adapter</RootNamespace>
+        <AssemblyName>OpenSvip.Adapter</AssemblyName>
         <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>10</LangVersion>
-        <Nullable>disable</Nullable>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,17 +33,8 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-          <HintPath>..\.tmp\XStudioSinger\Newtonsoft.Json.dll</HintPath>
-        </Reference>
-        <Reference Include="SingingTool.Const, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\.tmp\XStudioSinger\SingingTool.Const.dll</HintPath>
-        </Reference>
-        <Reference Include="SingingTool.Library, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\.tmp\SingingTool.Library.dll</HintPath>
-        </Reference>
         <Reference Include="SingingTool.Model, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\.tmp\SingingTool.Model.dll</HintPath>
+          <HintPath>C:..\.tmp\SingingTool.Model.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -52,22 +42,14 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="BinarySvipConverter.cs" />
-        <Compile Include="Stream.cs" />
+        <Compile Include="Converter.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\Adapter\OpenSvip.Adapter.csproj">
-        <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
-        <Name>OpenSvip.Adapter</Name>
-      </ProjectReference>
       <ProjectReference Include="..\Model\OpenSvip.Model.csproj">
         <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="App.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
