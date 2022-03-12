@@ -318,8 +318,8 @@ public class Vibrato
     public float StartPercent { get; set; }
     public float EndPercent { get; set; }
     public bool IsAntiPhase { get; set; }
-    public ParamLine Amplitude { get; set; } = new ParamLine();
-    public ParamLine Frequency { get; set; } = new ParamLine();
+    public ParamLine Amplitude { get; set; } = new();
+    public ParamLine Frequency { get; set; } = new();
 
     public Vibrato Decode(SingingTool.Model.Note note)
     {
@@ -393,7 +393,7 @@ public class Params
     {
         return new Hashtable
         {
-            {"Pitch", Pitch.Encode(op: x => x > -100 ? x + 1150 : -100)},
+            {"Pitch", Pitch.Encode(op: x => x > -100 ? x + 1150 : -100, termination: -100)},
             {"Volume", Volume.Encode()},
             {"Breath", Breath.Encode()},
             {"Gender", Gender.Encode()},
@@ -428,29 +428,26 @@ public class ParamLine
         Func<int, int> op = null,
         int left = -192000,
         int right = 1073741823,
-        int @default = 0)
+        int termination = 0)
     {
         op ??= x => x;
         var line = new SingingTool.Model.Line.LineParam();
-        var length = Math.Max(0, Math.Min(TotalPointsCount, PointList.Count));
+        var length = PointList.Count;
         PointList.Sort((p1, p2) => p1.Item1 - p2.Item1);
-        for (var i = 0; i < length; i++)
+        foreach (var (pos, value) in PointList.Where(point => point.Item1 >= left && point.Item2 <= right))
         {
-            if (PointList[i].Item1 >= left && PointList[i].Item1 <= right)
-            {
-                line.PushBack(
-                    new SingingTool.Model.Line.LineParamNode(PointList[i].Item1, op(PointList[i].Item2)));
-            }
+            line.PushBack(new SingingTool.Model.Line.LineParamNode(pos, op(value)));
         }
         if (length == 0 || line.Begin.Value.Pos > left)
         {
-            line.PushFront(new SingingTool.Model.Line.LineParamNode(left, @default));
+            line.PushFront(new SingingTool.Model.Line.LineParamNode(left, termination));
         }
 
         if (length == 0 || line.Back.Pos < right)
         {
-            line.PushBack(new SingingTool.Model.Line.LineParamNode(right, @default));
+            line.PushBack(new SingingTool.Model.Line.LineParamNode(right, termination));
         }
+        TotalPointsCount = PointList.Count;
         return line;
     }
 }
