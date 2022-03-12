@@ -33,9 +33,6 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-        <Reference Include="SingingTool.Model, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>C:..\.tmp\SingingTool.Model.dll</HintPath>
-        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
