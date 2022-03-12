@@ -1,4 +1,6 @@
-﻿using CommandLine;
+﻿using System.Reflection;
+using CommandLine;
+using Microsoft.Win32;
 using OpenSvip.Model;
 using OpenSvip.Stream;
 
@@ -8,6 +10,7 @@ internal static class Application
 {
     public static void Main(string[] args)
     {
+        AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
         var results = Parser.Default.ParseArguments<Options>(args);
         if (results.Errors.Any())
         {
@@ -27,6 +30,24 @@ internal static class Application
             _ => throw new ArgumentException("当前仅支持 json 和 svip 格式。")
         };
         write(options.OutPath!, read(options.InPath!));
+    }
+
+    private static string FindLibrary()
+    {
+        var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
+        if (key == null)
+        {
+            throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。");
+        }
+        var value = key.GetValue("").ToString().Split('"')[1];
+        return value.Substring(0, value.Length - 18);
+    }
+
+    private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)
+    {
+        var path = FindLibrary();
+        var filename = args.Name.Split(',')[0];
+        return Assembly.LoadFile($@"{path}\{filename}.dll");
     }
 }
 
@@ -49,5 +70,4 @@ internal class Options
 
     [Option(Default = false, Required = false, HelpText = "是否输出带缩进格式的 JSON 文件")]
     public bool Indented { get; set; }
-    
 }

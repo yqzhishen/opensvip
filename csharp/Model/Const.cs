@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ public static class Singers
     private static readonly Dictionary<string, string> SingerNames;
     static Singers()
     {
-        var stream = new FileStream(@".\OpenSvip.Const.Singers.json", FileMode.Open, FileAccess.Read);
+        var stream = new FileStream(AppDomain.CurrentDomain.BaseDirectory + "OpenSvip.Const.Singers.json", FileMode.Open, FileAccess.Read);
         var reader = new StreamReader(stream, Encoding.UTF8);
         SingerNames = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd());
         stream.Close();
@@ -29,7 +30,7 @@ public static class Singers
         }
         if (Regex.IsMatch(id, "[FM]\\d+"))
         {
-            return "$(" + id + ")";
+            return $"$({id})";
         }
         return "";
     }
