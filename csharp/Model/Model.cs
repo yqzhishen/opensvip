@@ -318,8 +318,8 @@ public class Vibrato
     public float StartPercent { get; set; }
     public float EndPercent { get; set; }
     public bool IsAntiPhase { get; set; }
-    public ParamLine Amplitude { get; set; } = new();
-    public ParamLine Frequency { get; set; } = new();
+    public ParamCurve Amplitude { get; set; } = new();
+    public ParamCurve Frequency { get; set; } = new();
 
     public Vibrato Decode(SingingTool.Model.Note note)
     {
@@ -358,11 +358,11 @@ public class Vibrato
 
 public class Params
 {
-    public ParamLine Pitch { get; set; } = new();
-    public ParamLine Volume { get; set; } = new();
-    public ParamLine Breath { get; set; } = new();
-    public ParamLine Gender { get; set; } = new();
-    public ParamLine Strength { get; set; } = new();
+    public ParamCurve Pitch { get; set; } = new();
+    public ParamCurve Volume { get; set; } = new();
+    public ParamCurve Breath { get; set; } = new();
+    public ParamCurve Gender { get; set; } = new();
+    public ParamCurve Strength { get; set; } = new();
 
     public Params Decode(SingingTool.Model.SingingTrack track)
     {
@@ -402,13 +402,13 @@ public class Params
     }
 }
 
-public class ParamLine
+public class ParamCurve
 {
     public int TotalPointsCount { get; set; }
     [JsonConverter(typeof(PointListJsonConverter))]
     public List<Tuple<int, int>> PointList { get; set; } = new();
 
-    public ParamLine Decode(
+    public ParamCurve Decode(
         SingingTool.Model.Line.LineParam line,
         Func<int, int> op = null)
     {
@@ -447,7 +447,7 @@ public class ParamLine
         {
             line.PushBack(new SingingTool.Model.Line.LineParamNode(right, termination));
         }
-        TotalPointsCount = PointList.Count;
+        TotalPointsCount = line.Length();
         return line;
     }
 }

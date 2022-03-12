@@ -205,7 +205,6 @@ class OpenSvipInstrumentalTrack(OpenSvipTrack):
         super().decode(track)
         self.AudioFilePath = track.get_InstrumentFilePath()
         self.Offset = track.get_OffsetInPos()
-        # self.SampleRate: float = 0.
         return self
 
     def dedict(self, obj: dict):
@@ -306,8 +305,8 @@ class OpenSvipVibrato:
         self.StartPercent: float = 0.
         self.EndPercent: float = 0.
         self.IsAntiPhase: bool = False
-        self.Amplitude: OpenSvipParamLine = OpenSvipParamLine()
-        self.Frequency: OpenSvipParamLine = OpenSvipParamLine()
+        self.Amplitude: OpenSvipParamCurve = OpenSvipParamCurve()
+        self.Frequency: OpenSvipParamCurve = OpenSvipParamCurve()
 
     def decode(self, note: Note):
         percent = note.get_VibratoPercentInfo()
@@ -344,11 +343,11 @@ class OpenSvipVibrato:
 
 class OpenSvipParams:
     def __init__(self):
-        self.Pitch: OpenSvipParamLine = OpenSvipParamLine()
-        self.Volume: OpenSvipParamLine = OpenSvipParamLine()
-        self.Breath: OpenSvipParamLine = OpenSvipParamLine()
-        self.Gender: OpenSvipParamLine = OpenSvipParamLine()
-        self.Strength: OpenSvipParamLine = OpenSvipParamLine()
+        self.Pitch: OpenSvipParamCurve = OpenSvipParamCurve()
+        self.Volume: OpenSvipParamCurve = OpenSvipParamCurve()
+        self.Breath: OpenSvipParamCurve = OpenSvipParamCurve()
+        self.Gender: OpenSvipParamCurve = OpenSvipParamCurve()
+        self.Strength: OpenSvipParamCurve = OpenSvipParamCurve()
 
     def decode(self, track: SingingTrack):
         if track.get_EditedPitchLine() is not None:
@@ -381,7 +380,7 @@ class OpenSvipParams:
         }
 
 
-class OpenSvipParamLine:
+class OpenSvipParamCurve:
     def __init__(self):
         self.TotalPointsCount: int = 0
         self.PointList: List[Tuple[int]] = []
@@ -403,9 +402,9 @@ class OpenSvipParamLine:
 
     def encode(self, op=lambda x: x, left=-192000, right=1073741823, default=0) -> LineParam:
         line = LineParam()
-        length = max(0, min(self.TotalPointsCount, len(self.PointList)))
-        points = sorted(self.PointList, key=lambda x: x[0])[:length]
-        for p in points:
+        length = len(self.PointList)
+        self.PointList = sorted(self.PointList, key=lambda x: x[0])
+        for p in self.PointList:
             if left <= p[0] <= right:
                 node = LineParamNode()
                 node.set_Pos(p[0])
@@ -421,4 +420,5 @@ class OpenSvipParamLine:
             bound.set_Pos(right)
             bound.set_Value(default)
             line.PushBack(bound)
+        self.TotalPointsCount = line.Length()
         return line
