@@ -1,23 +1,16 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using OpenSvip.Adapter;
+using Microsoft.Win32;
+using OpenSvip.Framework;
 using OpenSvip.Model;
 
 namespace OpenSvip.Stream
 {
     public class BinarySvipConverter : IProjectConverter
     {
-        public string Version { get; set; } = "SVIP" + SingingTool.Const.ToolConstValues.ProjectVersion;
-        
-        public BinarySvipConverter() { }
-
-        public BinarySvipConverter(string version)
-        {
-            Version = version;
-        }
-        
         public Project Load(string path)
         {
             var reader = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -26,18 +19,17 @@ namespace OpenSvip.Stream
             reader.Read(buffer, 0, 4);
             reader.ReadByte();
             reader.Read(buffer, 4, 5);
-            Version = Encoding.Default.GetString(buffer);
+            var version = Encoding.Default.GetString(buffer);
             var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(reader);
             reader.Close();
             reader.Dispose();
-            return new Project().Decode(Version, model);
+            return new BinarySvipDecoder().DecodeProject(version, model);
         }
 
         public void Save(string path, Project project)
         {
-            var (version, model) = project.Encode();
-            Version = version;
-            var buffer = Encoding.Default.GetBytes(Version);
+            var (version, model) = new BinarySvipEncoder().EncodeProject(project);
+            var buffer = Encoding.Default.GetBytes(version);
             var writer = new FileStream(path, FileMode.Create, FileAccess.Write);
             writer.WriteByte(4);
             writer.Write(buffer, 0, 4);
@@ -48,10 +40,28 @@ namespace OpenSvip.Stream
             writer.Close();
             writer.Dispose();
         }
-
-        public void Reset()
+        
+        static BinarySvipConverter()
         {
-            Version = "SVIP" + SingingTool.Const.ToolConstValues.ProjectVersion;
+            AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
+        }
+        
+        private static string FindLibrary()
+        {
+            var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
+            if (key == null)
+            {
+                throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。");
+            }
+            var value = key.GetValue("").ToString().Split('"')[1];
+            return value.Substring(0, value.Length - 18);
+        }
+
+        private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            var path = FindLibrary();
+            var filename = args.Name.Split(',')[0];
+            return Assembly.LoadFile($@"{path}\{filename}.dll");
         }
     }
 }

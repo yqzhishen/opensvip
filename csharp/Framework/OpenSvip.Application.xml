@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application ArtifactId="OpenSVIP" Version="beta9" Url="https://github.com/yqzhishen/opensvip">
+    
+    <Plugins>
+        
+        <Plugin>
+            <Name>BinarySvip</Name>
+            <Version>1.0.0</Version>
+            <Identifier>svip</Identifier>
+            <Format>X Studio 工程文件</Format>
+            <Suffix>svip</Suffix>
+            <Descriptions>原始二进制 .svip 文件转换插件。</Descriptions>
+            <Author>YQ之神</Author>
+            <HomePage>https://space.bilibili.com/102844209</HomePage>
+            <LibraryPath>OpenSvip\OpenSvip.Stream.dll</LibraryPath>
+            <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
+        </Plugin>
+        
+        <Plugin>
+            <Name>JsonSvip</Name>
+            <Version>1.0.0</Version>
+            <Identifier>json</Identifier>
+            <Format>OpenSVIP 文件</Format>
+            <Suffix>json</Suffix>
+            <Descriptions>OpenSVIP Model 的 JSON 格式转换插件。</Descriptions>
+            <Author>YQ之神</Author>
+            <HomePage>https://space.bilibili.com/102844209</HomePage>
+            <LibraryPath>OpenSvip\OpenSvip.Stream.dll</LibraryPath>
+            <Converter>OpenSvip.Stream.JsonSvipConverter</Converter>
+            <Options>
+                <Option Name="indented" Type="bool" Default="false"/>
+            </Options>
+        </Plugin>
+        
+    </Plugins>
+    
+</Application>

@@ -1,6 +1,6 @@
 ﻿using OpenSvip.Model;
 
-namespace OpenSvip.Adapter
+namespace OpenSvip.Framework
 {
     /// <summary>
     /// OpenSVIP Framework 核心接口。所有工程格式的转换器实现本接口并接入框架后，可与 OpenSVIP Model 互相转换。

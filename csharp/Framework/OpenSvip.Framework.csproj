@@ -7,8 +7,8 @@
         <ProjectGuid>{1A025CF4-6CE6-42F9-AD09-16E56D840D95}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>Adapter</RootNamespace>
-        <AssemblyName>OpenSvip.Adapter</AssemblyName>
+        <RootNamespace>OpenSvip.Framework</RootNamespace>
+        <AssemblyName>OpenSvip.Framework</AssemblyName>
         <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>7.3</LangVersion>
@@ -39,7 +39,11 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="ApplicationInfo.cs" />
+        <Compile Include="Option.cs" />
+        <Compile Include="Plugin.cs" />
         <Compile Include="IProjectConverter.cs" />
+        <Compile Include="PluginManager.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
@@ -47,6 +51,11 @@
         <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="OpenSvip.Application.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

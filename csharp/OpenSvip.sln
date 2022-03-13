@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Console", "Console
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Stream", "Stream\OpenSvip.Stream.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Adapter", "Adapter\OpenSvip.Adapter.csproj", "{1A025CF4-6CE6-42F9-AD09-16E56D840D95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Framework", "Framework\OpenSvip.Framework.csproj", "{1A025CF4-6CE6-42F9-AD09-16E56D840D95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

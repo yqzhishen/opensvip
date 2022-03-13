@@ -10,12 +10,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Model\OpenSvip.Model.csproj" />
-      <ProjectReference Include="..\Stream\OpenSvip.Stream.csproj" />
+      <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
+      <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using Newtonsoft.Json;
-using OpenSvip.Adapter;
+using OpenSvip.Framework;
 using OpenSvip.Model;
 
 namespace OpenSvip.Stream
