@@ -7,7 +7,7 @@ using OpenSvip.Model;
 
 namespace OpenSvip.Stream
 {
-    public class BinarySvipConverter : IProjectConverter<SingingTool.Model.AppModel>
+    public class BinarySvipConverter : IProjectConverter
     {
         public string Version { get; set; } = "SVIP" + SingingTool.Const.ToolConstValues.ProjectVersion;
         
@@ -18,7 +18,7 @@ namespace OpenSvip.Stream
             Version = version;
         }
         
-        public SingingTool.Model.AppModel Load(string path)
+        public Project Load(string path)
         {
             var reader = new FileStream(path, FileMode.Open, FileAccess.Read);
             var buffer = new byte[9];
@@ -30,11 +30,13 @@ namespace OpenSvip.Stream
             var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(reader);
             reader.Close();
             reader.Dispose();
-            return model;
+            return new Project().Decode(Version, model);
         }
 
-        public void Save(string path, SingingTool.Model.AppModel model)
+        public void Save(string path, Project project)
         {
+            var (version, model) = project.Encode();
+            Version = version;
             var buffer = Encoding.Default.GetBytes(Version);
             var writer = new FileStream(path, FileMode.Create, FileAccess.Write);
             writer.WriteByte(4);
@@ -45,18 +47,6 @@ namespace OpenSvip.Stream
             writer.Flush();
             writer.Close();
             writer.Dispose();
-        }
-
-        public Project Parse(SingingTool.Model.AppModel model)
-        {
-            return new Project().Decode(Version, model);
-        }
-
-        public SingingTool.Model.AppModel Build(Project project)
-        {
-            var (version, model) = project.Encode();
-            Version = version;
-            return model;
         }
 
         public void Reset()

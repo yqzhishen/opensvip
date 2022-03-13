@@ -1,30 +1,23 @@
 ﻿using System.IO;
 using System.Text;
 using Newtonsoft.Json;
+using OpenSvip.Adapter;
 using OpenSvip.Model;
 
 namespace OpenSvip.Stream
 {
-    public static class Binary
+    public class JsonSvipConverter : IProjectConverter
     {
-        public static Project Read(string path)
+        public bool Indented { get; set; }
+        
+        public JsonSvipConverter() { }
+
+        public JsonSvipConverter(bool indented)
         {
-            var converter = new BinarySvipConverter();
-            var model = converter.Load(path);
-            return converter.Parse(model);
+            Indented = indented;
         }
 
-        public static void Write(string path, Project project)
-        {
-            var converter = new BinarySvipConverter();
-            var model = converter.Build(project);
-            converter.Save(path, model);
-        }
-    }
-
-    public static class Json
-    {
-        public static Project Load(string path)
+        public Project Load(string path)
         {
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new StreamReader(stream, new UTF8Encoding(false));
@@ -36,13 +29,13 @@ namespace OpenSvip.Stream
             return project;
         }
 
-        public static void Dump(string path, Project project, bool indented = false)
+        public void Save(string path, Project project)
         {
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
             var settings = new JsonSerializerSettings
             {
-                Formatting = indented ? Formatting.Indented : Formatting.None,
+                Formatting = Indented ? Formatting.Indented : Formatting.None,
                 ReferenceLoopHandling = ReferenceLoopHandling.Error
             };
             writer.Write(JsonConvert.SerializeObject(project, settings));

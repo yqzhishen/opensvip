@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using CommandLine;
 using Microsoft.Win32;
-using OpenSvip.Model;
+using OpenSvip.Adapter;
 using OpenSvip.Stream;
 
 namespace OpenSvip.Console
@@ -20,31 +20,30 @@ namespace OpenSvip.Console
                 Environment.Exit(1);
             }
             var options = results.Value;
-            Func<string, Project> read;
+            IProjectConverter inputConverter, outputConverter;
             switch (options.InType)
             {
                 case "json":
-                    read = Json.Load;
+                    inputConverter = new JsonSvipConverter();
                     break;
                 case "svip":
-                    read = Binary.Read;
+                    inputConverter = new BinarySvipConverter();
                     break;
                 default:
                     throw new ArgumentException("当前仅支持 json 和 svip 格式。");
             }
-            Action<string, Project> write;
             switch (options.OutType)
             {
                 case "json":
-                    write = (s, p) => Json.Dump(s, p, options.Indented);
+                    outputConverter = new JsonSvipConverter(options.Indented);
                     break;
                 case "svip":
-                    write = Binary.Write;
+                    outputConverter = new BinarySvipConverter();
                     break;
                 default:
                     throw new ArgumentException("当前仅支持 json 和 svip 格式。");
             }
-            write(options.OutPath, read(options.InPath));
+            outputConverter.Save(options.OutPath, inputConverter.Load(options.InPath));
         }
 
         private static string FindLibrary()
@@ -66,7 +65,6 @@ namespace OpenSvip.Console
         }
     }
 
-    // ReSharper disable once ClassNeverInstantiated.Global
     internal class Options
     {
         [Option('i', "input-type", Required = true,
@@ -86,5 +84,4 @@ namespace OpenSvip.Console
         [Option(Default = false, Required = false, HelpText = "是否输出带缩进格式的 JSON 文件")]
         public bool Indented { get; set; }
     }
-
 }

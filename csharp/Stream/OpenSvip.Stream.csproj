@@ -53,7 +53,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="BinarySvipConverter.cs" />
-        <Compile Include="Stream.cs" />
+        <Compile Include="JsonSvipConverter.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
