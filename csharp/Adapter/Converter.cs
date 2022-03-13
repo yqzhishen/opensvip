@@ -1,14 +1,15 @@
 ﻿using OpenSvip.Model;
 
-namespace OpenSvip.Adapter;
-
-public interface IProjectConverter<T>
+namespace OpenSvip.Adapter
 {
-    public T Load(string path);
+    public interface IProjectConverter<T>
+    {
+        T Load(string path);
 
-    public void Save(string path, T model);
+        void Save(string path, T model);
+        
+        Project Parse(T model);
 
-    public Project Parse(T model);
-
-    public T Build(Project project);
+        T Build(Project project);
+    }
 }
