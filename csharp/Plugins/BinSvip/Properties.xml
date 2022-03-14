@@ -4,11 +4,16 @@
     <Version>1.0.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
-    <Descriptions>原始二进制 .svip 文件转换插件。</Descriptions>
-    <Requirements>系统上需要安装 X Studio 2.0 及以上版本，并设置为 .svip 文件默认打开方式。</Requirements>
+    <Descriptions>
+        原始二进制 .svip 文件转换插件。
+        若要指定歌手编号与名称的转换关系，或添加拥有编号但未公开发行的歌手，请修改 OpenSvip.Const.Singers.json。
+    </Descriptions>
+    <Requirements>系统上需要安装 X Studio 2.0 或更高版本，且设置为 .svip 文件默认打开方式。</Requirements>
     <Format>X Studio 工程文件</Format>
     <Suffix>svip</Suffix>
     <Identifier>svip</Identifier>
     <LibraryPath>BinSvip\Plugin.BinarySvip.dll</LibraryPath>
     <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
+    <InputOptions/>
+    <OutputOptions/>
 </Plugin>

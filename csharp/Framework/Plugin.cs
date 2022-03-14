@@ -18,6 +18,7 @@ namespace OpenSvip.Framework
         public string Identifier { get; set; }
         public string LibraryPath { get; set; }
         public string Converter { get; set; }
-        public Option[] Options { get; set; }
+        public Option[] InputOptions { get; set; } = Array.Empty<Option>();
+        public Option[] OutputOptions { get; set; } = Array.Empty<Option>();
     }
 }

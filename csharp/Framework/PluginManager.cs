@@ -17,20 +17,26 @@ namespace OpenSvip.Framework
         {
             foreach (var pluginDir in Directory.GetDirectories(PluginPath))
             {
+                var propertiesPath = Path.Combine(pluginDir, "Properties.xml");
+                if (!File.Exists(propertiesPath))
+                {
+                    continue;
+                }
+                var stream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read);
+                var reader = new StreamReader(stream, new UTF8Encoding(false));
                 try
                 {
-                    var stream = new FileStream(Path.Combine(pluginDir, "Properties.xml"), FileMode.Open, FileAccess.Read);
-                    var reader = new StreamReader(stream, new UTF8Encoding(false));
                     var plugin = (Plugin) new XmlSerializer(typeof(Plugin)).Deserialize(reader);
-                    stream.Close();
-                    reader.Close();
-                    stream.Dispose();
-                    reader.Dispose();
                     Plugins[plugin.Identifier] = plugin;
                 }
                 catch (Exception)
                 {
                     // ignored
+                }
+                finally
+                {
+                    stream.Close();
+                    reader.Close();
                 }
             }
         }
@@ -38,7 +44,7 @@ namespace OpenSvip.Framework
         public static IProjectConverter GetConverter(string identifier)
         {
             var plugin = GetPluginProperties(identifier);
-            var assembly = Assembly.LoadFile(PluginPath + plugin.LibraryPath);
+            var assembly = Assembly.LoadFile(Path.Combine(PluginPath, plugin.LibraryPath));
             var type = assembly.GetType(plugin.Converter);
             return (IProjectConverter) Activator.CreateInstance(type);
         }

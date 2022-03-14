@@ -11,9 +11,10 @@
     <Identifier>json</Identifier>
     <LibraryPath>JsonSvip\Plugin.JsonSvip.dll</LibraryPath>
     <Converter>OpenSvip.Stream.JsonSvipConverter</Converter>
-    <Options>
+    <InputOptions/>
+    <OutputOptions>
         <Option Name="indented" Type="bool" Default="false">
             <Notes>是否生成带缩进格式的 JSON 文件</Notes>
         </Option>
-    </Options>
+    </OutputOptions>
 </Plugin>
