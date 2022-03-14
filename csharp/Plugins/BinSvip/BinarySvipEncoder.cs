@@ -161,7 +161,7 @@ namespace OpenSvip.Stream
             var line = new SingingTool.Model.Line.LineParam();
             var length = paramCurve.PointList.Count;
             paramCurve.PointList.Sort((p1, p2) => p1.Item1 - p2.Item1);
-            foreach (var (pos, value) in paramCurve.PointList.Where(point => point.Item1 >= left && point.Item2 <= right))
+            foreach (var (pos, value) in paramCurve.PointList.Where(point => point.Item1 >= left && point.Item1 <= right))
             {
                 line.PushBack(new SingingTool.Model.Line.LineParamNode(pos, op(value)));
             }
@@ -176,7 +176,6 @@ namespace OpenSvip.Stream
             }
             paramCurve.TotalPointsCount = line.Length();
             return line;
-
         }
     }
 }
