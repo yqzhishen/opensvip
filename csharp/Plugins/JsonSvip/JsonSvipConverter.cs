@@ -24,8 +24,6 @@ namespace OpenSvip.Stream
             var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            stream.Dispose();
-            reader.Dispose();
             return project;
         }
 
@@ -43,8 +41,6 @@ namespace OpenSvip.Stream
             stream.Flush();
             writer.Close();
             stream.Close();
-            writer.Dispose();
-            stream.Dispose();
         }
     }
 }

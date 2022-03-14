@@ -22,7 +22,6 @@ namespace OpenSvip.Stream
             var version = Encoding.Default.GetString(buffer);
             var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(reader);
             reader.Close();
-            reader.Dispose();
             return new BinarySvipDecoder().DecodeProject(version, model);
         }
 
@@ -38,7 +37,6 @@ namespace OpenSvip.Stream
             new BinaryFormatter().Serialize(writer, model);
             writer.Flush();
             writer.Close();
-            writer.Dispose();
         }
         
         static BinarySvipConverter()
