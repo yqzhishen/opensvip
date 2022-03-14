@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using OpenSvip.Const;
 using OpenSvip.Model;
 
@@ -131,10 +132,12 @@ namespace OpenSvip.Stream
             {
                 IsAntiPhase = vibrato.IsAntiPhase
             };
-            style.AmpLine.ReplaceParamNodesInPosRange(-1, 100001,
-                EncodeParamCurve(vibrato.Amplitude, left: -1, right: 100001));
-            style.FreqLine.ReplaceParamNodesInPosRange(-1, 100001,
-                EncodeParamCurve(vibrato.Frequency, left: -1, right: 100001));
+            const BindingFlags flag = BindingFlags.Instance | BindingFlags.Public;
+            var type = style.GetType();
+            var ampLine = type.GetProperty("AmpLine", flag);
+            var freqLine = type.GetProperty("FreqLine", flag);
+            ampLine?.SetValue(style, EncodeParamCurve(vibrato.Amplitude, left: -1, right: 100001), null);
+            freqLine?.SetValue(style, EncodeParamCurve(vibrato.Frequency, left: -1, right: 100001), null);
             return new Tuple<SingingTool.Model.VibratoPercentInfo, SingingTool.Model.VibratoStyle>(percent, style);
         }
         
