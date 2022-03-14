@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>JsonSvip</Name>
+    <Version>1.0.0</Version>
+    <Author>YQ之神</Author>
+    <HomePage>https://space.bilibili.com/102844209</HomePage>
+    <Format>OpenSVIP 文件</Format>
+    <Suffix>json</Suffix>
+    <Descriptions>OpenSVIP Model 的 JSON 格式转换插件。</Descriptions>
+    <Identifier>json</Identifier>
+    <LibraryPath>JsonSvip\Plugin.JsonSvip.dll</LibraryPath>
+    <Converter>OpenSvip.Stream.JsonSvipConverter</Converter>
+    <Options>
+        <Option Name="indented" Type="bool" Default="false">
+            <Notes>是否生成带缩进格式的 JSON 文件</Notes>
+        </Option>
+    </Options>
+</Plugin>

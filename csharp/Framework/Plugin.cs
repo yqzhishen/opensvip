@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 namespace OpenSvip.Framework
 {
     [Serializable]
-    [XmlType("Plugin")]
+    [XmlRoot("Plugin")]
     public class Plugin
     {
         public string Name { get; set; }

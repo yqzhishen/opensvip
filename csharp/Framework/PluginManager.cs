@@ -1,33 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace OpenSvip.Framework
 {
     public static class PluginManager
     {
-
-        private static readonly string PluginPath = AppDomain.CurrentDomain.BaseDirectory + @"Plugins\";
+        private static readonly string PluginPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\");
 
         private static readonly Dictionary<string, Plugin> Plugins = new Dictionary<string, Plugin>();
-        
+
         static PluginManager()
         {
-            foreach (var plugin in ApplicationInfo.Application.Plugins)
+            foreach (var pluginDir in Directory.GetDirectories(PluginPath))
             {
-                Plugins[plugin.Identifier] = plugin;
+                try
+                {
+                    var stream = new FileStream(Path.Combine(pluginDir, "Properties.xml"), FileMode.Open, FileAccess.Read);
+                    var reader = new StreamReader(stream, new UTF8Encoding(false));
+                    var plugin = (Plugin) new XmlSerializer(typeof(Plugin)).Deserialize(reader);
+                    stream.Close();
+                    reader.Close();
+                    stream.Dispose();
+                    reader.Dispose();
+                    Plugins[plugin.Identifier] = plugin;
+                }
+                catch (Exception)
+                {
+                    // ignored
+                }
             }
         }
-        
+
         public static IProjectConverter GetConverter(string identifier)
         {
-            var plugin = GetPlugin(identifier);
+            var plugin = GetPluginProperties(identifier);
             var assembly = Assembly.LoadFile(PluginPath + plugin.LibraryPath);
             var type = assembly.GetType(plugin.Converter);
             return (IProjectConverter) Activator.CreateInstance(type);
         }
 
-        public static Plugin GetPlugin(string identifier)
+        public static Plugin GetPluginProperties(string identifier)
         {
             if (!Plugins.ContainsKey(identifier))
             {
