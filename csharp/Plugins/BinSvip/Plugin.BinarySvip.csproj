@@ -37,9 +37,6 @@
         <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
           <HintPath>..\.tmp\XStudioSinger\Newtonsoft.Json.dll</HintPath>
         </Reference>
-        <Reference Include="SingingTool.Const, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\.tmp\XStudioSinger\SingingTool.Const.dll</HintPath>
-        </Reference>
         <Reference Include="SingingTool.Library, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\.tmp\SingingTool.Library.dll</HintPath>
         </Reference>
@@ -48,8 +45,6 @@
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
-        <Reference Include="System.Data" />
-        <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
         <Compile Include="BinarySvipConverter.cs" />
