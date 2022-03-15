@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
@@ -43,19 +44,24 @@ namespace OpenSvip.Framework
 
         public static IProjectConverter GetConverter(string identifier)
         {
-            var plugin = GetPluginProperties(identifier);
+            var plugin = GetPlugin(identifier);
             var assembly = Assembly.LoadFile(Path.Combine(PluginPath, plugin.LibraryPath));
             var type = assembly.GetType(plugin.Converter);
             return (IProjectConverter) Activator.CreateInstance(type);
         }
 
-        public static Plugin GetPluginProperties(string identifier)
+        public static Plugin GetPlugin(string identifier)
         {
             if (!Plugins.ContainsKey(identifier))
             {
                 throw new ArgumentException("找不到标识符所对应的转换插件。");
             }
             return Plugins[identifier];
+        }
+
+        public static Plugin[] GetAllPlugins()
+        {
+            return Array.ConvertAll(Plugins.ToArray(), kv => kv.Value);
         }
     }
 }

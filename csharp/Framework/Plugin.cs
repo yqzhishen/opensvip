@@ -7,18 +7,31 @@ namespace OpenSvip.Framework
     [XmlRoot("Plugin")]
     public class Plugin
     {
+        [XmlElement]
         public string Name { get; set; }
+        [XmlElement]
         public string Version { get; set; }
+        [XmlElement]
         public string Author { get; set; }
+        [XmlElement]
         public string HomePage { get; set; }
-        public string Description { get; set; }
+        [XmlElement]
+        public string Descriptions { get; set; }
+        [XmlElement]
         public string Requirements { get; set; }
+        [XmlElement]
         public string Format { get; set; }
+        [XmlElement]
         public string Suffix { get; set; }
+        [XmlElement]
         public string Identifier { get; set; }
+        [XmlElement]
         public string LibraryPath { get; set; }
+        [XmlElement]
         public string Converter { get; set; }
+        [XmlArray]
         public Option[] InputOptions { get; set; } = Array.Empty<Option>();
+        [XmlArray]
         public Option[] OutputOptions { get; set; } = Array.Empty<Option>();
     }
 }

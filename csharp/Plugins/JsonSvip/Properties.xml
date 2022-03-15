@@ -13,8 +13,8 @@
     <Converter>OpenSvip.Stream.JsonSvipConverter</Converter>
     <InputOptions/>
     <OutputOptions>
-        <Option Name="indented" Type="bool" Default="false">
-            <Notes>是否生成带缩进格式的 JSON 文件</Notes>
+        <Option Name="indented" Type="boolean" Default="false">
+            <Notes>生成带缩进格式的 JSON 文件</Notes>
         </Option>
     </OutputOptions>
 </Plugin>

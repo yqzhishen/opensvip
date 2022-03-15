@@ -38,6 +38,8 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Choice.cs" />
+        <Compile Include="ConverterOptions.cs" />
         <Compile Include="Option.cs" />
         <Compile Include="Plugin.cs" />
         <Compile Include="IProjectConverter.cs" />

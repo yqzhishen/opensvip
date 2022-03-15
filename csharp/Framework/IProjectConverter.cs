@@ -11,14 +11,16 @@ namespace OpenSvip.Framework
         /// 读取目标工程文件并转换为 OpenSVIP Model 对象。
         /// </summary>
         /// <param name="path">文件路径</param>
+        /// <param name="options">输入转换选项</param>
         /// <returns>目标格式对象</returns>
-        Project Load(string path);
+        Project Load(string path, ConverterOptions options);
 
         /// <summary>
         /// 将 OpenSVIP Model 对象转换并保存为目标格式工程文件。
         /// </summary>
         /// <param name="path">文件路径</param>
         /// <param name="project">OpenSVIP Model 对象</param>
-        void Save(string path, Project project);
+        /// <param name="options">输出转换选项</param>
+        void Save(string path, Project project, ConverterOptions options);
     }
 }

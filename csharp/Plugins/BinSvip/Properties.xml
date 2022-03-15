@@ -4,9 +4,7 @@
     <Version>1.0.2</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
-    <Descriptions>
-        原始二进制 .svip 文件转换插件。
-        若要指定歌手编号与名称的转换关系，或添加拥有编号但未公开发行的歌手，请修改 OpenSvip.Const.Singers.json。
+    <Descriptions>原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，&#x000A;请修改 OpenSvip.Const.Singers.json。
     </Descriptions>
     <Requirements>系统上需要安装 X Studio 2.0 或更高版本，且设置为 .svip 文件默认打开方式。</Requirements>
     <Format>X Studio 工程文件</Format>
@@ -15,5 +13,13 @@
     <LibraryPath>BinSvip\Plugin.BinarySvip.dll</LibraryPath>
     <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
     <InputOptions/>
-    <OutputOptions/>
+    <OutputOptions>
+        <Option Name="version" Type="enum">
+            <Notes>指定生成的 .svip 文件版本</Notes>
+            <EnumChoices>
+                <Choice Name="SVIP 7.0.0 (X Studio 2.0)" Tag="7.0.0"/>
+                <Choice Name="SVIP 6.0.0 (X Studio 1.8)" Tag="6.0.0"/>
+            </EnumChoices>
+        </Option>
+    </OutputOptions>
 </Plugin>

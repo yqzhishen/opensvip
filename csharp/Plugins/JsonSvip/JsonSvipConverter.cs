@@ -8,16 +8,7 @@ namespace OpenSvip.Stream
 {
     public class JsonSvipConverter : IProjectConverter
     {
-        public bool Indented { get; set; }
-        
-        public JsonSvipConverter() { }
-
-        public JsonSvipConverter(bool indented)
-        {
-            Indented = indented;
-        }
-
-        public Project Load(string path)
+        public Project Load(string path, ConverterOptions options)
         {
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new StreamReader(stream, new UTF8Encoding(false));
@@ -27,13 +18,13 @@ namespace OpenSvip.Stream
             return project;
         }
 
-        public void Save(string path, Project project)
+        public void Save(string path, Project project, ConverterOptions options)
         {
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
             var settings = new JsonSerializerSettings
             {
-                Formatting = Indented ? Formatting.Indented : Formatting.None,
+                Formatting = options.GetOptionAsBoolean("indented") ? Formatting.Indented : Formatting.None,
                 ReferenceLoopHandling = ReferenceLoopHandling.Error
             };
             writer.Write(JsonConvert.SerializeObject(project, settings));
