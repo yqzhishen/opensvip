@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using OpenSvip.Const;
 using OpenSvip.Model;
 
@@ -11,6 +12,9 @@ namespace OpenSvip.Stream
     {
         public Tuple<string, SingingTool.Model.AppModel> EncodeProject(Project project)
         {
+            var version = Regex.IsMatch(project.Version, @"^SVIP\d\.\d\.\d$")
+                ? project.Version
+                : "SVIP" + SingingTool.Const.ToolConstValues.ProjectVersion;
             var model = new SingingTool.Model.AppModel();
             foreach (var tempo in project.SongTempoList)
             {
@@ -24,7 +28,7 @@ namespace OpenSvip.Stream
             {
                 model.TrackList.Add(t);
             }
-            return new Tuple<string, SingingTool.Model.AppModel>(project.Version, model);
+            return new Tuple<string, SingingTool.Model.AppModel>(version, model);
         }
         
         private SingingTool.Model.SingingGeneralConcept.SongTempo EncodeSongTempo(SongTempo tempo)
