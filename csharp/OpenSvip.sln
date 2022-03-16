@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Framework", "Frame
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.JsonSvip", "Plugins\JsonSvip\Plugin.JsonSvip.csproj", "{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.SynthV", "Plugins\SynthV\Plugin.SynthV.csproj", "{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
