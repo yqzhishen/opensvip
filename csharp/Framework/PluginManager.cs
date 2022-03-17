@@ -45,7 +45,7 @@ namespace OpenSvip.Framework
         public static IProjectConverter GetConverter(string identifier)
         {
             var plugin = GetPlugin(identifier);
-            var assembly = Assembly.LoadFile(Path.Combine(PluginPath, plugin.LibraryPath));
+            var assembly = Assembly.LoadFrom(Path.Combine(PluginPath, plugin.LibraryPath));
             var type = assembly.GetType(plugin.Converter);
             return (IProjectConverter) Activator.CreateInstance(type);
         }
