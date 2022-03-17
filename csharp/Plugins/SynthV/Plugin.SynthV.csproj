@@ -39,12 +39,14 @@
         <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
           <HintPath>..\..\.tmp\Newtonsoft.Json.dll</HintPath>
         </Reference>
+        <Reference Include="NPinyinPro, Version=0.3.3.0, Culture=neutral, PublicKeyToken=null">
+          <HintPath>..\..\packages\NPinyinPro.0.3.3\lib\net20\NPinyinPro.dll</HintPath>
+        </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
-        <Reference Include="System.Data" />
-        <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="PhonemeUtils.cs" />
         <Compile Include="SynthVConverter.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="SynthVDecoder.cs" />
@@ -65,9 +67,15 @@
       </ProjectReference>
     </ItemGroup>
     <ItemGroup>
+      <Content Include="PhonemeDict.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
       <Content Include="Properties.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="packages.config" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

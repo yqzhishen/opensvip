@@ -10,6 +10,7 @@ __pycache__/
 bin/
 obj/
 /csharp/.tmp/
+/csharp/packages/
 
 # Distribution / packaging
 .Python

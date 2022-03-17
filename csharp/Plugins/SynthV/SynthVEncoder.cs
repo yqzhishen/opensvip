@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using NAudio.Wave;
 using OpenSvip.Model;
 using SynthV.Model;
@@ -24,6 +25,8 @@ namespace Plugin.SynthV
         private List<Note> NoteBuffer;
 
         private HashSet<int> NoVibratoIndexes;
+
+        private List<string> LyricsPinyin;
 
         public SVProject EncodeProject(Project project)
         {
@@ -143,12 +146,25 @@ namespace Plugin.SynthV
                     svTrack.DispColor = "ff7db235";
                     svTrack.MainRef.Database.Language = "mandarin";
                     svTrack.MainRef.Database.PhoneSet = "xsampa";
+                    
                     NoteBuffer = singingTrack.NoteList;
+                    
                     svTrack.MainGroup.Params = EncodeParams(singingTrack.EditedParams);
-                    foreach (var note in singingTrack.NoteList)
-                    {
-                        svTrack.MainGroup.Notes.Add(EncodeNote(note));
-                    }
+                    
+                    LyricsPinyin = PhonemeUtils.LyricsToPinyin(NoteBuffer.ConvertAll(note =>
+                        {
+                            if (!string.IsNullOrEmpty(note.Pronunciation))
+                            {
+                                return note.Pronunciation;
+                            }
+                            var validChars = Regex.Replace(
+                                note.Lyric,
+                                "[\\s\\(\\)\\[\\]\\{\\}\\^_*×――—（）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”0-9a-zA-Z]",
+                                "la");
+                            return validChars == "" ? "" : validChars[0].ToString();
+                        }));
+                    svTrack.MainGroup.Notes = EncodeNotesWithPhones(singingTrack.NoteList);
+
                     // vibrato options
                     switch (VibratoOptions)
                     {
@@ -168,7 +184,6 @@ namespace Plugin.SynthV
                         default:
                             break;
                     }
-                    // TODO: other singing track attributes
                     break;
                 case InstrumentalTrack instrumentalTrack:
                     svTrack.MainRef.IsInstrumental = true;
@@ -382,6 +397,125 @@ namespace Plugin.SynthV
             return svCurve;
         }
 
+        private List<SVNote> EncodeNotesWithPhones(List<Note> notes)
+        {
+            var svNoteList = new List<SVNote>();
+            if (!notes.Any())
+            {
+                return svNoteList;
+            }
+
+            var currentSVNote = EncodeNote(notes[0]);
+            var currentPhoneMarks = PhonemeUtils.DefaultPhoneMarks(LyricsPinyin[0]);
+            // head part of the first note
+            if (currentPhoneMarks[0] > 0 && notes[0].EditedPhones != null && notes[0].EditedPhones.HeadLengthInSecs > 0)
+            {
+                var ratio = notes[0].EditedPhones.HeadLengthInSecs / currentPhoneMarks[0];
+                currentSVNote.Attributes.SetPhoneDuration(0, ratio < 0.2 ? 0.2 : ratio > 1.8 ? 1.8 : ratio);
+            }
+            var i = 0;
+            for (; i < notes.Count - 1; i++)
+            {
+                var nextSVNote = EncodeNote(notes[i + 1]);
+                var nextPhoneMarks = PhonemeUtils.DefaultPhoneMarks(LyricsPinyin[i + 1]);
+                
+                var currentMainPartEdited =
+                    currentPhoneMarks[1] > 0
+                    && notes[i].EditedPhones != null
+                    && notes[i].EditedPhones.MidRatioOverTail > 0;
+                var nextHeadPartEdited =
+                    nextPhoneMarks[0] > 0
+                    && notes[i + 1].EditedPhones != null
+                    && notes[i + 1].EditedPhones.HeadLengthInSecs > 0;
+
+                if (currentMainPartEdited && nextHeadPartEdited) // three parts should all be adjusted
+                {
+                    var currentMainRatio = notes[i].EditedPhones.MidRatioOverTail / currentPhoneMarks[1];
+                    var nextHeadRatio = notes[i + 1].EditedPhones.HeadLengthInSecs / nextPhoneMarks[0];
+                    var x = 2 * currentMainRatio / (1 + currentMainRatio);
+                    var y = 2 / (1 + currentMainRatio);
+                    var z = nextHeadRatio;
+                    var max = Math.Max(x, Math.Max(y, z));
+                    var min = Math.Min(x, Math.Min(y, z));
+                    var finalRatio =
+                        min < 0.2 && max >= 0.2 && max <= 1.8 || max > 1.8 && min >= 0.2 && min <= 1.8
+                            ? (0.2 / min + 1.8 / max) / 2
+                            : 1.0;
+                    x *= finalRatio;
+                    y *= finalRatio;
+                    z *= finalRatio;
+                    currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
+                    currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
+                    nextSVNote.Attributes.SetPhoneDuration(0, z < 0.2 ? 0.2 : z > 1.8 ? 1.8 : z);
+                }
+                else if (currentMainPartEdited) // only main part of current note should be adjusted
+                {
+                    var ratio = notes[i].EditedPhones.MidRatioOverTail / currentPhoneMarks[1];
+                    var x = 2 * ratio / (1 + ratio);
+                    var y = 2 / (1 + ratio);
+                    currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
+                    currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
+                }
+                else if (nextHeadPartEdited) // only head part of next note should be adjusted
+                {
+                    var ratio = notes[i + 1].EditedPhones.HeadLengthInSecs / currentPhoneMarks[0];
+                    if (ratio < 0.2)
+                    {
+                        var implicatedRatio = 0.2 / ratio > 1.8 ? 1.8 : 0.2 / ratio;
+                        currentSVNote.Attributes.SetPhoneDuration(1, implicatedRatio);
+                        if (currentPhoneMarks[1] > 0.0)
+                        {
+                            currentSVNote.Attributes.SetPhoneDuration(2, implicatedRatio);
+                        }
+                        ratio = 0.2;
+                    }
+                    else if (ratio > 1.8)
+                    {
+                        var implicatedRatio = 1.8 / ratio < 0.2 ? 0.2 : 1.8 / ratio;
+                        currentSVNote.Attributes.SetPhoneDuration(1, implicatedRatio);
+                        if (currentPhoneMarks[1] > 0.0)
+                        {
+                            currentSVNote.Attributes.SetPhoneDuration(2, implicatedRatio);
+                        }
+                        ratio = 1.8;
+                    }
+                    nextSVNote.Attributes.SetPhoneDuration(0, ratio);
+                }
+                // check length of phone duration array if edited
+                if (currentSVNote.Attributes.PhoneDurations != null)
+                {
+                    var expectedLength = PhonemeUtils.NumberOfPhones(LyricsPinyin[i]);
+                    if (currentSVNote.Attributes.PhoneDurations.Length < expectedLength)
+                    {
+                        currentSVNote.Attributes.SetPhoneDuration(expectedLength - 1, 1.0);
+                    }
+                }
+                svNoteList.Add(currentSVNote);
+                currentSVNote = nextSVNote;
+                currentPhoneMarks = nextPhoneMarks;
+            }
+            // main part of the last note
+            if (currentPhoneMarks[1] > 0 && notes[i].EditedPhones != null && notes[i].EditedPhones.MidRatioOverTail > 0)
+            {
+                var ratio = notes[i].EditedPhones.MidRatioOverTail / currentPhoneMarks[1];
+                var x = 2 * ratio / (1 + ratio);
+                var y = 2 / (1 + ratio);
+                currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
+                currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
+            }
+            // check length of phone duration array if edited
+            if (currentSVNote.Attributes.PhoneDurations != null)
+            {
+                var expectedLength = PhonemeUtils.NumberOfPhones(LyricsPinyin[i]);
+                if (currentSVNote.Attributes.PhoneDurations.Length < expectedLength)
+                {
+                    currentSVNote.Attributes.SetPhoneDuration(expectedLength - 1, 1.0);
+                }
+            }
+            svNoteList.Add(currentSVNote);
+            return svNoteList;
+        }
+
         private SVNote EncodeNote(Note note)
         {
             var svNote = new SVNote
@@ -391,7 +525,6 @@ namespace Plugin.SynthV
             svNote.Duration = EncodePosition(note.StartPos + note.Length) - svNote.Onset;
             svNote.Pitch = note.KeyNumber;
             svNote.Lyrics = note.Pronunciation ?? note.Lyric;
-            // TODO: other attributes
             return svNote;
         }
 

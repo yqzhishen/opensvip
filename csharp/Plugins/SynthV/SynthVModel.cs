@@ -92,15 +92,43 @@ namespace SynthV.Model
         [JsonProperty("attributes")] public SVNoteAttributes Attributes { get; set; } = new SVNoteAttributes();
     }
 
+    [JsonConverter(typeof(SVNoteAttributesJsonConverter))]
     public class SVNoteAttributes
     {
-        [JsonProperty("tF0VbrStart")] public double VibratoStart = double.NaN;
-        [JsonProperty("tF0VbrLeft")] public double VibratoLeft = double.NaN;
-        [JsonProperty("tF0VbrRight")] public double VibratoRight = double.NaN;
-        [JsonProperty("dF0Vbr")] public double VibratoDepth = double.NaN;
-        [JsonProperty("fF0Vbr")] public double VibratoFrequency = double.NaN;
-        [JsonProperty("pF0Vbr")] public double VibratoPhase = double.NaN;
-        [JsonProperty("dF0Jitter")] public double VibratoJitter = double.NaN;
+        [JsonProperty("tF0VbrStart")] public double VibratoStart { get; set; } = double.NaN;
+        [JsonProperty("tF0VbrLeft")] public double VibratoLeft { get; set; } = double.NaN;
+        [JsonProperty("tF0VbrRight")] public double VibratoRight { get; set; } = double.NaN;
+        [JsonProperty("dF0Vbr")] public double VibratoDepth { get; set; } = double.NaN;
+        [JsonProperty("fF0Vbr")] public double VibratoFrequency { get; set; } = double.NaN;
+        [JsonProperty("pF0Vbr")] public double VibratoPhase { get; set; } = double.NaN;
+        [JsonProperty("dF0Jitter")] public double VibratoJitter { get; set; } = double.NaN;
+        [JsonProperty("dur")] public double[] PhoneDurations { get; set; }
+        
+        public void SetPhoneDuration(int index, double value)
+        {
+            if (PhoneDurations == null)
+            {
+                PhoneDurations = new double[index + 1];
+                for (var i = 0; i < index; i++)
+                {
+                    PhoneDurations[i] = 1.0;
+                }
+            }
+            else if (PhoneDurations.Length <= index)
+            {
+                var newArr = new double[index + 1];
+                for (var i = 0; i < PhoneDurations.Length; i++)
+                {
+                    newArr[i] = PhoneDurations[i];
+                }
+                for (var i = PhoneDurations.Length; i < index; i++)
+                {
+                    newArr[i] = 1.0;
+                }
+                PhoneDurations = newArr;
+            }
+            PhoneDurations[index] = value;
+        }
     }
 
     public class SVRef

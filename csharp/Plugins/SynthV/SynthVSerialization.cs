@@ -75,6 +75,11 @@ namespace Plugin.SynthV
                 writer.WritePropertyName("dF0Jitter");
                 writer.WriteValue(value.VibratoJitter);
             }
+            if (value.PhoneDurations != null)
+            {
+                writer.WritePropertyName("dur");
+                serializer.Serialize(writer, value.PhoneDurations);
+            }
             writer.WriteEndObject();
         }
 
