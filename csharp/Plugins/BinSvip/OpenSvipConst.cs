@@ -22,8 +22,6 @@ namespace OpenSvip.Const
             SingerNames = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            stream.Dispose();
-            reader.Dispose();
         }
 
         public static string GetName(string id)
