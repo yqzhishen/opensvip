@@ -22,7 +22,11 @@ namespace SynthV.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            var svProject = new SynthVEncoder().EncodeProject(project);
+            var svProject = new SynthVEncoder
+            {
+                DefaultTempo = options.GetOptionAsInteger("default-tempo", 60),
+                VibratoOptions = options.GetOptionAsEnum("vibrato", VibratoOptions.Hybrid)
+            }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);
             var jsonString = JsonConvert.SerializeObject(svProject);

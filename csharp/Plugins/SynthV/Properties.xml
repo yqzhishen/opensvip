@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>SynthV</Name>
+    <Version>1.0.0</Version>
+    <Author>YQ之神</Author>
+    <HomePage>https://space.bilibili.com/102844209</HomePage>
+    <Descriptions>Synthesizer V 工程格式转换插件。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>Synthesizer V 工程文件</Format>
+    <Suffix>svp</Suffix>
+    <Identifier>svp</Identifier>
+    <LibraryPath>SynthV\Plugin.SynthV.dll</LibraryPath>
+    <Converter>SynthV.Stream.SynthVConverter</Converter>
+    <InputOptions/>
+    <OutputOptions>
+        <Option Name="default-tempo" Type="integer" Default="60">
+            <Notes>拍号分母小于 2 或大于 16 时使用此曲速进行时间对齐</Notes>
+        </Option>
+        <Option Name="vibrato" Type="enum" Default="hybrid">
+            <Notes>自动颤音处理方式</Notes>
+            <EnumChoices>
+                <Choice Name="全部丢弃" Tag="none"/>
+                <Choice Name="全部保留" Tag="always"/>
+                <Choice Name="音高无参处保留" Tag="hybrid"/>
+            </EnumChoices>
+        </Option>
+    </OutputOptions>
+</Plugin>

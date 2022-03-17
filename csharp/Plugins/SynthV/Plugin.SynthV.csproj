@@ -5,7 +5,7 @@
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}</ProjectGuid>
-        <OutputType>Exe</OutputType>
+        <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>Plugin.SynthV</RootNamespace>
         <AssemblyName>Plugin.SynthV</AssemblyName>
@@ -52,6 +52,7 @@
         <Compile Include="SynthVSerialization.cs" />
         <Compile Include="SynthVModel.cs" />
         <Compile Include="Test.cs" />
+        <Compile Include="VibratoOptions.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -62,6 +63,11 @@
         <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Properties.xml">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

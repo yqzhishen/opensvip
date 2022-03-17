@@ -94,7 +94,13 @@ namespace SynthV.Model
 
     public class SVNoteAttributes
     {
-        
+        [JsonProperty("tF0VbrStart")] public double VibratoStart = double.NaN;
+        [JsonProperty("tF0VbrLeft")] public double VibratoLeft = double.NaN;
+        [JsonProperty("tF0VbrRight")] public double VibratoRight = double.NaN;
+        [JsonProperty("dF0Vbr")] public double VibratoDepth = double.NaN;
+        [JsonProperty("fF0Vbr")] public double VibratoFrequency = double.NaN;
+        [JsonProperty("pF0Vbr")] public double VibratoPhase = double.NaN;
+        [JsonProperty("dF0Jitter")] public double VibratoJitter = double.NaN;
     }
 
     public class SVRef
