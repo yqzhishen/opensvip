@@ -46,7 +46,7 @@ namespace OpenSvip.Console
                     System.Console.WriteLine($"\n主页：{plugin.HomePage}");
                 }
                 System.Console.WriteLine($"\n此插件可用于转换 {plugin.Format} (*.{plugin.Suffix})。");
-                System.Console.WriteLine($"若要使用此插件，请在转换时指定 \"-i {plugin.Identifier}\" 或 \"-o {plugin.Identifier}\"");
+                System.Console.WriteLine($"若要使用此插件，请在转换时指定 \"-i {plugin.Identifier}\" 或 \"-o {plugin.Identifier}\"。");
                 if (plugin.Descriptions != null)
                 {
                     System.Console.WriteLine($"\n描述：\n{plugin.Descriptions}");
@@ -77,13 +77,12 @@ namespace OpenSvip.Console
                                 }
                                 if (option.Type == "enum")
                                 {
-                                    System.Console.WriteLine("\n  可用值如下：");
+                                    System.Console.WriteLine("  可用值如下：");
                                     foreach (var choice in option.EnumChoices)
                                     {
-                                        System.Console.WriteLine($"    {choice.Tag}    =>    {choice.Name}");
+                                        System.Console.WriteLine($"    {choice.Tag}\t=>\t{choice.Name}");
                                     }
                                 }
-                                System.Console.WriteLine();
                                 break;
                             default:
                                 continue;
@@ -91,6 +90,7 @@ namespace OpenSvip.Console
                     }
                 }
                 ++num;
+                System.Console.WriteLine();
             }
             return 0;
         }
