@@ -36,7 +36,7 @@ namespace Plugin.SynthV
 
         public static PitchInterpolation SigmoidInterpolation()
         {
-            return new PitchInterpolation(0.075, 0.5,
+            return new PitchInterpolation(0.075, 0.48,
                 x => 1 / (1 + Math.Exp(5.5 * (-2 * x + 1))));
         }
     }

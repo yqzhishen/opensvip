@@ -13,16 +13,16 @@ namespace Plugin.SynthV
         public int DefaultTempo { get; set; } = 60;
 
         public VibratoOptions VibratoOptions { get; set; } = VibratoOptions.Hybrid;
-        
-        private bool IsAbsoluteTimeMode;
 
         private int FirstBarTick;
 
         private List<SongTempo> FirstBarTempo;
 
-        private List<SongTempo> TempoBuffer;
-
         private List<Note> NoteBuffer;
+
+        private TimeSynchronizer Synchronizer;
+
+        private PitchGenerator PitchGenerator;
 
         private HashSet<int> NoVibratoIndexes;
 
@@ -67,12 +67,8 @@ namespace Plugin.SynthV
                     BPM = project.SongTempoList[i - 1].BPM
                 });
             }
-            TempoBuffer = newTempos;
-            if (newMeters.Any(meter => meter.Denominator < 2 || meter.Denominator > 16))
-            {
-                IsAbsoluteTimeMode = true;
-            }
-            if (!IsAbsoluteTimeMode)
+            var isAbsoluteTimeMode = newMeters.Any(meter => meter.Denominator < 2 || meter.Denominator > 16);
+            if (!isAbsoluteTimeMode)
             {
                 foreach (var meter in newMeters)
                 {
@@ -97,6 +93,8 @@ namespace Plugin.SynthV
                     BPM = DefaultTempo
                 });
             }
+            Synchronizer = new TimeSynchronizer(newTempos, isAbsoluteTimeMode, DefaultTempo);
+            
             var id = 0;
             foreach (var svTrack in project.TrackList.Select(EncodeTrack))
             {
@@ -148,6 +146,10 @@ namespace Plugin.SynthV
                     svTrack.MainRef.Database.PhoneSet = "xsampa";
                     
                     NoteBuffer = singingTrack.NoteList;
+                    PitchGenerator = new PitchGenerator(
+                        singingTrack.NoteList,
+                        Synchronizer,
+                        PitchInterpolation.SigmoidInterpolation());
                     
                     svTrack.MainGroup.Params = EncodeParams(singingTrack.EditedParams);
                     
@@ -262,12 +264,11 @@ namespace Plugin.SynthV
                         }
                         pointList.Add(new Tuple<long, double>(EncodePosition(buffer[0].Item1 - minInterval), 0.0));
                     }
-                    var interpolation = PitchInterpolation.SigmoidInterpolation();
                     foreach (var (bufferPos, bufferVal) in buffer)
                     {
                         pointList.Add(new Tuple<long, double>(
                             EncodePosition(bufferPos),
-                            EncodePitchDiff(bufferPos, bufferVal, interpolation)));
+                            EncodePitchDiff(bufferPos, bufferVal)));
                     }
                     lastPoint = buffer.Last();
                     buffer.Clear();
@@ -284,77 +285,23 @@ namespace Plugin.SynthV
             return svCurve;
         }
  
-        private double EncodePitchDiff(int pos, int pitch, PitchInterpolation interpolation)
+        private double EncodePitchDiff(int pos, int pitch)
         {
-            var maxSlideTimeInSecs = interpolation.MaxInterTimeInSecs;
-            var defaultSlidePercent = interpolation.MaxInterTimePercent;
             var targetNoteIndex = NoteBuffer.FindLastIndex(note => note.StartPos <= pos);
             var targetNote = targetNoteIndex >= 0 ? NoteBuffer[targetNoteIndex] : null;
-            var nextNote = targetNoteIndex < NoteBuffer.Count - 1 ? NoteBuffer[targetNoteIndex + 1] : null;
-            var prevNote = targetNoteIndex > 0 ? NoteBuffer[targetNoteIndex - 1] : null;
+            var pitchDiff = pitch - PitchGenerator.PitchAtSecs(Synchronizer.GetActualSecsFromTicks(pos));
             if (targetNote == null) // position before all heads of note
             {
-                return pitch - NoteBuffer[0].KeyNumber * 100;
+                return pitchDiff;
             }
             // hybrid mode is on, and the point is within the range where the automatic vibrato should have been
-            if (VibratoOptions == VibratoOptions.Hybrid && DurationPositionToSecs(targetNote.StartPos, pos) > 0.25)
+            if (VibratoOptions == VibratoOptions.Hybrid
+                && Synchronizer.GetDurationSecsFromTicks(targetNote.StartPos, pos) > 0.25
+                && pos < targetNote.StartPos + targetNote.Length)
             {
                 NoVibratoIndexes.Add(targetNoteIndex);
             }
-            if (nextNote == null) // position after all heads of note
-            {
-                return pitch - NoteBuffer.Last().KeyNumber * 100;
-            }
-            // position is between note heads
-            var timeAfterHeadInSecs = DurationPositionToSecs(targetNote.StartPos, pos);
-            var headSlidePartInSecs = Math.Min(maxSlideTimeInSecs, defaultSlidePercent * DurationPositionToSecs(
-                targetNote.StartPos, targetNote.StartPos + targetNote.Length));
-            if (timeAfterHeadInSecs < headSlidePartInSecs) // position is near the head of target note
-            {
-                if (prevNote == null) // there is no previous note (position is only after head of the first note)
-                {
-                    return pitch - targetNote.KeyNumber * 100;
-                }
-                var prevSlidePartInSecs = Math.Min(maxSlideTimeInSecs, defaultSlidePercent * DurationPositionToSecs(
-                    prevNote.StartPos,
-                    prevNote.StartPos + prevNote.Length));
-                var intervalPartInSecs = DurationPositionToSecs(prevNote.StartPos + prevNote.Length, targetNote.StartPos);
-                var interpolationSecs = prevSlidePartInSecs + intervalPartInSecs + headSlidePartInSecs;
-                if (intervalPartInSecs > maxSlideTimeInSecs * 2) // previous note is too far away
-                {
-                    return pitch - targetNote.KeyNumber * 100;
-                }
-                // interpolation of the slide part
-                var ratio = interpolation.Apply((prevSlidePartInSecs + intervalPartInSecs / 2 + timeAfterHeadInSecs) / interpolationSecs);
-                return pitch - ((1 - ratio) * prevNote.KeyNumber + ratio * targetNote.KeyNumber) * 100;
-            }
-            var noteLengthInSecs = DurationPositionToSecs(targetNote.StartPos, targetNote.StartPos + targetNote.Length);
-            var noSlidePartInSecs = noteLengthInSecs - Math.Min(maxSlideTimeInSecs, defaultSlidePercent * noteLengthInSecs);
-            if (timeAfterHeadInSecs > noSlidePartInSecs) // position is near the tail of target note
-            {
-                var tailSlidePartInSecs = noteLengthInSecs - noSlidePartInSecs;
-                var intervalPartInSecs =
-                    DurationPositionToSecs(targetNote.StartPos + targetNote.Length, nextNote.StartPos);
-                var nextSlidePartInSecs = Math.Min(maxSlideTimeInSecs, defaultSlidePercent * DurationPositionToSecs(
-                    nextNote.StartPos, nextNote.StartPos + nextNote.Length));
-                var interpolationSecs = tailSlidePartInSecs + intervalPartInSecs + nextSlidePartInSecs;
-                if (intervalPartInSecs > maxSlideTimeInSecs * 2) // next note is too far away
-                {
-                    if (timeAfterHeadInSecs > noteLengthInSecs) // position between tail of target note and head of next note
-                    {
-                        return timeAfterHeadInSecs - noteLengthInSecs < interpolationSecs / 2
-                            ? pitch - targetNote.KeyNumber * 100 // closer to the tail of target note
-                            : pitch - nextNote.KeyNumber * 100; // closer to the head of next note
-                    }
-                    // before tail of target note
-                    return pitch - targetNote.KeyNumber * 100;
-                }
-                // interpolation of the slide part
-                var ratio = interpolation.Apply((timeAfterHeadInSecs - intervalPartInSecs / 2 - noSlidePartInSecs) / interpolationSecs);
-                return pitch - ((1 - ratio) * targetNote.KeyNumber + ratio * nextNote.KeyNumber) * 100;
-            }
-            // position is within the middle of target note
-            return pitch - targetNote.KeyNumber * 100;
+            return pitchDiff;
         }
 
         private SVParamCurve EncodeParamCurve(ParamCurve curve, int termination, double defaultValue, Func<int, double> op)
@@ -436,7 +383,7 @@ namespace Plugin.SynthV
                     var x = 2 * currentMainRatio / (1 + currentMainRatio);
                     var y = 2 / (1 + currentMainRatio);
                     var z = nextHeadRatio;
-                    if (DurationPositionToSecs(notes[i].StartPos + notes[i].Length, notes[i + 1].StartPos) < nextPhoneMarks[0])
+                    if (Synchronizer.GetDurationSecsFromTicks(notes[i].StartPos + notes[i].Length, notes[i + 1].StartPos) < nextPhoneMarks[0])
                     {
                         var finalRatio = 2 / (1 + nextHeadRatio);
                         x *= finalRatio;
@@ -458,7 +405,7 @@ namespace Plugin.SynthV
                 else if (nextHeadPartEdited) // only head part of next note should be adjusted
                 {
                     var ratio = notes[i + 1].EditedPhones.HeadLengthInSecs / nextPhoneMarks[0];
-                    if (DurationPositionToSecs(notes[i].StartPos + notes[i].Length, notes[i + 1].StartPos) < nextPhoneMarks[0])
+                    if (Synchronizer.GetDurationSecsFromTicks(notes[i].StartPos + notes[i].Length, notes[i + 1].StartPos) < nextPhoneMarks[0])
                     {
                         var ratioZ = 2 * ratio / (1 + ratio);
                         var ratioXY = 2 / (1 + ratio);
@@ -548,56 +495,7 @@ namespace Plugin.SynthV
 
         private long EncodePosition(int position)
         {
-            if (!IsAbsoluteTimeMode)
-            {
-                return position * 1470000L;
-            }
-            var res = 0.0;
-            var i = 0;
-            for (; i < TempoBuffer.Count - 1 && TempoBuffer[i + 1].Position < position; i++)
-            {
-                res += (TempoBuffer[i + 1].Position - TempoBuffer[i].Position) * DefaultTempo / TempoBuffer[i].BPM;
-            }
-            res += (position - TempoBuffer[i].Position) * DefaultTempo / TempoBuffer[i].BPM;
-            return (long) Math.Round(res * 1470000L);
-        }
-
-        private double DurationPositionToSecs(int startPos, int endPos)
-        {
-            double PositionToTick(int position)
-            {
-                var tick = 0.0;
-                var i = 0;
-                for (; i < TempoBuffer.Count - 1 && TempoBuffer[i + 1].Position < position; i++)
-                {
-                    tick += (TempoBuffer[i + 1].Position - TempoBuffer[i].Position) * (double) DefaultTempo / TempoBuffer[i].BPM;
-                }
-                tick += (position - TempoBuffer[i].Position) * DefaultTempo / (double) TempoBuffer[i].BPM;
-                return tick;
-            }
-
-            if (IsAbsoluteTimeMode)
-            {
-                return (PositionToTick(endPos) - PositionToTick(startPos)) / DefaultTempo / 8;
-            }
-            
-            var startTempoIndex = TempoBuffer.FindLastIndex(tempo => tempo.Position <= startPos);
-            var endTempoIndex = TempoBuffer.FindIndex(tempo => tempo.Position >= endPos);
-            
-            if (endTempoIndex == -1 || startTempoIndex + 1 == endTempoIndex)
-            {
-                return (endPos - startPos) / TempoBuffer[startTempoIndex].BPM / 8;
-            }
-            
-            var secs = 0.0;
-            secs += (TempoBuffer[startTempoIndex + 1].Position - startPos)
-                        / (double) TempoBuffer[startTempoIndex].BPM / 8;
-            for (var i = startTempoIndex + 1; i < endTempoIndex - 1; i++)
-            {
-                secs += (TempoBuffer[i + 1].Position - TempoBuffer[i].Position) / (double) TempoBuffer[i].BPM / 8;
-            }
-            secs += (endPos - TempoBuffer[endTempoIndex - 1].Position) / (double) TempoBuffer[endTempoIndex - 1].BPM / 8;
-            return secs;
+            return (long) Math.Round(Synchronizer.GetActualTicksFromTicks(position) * 1470000L);
         }
     }
 }

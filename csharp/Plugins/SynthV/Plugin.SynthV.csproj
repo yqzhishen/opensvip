@@ -47,6 +47,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="PhonemeUtils.cs" />
+        <Compile Include="PitchGenerator.cs" />
         <Compile Include="PitchInterpolation.cs" />
         <Compile Include="SynthVConverter.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,6 +56,7 @@
         <Compile Include="SynthVSerialization.cs" />
         <Compile Include="SynthVModel.cs" />
         <Compile Include="Test.cs" />
+        <Compile Include="TimeSynchronizer.cs" />
         <Compile Include="VibratoOptions.cs" />
     </ItemGroup>
     <ItemGroup>
