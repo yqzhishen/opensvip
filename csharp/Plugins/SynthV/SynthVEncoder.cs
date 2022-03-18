@@ -435,15 +435,13 @@ namespace Plugin.SynthV
                     var x = 2 * currentMainRatio / (1 + currentMainRatio);
                     var y = 2 / (1 + currentMainRatio);
                     var z = nextHeadRatio;
-                    var max = Math.Max(x, Math.Max(y, z));
-                    var min = Math.Min(x, Math.Min(y, z));
-                    var finalRatio =
-                        min < 0.2 && max >= 0.2 && max <= 1.8 || max > 1.8 && min >= 0.2 && min <= 1.8
-                            ? (0.2 / min + 1.8 / max) / 2
-                            : 1.0;
-                    x *= finalRatio;
-                    y *= finalRatio;
-                    z *= finalRatio;
+                    if (DurationPositionToSecs(notes[i].StartPos + notes[i].Length, notes[i + 1].StartPos) < nextPhoneMarks[0])
+                    {
+                        var finalRatio = 2 / (1 + nextHeadRatio);
+                        x *= finalRatio;
+                        y *= finalRatio;
+                        z *= finalRatio;
+                    }
                     currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
                     currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
                     nextSVNote.Attributes.SetPhoneDuration(0, z < 0.2 ? 0.2 : z > 1.8 ? 1.8 : z);
@@ -458,26 +456,19 @@ namespace Plugin.SynthV
                 }
                 else if (nextHeadPartEdited) // only head part of next note should be adjusted
                 {
-                    var ratio = notes[i + 1].EditedPhones.HeadLengthInSecs / currentPhoneMarks[0];
-                    if (ratio < 0.2)
+                    var ratio = notes[i + 1].EditedPhones.HeadLengthInSecs / nextPhoneMarks[0];
+                    if (DurationPositionToSecs(notes[i].StartPos + notes[i].Length, notes[i + 1].StartPos) < nextPhoneMarks[0])
                     {
-                        var implicatedRatio = 0.2 / ratio > 1.8 ? 1.8 : 0.2 / ratio;
-                        currentSVNote.Attributes.SetPhoneDuration(1, implicatedRatio);
+                        var ratioZ = 2 * ratio / (1 + ratio);
+                        var ratioXY = 2 / (1 + ratio);
+                        ratioZ = ratioZ < 0.2 ? 0.2 : ratioZ > 1.8 ? 1.8 : ratioZ;
+                        ratioXY = ratioXY < 0.2 ? 0.2 : ratioXY > 1.8 ? 1.8 : ratioXY;
+                        currentSVNote.Attributes.SetPhoneDuration(1, ratioXY);
                         if (currentPhoneMarks[1] > 0.0)
                         {
-                            currentSVNote.Attributes.SetPhoneDuration(2, implicatedRatio);
+                            currentSVNote.Attributes.SetPhoneDuration(2, ratioXY);
                         }
-                        ratio = 0.2;
-                    }
-                    else if (ratio > 1.8)
-                    {
-                        var implicatedRatio = 1.8 / ratio < 0.2 ? 0.2 : 1.8 / ratio;
-                        currentSVNote.Attributes.SetPhoneDuration(1, implicatedRatio);
-                        if (currentPhoneMarks[1] > 0.0)
-                        {
-                            currentSVNote.Attributes.SetPhoneDuration(2, implicatedRatio);
-                        }
-                        ratio = 1.8;
+                        ratio = ratioZ;
                     }
                     nextSVNote.Attributes.SetPhoneDuration(0, ratio);
                 }
@@ -559,7 +550,6 @@ namespace Plugin.SynthV
             if (!IsAbsoluteTimeMode)
             {
                 return position * 1470000L;
-                // TODO: is this right??
             }
             var res = 0.0;
             var i = 0;
