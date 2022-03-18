@@ -262,9 +262,12 @@ namespace Plugin.SynthV
                         }
                         pointList.Add(new Tuple<long, double>(EncodePosition(buffer[0].Item1 - minInterval), 0.0));
                     }
+                    var interpolation = PitchInterpolation.SigmoidInterpolation();
                     foreach (var (bufferPos, bufferVal) in buffer)
                     {
-                        pointList.Add(new Tuple<long, double>(EncodePosition(bufferPos), EncodePitchDiff(bufferPos, bufferVal)));
+                        pointList.Add(new Tuple<long, double>(
+                            EncodePosition(bufferPos),
+                            EncodePitchDiff(bufferPos, bufferVal, interpolation)));
                     }
                     lastPoint = buffer.Last();
                     buffer.Clear();
@@ -281,10 +284,10 @@ namespace Plugin.SynthV
             return svCurve;
         }
  
-        private double EncodePitchDiff(int pos, int pitch)
+        private double EncodePitchDiff(int pos, int pitch, PitchInterpolation interpolation)
         {
-            var maxSlideTimeInSecs = 0.05;
-            var defaultSlidePercent = 0.1;
+            var maxSlideTimeInSecs = interpolation.MaxInterTimeInSecs;
+            var defaultSlidePercent = interpolation.MaxInterTimePercent;
             var targetNoteIndex = NoteBuffer.FindLastIndex(note => note.StartPos <= pos);
             var targetNote = targetNoteIndex >= 0 ? NoteBuffer[targetNoteIndex] : null;
             var nextNote = targetNoteIndex < NoteBuffer.Count - 1 ? NoteBuffer[targetNoteIndex + 1] : null;
@@ -317,14 +320,13 @@ namespace Plugin.SynthV
                     prevNote.StartPos + prevNote.Length));
                 var intervalPartInSecs = DurationPositionToSecs(prevNote.StartPos + prevNote.Length, targetNote.StartPos);
                 var interpolationSecs = prevSlidePartInSecs + intervalPartInSecs + headSlidePartInSecs;
-                if (interpolationSecs > maxSlideTimeInSecs * 2) // previous note is too far away
+                if (intervalPartInSecs > maxSlideTimeInSecs * 2) // previous note is too far away
                 {
                     return pitch - targetNote.KeyNumber * 100;
                 }
-                // cosine interpolation of the slide part
-                var ratio = 0.5 * (1 + Math.Cos(
-                    Math.PI * (prevSlidePartInSecs + intervalPartInSecs + timeAfterHeadInSecs) / interpolationSecs));
-                return pitch - (ratio * prevNote.KeyNumber + (1 - ratio) * targetNote.KeyNumber) * 100;
+                // interpolation of the slide part
+                var ratio = interpolation.Apply((prevSlidePartInSecs + intervalPartInSecs / 2 + timeAfterHeadInSecs) / interpolationSecs);
+                return pitch - ((1 - ratio) * prevNote.KeyNumber + ratio * targetNote.KeyNumber) * 100;
             }
             var noteLengthInSecs = DurationPositionToSecs(targetNote.StartPos, targetNote.StartPos + targetNote.Length);
             var noSlidePartInSecs = noteLengthInSecs - Math.Min(maxSlideTimeInSecs, defaultSlidePercent * noteLengthInSecs);
@@ -336,7 +338,7 @@ namespace Plugin.SynthV
                 var nextSlidePartInSecs = Math.Min(maxSlideTimeInSecs, defaultSlidePercent * DurationPositionToSecs(
                     nextNote.StartPos, nextNote.StartPos + nextNote.Length));
                 var interpolationSecs = tailSlidePartInSecs + intervalPartInSecs + nextSlidePartInSecs;
-                if (interpolationSecs > maxSlideTimeInSecs * 2) // next note is too far away
+                if (intervalPartInSecs > maxSlideTimeInSecs * 2) // next note is too far away
                 {
                     if (timeAfterHeadInSecs > noteLengthInSecs) // position between tail of target note and head of next note
                     {
@@ -347,10 +349,9 @@ namespace Plugin.SynthV
                     // before tail of target note
                     return pitch - targetNote.KeyNumber * 100;
                 }
-                // cosine interpolation of the slide part
-                var ratio = 0.5 * (1 + Math.Cos(
-                    Math.PI * (timeAfterHeadInSecs - noSlidePartInSecs) / interpolationSecs));
-                return pitch - (ratio * targetNote.KeyNumber + (1 - ratio) * nextNote.KeyNumber) * 100;
+                // interpolation of the slide part
+                var ratio = interpolation.Apply((timeAfterHeadInSecs - intervalPartInSecs / 2 - noSlidePartInSecs) / interpolationSecs);
+                return pitch - ((1 - ratio) * targetNote.KeyNumber + ratio * nextNote.KeyNumber) * 100;
             }
             // position is within the middle of target note
             return pitch - targetNote.KeyNumber * 100;
