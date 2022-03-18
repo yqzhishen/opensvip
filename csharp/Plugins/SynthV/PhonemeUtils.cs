@@ -14,7 +14,7 @@ namespace Plugin.SynthV
 
         private static readonly Dictionary<string, double> DefaultDurations = new Dictionary<string, double>
         {
-            {"stop", 0.110},
+            {"stop", 0.10},
             {"affricate", 0.120},
             {"fricative", 0.120},
             {"aspirate", 0.094},

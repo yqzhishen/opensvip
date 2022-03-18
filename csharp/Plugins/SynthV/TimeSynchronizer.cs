@@ -53,9 +53,9 @@ namespace Plugin.SynthV
             }
             
             var startTempoIndex = TempoBuffer.FindLastIndex(tempo => tempo.Position <= startTicks);
-            var endTempoIndex = TempoBuffer.FindIndex(tempo => tempo.Position >= endTicks);
+            var endTempoIndex = TempoBuffer.FindLastIndex(tempo => tempo.Position <= endTicks);
             
-            if (endTempoIndex == -1 || startTempoIndex + 1 == endTempoIndex)
+            if (startTempoIndex == endTempoIndex)
             {
                 return (endTicks - startTicks) / TempoBuffer[startTempoIndex].BPM / 8;
             }
@@ -63,11 +63,11 @@ namespace Plugin.SynthV
             var secs = 0.0;
             secs += (TempoBuffer[startTempoIndex + 1].Position - startTicks)
                     / (double) TempoBuffer[startTempoIndex].BPM / 8;
-            for (var i = startTempoIndex + 1; i < endTempoIndex - 1; i++)
+            for (var i = startTempoIndex + 1; i < endTempoIndex; i++)
             {
                 secs += (TempoBuffer[i + 1].Position - TempoBuffer[i].Position) / (double) TempoBuffer[i].BPM / 8;
             }
-            secs += (endTicks - TempoBuffer[endTempoIndex - 1].Position) / (double) TempoBuffer[endTempoIndex - 1].BPM / 8;
+            secs += (endTicks - TempoBuffer[endTempoIndex].Position) / (double) TempoBuffer[endTempoIndex].BPM / 8;
             return secs;
         }
 

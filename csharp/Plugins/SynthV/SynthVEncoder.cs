@@ -68,6 +68,7 @@ namespace Plugin.SynthV
                 });
             }
             var isAbsoluteTimeMode = newMeters.Any(meter => meter.Denominator < 2 || meter.Denominator > 16);
+            Synchronizer = new TimeSynchronizer(newTempos, isAbsoluteTimeMode, DefaultTempo);
             if (!isAbsoluteTimeMode)
             {
                 foreach (var meter in newMeters)
@@ -93,7 +94,6 @@ namespace Plugin.SynthV
                     BPM = DefaultTempo
                 });
             }
-            Synchronizer = new TimeSynchronizer(newTempos, isAbsoluteTimeMode, DefaultTempo);
             
             var id = 0;
             foreach (var svTrack in project.TrackList.Select(EncodeTrack))
