@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -33,13 +32,17 @@ namespace OpenSvip.Const
             return Regex.IsMatch(id, "[FM]\\d+") ? $"$({id})" : "";
         }
 
-        public static string GetId(string name)
+        public static string GetId(string name, string defaultName = null)
         {
             foreach (var singer in SingerNames.Where(singer => singer.Value.Equals(name)))
             {
                 return singer.Key;
             }
-            return Regex.IsMatch(name, "\\$\\([FM]\\d+\\)") ? name.Substring(2, name.Length - 3) : "";
+            if (Regex.IsMatch(name, "\\$\\([FM]\\d+\\)"))
+            {
+                return name.Substring(2, name.Length - 3);
+            }
+            return defaultName ?? "";
         }
     }
 

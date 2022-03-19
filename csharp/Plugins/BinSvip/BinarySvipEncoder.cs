@@ -10,6 +10,8 @@ namespace OpenSvip.Stream
 {
     public class BinarySvipEncoder
     {
+        public string defaultSinger { get; set; }
+
         public Tuple<string, SingingTool.Model.AppModel> EncodeProject(Project project)
         {
             var version = Regex.IsMatch(project.Version, @"^SVIP\d\.\d\.\d$")
@@ -61,7 +63,7 @@ namespace OpenSvip.Stream
                 case SingingTrack singingTrack:
                     var sTrack = new SingingTool.Model.SingingTrack
                     {
-                        AISingerId = Singers.GetId(singingTrack.AISingerName),
+                        AISingerId = Singers.GetId(singingTrack.AISingerName, defaultSinger),
                         ReverbPreset = ReverbPresets.GetIndex(singingTrack.ReverbPreset)
                     };
                     foreach (var note in singingTrack.NoteList)

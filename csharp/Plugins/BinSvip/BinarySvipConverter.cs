@@ -27,7 +27,10 @@ namespace OpenSvip.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            var (version, model) = new BinarySvipEncoder().EncodeProject(project);
+            var (version, model) = new BinarySvipEncoder
+            {
+                defaultSinger = options.GetOptionAsString("singer", "陈水若")
+            }.EncodeProject(project);
             var verEnum = options.GetOptionAsEnum<BinarySvipVersions>("version");
             switch (verEnum)
             {

@@ -14,6 +14,9 @@
     <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
     <InputOptions/>
     <OutputOptions>
+        <Option Name="singer" Type="string" Default="陈水若">
+            <Notes>无法匹配歌手时，使用此缺省歌手</Notes>
+        </Option>
         <Option Name="version" Type="enum" Default="auto">
             <Notes>指定生成的 .svip 文件版本</Notes>
             <EnumChoices>
