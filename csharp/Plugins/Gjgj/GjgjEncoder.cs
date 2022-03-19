@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenSvip.Model;
 using Gjgj.Model;
+using System.Windows.Forms;
 
 namespace Plugin.Gjgj
 {
@@ -51,24 +52,31 @@ namespace Plugin.Gjgj
         {
             gjAccompanimentsItem.ID = Convert.ToString(trackID);
             gjAccompanimentsItem.Path = instrumentalTrack.AudioFilePath;
-            int offsetFromXS = instrumentalTrack.Offset;
-            int convertedAccompanimentsOffset = (int)((project.SongTempoList[0].BPM / 60.0) * 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator / 480 * 10000000);
-            int tempoIndex = 0;
+            //int offsetFromXS = instrumentalTrack.Offset;
+            int convertedAccompanimentsOffset = 0;
+            /*int tempoIndex = 0;
             int lastTempoPosition = 0;
-            while (project.SongTempoList[tempoIndex].Position <= offsetFromXS)
+            if (project.SongTempoList.Count == 1)
             {
-                convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (project.SongTempoList[tempoIndex].Position - lastTempoPosition) / 480 * 10000000);
-                lastTempoPosition = project.SongTempoList[tempoIndex].Position;
-                if (tempoIndex < project.SongTempoList.Count - 1)
-                {
-                    tempoIndex++;
-                }
-                else
-                {
-                    break;
-                }
+                convertedAccompanimentsOffset += (int)((project.SongTempoList[0].BPM / 60.0) * offsetFromXS / 480.0 * 10000000.0);
             }
-            convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (offsetFromXS - lastTempoPosition) / 480 * 10000000);
+            else
+            {
+                while (project.SongTempoList[tempoIndex].Position <= offsetFromXS)
+                {
+                    convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (project.SongTempoList[tempoIndex].Position - lastTempoPosition) / 480.0 * 10000000.0);
+                    lastTempoPosition = project.SongTempoList[tempoIndex].Position;
+                    if (tempoIndex < project.SongTempoList.Count - 1)
+                    {
+                        tempoIndex++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (offsetFromXS - lastTempoPosition) / 480.0 * 10000000.0);
+            }*/
             gjAccompanimentsItem.Offset = convertedAccompanimentsOffset;
             gjAccompanimentsItem.MasterVolume = new GjMasterVolume();
             gjAccompanimentsItem.MasterVolume.Volume = 1.0f;
@@ -274,7 +282,7 @@ namespace Plugin.Gjgj
             {
                 GjTemposItem gjTemposItem = new GjTemposItem();
                 gjTemposItem.Time = project.SongTempoList[i].Position;
-                gjTemposItem.MicrosecondsPerQuarterNote = (int)(60 / project.SongTempoList[i].BPM * 1000000);
+                gjTemposItem.MicrosecondsPerQuarterNote = (int)(60.0 / project.SongTempoList[i].BPM * 1000000.0);
                 gjProject.TempoMap.Tempos.Add(gjTemposItem);
             }
         }

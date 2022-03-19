@@ -38,9 +38,6 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommandLine">
-      <HintPath>E:\编程开发\OpenSvipConverter\OpenSvipConverter\bin\Debug\CommandLine.dll</HintPath>
-    </Reference>
     <Reference Include="NAudio">
       <HintPath>..\..\..\..\..\..\..\..\软件\编曲\合成器\X Studio 2.0.2\XStudioSinger\NAudio.dll</HintPath>
     </Reference>
@@ -69,10 +66,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Console\OpenSvip.Console.csproj">
-      <Project>{3779da9f-186c-4529-9ff6-56d0186d571c}</Project>
-      <Name>OpenSvip.Console</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
       <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
       <Name>OpenSvip.Framework</Name>

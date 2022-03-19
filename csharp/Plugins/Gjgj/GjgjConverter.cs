@@ -5,7 +5,6 @@ using OpenSvip.Framework;
 using OpenSvip.Model;
 using Plugin.Gjgj;
 using Gjgj.Model;
-using System.Windows.Forms;
 
 namespace Gjgj.Stream
 {
@@ -24,35 +23,18 @@ namespace Gjgj.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            try
+            var gjProject = new GjgjEncoder().EncodeProject(project);
+            var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            var writer = new StreamWriter(stream, Encoding.UTF8);
+            var jsonString = JsonConvert.SerializeObject(gjProject);
+            foreach (var ch in jsonString)
             {
-                var gjProject = new GjgjEncoder().EncodeProject(project);
-                var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-                var writer = new StreamWriter(stream, Encoding.UTF8);
-                var jsonString = JsonConvert.SerializeObject(gjProject);
-                foreach (var ch in jsonString)
-                {
-                    writer.Write(ch);
-                    /*if (ch > 32 && ch < 127)
-                    {
-                        writer.Write(ch);
-                    }
-                    else
-                    {
-                        writer.Write($@"\u{(int)ch:x4}");
-                    }*/
-                }
-                writer.Flush();
-                stream.WriteByte(0);
-                stream.Flush();
-                writer.Close();
-                stream.Close();
+                writer.Write(ch);
             }
-            catch (System.Exception e)
-            {
-                MessageBox.Show("错误：" + e);
-                throw;
-            }
+            writer.Flush();
+            stream.Flush();
+            writer.Close();
+            stream.Close();
         }
     }
 }
