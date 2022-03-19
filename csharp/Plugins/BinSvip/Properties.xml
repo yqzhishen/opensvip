@@ -14,9 +14,10 @@
     <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
     <InputOptions/>
     <OutputOptions>
-        <Option Name="version" Type="enum">
+        <Option Name="version" Type="enum" Default="auto">
             <Notes>指定生成的 .svip 文件版本</Notes>
             <EnumChoices>
+                <Choice Name="根据当前安装的 X Studio 自动选择" Tag="auto"/>
                 <Choice Name="SVIP 7.0.0 (X Studio 2.0)" Tag="7.0.0"/>
                 <Choice Name="SVIP 6.0.0 (X Studio 1.8)" Tag="6.0.0"/>
             </EnumChoices>

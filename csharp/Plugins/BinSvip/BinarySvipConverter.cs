@@ -28,19 +28,19 @@ namespace OpenSvip.Stream
         public void Save(string path, Project project, ConverterOptions options)
         {
             var (version, model) = new BinarySvipEncoder().EncodeProject(project);
-            if (options.ContainsOption("version")) {
-                var verEnum = options.GetOptionAsEnum<BinarySvipVersions>("version");
-                switch (verEnum)
-                {
-                    case BinarySvipVersions.SVIP7_0_0:
-                        version = "SVIP7.0.0";
-                        break;
-                    case BinarySvipVersions.SVIP6_0_0:
-                        version = "SVIP6.0.0";
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+            var verEnum = options.GetOptionAsEnum<BinarySvipVersions>("version");
+            switch (verEnum)
+            {
+                case BinarySvipVersions.SVIP7_0_0:
+                    version = "SVIP7.0.0";
+                    break;
+                case BinarySvipVersions.SVIP6_0_0:
+                    version = "SVIP6.0.0";
+                    break;
+                case BinarySvipVersions.Automatic:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
             var buffer = Encoding.Default.GetBytes(version);
             var writer = new FileStream(path, FileMode.Create, FileAccess.Write);
