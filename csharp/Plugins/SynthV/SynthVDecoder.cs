@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using OpenSvip.Model;
 using SynthV.Model;
 
@@ -6,18 +9,42 @@ namespace Plugin.SynthV
 {
     public class SynthVDecoder
     {
+        private int FirstBarTick;
+
+        private float FirstBPM;
+
+        private List<string> LyricsPinyin;
+
+        private List<Track> GroupTracksBuffer = new List<Track>(); // reserved for note groups
+
         public Project DecodeProject(SVProject svProject)
         {
             var project = new Project();
             var time = svProject.Time;
-            foreach (var meter in time.Meters)
+            // shift all meters one bar later, except the first meter
+            var firstMeter = DecodeMeter(time.Meters[0]);
+            FirstBarTick = 1920 * firstMeter.Numerator / firstMeter.Denominator;
+            project.TimeSignatureList.Add(firstMeter);
+            foreach (var svMeter in time.Meters.Skip(1))
             {
-                project.TimeSignatureList.Add(DecodeMeter(meter));
+                var meter = DecodeMeter(svMeter);
+                meter.BarIndex++;
+                project.TimeSignatureList.Add(meter);
             }
-
-            foreach (var tempo in time.Tempos)
+            // shift all tempos one bar later, except the first tempo
+            var firstTempo = DecodeTempo(time.Tempos[0]);
+            FirstBPM = firstTempo.BPM;
+            project.SongTempoList.Add(firstTempo);
+            foreach (var svTempo in time.Tempos.Skip(1))
             {
-                project.SongTempoList.Add(DecodeTempo(tempo));
+                var tempo = DecodeTempo(svTempo);
+                tempo.Position += FirstBarTick;
+                project.SongTempoList.Add(tempo);
+            }
+            
+            foreach (var svTrack in svProject.Tracks)
+            {
+                project.TrackList.Add(DecodeTrack(svTrack));
             }
             return project;
         }
@@ -49,15 +76,17 @@ namespace Plugin.SynthV
                 svipTrack = new InstrumentalTrack
                 {
                     AudioFilePath = track.MainRef.Audio.Filename,
-                    Offset = DecodePosition(track.MainRef.BlickOffset)
+                    Offset = DecodeAudioOffset(track.MainRef.BlickOffset)
                 };
             }
             else
             {
                 var singingTrack = new SingingTrack
                 {
-                    // TODO: singing track attributes
+                    NoteList = DecodeNoteList(track.MainGroup.Notes),
+                    EditedParams = DecodeParams(track.MainGroup.Params)
                 };
+                // TODO: decode note groups
                 svipTrack = singingTrack;
             }
             svipTrack.Title = track.Name;
@@ -75,10 +104,50 @@ namespace Plugin.SynthV
                 : Math.Pow(10, gain / 20.0);
         }
 
+        private List<Note> DecodeNoteList(List<SVNote> svNotes)
+        {
+            // TODO: decode phones
+            return svNotes.Select(DecodeNote).ToList();
+        }
+
+        private Params DecodeParams(SVParams svParams)
+        {
+            var parameters = new Params();
+            return parameters;
+        }
+
+        private Note DecodeNote(SVNote svNote)
+        {
+            var note = new Note
+            {
+                StartPos = DecodePosition(svNote.Onset),
+                KeyNumber = svNote.Pitch
+            };
+            note.Length = DecodePosition(svNote.Onset + svNote.Duration) - note.StartPos; // avoid overlapping
+            if (Regex.IsMatch(svNote.Lyrics, @"[a-zA-Z]"))
+            {
+                note.Lyric = "啊";
+                note.Pronunciation = svNote.Lyrics;
+            }
+            else
+            {
+                note.Lyric = svNote.Lyrics;
+            }
+            return note;
+        }
+
+        private int DecodeAudioOffset(long offset)
+        {
+            if (offset >= 0)
+            {
+                return DecodePosition(offset);
+            }
+            return (int) Math.Round(offset / 1470000.0 * (FirstBPM / 120));
+        }
+
         private int DecodePosition(long position)
         {
             return (int) Math.Round(position / 1470000.0);
-            // TODO: is this right??
         }
     }
 }

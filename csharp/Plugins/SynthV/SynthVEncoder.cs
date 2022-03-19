@@ -459,11 +459,11 @@ namespace Plugin.SynthV
         {
             var svNote = new SVNote
             {
-                Onset = EncodePosition(note.StartPos)
+                Onset = EncodePosition(note.StartPos),
+                Pitch = note.KeyNumber,
+                Lyrics = note.Pronunciation ?? note.Lyric
             };
             svNote.Duration = EncodePosition(note.StartPos + note.Length) - svNote.Onset;
-            svNote.Pitch = note.KeyNumber;
-            svNote.Lyrics = note.Pronunciation ?? note.Lyric;
             return svNote;
         }
 

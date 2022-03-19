@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Newtonsoft.Json;
 using Plugin.SynthV;
 
@@ -92,17 +93,38 @@ namespace SynthV.Model
         [JsonProperty("attributes")] public SVNoteAttributes Attributes { get; set; } = new SVNoteAttributes();
     }
 
-    [JsonConverter(typeof(SVNoteAttributesJsonConverter))]
     public class SVNoteAttributes
     {
-        [JsonProperty("tF0VbrStart")] public double VibratoStart { get; set; } = double.NaN;
-        [JsonProperty("tF0VbrLeft")] public double VibratoLeft { get; set; } = double.NaN;
-        [JsonProperty("tF0VbrRight")] public double VibratoRight { get; set; } = double.NaN;
-        [JsonProperty("dF0Vbr")] public double VibratoDepth { get; set; } = double.NaN;
-        [JsonProperty("fF0Vbr")] public double VibratoFrequency { get; set; } = double.NaN;
-        [JsonProperty("pF0Vbr")] public double VibratoPhase { get; set; } = double.NaN;
-        [JsonProperty("dF0Jitter")] public double VibratoJitter { get; set; } = double.NaN;
-        [JsonProperty("dur")] public double[] PhoneDurations { get; set; }
+        [DefaultValue(double.NaN)]
+        [JsonProperty("tF0VbrStart", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoStart { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("tF0VbrLeft", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoLeft { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("tF0VbrRight", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoRight { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("dF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoDepth { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("fF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoFrequency { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("pF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoPhase { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("dF0Jitter", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double VibratoJitter { get; set; }
+        
+        [JsonProperty("dur", NullValueHandling = NullValueHandling.Ignore)]
+        public double[] PhoneDurations { get; set; }
         
         public void SetPhoneDuration(int index, double value)
         {
@@ -133,7 +155,8 @@ namespace SynthV.Model
 
     public class SVRef
     {
-        [JsonProperty("groupID")] public string GroupId { get; set; } = "aba7184c-14a3-4caf-a740-69d9cdc35a80";
+        [JsonProperty("groupID")]
+        public string GroupId { get; set; } = "aba7184c-14a3-4caf-a740-69d9cdc35a80";
         [JsonProperty("blickOffset")] public long BlickOffset { get; set; }
         [JsonProperty("pitchOffset")] public int PitchOffset { get; set; }
         [JsonProperty("isInstrumental")] public bool IsInstrumental { get; set; }
