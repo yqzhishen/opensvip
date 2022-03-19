@@ -11,12 +11,20 @@ namespace Plugin.Gjgj
     {
         public GjProject EncodeProject(Project project)
         {
-            var gjProject = new GjProject();
-            SetGjProjectProperties(gjProject);
-            EncodeTempo(project, gjProject);
-            EncodeTimeSignature(project, gjProject);
-            EncodeTracks(project, gjProject);
-            return gjProject;
+            try
+            {
+                GjProject gjProject = new GjProject();
+                SetGjProjectProperties(gjProject);
+                EncodeTempo(project, gjProject);
+                EncodeTimeSignature(project, gjProject);
+                EncodeTracks(project, gjProject);
+                return gjProject;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
         }
 
         private void EncodeTracks(Project project, GjProject gjProject)
@@ -78,11 +86,13 @@ namespace Plugin.Gjgj
                 convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (offsetFromXS - lastTempoPosition) / 480.0 * 10000000.0);
             }*/
             gjAccompanimentsItem.Offset = convertedAccompanimentsOffset;
-            gjAccompanimentsItem.MasterVolume = new GjMasterVolume();
-            gjAccompanimentsItem.MasterVolume.Volume = 1.0f;
-            gjAccompanimentsItem.MasterVolume.LeftVolume = 1.0f;
-            gjAccompanimentsItem.MasterVolume.RightVolume = 1.0f;
-            gjAccompanimentsItem.MasterVolume.Mute = instrumentalTrack.Mute;
+            gjAccompanimentsItem.MasterVolume = new GjMasterVolume
+            {
+                Volume = 1.0f,
+                LeftVolume = 1.0f,
+                RightVolume = 1.0f,
+                Mute = instrumentalTrack.Mute
+            };
             gjAccompanimentsItem.EQProgram = "";
         }
 
@@ -105,16 +115,18 @@ namespace Plugin.Gjgj
 
         private static void EncodeNotes(Project project, int noteID, GjTracksItem gjTracksItem, Note note)
         {
-            GjBeatItemsItem gjBeatItemsItem = new GjBeatItemsItem();
-            gjBeatItemsItem.ID = noteID;
-            gjBeatItemsItem.Lyric = note.Lyric;
-            gjBeatItemsItem.Pinyin = note.Pronunciation ?? "";
-            gjBeatItemsItem.StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-            gjBeatItemsItem.Duration = note.Length;
-            gjBeatItemsItem.Track = note.KeyNumber - 24;
-            gjBeatItemsItem.PreTime = 0;
-            gjBeatItemsItem.PostTime = 0;
-            gjBeatItemsItem.Style = 0;
+            GjBeatItemsItem gjBeatItemsItem = new GjBeatItemsItem
+            {
+                ID = noteID,
+                Lyric = note.Lyric,
+                Pinyin = note.Pronunciation ?? "",
+                StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator,
+                Duration = note.Length,
+                Track = note.KeyNumber - 24,
+                PreTime = 0,
+                PostTime = 0,
+                Style = 0
+            };
             gjTracksItem.BeatItems.Add(gjBeatItemsItem);
         }
 
@@ -166,20 +178,26 @@ namespace Plugin.Gjgj
                         {
                             for (int volumePointTimeBufferIndex = 0; volumePointTimeBufferIndex < volumePointTimeBuffer.Count; volumePointTimeBufferIndex += 5)
                             {
-                                GjVolumeMapItem gjVolumeMapItem = new GjVolumeMapItem();
-                                gjVolumeMapItem.Time = volumePointTimeBuffer[volumePointTimeBufferIndex];
-                                gjVolumeMapItem.Volume = volumePointValueBuffer[volumePointTimeBufferIndex];
+                                GjVolumeMapItem gjVolumeMapItem = new GjVolumeMapItem
+                                {
+                                    Time = volumePointTimeBuffer[volumePointTimeBufferIndex],
+                                    Volume = volumePointValueBuffer[volumePointTimeBufferIndex]
+                                };
                                 gjTracksItem.VolumeMap.Add(gjVolumeMapItem);
                             }
 
-                            GjVolumeMapItem gjVolumeParamLeftEndpoint = new GjVolumeMapItem();
-                            gjVolumeParamLeftEndpoint.Time = volumePointTimeBuffer[0] - 3;
-                            gjVolumeParamLeftEndpoint.Volume = 1.0;
+                            GjVolumeMapItem gjVolumeParamLeftEndpoint = new GjVolumeMapItem
+                            {
+                                Time = volumePointTimeBuffer[0] - 3,
+                                Volume = 1.0
+                            };
                             gjTracksItem.VolumeMap.Add(gjVolumeParamLeftEndpoint);
 
-                            GjVolumeMapItem gjVolumeParamRightEndpoint = new GjVolumeMapItem();
-                            gjVolumeParamRightEndpoint.Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 3;
-                            gjVolumeParamRightEndpoint.Volume = 1.0;
+                            GjVolumeMapItem gjVolumeParamRightEndpoint = new GjVolumeMapItem
+                            {
+                                Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 3,
+                                Volume = 1.0
+                            };
                             gjTracksItem.VolumeMap.Add(gjVolumeParamRightEndpoint);
 
 
@@ -197,7 +215,6 @@ namespace Plugin.Gjgj
         {
             gjTracksItem.Tone = new GjTone();
             double convertedPitchFromXS;
-            List<double> breakPoints = new List<double>();
             List<double> pitchPointBufferX = new List<double>();
             List<double> pitchPointBufferY = new List<double>();
             gjTracksItem.Tone.Modifys = new List<GjModifysItem>();
@@ -232,14 +249,18 @@ namespace Plugin.Gjgj
                         {
                             for (int j = 0; j < pitchPointBufferX.Count; j++)
                             {
-                                GjModifysItem gjModifysItem = new GjModifysItem();
-                                gjModifysItem.X = pitchPointBufferX[j];
-                                gjModifysItem.Y = pitchPointBufferY[j];
+                                GjModifysItem gjModifysItem = new GjModifysItem
+                                {
+                                    X = pitchPointBufferX[j],
+                                    Y = pitchPointBufferY[j]
+                                };
                                 gjTracksItem.Tone.Modifys.Add(gjModifysItem);
                             }
-                            GjModifyRangesItem gjModifyRangesItem = new GjModifyRangesItem();
-                            gjModifyRangesItem.X = pitchPointBufferX[0];
-                            gjModifyRangesItem.Y = pitchPointBufferX[pitchPointBufferY.Count - 1];
+                            GjModifyRangesItem gjModifyRangesItem = new GjModifyRangesItem
+                            {
+                                X = pitchPointBufferX[0],
+                                Y = pitchPointBufferX[pitchPointBufferY.Count - 1]
+                            };
                             gjTracksItem.Tone.ModifyRanges.Add(gjModifyRangesItem);
                             pitchPointBufferX.Clear();
                             pitchPointBufferY.Clear();
@@ -275,14 +296,18 @@ namespace Plugin.Gjgj
 
         private static void EncodeTempo(Project project, GjProject gjProject)
         {
-            gjProject.TempoMap = new GjTempoMap();
-            gjProject.TempoMap.TicksPerQuarterNote = 480;
-            gjProject.TempoMap.Tempos = new List<GjTemposItem>(project.SongTempoList.Count);
+            gjProject.TempoMap = new GjTempoMap
+            {
+                TicksPerQuarterNote = 480,
+                Tempos = new List<GjTemposItem>(project.SongTempoList.Count)
+            };
             for (int i = 0; i < project.SongTempoList.Count; i++)
             {
-                GjTemposItem gjTemposItem = new GjTemposItem();
-                gjTemposItem.Time = project.SongTempoList[i].Position;
-                gjTemposItem.MicrosecondsPerQuarterNote = (int)(60.0 / project.SongTempoList[i].BPM * 1000000.0);
+                GjTemposItem gjTemposItem = new GjTemposItem
+                {
+                    Time = project.SongTempoList[i].Position,
+                    MicrosecondsPerQuarterNote = (int)(60.0 / project.SongTempoList[i].BPM * 1000000.0)
+                };
                 gjProject.TempoMap.Tempos.Add(gjTemposItem);
             }
         }
@@ -290,9 +315,11 @@ namespace Plugin.Gjgj
         private static void SetGjProjectProperties(GjProject gjProject)
         {
             gjProject.gjgjVersion = 1;
-            gjProject.ProjectSetting = new GjProjectSetting();
-            gjProject.ProjectSetting.No1KeyName = "C";
-            gjProject.ProjectSetting.EQAfterMix = "";
+            gjProject.ProjectSetting = new GjProjectSetting
+            {
+                No1KeyName = "C",
+                EQAfterMix = ""
+            };
         }
 
         private double ToneToY(double tone)

@@ -66,7 +66,7 @@ namespace Gjgj.Model
 
     public class GjVolumeMapItem
     {
-        public int Time { get; set; }
+        public double Time { get; set; }
         public double Volume { get; set; }
     }
 

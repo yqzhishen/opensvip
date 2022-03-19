@@ -5,6 +5,8 @@ using OpenSvip.Framework;
 using OpenSvip.Model;
 using Plugin.Gjgj;
 using Gjgj.Model;
+using System.Windows.Forms;
+using System;
 
 namespace Gjgj.Stream
 {
@@ -13,12 +15,20 @@ namespace Gjgj.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var reader = new StreamReader(stream, Encoding.UTF8);
-            var gjProject = JsonConvert.DeserializeObject<GjProject>(reader.ReadToEnd());
-            stream.Close();
-            reader.Close();
-            return new GjgjDecoder().DecodeProject(gjProject);
+            try
+            {
+                var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+                var reader = new StreamReader(stream, Encoding.UTF8);
+                var gjProject = JsonConvert.DeserializeObject<GjProject>(reader.ReadToEnd());
+                stream.Close();
+                reader.Close();
+                return new GjgjDecoder().DecodeProject(gjProject);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return null;
+            }
         }
 
         public void Save(string path, Project project, ConverterOptions options)
