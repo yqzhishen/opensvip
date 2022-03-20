@@ -31,7 +31,8 @@ namespace OpenSvip.Stream
             var model = new SingingTool.Model.AppModel();
             FirstBarTick = (int) Math.Round(1920.0 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator);
             FirstBarTempo = project.SongTempoList.Where(tempo => tempo.Position < FirstBarTick).ToList();
-            IsAbsoluteTimeMode = project.SongTempoList.Any(tempo => tempo.BPM < 20 || tempo.BPM > 300);
+            IsAbsoluteTimeMode = project.SongTempoList.Any(tempo => tempo.BPM < 20 || tempo.BPM > 300) 
+                                 || project.TimeSignatureList.Any(beat => beat.Numerator > 255 || beat.Denominator > 32);
             Synchronizer = new TimeSynchronizer(project.SongTempoList, FirstBarTick, IsAbsoluteTimeMode, DefaultTempo);
             if (!IsAbsoluteTimeMode)
             {
