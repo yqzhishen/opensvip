@@ -4,13 +4,24 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using OpenSvip.Const;
+using OpenSvip.Library;
 using OpenSvip.Model;
 
 namespace OpenSvip.Stream
 {
     public class BinarySvipEncoder
     {
-        public string defaultSinger { get; set; }
+        public string DefaultSinger { get; set; }
+        
+        public int DefaultTempo { get; set; }
+
+        private bool IsAbsoluteTimeMode;
+
+        private TimeSynchronizer Synchronizer;
+
+        private int FirstBarTick;
+
+        private List<SongTempo> FirstBarTempo;
 
         public Tuple<string, SingingTool.Model.AppModel> EncodeProject(Project project)
         {
@@ -18,14 +29,51 @@ namespace OpenSvip.Stream
                 ? project.Version
                 : "SVIP" + SingingTool.Const.ToolConstValues.ProjectVersion;
             var model = new SingingTool.Model.AppModel();
-            foreach (var tempo in project.SongTempoList)
+            FirstBarTick = (int) Math.Round(1920.0 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator);
+            FirstBarTempo = project.SongTempoList.Where(tempo => tempo.Position < FirstBarTick).ToList();
+            IsAbsoluteTimeMode = project.SongTempoList.Any(tempo => tempo.BPM < 20 || tempo.BPM > 300);
+            Synchronizer = new TimeSynchronizer(project.SongTempoList, FirstBarTick, IsAbsoluteTimeMode, DefaultTempo);
+            
+            // beat
+            if (IsAbsoluteTimeMode || project.TimeSignatureList.Any(beat => beat.Numerator > 255 || beat.Denominator > 32))
             {
-                model.TempoList.InsertItemInOrder(EncodeSongTempo(tempo));
+                model.BeatList.InsertItemInOrder(new SingingTool.Model.SingingGeneralConcept.SongBeat
+                {
+                    BarIndex = 0,
+                    BeatSize = new SingingTool.Model.SingingGeneralConcept.BeatSize
+                    {
+                        X = 4,
+                        Y = 4
+                    }
+                });
             }
-            foreach (var beat in project.TimeSignatureList)
+            else
             {
-                model.BeatList.InsertItemInOrder(EncodeTimeSignature(beat));
+                foreach (var beat in project.TimeSignatureList)
+                {
+                    model.BeatList.InsertItemInOrder(EncodeTimeSignature(beat));
+                }
             }
+            
+            // tempo
+            if (IsAbsoluteTimeMode)
+            {
+                model.TempoList.InsertItemInOrder(new SingingTool.Model.SingingGeneralConcept.SongTempo
+                {
+                    Pos = 0,
+                    Tempo = DefaultTempo * 100
+                });
+            }
+            else
+            {
+                foreach (var tempo in project.SongTempoList)
+                {
+                    model.TempoList.InsertItemInOrder(EncodeSongTempo(tempo));
+                }
+                
+            }
+            
+            // tracks
             foreach (var t in project.TrackList.Select(EncodeTrack).Where(t => t != null))
             {
                 model.TrackList.Add(t);
@@ -63,7 +111,7 @@ namespace OpenSvip.Stream
                 case SingingTrack singingTrack:
                     var sTrack = new SingingTool.Model.SingingTrack
                     {
-                        AISingerId = Singers.GetId(singingTrack.AISingerName, defaultSinger),
+                        AISingerId = Singers.GetId(singingTrack.AISingerName, DefaultSinger),
                         ReverbPreset = ReverbPresets.GetIndex(singingTrack.ReverbPreset)
                     };
                     foreach (var note in singingTrack.NoteList)
@@ -82,7 +130,7 @@ namespace OpenSvip.Stream
                     resultTrack = new SingingTool.Model.InstrumentTrack
                     {
                         InstrumentFilePath = instrumentalTrack.AudioFilePath,
-                        OffsetInPos = instrumentalTrack.Offset
+                        OffsetInPos = EncodeAudioOffset(instrumentalTrack.Offset)
                     };
                     break;
                 default:
@@ -100,13 +148,14 @@ namespace OpenSvip.Stream
         {
             var resultNote = new SingingTool.Model.Note
             {
-                ActualStartPos = note.StartPos,
-                WidthPos = note.Length,
+                ActualStartPos = (int) Math.Round(Synchronizer.GetActualTicksFromTicks(note.StartPos)),
                 KeyIndex = note.KeyNumber + 12,
                 Lyric = note.Lyric,
                 HeadTag = NoteHeadTags.GetIndex(note.HeadTag),
                 Pronouncing = note.Pronunciation
             };
+            resultNote.WidthPos = (int) Math.Round(
+                    Synchronizer.GetActualTicksFromTicks(note.StartPos + note.Length)) - resultNote.ActualStartPos;
             if (note.EditedPhones != null)
             {
                 resultNote.NotePhoneInfo = EncodePhones(note.EditedPhones);
@@ -142,8 +191,8 @@ namespace OpenSvip.Stream
             var type = style.GetType();
             var ampLine = type.GetProperty("AmpLine", flag);
             var freqLine = type.GetProperty("FreqLine", flag);
-            ampLine?.SetValue(style, EncodeParamCurve(vibrato.Amplitude, left: -1, right: 100001), null);
-            freqLine?.SetValue(style, EncodeParamCurve(vibrato.Frequency, left: -1, right: 100001), null);
+            ampLine?.SetValue(style, EncodeParamCurve(vibrato.Amplitude, left: -1, right: 100001, isTicks: false), null);
+            freqLine?.SetValue(style, EncodeParamCurve(vibrato.Frequency, left: -1, right: 100001, isTicks: false), null);
             return new Tuple<SingingTool.Model.VibratoPercentInfo, SingingTool.Model.VibratoStyle>(percent, style);
         }
         
@@ -164,27 +213,68 @@ namespace OpenSvip.Stream
             Func<int, int> op = null,
             int left = -192000,
             int right = 1073741823,
-            int termination = 0)
+            int termination = 0,
+            bool isTicks = true)
         {
             op = op ?? (x => x);
             var line = new SingingTool.Model.Line.LineParam();
+            const BindingFlags flag = BindingFlags.Instance | BindingFlags.NonPublic;
+            var linkedNodeList = (LinkedList<SingingTool.Model.Line.LineParamNode>) line
+                .GetType()
+                .GetField("_nodeLinkedList", flag)?
+                .GetValue(line);
+            linkedNodeList?.Clear();
             var length = paramCurve.PointList.Count;
-            paramCurve.PointList.Sort((p1, p2) => p1.Item1 - p2.Item1);
-            foreach (var (pos, value) in paramCurve.PointList.Where(point => point.Item1 >= left && point.Item1 <= right))
+            foreach (var (pos, value) in paramCurve.PointList
+                         .Where(point => point.Item1 >= left && point.Item1 <= right)
+                         .OrderBy(point => point.Item1))
             {
-                line.PushBack(new SingingTool.Model.Line.LineParamNode(pos, op(value)));
+                var actualPos = IsAbsoluteTimeMode && isTicks && pos != left && pos != right
+                    ? (int) Math.Round(Synchronizer.GetActualTicksFromTicks(pos - FirstBarTick) + 1920)
+                    : pos;
+                linkedNodeList?.AddLast(new SingingTool.Model.Line.LineParamNode(actualPos, op(value)));
             }
             if (length == 0 || line.Begin.Value.Pos > left)
             {
-                line.PushFront(new SingingTool.Model.Line.LineParamNode(left, termination));
+                linkedNodeList?.AddFirst(new SingingTool.Model.Line.LineParamNode(left, termination));
             }
 
             if (length == 0 || line.Back.Pos < right)
             {
-                line.PushBack(new SingingTool.Model.Line.LineParamNode(right, termination));
+                linkedNodeList?.AddLast(new SingingTool.Model.Line.LineParamNode(right, termination));
             }
             paramCurve.TotalPointsCount = line.Length();
             return line;
+        }
+
+        private int EncodeAudioOffset(int offset)
+        {
+            if (!IsAbsoluteTimeMode)
+            {
+                return offset;
+            }
+            if (offset > 0)
+            {
+                return (int) Math.Round(Synchronizer.GetActualTicksFromTicks(offset));
+            }
+            var currentPos = FirstBarTick;
+            var actualPos = FirstBarTick + offset;
+            var res = 0.0;
+            var i = FirstBarTempo.Count - 1;
+            for (; i >= 0 && actualPos <= FirstBarTempo[i].Position; i--)
+            {
+                res -= (currentPos - FirstBarTempo[i].Position) * DefaultTempo / FirstBarTempo[i].BPM;
+                currentPos = FirstBarTempo[i].Position;
+            }
+            if (i >= 0)
+            {
+                res -= (currentPos - actualPos) * DefaultTempo / FirstBarTempo[i].BPM;
+            }
+            else
+            {
+                res += actualPos * DefaultTempo / FirstBarTempo[0].BPM;
+            }
+            return (int) Math.Round(res);
         }
     }
 }

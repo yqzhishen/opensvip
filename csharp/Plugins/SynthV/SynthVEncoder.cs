@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NAudio.Wave;
 using OpenSvip.Model;
+using OpenSvip.Library;
 using SynthV.Model;
 
 namespace Plugin.SynthV
 {
     public class SynthVEncoder
     {
-        public int DefaultTempo { get; set; } = 60;
-
         public VibratoOptions VibratoOptions { get; set; } = VibratoOptions.Hybrid;
 
         private int FirstBarTick;
@@ -31,56 +30,15 @@ namespace Plugin.SynthV
         public SVProject EncodeProject(Project project)
         {
             var svProject = new SVProject();
-            var newMeters = project.TimeSignatureList.Skip(1).Select(
-                meter => new TimeSignature
-                {
-                    BarIndex = meter.BarIndex - 1,
-                    Numerator = meter.Numerator,
-                    Denominator = meter.Denominator
-                }).ToList();
-            if (!newMeters.Any() || newMeters[0].BarIndex > 0)
-            {
-                newMeters.Insert(0, new TimeSignature
-                {
-                    BarIndex = 0,
-                    Numerator = project.TimeSignatureList[0].Numerator,
-                    Denominator = project.TimeSignatureList[0].Denominator
-                });
-            }
-            FirstBarTick = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+            var newMeters = ScoreMarkUtils.SkipBeatList(project.TimeSignatureList, 1);
+            FirstBarTick = (int) Math.Round(1920.0 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator);
             FirstBarTempo = project.SongTempoList.Where(tempo => tempo.Position < FirstBarTick).ToList();
-            var newTempos = project.SongTempoList
-                .Where(tempo => tempo.Position >= FirstBarTick)
-                .Select(
-                    tempo => new SongTempo
-                    {
-                        Position = tempo.Position - FirstBarTick,
-                        BPM = tempo.BPM
-                    }).ToList();
-            if (!newTempos.Any() || newTempos[0].Position > 0)
+            Synchronizer = new TimeSynchronizer(project.SongTempoList, FirstBarTick);
+            foreach (var tempo in Synchronizer.TempoList)
             {
-                var i = 0;
-                for (; i < project.SongTempoList.Count && project.SongTempoList[i].Position <= FirstBarTick; i++) { }
-                newTempos.Insert(0, new SongTempo
-                {
-                    Position = 0,
-                    BPM = project.SongTempoList[i - 1].BPM
-                });
+                svProject.Time.Tempos.Add(EncodeTempo(tempo));
             }
-            var isAbsoluteTimeMode = newMeters.Any(meter => meter.Denominator < 2 || meter.Denominator > 16);
-            Synchronizer = new TimeSynchronizer(newTempos, isAbsoluteTimeMode, DefaultTempo);
-            if (!isAbsoluteTimeMode)
-            {
-                foreach (var meter in newMeters)
-                {
-                    svProject.Time.Meters.Add(EncodeMeter(meter));
-                }
-                foreach (var tempo in newTempos)
-                {
-                    svProject.Time.Tempos.Add(EncodeTempo(tempo));
-                }
-            }
-            else
+            if (project.TimeSignatureList.Any(beat => beat.Denominator < 2 || beat.Denominator > 16))
             {
                 svProject.Time.Meters.Add(new SVMeter
                 {
@@ -88,13 +46,14 @@ namespace Plugin.SynthV
                     Numerator = 4,
                     Denominator = 4
                 });
-                svProject.Time.Tempos.Add(new SVTempo
-                {
-                    Position = 0,
-                    BPM = DefaultTempo
-                });
             }
-            
+            else
+            {
+                foreach (var meter in newMeters)
+                {
+                    svProject.Time.Meters.Add(EncodeMeter(meter));
+                }
+            }
             var id = 0;
             foreach (var svTrack in project.TrackList.Select(EncodeTrack))
             {
@@ -119,7 +78,7 @@ namespace Plugin.SynthV
         {
             return new SVTempo
             {
-                Position = EncodePosition(tempo.Position),
+                Position = TicksToPosition(tempo.Position),
                 BPM = tempo.BPM
             };
         }
@@ -260,14 +219,14 @@ namespace Plugin.SynthV
                     {
                         if (lastPoint != null && lastPoint.Item1 + 2 * minInterval < buffer[0].Item1)
                         {
-                            pointList.Add(new Tuple<long, double>(EncodePosition(lastPoint.Item1 + minInterval), 0.0));
+                            pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), 0.0));
                         }
-                        pointList.Add(new Tuple<long, double>(EncodePosition(buffer[0].Item1 - minInterval), 0.0));
+                        pointList.Add(new Tuple<long, double>(TicksToPosition(buffer[0].Item1 - minInterval), 0.0));
                     }
                     foreach (var (bufferPos, bufferVal) in buffer)
                     {
                         pointList.Add(new Tuple<long, double>(
-                            EncodePosition(bufferPos),
+                            TicksToPosition(bufferPos),
                             EncodePitchDiff(bufferPos, bufferVal)));
                     }
                     lastPoint = buffer.Last();
@@ -280,7 +239,7 @@ namespace Plugin.SynthV
             }
             if (lastPoint != null)
             {
-                pointList.Add(new Tuple<long, double>(EncodePosition(lastPoint.Item1 + minInterval), 0.0));
+                pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), 0.0));
             }
             return svCurve;
         }
@@ -322,13 +281,13 @@ namespace Plugin.SynthV
                     {
                         if (lastPoint != null && lastPoint.Item1 + 2 * minInterval < buffer[0].Item1)
                         {
-                            pointList.Add(new Tuple<long, double>(EncodePosition(lastPoint.Item1 + minInterval), defaultValue));
+                            pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), defaultValue));
                         }
-                        pointList.Add(new Tuple<long, double>(EncodePosition(buffer[0].Item1 - minInterval), defaultValue));
+                        pointList.Add(new Tuple<long, double>(TicksToPosition(buffer[0].Item1 - minInterval), defaultValue));
                     }
                     foreach (var (bufferPos, bufferVal) in buffer)
                     {
-                        pointList.Add(new Tuple<long, double>(EncodePosition(bufferPos), op(bufferVal)));
+                        pointList.Add(new Tuple<long, double>(TicksToPosition(bufferPos), op(bufferVal)));
                     }
                     lastPoint = buffer.Last();
                     buffer.Clear();
@@ -340,7 +299,7 @@ namespace Plugin.SynthV
             }
             if (lastPoint != null)
             {
-                pointList.Add(new Tuple<long, double>(EncodePosition(lastPoint.Item1 + minInterval), defaultValue));
+                pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), defaultValue));
             }
             return svCurve;
         }
@@ -459,11 +418,11 @@ namespace Plugin.SynthV
         {
             var svNote = new SVNote
             {
-                Onset = EncodePosition(note.StartPos),
+                Onset = TicksToPosition(note.StartPos),
                 Pitch = note.KeyNumber,
                 Lyrics = note.Pronunciation ?? note.Lyric
             };
-            svNote.Duration = EncodePosition(note.StartPos + note.Length) - svNote.Onset;
+            svNote.Duration = TicksToPosition(note.StartPos + note.Length) - svNote.Onset;
             return svNote;
         }
 
@@ -471,7 +430,7 @@ namespace Plugin.SynthV
         {
             if (offset >= 0)
             {
-                return EncodePosition(offset);
+                return TicksToPosition(offset);
             }
             var currentPos = FirstBarTick;
             var actualPos = FirstBarTick + offset;
@@ -493,9 +452,9 @@ namespace Plugin.SynthV
             return (long) Math.Round(res * 1470000L);
         }
 
-        private long EncodePosition(int position)
+        private static long TicksToPosition(int position)
         {
-            return (long) Math.Round(Synchronizer.GetActualTicksFromTicks(position) * 1470000L);
+            return (long) Math.Round((double) position * 1470000L);
         }
     }
 }

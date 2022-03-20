@@ -24,7 +24,6 @@ namespace SynthV.Stream
         {
             var svProject = new SynthVEncoder
             {
-                DefaultTempo = options.GetOptionAsInteger("default-tempo", 60),
                 VibratoOptions = options.GetOptionAsEnum("vibrato", VibratoOptions.Hybrid)
             }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using OpenSvip.Library;
 using OpenSvip.Model;
 using SynthV.Model;
 
@@ -11,7 +12,7 @@ namespace Plugin.SynthV
     {
         private int FirstBarTick;
 
-        private float FirstBPM;
+        private double FirstBPM;
 
         private List<string> LyricsPinyin;
 
@@ -21,26 +22,11 @@ namespace Plugin.SynthV
         {
             var project = new Project();
             var time = svProject.Time;
-            // shift all meters one bar later, except the first meter
-            var firstMeter = DecodeMeter(time.Meters[0]);
-            FirstBarTick = 1920 * firstMeter.Numerator / firstMeter.Denominator;
-            project.TimeSignatureList.Add(firstMeter);
-            foreach (var svMeter in time.Meters.Skip(1))
-            {
-                var meter = DecodeMeter(svMeter);
-                meter.BarIndex++;
-                project.TimeSignatureList.Add(meter);
-            }
-            // shift all tempos one bar later, except the first tempo
-            var firstTempo = DecodeTempo(time.Tempos[0]);
-            FirstBPM = firstTempo.BPM;
-            project.SongTempoList.Add(firstTempo);
-            foreach (var svTempo in time.Tempos.Skip(1))
-            {
-                var tempo = DecodeTempo(svTempo);
-                tempo.Position += FirstBarTick;
-                project.SongTempoList.Add(tempo);
-            }
+            FirstBarTick = 1920 * time.Meters[0].Numerator / time.Meters[0].Denominator;
+            FirstBPM = time.Tempos[0].BPM;
+            
+            project.SongTempoList = ScoreMarkUtils.ShiftTempoList(time.Tempos.ConvertAll(DecodeTempo), FirstBarTick);
+            project.TimeSignatureList = ScoreMarkUtils.ShiftBeatList(time.Meters.ConvertAll(DecodeMeter), 1);
             
             foreach (var svTrack in svProject.Tracks)
             {
