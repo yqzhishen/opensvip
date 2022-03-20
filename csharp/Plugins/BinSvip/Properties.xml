@@ -17,6 +17,9 @@
         <Option Name="singer" Type="string" Default="陈水若">
             <Notes>无法匹配歌手时，使用此缺省歌手</Notes>
         </Option>
+        <Option Name="tempo" Type="integer" Default="60">
+            <Notes>曲速过低或过高时，使用此曲速进行绝对时间对齐</Notes>
+        </Option>
         <Option Name="version" Type="enum" Default="auto">
             <Notes>指定生成的 .svip 文件版本</Notes>
             <EnumChoices>
