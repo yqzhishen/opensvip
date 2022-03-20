@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenSvip.Model;
 
@@ -87,7 +88,7 @@ namespace OpenSvip.Library
         public double GetActualTicksFromSecs(double secs)
         {
             // maybe useless
-            return 0;
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -122,7 +123,7 @@ namespace OpenSvip.Library
         public double GetActualTicksFromSecsOffset(int startTicks, double offsetSecs)
         {
             // maybe useless
-            return 0;
+            throw new NotImplementedException();
         }
     }
 }
