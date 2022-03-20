@@ -39,6 +39,7 @@
     </ItemGroup>
     <ItemGroup>
         <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="ScoreMarkUtils.cs" />
         <Compile Include="TimeSynchronizer.cs" />
     </ItemGroup>
     <ItemGroup>

@@ -31,21 +31,11 @@ namespace OpenSvip.Stream
             var model = new SingingTool.Model.AppModel();
             FirstBarTick = (int) Math.Round(1920.0 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator);
             FirstBarTempo = project.SongTempoList.Where(tempo => tempo.Position < FirstBarTick).ToList();
-            IsAbsoluteTimeMode = project.SongTempoList.Any(tempo => tempo.BPM < 20 || tempo.BPM > 300) 
-                                 || project.TimeSignatureList.Any(beat => beat.Numerator > 255 || beat.Denominator > 32);
+            IsAbsoluteTimeMode = project.SongTempoList.Any(tempo => tempo.BPM < 20 || tempo.BPM > 300);
             Synchronizer = new TimeSynchronizer(project.SongTempoList, FirstBarTick, IsAbsoluteTimeMode, DefaultTempo);
-            if (!IsAbsoluteTimeMode)
-            {
-                foreach (var tempo in project.SongTempoList)
-                {
-                    model.TempoList.InsertItemInOrder(EncodeSongTempo(tempo));
-                }
-                foreach (var beat in project.TimeSignatureList)
-                {
-                    model.BeatList.InsertItemInOrder(EncodeTimeSignature(beat));
-                }
-            }
-            else
+            
+            // beat
+            if (IsAbsoluteTimeMode || project.TimeSignatureList.Any(beat => beat.Numerator > 255 || beat.Denominator > 32))
             {
                 model.BeatList.InsertItemInOrder(new SingingTool.Model.SingingGeneralConcept.SongBeat
                 {
@@ -56,12 +46,34 @@ namespace OpenSvip.Stream
                         Y = 4
                     }
                 });
+            }
+            else
+            {
+                foreach (var beat in project.TimeSignatureList)
+                {
+                    model.BeatList.InsertItemInOrder(EncodeTimeSignature(beat));
+                }
+            }
+            
+            // tempo
+            if (IsAbsoluteTimeMode)
+            {
                 model.TempoList.InsertItemInOrder(new SingingTool.Model.SingingGeneralConcept.SongTempo
                 {
                     Pos = 0,
                     Tempo = DefaultTempo * 100
                 });
             }
+            else
+            {
+                foreach (var tempo in project.SongTempoList)
+                {
+                    model.TempoList.InsertItemInOrder(EncodeSongTempo(tempo));
+                }
+                
+            }
+            
+            // tracks
             foreach (var t in project.TrackList.Select(EncodeTrack).Where(t => t != null))
             {
                 model.TrackList.Add(t);

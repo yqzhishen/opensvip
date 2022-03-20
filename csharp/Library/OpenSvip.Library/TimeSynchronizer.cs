@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenSvip.Model;
 
 namespace OpenSvip.Library
@@ -13,7 +12,7 @@ namespace OpenSvip.Library
         /// <summary>
         /// 经过 ignoredTicks 偏移后的曲速列表。若 ignoredTicks == 0，此列表和传入的曲速列表是一致的。
         /// </summary>
-        public List<SongTempo> TempoListAfterOffset { get; }
+        public List<SongTempo> TempoList { get; }
 
         private readonly bool IsAbsoluteTimeMode;
 
@@ -23,35 +22,18 @@ namespace OpenSvip.Library
         /// 实例化一个新的曲谱时间同步器。通常每个工程文件只需要使用一个时间同步器。
         /// </summary>
         /// <param name="originalTempoList">该曲谱的原始曲速列表。</param>
-        /// <param name="ignoredTicks">
-        ///     指定原始谱面上需要忽略的开头长度，单位为梯。
+        /// <param name="skipTicks">
+        ///     指定原始谱面上需要跳过的开头长度，单位为梯。
         ///     例如 OpenSvip Model 中曲速位置的零点比音符位置的零点靠前一个小节，需将第一小节的长度设置为忽略。</param>
         /// <param name="isAbsoluteTimeMode">是否采用绝对时间对齐模式。
         ///     当出现不支持的拍号、曲速等情况时可以开启此模式，将使用恒定曲速进行绝对时间的对齐。</param>
         /// <param name="defaultTempo">当采用绝对时间对齐模式时，可以指定用于对齐的默认曲速。</param>
-        public TimeSynchronizer(IList<SongTempo> originalTempoList,
-            int ignoredTicks = 0,
+        public TimeSynchronizer(List<SongTempo> originalTempoList,
+            int skipTicks = 0,
             bool isAbsoluteTimeMode = false,
             int defaultTempo = 60)
         {
-            TempoListAfterOffset = originalTempoList
-                .Where(tempo => tempo.Position >= ignoredTicks)
-                .Select(
-                    tempo => new SongTempo
-                    {
-                        Position = tempo.Position - ignoredTicks,
-                        BPM = tempo.BPM
-                    }).ToList();
-            if (!TempoListAfterOffset.Any() || TempoListAfterOffset[0].Position > 0)
-            {
-                var i = 0;
-                for (; i < originalTempoList.Count && originalTempoList[i].Position <= ignoredTicks; i++) { }
-                TempoListAfterOffset.Insert(0, new SongTempo
-                {
-                    Position = 0,
-                    BPM = originalTempoList[i - 1].BPM
-                });
-            }
+            TempoList = skipTicks > 0 ? ScoreMarkUtils.SkipTempoList(originalTempoList, skipTicks) : originalTempoList;
             IsAbsoluteTimeMode = isAbsoluteTimeMode;
             DefaultTempo = defaultTempo;
         }
@@ -67,11 +49,11 @@ namespace OpenSvip.Library
             }
             var res = 0.0;
             var i = 0;
-            for (; i < TempoListAfterOffset.Count - 1 && TempoListAfterOffset[i + 1].Position < ticks; i++)
+            for (; i < TempoList.Count - 1 && TempoList[i + 1].Position < ticks; i++)
             {
-                res += (TempoListAfterOffset[i + 1].Position - TempoListAfterOffset[i].Position) * DefaultTempo / TempoListAfterOffset[i].BPM;
+                res += (TempoList[i + 1].Position - TempoList[i].Position) * DefaultTempo / TempoList[i].BPM;
             }
-            res += (ticks - TempoListAfterOffset[i].Position) * DefaultTempo / TempoListAfterOffset[i].BPM;
+            res += (ticks - TempoList[i].Position) * DefaultTempo / TempoList[i].BPM;
             return res;
         }
 
@@ -101,22 +83,22 @@ namespace OpenSvip.Library
                 return (GetActualTicksFromTicks(endTicks) - GetActualTicksFromTicks(startTicks)) / DefaultTempo / 8;
             }
             
-            var startTempoIndex = TempoListAfterOffset.FindLastIndex(tempo => tempo.Position <= startTicks);
-            var endTempoIndex = TempoListAfterOffset.FindLastIndex(tempo => tempo.Position <= endTicks);
+            var startTempoIndex = TempoList.FindLastIndex(tempo => tempo.Position <= startTicks);
+            var endTempoIndex = TempoList.FindLastIndex(tempo => tempo.Position <= endTicks);
             
             if (startTempoIndex == endTempoIndex)
             {
-                return (endTicks - startTicks) / TempoListAfterOffset[startTempoIndex].BPM / 8;
+                return (endTicks - startTicks) / TempoList[startTempoIndex].BPM / 8;
             }
             
             var secs = 0.0;
-            secs += (TempoListAfterOffset[startTempoIndex + 1].Position - startTicks)
-                    / (double) TempoListAfterOffset[startTempoIndex].BPM / 8;
+            secs += (TempoList[startTempoIndex + 1].Position - startTicks)
+                    / (double) TempoList[startTempoIndex].BPM / 8;
             for (var i = startTempoIndex + 1; i < endTempoIndex; i++)
             {
-                secs += (TempoListAfterOffset[i + 1].Position - TempoListAfterOffset[i].Position) / (double) TempoListAfterOffset[i].BPM / 8;
+                secs += (TempoList[i + 1].Position - TempoList[i].Position) / (double) TempoList[i].BPM / 8;
             }
-            secs += (endTicks - TempoListAfterOffset[endTempoIndex].Position) / (double) TempoListAfterOffset[endTempoIndex].BPM / 8;
+            secs += (endTicks - TempoList[endTempoIndex].Position) / (double) TempoList[endTempoIndex].BPM / 8;
             return secs;
         }
 
