@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using NAudio.Wave;
 using OpenSvip.Model;
+using OpenSvip.Library;
 using SynthV.Model;
 
 namespace Plugin.SynthV
@@ -49,33 +50,15 @@ namespace Plugin.SynthV
             }
             FirstBarTick = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
             FirstBarTempo = project.SongTempoList.Where(tempo => tempo.Position < FirstBarTick).ToList();
-            var newTempos = project.SongTempoList
-                .Where(tempo => tempo.Position >= FirstBarTick)
-                .Select(
-                    tempo => new SongTempo
-                    {
-                        Position = tempo.Position - FirstBarTick,
-                        BPM = tempo.BPM
-                    }).ToList();
-            if (!newTempos.Any() || newTempos[0].Position > 0)
-            {
-                var i = 0;
-                for (; i < project.SongTempoList.Count && project.SongTempoList[i].Position <= FirstBarTick; i++) { }
-                newTempos.Insert(0, new SongTempo
-                {
-                    Position = 0,
-                    BPM = project.SongTempoList[i - 1].BPM
-                });
-            }
             var isAbsoluteTimeMode = newMeters.Any(meter => meter.Denominator < 2 || meter.Denominator > 16);
-            Synchronizer = new TimeSynchronizer(newTempos, isAbsoluteTimeMode, DefaultTempo);
+            Synchronizer = new TimeSynchronizer(project.SongTempoList, FirstBarTick, isAbsoluteTimeMode, DefaultTempo);
             if (!isAbsoluteTimeMode)
             {
                 foreach (var meter in newMeters)
                 {
                     svProject.Time.Meters.Add(EncodeMeter(meter));
                 }
-                foreach (var tempo in newTempos)
+                foreach (var tempo in Synchronizer.TempoListAfterOffset)
                 {
                     svProject.Time.Tempos.Add(EncodeTempo(tempo));
                 }
