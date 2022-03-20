@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OpenSvip.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "-i svip \"D:\\Users\\fluty\\Downloads\\惊鹊-主.svip\" -o gj \"D:\\Users\\fluty\\Downloads\\惊鹊-主.gj\""
+    }
+  }
+}

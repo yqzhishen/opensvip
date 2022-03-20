@@ -59,7 +59,6 @@ namespace Plugin.Gjgj
                 for (int noteIndex = 0; noteIndex < gjProject.Tracks[singingTrackIndex].BeatItems.Count; noteIndex++)
                 {
                     Note noteFromGj = DecodeNote(gjProject, singingTrackIndex, noteIndex);
-                    //MessageBox.Show(noteFromGj.Lyric);
                     noteListFromGj.Add(noteFromGj);
                 }
 
@@ -92,7 +91,7 @@ namespace Plugin.Gjgj
 
         private static void DecodeTimeSignature(GjProject gjProject, Project project)
         {
-            if(gjProject.TempoMap.TimeSignature.Count == 0)
+            if(gjProject.TempoMap.TimeSignature.Count == 0)//如果拍号只有4/4，gjgj不存
             {
                 TimeSignature timeSignature = new TimeSignature
                 {
@@ -104,21 +103,54 @@ namespace Plugin.Gjgj
             }
             else
             {
-                for (int timeSignatureIndex = 0; timeSignatureIndex < gjProject.TempoMap.TimeSignature.Count; timeSignatureIndex++)
+                if (gjProject.TempoMap.TimeSignature[0].Time != 0)//如果存的第一个拍号不在0处，说明0处的拍号是4/4
                 {
-                    TimeSignature timeSignature = new TimeSignature();
-                    if (timeSignatureIndex == 0)
+                    TimeSignature timeSignatureAtZero = new TimeSignature
                     {
-                        timeSignature.BarIndex = gjProject.TempoMap.TimeSignature[0].Time / 1920 / gjProject.TempoMap.TimeSignature[timeSignatureIndex].Numerator * gjProject.TempoMap.TimeSignature[timeSignatureIndex].Denominator;
-                    }
-                    else
+                        BarIndex = 0,
+                        Numerator = 4,
+                        Denominator = 4
+                    };
+                    project.TimeSignatureList.Add(timeSignatureAtZero);
+
+                    int sumOfTime = 0;
+                    for (int index = 0; index < gjProject.TempoMap.TimeSignature.Count; index++)
                     {
-                        //TODO: 多拍号导入
-                        timeSignature.BarIndex = gjProject.TempoMap.TimeSignature[0].Time / 1920 / gjProject.TempoMap.TimeSignature[timeSignatureIndex].Numerator * gjProject.TempoMap.TimeSignature[timeSignatureIndex].Denominator;
+                        TimeSignature timeSignature = new TimeSignature();
+                        if (index == 0)
+                        {
+                            sumOfTime += gjProject.TempoMap.TimeSignature[0].Time / 1920;
+                            timeSignature.BarIndex = sumOfTime;
+                        }
+                        else
+                        {
+                            sumOfTime += (gjProject.TempoMap.TimeSignature[index].Time - gjProject.TempoMap.TimeSignature[index - 1].Time) * gjProject.TempoMap.TimeSignature[index - 1].Denominator / 1920 / gjProject.TempoMap.TimeSignature[index - 1].Numerator;
+                            timeSignature.BarIndex = sumOfTime;
+                        }
+                        timeSignature.Numerator = gjProject.TempoMap.TimeSignature[index].Numerator;
+                        timeSignature.Denominator = gjProject.TempoMap.TimeSignature[index].Denominator;
+                        project.TimeSignatureList.Add(timeSignature);
                     }
-                    timeSignature.Numerator = gjProject.TempoMap.TimeSignature[timeSignatureIndex].Numerator;
-                    timeSignature.Denominator = gjProject.TempoMap.TimeSignature[timeSignatureIndex].Denominator;
-                    project.TimeSignatureList.Add(timeSignature);
+                }
+                else
+                {
+                    int sumOfTime = 0;
+                    for (int index = 0; index < gjProject.TempoMap.TimeSignature.Count; index++)
+                    {
+                        TimeSignature timeSignature = new TimeSignature();
+                        if (index == 0)
+                        {
+                            timeSignature.BarIndex = 0;
+                        }
+                        else
+                        {
+                            sumOfTime += (gjProject.TempoMap.TimeSignature[index].Time - gjProject.TempoMap.TimeSignature[index - 1].Time) * gjProject.TempoMap.TimeSignature[index - 1].Denominator / 1920 / gjProject.TempoMap.TimeSignature[index - 1].Numerator;
+                            timeSignature.BarIndex = sumOfTime;
+                        }
+                        timeSignature.Numerator = gjProject.TempoMap.TimeSignature[index].Numerator;
+                        timeSignature.Denominator = gjProject.TempoMap.TimeSignature[index].Denominator;
+                        project.TimeSignatureList.Add(timeSignature);
+                    }
                 }
             }
             

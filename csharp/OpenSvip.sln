@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1684
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Model", "Model\OpenSvip.Model.csproj", "{F0CF4E57-33F4-4A63-A45F-69727058C24A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{3779DA9F-186C-4529-9FF6-56D0186D571C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{3779DA9F-186C-4529-9FF6-56D0186D571C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.BinarySvip", "Plugins\BinSvip\Plugin.BinarySvip.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.JsonSvip", "Plugins\JsonSvip\Plugin.JsonSvip.csproj", "{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.SynthV", "Plugins\SynthV\Plugin.SynthV.csproj", "{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Gjgj", "Plugins\Gjgj\Plugin.Gjgj.csproj", "{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
