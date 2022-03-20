@@ -48,7 +48,7 @@ namespace Plugin.SynthV
                     Denominator = project.TimeSignatureList[0].Denominator
                 });
             }
-            FirstBarTick = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+            FirstBarTick = (int) Math.Round(1920.0 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator);
             FirstBarTempo = project.SongTempoList.Where(tempo => tempo.Position < FirstBarTick).ToList();
             var isAbsoluteTimeMode = newMeters.Any(meter => meter.Denominator < 2 || meter.Denominator > 16);
             Synchronizer = new TimeSynchronizer(project.SongTempoList, FirstBarTick, isAbsoluteTimeMode, DefaultTempo);
