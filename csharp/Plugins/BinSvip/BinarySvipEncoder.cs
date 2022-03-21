@@ -218,12 +218,6 @@ namespace OpenSvip.Stream
         {
             op = op ?? (x => x);
             var line = new SingingTool.Model.Line.LineParam();
-            const BindingFlags flag = BindingFlags.Instance | BindingFlags.NonPublic;
-            var linkedNodeList = (LinkedList<SingingTool.Model.Line.LineParamNode>) line
-                .GetType()
-                .GetField("_nodeLinkedList", flag)?
-                .GetValue(line);
-            linkedNodeList?.Clear();
             var length = paramCurve.PointList.Count;
             foreach (var (pos, value) in paramCurve.PointList
                          .Where(point => point.Item1 >= left && point.Item1 <= right)
@@ -232,16 +226,15 @@ namespace OpenSvip.Stream
                 var actualPos = IsAbsoluteTimeMode && isTicks && pos != left && pos != right
                     ? (int) Math.Round(Synchronizer.GetActualTicksFromTicks(pos - FirstBarTick) + 1920)
                     : pos;
-                linkedNodeList?.AddLast(new SingingTool.Model.Line.LineParamNode(actualPos, op(value)));
+                line.PushBack(new SingingTool.Model.Line.LineParamNode(actualPos, op(value)));
             }
             if (length == 0 || line.Begin.Value.Pos > left)
             {
-                linkedNodeList?.AddFirst(new SingingTool.Model.Line.LineParamNode(left, termination));
+                line.PushFront(new SingingTool.Model.Line.LineParamNode(left, termination));
             }
-
             if (length == 0 || line.Back.Pos < right)
             {
-                linkedNodeList?.AddLast(new SingingTool.Model.Line.LineParamNode(right, termination));
+                line.PushBack(new SingingTool.Model.Line.LineParamNode(right, termination));
             }
             paramCurve.TotalPointsCount = line.Length();
             return line;
