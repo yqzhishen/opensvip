@@ -62,27 +62,9 @@ namespace Plugin.Gjgj
                     Note noteFromGj = DecodeNote(gjProject, singingTrackIndex, noteIndex);
                     noteListFromGj.Add(noteFromGj);
                 }
-                //导入参数
                 Params paramsFromGj = new Params();
-                //导入音量参数
-                List<double> volumePointTimeBuffer = new List<double>();
-                List<double> volumePointValueBuffer = new List<double>();
-                double volumePointTimeFromGj;
-                double volumePointValueFromGj;
-                double convertedVolumeValueFromGj;
-                ParamCurve paramCurveVolume = new ParamCurve();
-                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.Tracks[singingTrackIndex].VolumeMap.Count; volumeParamPointIndex++)
-                {
-                    volumePointTimeFromGj = gjProject.Tracks[singingTrackIndex].VolumeMap[volumeParamPointIndex].Time;
-                    volumePointValueFromGj = gjProject.Tracks[singingTrackIndex].VolumeMap[volumeParamPointIndex].Volume;
-                    convertedVolumeValueFromGj = volumePointValueFromGj * 1000 - 1000;
-                    Tuple<int, int> volumeParamPoint = Tuple.Create((int)volumePointTimeFromGj, (int)convertedVolumeValueFromGj);
-                    paramCurveVolume.PointList.Add(volumeParamPoint);
-                }
-
-                paramCurveVolume.PointList.OrderBy(x => x.Item1).ToList();
-                paramsFromGj.Volume = paramCurveVolume;
-
+                DecodeVolumeParam(gjProject, singingTrackIndex, paramsFromGj);
+                DecodePitchParam(gjProject, singingTrackIndex, paramsFromGj);
 
                 Track svipTrack = new SingingTrack
                 {
@@ -98,6 +80,60 @@ namespace Plugin.Gjgj
                 };
                 project.TrackList.Add(svipTrack);
             }
+        }
+
+        private void DecodePitchParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj)
+        {
+            int convertedPitchFromGj;
+            double currentPitchFromGj;
+            int convertedTimeFromGj;
+            ParamCurve paramCurvePitch = new ParamCurve();
+            Tuple<int, int> pitchParamDefaultLeftEndpoint = Tuple.Create(-192000, -100);
+            paramCurvePitch.PointList.Add(pitchParamDefaultLeftEndpoint);
+            for (int index = 0; index < gjProject.Tracks[singingTrackIndex].Tone.Modifys.Count; index++)
+            {
+                convertedTimeFromGj = (int)(gjProject.Tracks[singingTrackIndex].Tone.Modifys[index].X * 5.0);
+                currentPitchFromGj = gjProject.Tracks[singingTrackIndex].Tone.Modifys[index].Y;
+                convertedPitchFromGj = (int)(YToTone(currentPitchFromGj) * 100.0 + 2400.0);
+
+                Tuple<int, int> pitchParamPoint = Tuple.Create((int)convertedTimeFromGj, (int)convertedPitchFromGj);
+                paramCurvePitch.PointList.Add(pitchParamPoint);
+            }
+            for (int index = 0; index < gjProject.Tracks[singingTrackIndex].Tone.ModifyRanges.Count; index++)
+            {
+                convertedTimeFromGj = (int)(gjProject.Tracks[singingTrackIndex].Tone.ModifyRanges[index].X * 5.0) - 10;
+                Tuple<int, int> pitchParamLeftEndpoint = Tuple.Create((int)convertedTimeFromGj, -100);
+                paramCurvePitch.PointList.Add(pitchParamLeftEndpoint);
+
+                convertedTimeFromGj = (int)(gjProject.Tracks[singingTrackIndex].Tone.ModifyRanges[index].Y * 5.0) + 10;
+                Tuple<int, int> pitchParamRightEndpoint = Tuple.Create((int)convertedTimeFromGj, -100);
+                paramCurvePitch.PointList.Add(pitchParamRightEndpoint);
+            }
+            Tuple<int, int> pitchParamDefaultRightEndpoint = Tuple.Create(1073741823, -100);
+            paramCurvePitch.PointList.Add(pitchParamDefaultRightEndpoint);
+            paramCurvePitch.PointList.OrderBy(x => x.Item1).ToList();
+            paramsFromGj.Pitch = paramCurvePitch;
+        }
+
+        private static void DecodeVolumeParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj)
+        {
+            List<double> volumePointTimeBuffer = new List<double>();
+            List<double> volumePointValueBuffer = new List<double>();
+            double volumePointTimeFromGj;
+            double volumePointValueFromGj;
+            double convertedVolumeValueFromGj;
+            ParamCurve paramCurveVolume = new ParamCurve();
+            for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.Tracks[singingTrackIndex].VolumeMap.Count; volumeParamPointIndex++)
+            {
+                volumePointTimeFromGj = gjProject.Tracks[singingTrackIndex].VolumeMap[volumeParamPointIndex].Time;
+                volumePointValueFromGj = gjProject.Tracks[singingTrackIndex].VolumeMap[volumeParamPointIndex].Volume;
+                convertedVolumeValueFromGj = volumePointValueFromGj * 1000 - 1000;
+                Tuple<int, int> volumeParamPoint = Tuple.Create((int)volumePointTimeFromGj, (int)convertedVolumeValueFromGj);
+                paramCurveVolume.PointList.Add(volumeParamPoint);
+            }
+
+            paramCurveVolume.PointList.OrderBy(x => x.Item1).ToList();
+            paramsFromGj.Volume = paramCurveVolume;
         }
 
         private static Note DecodeNote(GjProject gjProject, int singingTrackIndex, int noteIndex)
