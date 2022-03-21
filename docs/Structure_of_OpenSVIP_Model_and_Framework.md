@@ -180,3 +180,9 @@ OpenSVIP 模型（下称“本模型”）是与 X Studio · 歌手软件相适�
 |:----------------:|:-------------------------------:|:---------:|:------------------------------:|
 | TotalPointsCount |            int / int            |  integer  | 锚点总个数。这是一个只读属性，对其进行修改不会产生任何效果。 |
 |    PointList     | List[tuple] / List&lt;Tuple&gt; | 2-d array |             锚点列表。              |
+
+
+
+## OpenSVIP 框架
+
+OpenSVIP 框架（以下简称“本框架”）是基于 OpenSVIP 模型的插件式工程文件转换框架。

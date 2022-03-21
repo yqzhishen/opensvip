@@ -11,7 +11,16 @@
     <Identifier>svp</Identifier>
     <LibraryPath>SynthV\Plugin.SynthV.dll</LibraryPath>
     <Converter>SynthV.Stream.SynthVConverter</Converter>
-    <InputOptions/>
+    <InputOptions>
+        <Option Name="breath" Type="enum" Default="ignore">
+            <Notes>换气音符处理方式</Notes>
+            <EnumChoices>
+                <Choice Name="忽略所有换气音符" Tag="ignore"/>
+                <Choice Name="保留为普通音符" Tag="remain"/>
+                <Choice Name="转换为换气标记" Tag="convert"/>
+            </EnumChoices>
+        </Option>
+    </InputOptions>
     <OutputOptions>
         <Option Name="vibrato" Type="enum" Default="hybrid">
             <Notes>自动颤音处理方式</Notes>

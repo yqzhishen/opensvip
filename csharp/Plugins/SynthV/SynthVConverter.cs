@@ -17,14 +17,17 @@ namespace SynthV.Stream
             var svProject = JsonConvert.DeserializeObject<SVProject>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            return new SynthVDecoder().DecodeProject(svProject);
+            return new SynthVDecoder
+            {
+                BreathOption = options.GetOptionAsEnum("breath", BreathOptions.Convert)
+            }.DecodeProject(svProject);
         }
 
         public void Save(string path, Project project, ConverterOptions options)
         {
             var svProject = new SynthVEncoder
             {
-                VibratoOptions = options.GetOptionAsEnum("vibrato", VibratoOptions.Hybrid)
+                VibratoOption = options.GetOptionAsEnum("vibrato", VibratoOptions.Hybrid)
             }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);

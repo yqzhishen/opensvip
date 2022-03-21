@@ -10,6 +10,8 @@ namespace Plugin.SynthV
 {
     public class SynthVDecoder
     {
+        public BreathOptions BreathOption { get; set; }
+        
         private int FirstBarTick;
 
         private double FirstBPM;
@@ -90,12 +92,6 @@ namespace Plugin.SynthV
                 : Math.Pow(10, gain / 20.0);
         }
 
-        private List<Note> DecodeNoteList(List<SVNote> svNotes)
-        {
-            // TODO: decode phones
-            return svNotes.Select(DecodeNote).ToList();
-        }
-
         private Params DecodeParams(SVParams svParams)
         {
             var parameters = new Params
@@ -138,6 +134,53 @@ namespace Plugin.SynthV
                 interpolation);
             curve.PointList = generator.GetCurve(5, termination);
             return curve;
+        }
+
+        private List<Note> DecodeNoteList(List<SVNote> svNotes)
+        {
+            List<Note> noteList;
+            const string breathPattern = @"^\s*\.?\s*br(l?[1-9])?\s*$";
+            switch (BreathOption)
+            {
+                case BreathOptions.Ignore:
+                    svNotes = svNotes.Where(note => !Regex.IsMatch(note.Lyrics, breathPattern)).ToList();
+                    goto case BreathOptions.Remain;
+                case BreathOptions.Remain:
+                    noteList = svNotes.Select(DecodeNote).ToList();
+                    break;
+                case BreathOptions.Convert:
+                    noteList = new List<Note>();
+                    if (svNotes.Count > 1)
+                    {
+                        var prevIndex = -1;
+                        int currentIndex;
+                        while (-1 != (currentIndex = svNotes.FindIndex(prevIndex + 1, 
+                                   svNote => !Regex.IsMatch(svNote.Lyrics, breathPattern))))
+                        {
+                            var note = DecodeNote(svNotes[currentIndex]);
+                            if (currentIndex > prevIndex + 1)
+                            {
+                                var breathNote = svNotes[currentIndex - 1];
+                                if (DecodePosition(svNotes[currentIndex].Onset) - DecodePosition(breathNote.Onset + breathNote.Duration) <= 120)
+                                {
+                                    note.HeadTag = "V";
+                                }
+                            }
+                            noteList.Add(note);
+                            prevIndex = currentIndex;
+                        }
+                    }
+                    else if (svNotes.Count == 1 && !Regex.IsMatch(svNotes[0].Lyrics, breathPattern))
+                    {
+                        noteList.Add(DecodeNote(svNotes[0]));
+                    }
+                    svNotes = svNotes.Where(note => !Regex.IsMatch(note.Lyrics, breathPattern)).ToList();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            // TODO: decode phones
+            return noteList;
         }
 
         private Note DecodeNote(SVNote svNote)

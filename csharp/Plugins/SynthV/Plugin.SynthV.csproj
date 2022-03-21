@@ -46,6 +46,7 @@
         <Reference Include="System.Core" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BreathOptions.cs" />
         <Compile Include="CurveGenerator.cs" />
         <Compile Include="Interpolation.cs" />
         <Compile Include="PhonemeUtils.cs" />
