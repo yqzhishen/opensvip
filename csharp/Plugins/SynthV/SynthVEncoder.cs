@@ -266,12 +266,40 @@ namespace Plugin.SynthV
         private SVParamCurve EncodeParamCurve(ParamCurve curve, int termination, double defaultValue, Func<int, double> op)
         {
             var svCurve = new SVParamCurve();
+            if (!curve.PointList.Any())
+            {
+                return svCurve;
+            }
             var pointList = svCurve.Points;
+            var skipped = 0;
+            if (curve.PointList[0].Item1 == -192000)
+            {
+                if (curve.PointList.Count == 2 && curve.PointList[1].Item1 == 1073741823)
+                {
+                    if (curve.PointList[0].Item2 != termination)
+                    {
+                        pointList.Add(new Tuple<long, double>(0, op(curve.PointList[0].Item2)));
+                    }
+                    return svCurve;
+                }
+                skipped = 1;
+                var validIndex = curve.PointList.FindIndex(point => point.Item1 >= FirstBarTick);
+                if (validIndex != -1 && curve.PointList.Count > validIndex + 1
+                                     && !(curve.PointList[validIndex].Item2 == termination
+                                          && curve.PointList[validIndex + 1].Item2 == termination
+                                          && curve.PointList[validIndex + 1].Item1 < 1073741823))
+                {
+                    skipped = validIndex + 1;
+                    var (x0, y0) = curve.PointList[validIndex];
+                    pointList.Add(new Tuple<long, double>(TicksToPosition(x0 - FirstBarTick), op(y0)));
+                }
+            }
             var buffer = new List<Tuple<int, int>>();
             const int minInterval = 1;
             Tuple<int, int> lastPoint = null;
             foreach (var point in curve.PointList
-                         .Where(point => point.Item1 >= FirstBarTick).ToList()
+                         .Skip(skipped)
+                         .Where(point => point.Item1 >= FirstBarTick && point.Item1 < 1073741823).ToList()
                          .ConvertAll(point => new Tuple<int, int>(point.Item1 - FirstBarTick, point.Item2)))
             {
                 if (point.Item2 == termination)
@@ -297,7 +325,25 @@ namespace Plugin.SynthV
                     buffer.Add(point);
                 }
             }
-            if (lastPoint != null)
+            if (!buffer.Any())
+            {
+                return svCurve;
+            }
+            if (lastPoint == null || lastPoint.Item1 + minInterval < buffer[0].Item1)
+            {
+                if (lastPoint != null && lastPoint.Item1 + 2 * minInterval < buffer[0].Item1)
+                {
+                    pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), defaultValue));
+                }
+                pointList.Add(new Tuple<long, double>(TicksToPosition(buffer[0].Item1 - minInterval), defaultValue));
+            }
+            foreach (var (bufferPos, bufferVal) in buffer)
+            {
+                pointList.Add(new Tuple<long, double>(TicksToPosition(bufferPos), op(bufferVal)));
+            }
+            lastPoint = buffer.Last();
+            buffer.Clear();
+            if (lastPoint.Item2 == termination)
             {
                 pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), defaultValue));
             }
