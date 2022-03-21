@@ -98,10 +98,12 @@ namespace Plugin.Gjgj
 
         private GjTracksItem EncodeSingingTrack(Project project, ref int noteID, int trackID, SingingTrack singingTrack)
         {
-            GjTracksItem gjTracksItem = new GjTracksItem();
-            gjTracksItem.ID = Convert.ToString(trackID);
-            gjTracksItem.Name = "513singer";//扇宝
-            gjTracksItem.BeatItems = new List<GjBeatItemsItem>();
+            GjTracksItem gjTracksItem = new GjTracksItem
+            {
+                ID = Convert.ToString(trackID),
+                Name = "513singer",//扇宝
+                BeatItems = new List<GjBeatItemsItem>()
+            };
             foreach (var note in singingTrack.NoteList)
             {
                 EncodeNotes(project, noteID, gjTracksItem, note);
@@ -188,14 +190,14 @@ namespace Plugin.Gjgj
 
                             GjVolumeMapItem gjVolumeParamLeftEndpoint = new GjVolumeMapItem
                             {
-                                Time = volumePointTimeBuffer[0] - 3,
+                                Time = volumePointTimeBuffer[0] - 5,
                                 Volume = 1.0
                             };
                             gjTracksItem.VolumeMap.Add(gjVolumeParamLeftEndpoint);
 
                             GjVolumeMapItem gjVolumeParamRightEndpoint = new GjVolumeMapItem
                             {
-                                Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 3,
+                                Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 5,
                                 Volume = 1.0
                             };
                             gjTracksItem.VolumeMap.Add(gjVolumeParamRightEndpoint);
