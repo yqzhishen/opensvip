@@ -4,6 +4,7 @@ using Gjgj.Model;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Plugin.Gjgj
 {
@@ -61,6 +62,27 @@ namespace Plugin.Gjgj
                     Note noteFromGj = DecodeNote(gjProject, singingTrackIndex, noteIndex);
                     noteListFromGj.Add(noteFromGj);
                 }
+                //导入参数
+                Params paramsFromGj = new Params();
+                //导入音量参数
+                List<double> volumePointTimeBuffer = new List<double>();
+                List<double> volumePointValueBuffer = new List<double>();
+                double volumePointTimeFromGj;
+                double volumePointValueFromGj;
+                double convertedVolumeValueFromGj;
+                ParamCurve paramCurveVolume = new ParamCurve();
+                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.Tracks[singingTrackIndex].VolumeMap.Count; volumeParamPointIndex++)
+                {
+                    volumePointTimeFromGj = gjProject.Tracks[singingTrackIndex].VolumeMap[volumeParamPointIndex].Time;
+                    volumePointValueFromGj = gjProject.Tracks[singingTrackIndex].VolumeMap[volumeParamPointIndex].Volume;
+                    convertedVolumeValueFromGj = volumePointValueFromGj * 1000 - 1000;
+                    Tuple<int, int> volumeParamPoint = Tuple.Create((int)volumePointTimeFromGj, (int)convertedVolumeValueFromGj);
+                    paramCurveVolume.PointList.Add(volumeParamPoint);
+                }
+
+                paramCurveVolume.PointList.OrderBy(x => x.Item1).ToList();
+                paramsFromGj.Volume = paramCurveVolume;
+
 
                 Track svipTrack = new SingingTrack
                 {
@@ -71,7 +93,8 @@ namespace Plugin.Gjgj
                     Pan = 0.0,
                     AISingerName = "陈水若",
                     ReverbPreset = "干声",
-                    NoteList = noteListFromGj
+                    NoteList = noteListFromGj,
+                    EditedParams = paramsFromGj
                 };
                 project.TrackList.Add(svipTrack);
             }
@@ -178,8 +201,13 @@ namespace Plugin.Gjgj
                 case "514singer":
                     return "SING-林嘉慧";
                 default:
-                    return "";
+                    return "演唱轨";
             }
+        }
+
+        private double YToTone(double y)
+        {
+            return 71.5 - y / 18.0;
         }
     }
 }
