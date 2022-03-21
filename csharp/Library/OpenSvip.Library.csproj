@@ -43,7 +43,7 @@
         <Compile Include="TimeSynchronizer.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\..\Model\OpenSvip.Model.csproj">
+      <ProjectReference Include="..\Model\OpenSvip.Model.csproj">
         <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
