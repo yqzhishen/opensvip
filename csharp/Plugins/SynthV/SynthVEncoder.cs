@@ -11,7 +11,7 @@ namespace Plugin.SynthV
 {
     public class SynthVEncoder
     {
-        public VibratoOptions VibratoOptions { get; set; } = VibratoOptions.Hybrid;
+        public VibratoOptions VibratoOption { get; set; } = VibratoOptions.Hybrid;
 
         private int FirstBarTick;
 
@@ -127,7 +127,7 @@ namespace Plugin.SynthV
                     svTrack.MainGroup.Notes = EncodeNotesWithPhones(singingTrack.NoteList);
 
                     // vibrato options
-                    switch (VibratoOptions)
+                    switch (VibratoOption)
                     {
                         case VibratoOptions.None:
                             foreach (var note in svTrack.MainGroup.Notes)
@@ -196,7 +196,7 @@ namespace Plugin.SynthV
         private SVParamCurve EncodePitchCurve(ParamCurve curve)
         {
             var svCurve = new SVParamCurve();
-            if (VibratoOptions == VibratoOptions.Hybrid)
+            if (VibratoOption == VibratoOptions.Hybrid)
             {
                 NoVibratoIndexes = new HashSet<int>();
             }
@@ -254,7 +254,7 @@ namespace Plugin.SynthV
                 return pitchDiff;
             }
             // hybrid mode is on, and the point is within the range where the automatic vibrato should have been
-            if (VibratoOptions == VibratoOptions.Hybrid
+            if (VibratoOption == VibratoOptions.Hybrid
                 && Synchronizer.GetDurationSecsFromTicks(targetNote.StartPos, pos) > 0.25
                 && pos < targetNote.StartPos + targetNote.Length)
             {
