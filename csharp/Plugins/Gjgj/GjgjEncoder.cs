@@ -98,12 +98,10 @@ namespace Plugin.Gjgj
 
         private GjTracksItem EncodeSingingTrack(Project project, ref int noteID, int trackID, SingingTrack singingTrack)
         {
-            GjTracksItem gjTracksItem = new GjTracksItem
-            {
-                ID = Convert.ToString(trackID),
-                Name = "513singer",//扇宝
-                BeatItems = new List<GjBeatItemsItem>()
-            };
+            GjTracksItem gjTracksItem = new GjTracksItem();
+            gjTracksItem.ID = Convert.ToString(trackID);
+            gjTracksItem.Name = "513singer";//扇宝
+            gjTracksItem.BeatItems = new List<GjBeatItemsItem>();
             foreach (var note in singingTrack.NoteList)
             {
                 EncodeNotes(project, noteID, gjTracksItem, note);
