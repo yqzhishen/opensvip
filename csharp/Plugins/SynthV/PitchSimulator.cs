@@ -6,21 +6,21 @@ using OpenSvip.Model;
 
 namespace Plugin.SynthV
 {
-    public class PitchGenerator
+    public class PitchSimulator
     {
         private readonly List<Note> NoteList;
 
         private readonly TimeSynchronizer Synchronizer;
 
-        private readonly PitchInterpolation Interpolation;
+        private readonly PitchSlide Slide;
 
         private readonly List<Tuple<double, int>> PitchTags = new List<Tuple<double, int>>();
 
-        public PitchGenerator(List<Note> noteList, TimeSynchronizer synchronizer, PitchInterpolation interpolation)
+        public PitchSimulator(List<Note> noteList, TimeSynchronizer synchronizer, PitchSlide slide)
         {
             NoteList = noteList;
             Synchronizer = synchronizer;
-            Interpolation = interpolation;
+            Slide = slide;
             GenerateTags();
         }
 
@@ -44,7 +44,7 @@ namespace Plugin.SynthV
             {
                 return PitchTags[index].Item2 * 100;
             }
-            var ratio = Interpolation.Apply(
+            var ratio = Slide.Apply(
                 (secs - PitchTags[index].Item1) / (PitchTags[index + 1].Item1 - PitchTags[index].Item1));
             return ((1 - ratio) * PitchTags[index].Item2 + ratio * PitchTags[index + 1].Item2) * 100;
         }
@@ -55,8 +55,8 @@ namespace Plugin.SynthV
             {
                 return;
             }
-            var maxSlideTime = Interpolation.MaxInterTimeInSecs;
-            var maxSlidePercent = Interpolation.MaxInterTimePercent;
+            var maxSlideTime = Slide.MaxInterTimeInSecs;
+            var maxSlidePercent = Slide.MaxInterTimePercent;
             
             var currentNote = NoteList[0];
             var currentHead = Synchronizer.GetActualSecsFromTicks(currentNote.StartPos);

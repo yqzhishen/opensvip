@@ -21,7 +21,7 @@ namespace Plugin.SynthV
 
         private TimeSynchronizer Synchronizer;
 
-        private PitchGenerator PitchGenerator;
+        private PitchSimulator PitchSimulator;
 
         private HashSet<int> NoVibratoIndexes;
 
@@ -105,10 +105,10 @@ namespace Plugin.SynthV
                     svTrack.MainRef.Database.PhoneSet = "xsampa";
                     
                     NoteBuffer = singingTrack.NoteList;
-                    PitchGenerator = new PitchGenerator(
+                    PitchSimulator = new PitchSimulator(
                         singingTrack.NoteList,
                         Synchronizer,
-                        PitchInterpolation.SigmoidInterpolation());
+                        PitchSlide.SigmoidSlide());
                     
                     svTrack.MainGroup.Params = EncodeParams(singingTrack.EditedParams);
                     
@@ -248,7 +248,7 @@ namespace Plugin.SynthV
         {
             var targetNoteIndex = NoteBuffer.FindLastIndex(note => note.StartPos <= pos);
             var targetNote = targetNoteIndex >= 0 ? NoteBuffer[targetNoteIndex] : null;
-            var pitchDiff = pitch - PitchGenerator.PitchAtSecs(Synchronizer.GetActualSecsFromTicks(pos));
+            var pitchDiff = pitch - PitchSimulator.PitchAtSecs(Synchronizer.GetActualSecsFromTicks(pos));
             if (targetNote == null) // position before all heads of note
             {
                 return pitchDiff;

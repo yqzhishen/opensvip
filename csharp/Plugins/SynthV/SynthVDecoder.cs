@@ -98,8 +98,47 @@ namespace Plugin.SynthV
 
         private Params DecodeParams(SVParams svParams)
         {
-            var parameters = new Params();
+            var parameters = new Params
+            {
+                // TODO: decode pitch
+                Volume = DecodeParamCurve(svParams.Loudness, 0,
+                    val => val >= 0.0
+                        ? (int) Math.Round(val / 12.0 * 1000.0)
+                        : (int) Math.Round(1000.0 * Math.Pow(10, val / 20.0) - 1000.0)),
+                Breath = DecodeParamCurve(svParams.Breath, 0,
+                    val => (int) Math.Round(val * 1000.0)),
+                Gender = DecodeParamCurve(svParams.Gender, 0,
+                    val => (int) Math.Round(-val * 1000.0)),
+                Strength = DecodeParamCurve(svParams.Tension, 0,
+                    val => (int) Math.Round(val * 1000.0))
+            };
             return parameters;
+        }
+
+        private ParamCurve DecodeParamCurve(SVParamCurve svCurve, int termination, Func<double, int> op)
+        {
+            var curve = new ParamCurve();
+            Func<double, double> interpolation;
+            switch (svCurve.Mode)
+            {
+                case "cosine":
+                    interpolation = Interpolation.CosineInterpolation();
+                    break;
+                case "cubic":
+                    interpolation = Interpolation.CubicInterpolation();
+                    break;
+                default:
+                    interpolation = Interpolation.LinearInterpolation();
+                    break;
+            }
+
+            var generator = new CurveGenerator(
+                svCurve.Points.ConvertAll(
+                    point => new Tuple<int, int>(DecodePosition(point.Item1) + FirstBarTick, op(point.Item2))),
+                interpolation);
+            curve.PointList = generator.GetCurve(5, termination);
+            curve.TotalPointsCount = curve.PointList.Count;
+            return curve;
         }
 
         private Note DecodeNote(SVNote svNote)
