@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>BinarySvip</Name>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，&#x000A;请修改 OpenSvip.Const.Singers.json。

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.Model;
@@ -13,14 +13,11 @@ namespace OpenSvip.Stream
     {
         public Project Load(string path, ConverterOptions options)
         {
-            var reader = new FileStream(path, FileMode.Open, FileAccess.Read);
-            var buffer = new byte[9];
-            reader.ReadByte();
-            reader.Read(buffer, 0, 4);
-            reader.ReadByte();
-            reader.Read(buffer, 4, 5);
-            var version = Encoding.Default.GetString(buffer);
-            var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(reader);
+            var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            var reader = new BinaryReader(stream);
+            var version = reader.ReadString() + reader.ReadString();
+            var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(stream);
+            stream.Close();
             reader.Close();
             return new BinarySvipDecoder().DecodeProject(version, model);
         }
@@ -46,15 +43,16 @@ namespace OpenSvip.Stream
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            var buffer = Encoding.Default.GetBytes(version);
-            var writer = new FileStream(path, FileMode.Create, FileAccess.Write);
-            writer.WriteByte(4);
-            writer.Write(buffer, 0, 4);
-            writer.WriteByte(5);
-            writer.Write(buffer, 4, 5);
-            new BinaryFormatter().Serialize(writer, model);
+            var index = Regex.Match(version, @"\d+\.\d+\.\d+").Groups[0].Index;
+            var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
+            var writer = new BinaryWriter(stream);
+            writer.Write(version.Substring(0, index));
+            writer.Write(version.Substring(index, version.Length - index));
             writer.Flush();
+            new BinaryFormatter().Serialize(stream, model);
+            stream.Flush();
             writer.Close();
+            stream.Close();
         }
         
         static BinarySvipConverter()
