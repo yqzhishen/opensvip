@@ -178,7 +178,6 @@ namespace OpenSvip.Stream
         {
             var paramCurve = new ParamCurve();
             op = op ?? (x => x);
-            paramCurve.TotalPointsCount = line.Length();
             var point = line.Begin;
             for (var i = 0; i < paramCurve.TotalPointsCount && point != null; i++)
             {

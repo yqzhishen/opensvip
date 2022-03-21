@@ -137,7 +137,6 @@ namespace Plugin.SynthV
                     point => new Tuple<int, int>(DecodePosition(point.Item1) + FirstBarTick, op(point.Item2))),
                 interpolation);
             curve.PointList = generator.GetCurve(5, termination);
-            curve.TotalPointsCount = curve.PointList.Count;
             return curve;
         }
 

@@ -103,7 +103,7 @@ namespace OpenSvip.Model
 
     public class ParamCurve
     {
-        public int TotalPointsCount { get; set; }
+        public int TotalPointsCount => PointList.Count;
         [JsonConverter(typeof(PointListJsonConverter))]
         public List<Tuple<int, int>> PointList { get; set; } = new List<Tuple<int, int>>();
     }

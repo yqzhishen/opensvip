@@ -236,7 +236,6 @@ namespace OpenSvip.Stream
             {
                 line.PushBack(new SingingTool.Model.Line.LineParamNode(right, termination));
             }
-            paramCurve.TotalPointsCount = line.Length();
             return line;
         }
 
