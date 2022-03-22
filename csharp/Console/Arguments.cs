@@ -50,9 +50,11 @@ namespace OpenSvip.Console
         }
     }
 
-    [Verb("plugins", HelpText = "显示当前已安装的所有插件。")]
+    [Verb("plugins", HelpText = "查看当前已安装的插件信息。")]
     class PluginsOptions
     {
-        
+        [Option('n', "id", Required = false,
+            HelpText = "指定要查看具体的插件标识符。", MetaValue = "ID")]
+        public string Identifier { get; set; }
     }
 }
