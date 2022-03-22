@@ -16,6 +16,8 @@ namespace Plugin.SynthV
 
         private double FirstBPM;
 
+        private SVVoice VoiceSettings;
+
         private List<string> LyricsPinyin;
 
         private List<Track> GroupTracksBuffer = new List<Track>(); // reserved for note groups
@@ -69,6 +71,7 @@ namespace Plugin.SynthV
             }
             else
             {
+                VoiceSettings = track.MainRef.Voice;
                 var singingTrack = new SingingTrack
                 {
                     NoteList = DecodeNoteList(track.MainGroup.Notes),
@@ -97,22 +100,31 @@ namespace Plugin.SynthV
             var parameters = new Params
             {
                 // TODO: decode pitch
-                Volume = DecodeParamCurve(svParams.Loudness, 0,
-                    val => val >= 0.0
-                        ? (int) Math.Round(val / 12.0 * 1000.0)
-                        : (int) Math.Round(1000.0 * Math.Pow(10, val / 20.0) - 1000.0)),
-                Breath = DecodeParamCurve(svParams.Breath, 0,
-                    val => (int) Math.Round(val * 1000.0)),
-                Gender = DecodeParamCurve(svParams.Gender, 0,
-                    val => (int) Math.Round(-val * 1000.0)),
-                Strength = DecodeParamCurve(svParams.Tension, 0,
-                    val => (int) Math.Round(val * 1000.0))
+                Volume = DecodeParamCurve(svParams.Loudness, VoiceSettings.MasterLoudness, val =>
+                    {
+                        var v = val + VoiceSettings.MasterLoudness;
+                        return v >= 0.0
+                            ? (int) Math.Round(v / 12.0 * 1000.0)
+                            : (int) Math.Round(1000.0 * Math.Pow(10, v / 20.0) - 1000.0);
+                    }),
+                Breath = DecodeParamCurve(svParams.Breath, VoiceSettings.MasterBreath, val =>
+                    (int) Math.Round((val + VoiceSettings.MasterBreath) * 1000.0)),
+                Gender = DecodeParamCurve(svParams.Gender, VoiceSettings.MasterGender, val =>
+                    (int) Math.Round((val + VoiceSettings.MasterGender) * -1000.0)),
+                Strength = DecodeParamCurve(svParams.Tension, VoiceSettings.MasterTension, val =>
+                    (int) Math.Round((val + VoiceSettings.MasterTension) * 1000.0))
             };
             return parameters;
         }
 
-        private ParamCurve DecodeParamCurve(SVParamCurve svCurve, int termination, Func<double, int> op)
+        private ParamCurve DecodeParamCurve(SVParamCurve svCurve, double baseValue,
+            Func<double, int> mappingFunc)
         {
+            int Clip(int val)
+            {
+                return Math.Max(-1000, Math.Min(1000, val));
+            }
+            
             var curve = new ParamCurve();
             Func<double, double> interpolation;
             switch (svCurve.Mode)
@@ -130,9 +142,10 @@ namespace Plugin.SynthV
 
             var generator = new CurveGenerator(
                 svCurve.Points.ConvertAll(
-                    point => new Tuple<int, int>(DecodePosition(point.Item1) + FirstBarTick, op(point.Item2))),
+                    point => new Tuple<int, int>(
+                        DecodePosition(point.Item1) + FirstBarTick, Clip(mappingFunc(point.Item2)))),
                 interpolation);
-            curve.PointList = generator.GetCurve(5, termination);
+            curve.PointList = generator.GetCurve(5, Clip(mappingFunc(baseValue)));
             return curve;
         }
 
@@ -209,7 +222,7 @@ namespace Plugin.SynthV
             {
                 return DecodePosition(offset);
             }
-            return (int) Math.Round(offset / 1470000.0 * (FirstBPM / 120));
+            return (int) Math.Round(offset / 1470000.0 * FirstBPM / 120.0);
         }
 
         private int DecodePosition(long position)

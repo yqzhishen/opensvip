@@ -182,7 +182,7 @@ namespace Plugin.SynthV
                 Loudness = EncodeParamCurve(parameters.Volume, 0, 0.0,
                     val => val >= 0
                         ? val / 1000.0 * 12.0
-                        : Math.Max(20 * Math.Log10(val > -750.0 ? val / 1000.0 + 1.0 : 0.25), -12.0)),
+                        : Math.Max(20 * Math.Log10(val > -997 ? val / 1000.0 + 1.0 : 0.0039), -48.0)),
                 Tension = EncodeParamCurve(parameters.Strength, 0, 0.0,
                     val => val / 1000.0),
                 Breath = EncodeParamCurve(parameters.Breath, 0, 0.0,
@@ -263,7 +263,7 @@ namespace Plugin.SynthV
             return pitchDiff;
         }
 
-        private SVParamCurve EncodeParamCurve(ParamCurve curve, int termination, double defaultValue, Func<int, double> op)
+        private SVParamCurve EncodeParamCurve(ParamCurve curve, int termination, double defaultValue, Func<int, double> mappingFunc)
         {
             var svCurve = new SVParamCurve();
             if (!curve.PointList.Any())
@@ -278,7 +278,7 @@ namespace Plugin.SynthV
                 {
                     if (curve.PointList[0].Item2 != termination)
                     {
-                        pointList.Add(new Tuple<long, double>(0, op(curve.PointList[0].Item2)));
+                        pointList.Add(new Tuple<long, double>(0, mappingFunc(curve.PointList[0].Item2)));
                     }
                     return svCurve;
                 }
@@ -291,7 +291,7 @@ namespace Plugin.SynthV
                 {
                     skipped = validIndex + 1;
                     var (x0, y0) = curve.PointList[validIndex];
-                    pointList.Add(new Tuple<long, double>(TicksToPosition(x0 - FirstBarTick), op(y0)));
+                    pointList.Add(new Tuple<long, double>(TicksToPosition(x0 - FirstBarTick), mappingFunc(y0)));
                 }
             }
             var buffer = new List<Tuple<int, int>>();
@@ -315,7 +315,7 @@ namespace Plugin.SynthV
                     }
                     foreach (var (bufferPos, bufferVal) in buffer)
                     {
-                        pointList.Add(new Tuple<long, double>(TicksToPosition(bufferPos), op(bufferVal)));
+                        pointList.Add(new Tuple<long, double>(TicksToPosition(bufferPos), mappingFunc(bufferVal)));
                     }
                     lastPoint = buffer.Last();
                     buffer.Clear();
@@ -339,7 +339,7 @@ namespace Plugin.SynthV
             }
             foreach (var (bufferPos, bufferVal) in buffer)
             {
-                pointList.Add(new Tuple<long, double>(TicksToPosition(bufferPos), op(bufferVal)));
+                pointList.Add(new Tuple<long, double>(TicksToPosition(bufferPos), mappingFunc(bufferVal)));
             }
             lastPoint = buffer.Last();
             buffer.Clear();
