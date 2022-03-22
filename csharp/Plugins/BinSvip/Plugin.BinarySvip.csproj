@@ -73,7 +73,7 @@
         <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
         <Name>OpenSvip.Framework</Name>
       </ProjectReference>
-      <ProjectReference Include="..\..\Library\OpenSvip.Library\OpenSvip.Library.csproj">
+      <ProjectReference Include="..\..\Library\OpenSvip.Library.csproj">
         <Project>{c0982090-a08e-45b8-953a-6d1750a69cdd}</Project>
         <Name>OpenSvip.Library</Name>
       </ProjectReference>
