@@ -95,54 +95,55 @@ namespace SynthV.Model
 
     public class SVNoteAttributes
     {
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.0)]
         [JsonProperty("tF0Offset", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double TransitionOffset { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.07)]
         [JsonProperty("tF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double SlideLeft { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.07)]
         [JsonProperty("tF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double SlideRight { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.15)]
         [JsonProperty("dF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double DepthLeft { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.15)]
         [JsonProperty("dF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double DepthRight { get; set; }
 
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.250)]
         [JsonProperty("tF0VbrStart", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoStart { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.20)]
         [JsonProperty("tF0VbrLeft", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoLeft { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.20)]
         [JsonProperty("tF0VbrRight", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoRight { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(1.00)]
         [JsonProperty("dF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoDepth { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(5.50)]
         [JsonProperty("fF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoFrequency { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(0.0)]
         [JsonProperty("pF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoPhase { get; set; }
         
-        [DefaultValue(double.NaN)]
+        [DefaultValue(1.0)]
         [JsonProperty("dF0Jitter", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoJitter { get; set; }
         
+        [DefaultValue(null)]
         [JsonProperty("dur", NullValueHandling = NullValueHandling.Ignore)]
         public double[] PhoneDurations { get; set; }
         
@@ -183,7 +184,7 @@ namespace SynthV.Model
         [JsonProperty("database")] public SVDatabase Database { get; set; } = new SVDatabase();
         [JsonProperty("audio")] public SVAudio Audio { get; set; } = new SVAudio();
         [JsonProperty("dictionary")] public string Dictionary { get; set; } = "";
-        [JsonProperty("voice")] public object Voice { get; set; } = new object();
+        [JsonProperty("voice")] public SVVoice Voice { get; set; } = new SVVoice();
     }
 
     public class SVDatabase
@@ -201,19 +202,15 @@ namespace SynthV.Model
 
     public class SVVoice
     {
-        [DefaultValue(double.NaN)]
         [JsonProperty("paramLoudness", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double MasterLoudness { get; set; }
         
-        [DefaultValue(double.NaN)]
         [JsonProperty("paramTension", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double MasterTension { get; set; }
         
-        [DefaultValue(double.NaN)]
         [JsonProperty("paramBreathiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double MasterBreath { get; set; }
         
-        [DefaultValue(double.NaN)]
         [JsonProperty("paramGender", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double MasterGender { get; set; }
     }
