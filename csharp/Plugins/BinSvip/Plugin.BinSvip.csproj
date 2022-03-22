@@ -8,7 +8,7 @@
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>OpenSvip.Stream</RootNamespace>
-        <AssemblyName>Plugin.BinarySvip</AssemblyName>
+        <AssemblyName>Plugin.BinSvip</AssemblyName>
         <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <LangVersion>7.3</LangVersion>
@@ -55,13 +55,13 @@
         <Compile Include="BinarySvipEncoder.cs" />
         <Compile Include="BinarySvipVersions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="OpenSvipConst.cs" />
+        <Compile Include="BinarySvipConst.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="OpenSvip.Const.Singers.json">
+      <Content Include="SingerDict.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
       <Content Include="Properties.xml">

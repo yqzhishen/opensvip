@@ -14,7 +14,7 @@ namespace OpenSvip.Const
         static Singers()
         {
             var stream = new FileStream(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\OpenSvip.Const.Singers.json",
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\SingerDict.json",
                 FileMode.Open,
                 FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
