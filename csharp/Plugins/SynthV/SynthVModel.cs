@@ -96,6 +96,26 @@ namespace SynthV.Model
     public class SVNoteAttributes
     {
         [DefaultValue(double.NaN)]
+        [JsonProperty("tF0Offset", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double TransitionOffset { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("tF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double SlideLeft { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("tF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double SlideRight { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("dF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double DepthLeft { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("dF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double DepthRight { get; set; }
+
+        [DefaultValue(double.NaN)]
         [JsonProperty("tF0VbrStart", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoStart { get; set; }
         
@@ -177,6 +197,25 @@ namespace SynthV.Model
     {
         [JsonProperty("filename")] public string Filename { get; set; } = "";
         [JsonProperty("duration")] public double Duration { get; set; }
+    }
+
+    public class SVVoice
+    {
+        [DefaultValue(double.NaN)]
+        [JsonProperty("paramLoudness", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double MasterLoudness { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("paramTension", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double MasterTension { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("paramBreathiness", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double MasterBreath { get; set; }
+        
+        [DefaultValue(double.NaN)]
+        [JsonProperty("paramGender", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double MasterGender { get; set; }
     }
 
     public class SVConfig
