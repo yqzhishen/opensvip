@@ -98,51 +98,51 @@ namespace SynthV.Model
         [DefaultValue(0.0)]
         [JsonProperty("tF0Offset", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double TransitionOffset { get; set; }
-        
+
         [DefaultValue(0.07)]
         [JsonProperty("tF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double SlideLeft { get; set; }
-        
+        public double SlideLeft { get; set; } = 0.07;
+
         [DefaultValue(0.07)]
         [JsonProperty("tF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double SlideRight { get; set; }
-        
+        public double SlideRight { get; set; } = 0.07;
+
         [DefaultValue(0.15)]
         [JsonProperty("dF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double DepthLeft { get; set; }
-        
+        public double DepthLeft { get; set; } = 0.15;
+
         [DefaultValue(0.15)]
         [JsonProperty("dF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double DepthRight { get; set; }
+        public double DepthRight { get; set; } = 0.15;
 
         [DefaultValue(0.250)]
         [JsonProperty("tF0VbrStart", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoStart { get; set; }
-        
+        public double VibratoStart { get; set; } = 0.250;
+
         [DefaultValue(0.20)]
         [JsonProperty("tF0VbrLeft", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoLeft { get; set; }
-        
+        public double VibratoLeft { get; set; } = 0.20;
+
         [DefaultValue(0.20)]
         [JsonProperty("tF0VbrRight", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoRight { get; set; }
-        
+        public double VibratoRight { get; set; } = 0.20;
+
         [DefaultValue(1.00)]
         [JsonProperty("dF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoDepth { get; set; }
-        
+        public double VibratoDepth { get; set; } = 1.00;
+
         [DefaultValue(5.50)]
         [JsonProperty("fF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoFrequency { get; set; }
+        public double VibratoFrequency { get; set; } = 5.50;
         
         [DefaultValue(0.0)]
         [JsonProperty("pF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double VibratoPhase { get; set; }
-        
+
         [DefaultValue(1.0)]
         [JsonProperty("dF0Jitter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoJitter { get; set; }
-        
+        public double VibratoJitter { get; set; } = 1.0;
+
         [DefaultValue(null)]
         [JsonProperty("dur", NullValueHandling = NullValueHandling.Ignore)]
         public double[] PhoneDurations { get; set; }
