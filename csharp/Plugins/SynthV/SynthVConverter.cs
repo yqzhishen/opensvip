@@ -19,7 +19,8 @@ namespace SynthV.Stream
             reader.Close();
             return new SynthVDecoder
             {
-                BreathOption = options.GetOptionAsEnum("breath", BreathOptions.Convert)
+                PitchOption = options.GetValueAsEnum("pitch", PitchOptions.Edited),
+                BreathOption = options.GetValueAsEnum("breath", BreathOptions.Convert)
             }.DecodeProject(svProject);
         }
 
@@ -27,7 +28,7 @@ namespace SynthV.Stream
         {
             var svProject = new SynthVEncoder
             {
-                VibratoOption = options.GetOptionAsEnum("vibrato", VibratoOptions.Hybrid)
+                VibratoOption = options.GetValueAsEnum("vibrato", VibratoOptions.Hybrid)
             }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);

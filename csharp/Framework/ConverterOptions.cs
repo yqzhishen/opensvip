@@ -32,7 +32,7 @@ namespace OpenSvip.Framework
         /// </summary>
         /// <param name="name">选项名称</param>
         /// <param name="defaultValue">用户未指定该选项时，返回此默认值</param>
-        public string GetOptionAsString(string name, string defaultValue = null)
+        public string GetValueAsString(string name, string defaultValue = null)
         {
             return OptionDictionary.ContainsKey(name) ? OptionDictionary[name] : defaultValue;
         }
@@ -43,7 +43,7 @@ namespace OpenSvip.Framework
         /// <param name="name">选项名称</param>
         /// <param name="defaultValue">用户未指定该选项时，返回此默认值</param>
         /// <exception cref="ArgumentException">若用户输入的选项值不是整数类型</exception>
-        public int GetOptionAsInteger(string name, int defaultValue = 0)
+        public int GetValueAsInteger(string name, int defaultValue = 0)
         {
             try
             {
@@ -61,7 +61,7 @@ namespace OpenSvip.Framework
         /// <param name="name">选项名称</param>
         /// <param name="defaultValue">用户未指定该选项时，返回此默认值</param>
         /// <exception cref="ArgumentException">若用户输入的选项值不是浮点数类型</exception>
-        public double GetOptionAsDouble(string name, double defaultValue = 0.0)
+        public double GetValueAsDouble(string name, double defaultValue = 0.0)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace OpenSvip.Framework
         /// <param name="name">选项名称</param>
         /// <param name="defaultValue">用户未指定该选项时，返回此默认值</param>
         /// <exception cref="ArgumentException">若用户输入的选项值不是布尔类型</exception>
-        public bool GetOptionAsBoolean(string name, bool defaultValue = false)
+        public bool GetValueAsBoolean(string name, bool defaultValue = false)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace OpenSvip.Framework
         /// <param name="defaultValue">用户未指定该选项时，返回此默认值</param>
         /// <typeparam name="E">需要返回的枚举变量类型</typeparam>
         /// <exception cref="ArgumentException">若用户的输入无法匹配任何枚举变量</exception>
-        public E GetOptionAsEnum<E>(string name, E defaultValue = default) where E: Enum
+        public E GetValueAsEnum<E>(string name, E defaultValue = default) where E: Enum
         {
             if (!OptionDictionary.ContainsKey(name))
             {

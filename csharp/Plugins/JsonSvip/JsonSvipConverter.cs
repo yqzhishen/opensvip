@@ -24,7 +24,7 @@ namespace OpenSvip.Stream
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
             var settings = new JsonSerializerSettings
             {
-                Formatting = options.GetOptionAsBoolean("indented") ? Formatting.Indented : Formatting.None,
+                Formatting = options.GetValueAsBoolean("indented") ? Formatting.Indented : Formatting.None,
                 ReferenceLoopHandling = ReferenceLoopHandling.Error
             };
             writer.Write(JsonConvert.SerializeObject(project, settings));

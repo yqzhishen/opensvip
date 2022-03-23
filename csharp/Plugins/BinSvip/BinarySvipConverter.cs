@@ -26,10 +26,10 @@ namespace OpenSvip.Stream
         {
             var (version, model) = new BinarySvipEncoder
             {
-                DefaultSinger = options.GetOptionAsString("singer", "陈水若"),
-                DefaultTempo = options.GetOptionAsInteger("tempo", 60)
+                DefaultSinger = options.GetValueAsString("singer", "陈水若"),
+                DefaultTempo = options.GetValueAsInteger("tempo", 60)
             }.EncodeProject(project);
-            var verEnum = options.GetOptionAsEnum<BinarySvipVersions>("version");
+            var verEnum = options.GetValueAsEnum<BinarySvipVersions>("version");
             switch (verEnum)
             {
                 case BinarySvipVersions.SVIP7_0_0:

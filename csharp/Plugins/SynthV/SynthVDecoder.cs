@@ -12,6 +12,8 @@ namespace Plugin.SynthV
     {
         public BreathOptions BreathOption { get; set; }
         
+        public PitchOptions PitchOption { get; set; }
+        
         private int FirstBarTick;
 
         private double FirstBPM;
@@ -101,18 +103,15 @@ namespace Plugin.SynthV
             {
                 // TODO: decode pitch
                 Volume = DecodeParamCurve(svParams.Loudness, VoiceSettings.MasterLoudness, val =>
-                    {
-                        var v = val + VoiceSettings.MasterLoudness;
-                        return v >= 0.0
-                            ? (int) Math.Round(v / 12.0 * 1000.0)
-                            : (int) Math.Round(1000.0 * Math.Pow(10, v / 20.0) - 1000.0);
-                    }),
+                    val >= 0.0
+                        ? (int) Math.Round(val / 12.0 * 1000.0)
+                        : (int) Math.Round(1000.0 * Math.Pow(10, val / 20.0) - 1000.0)),
                 Breath = DecodeParamCurve(svParams.Breath, VoiceSettings.MasterBreath, val =>
-                    (int) Math.Round((val + VoiceSettings.MasterBreath) * 1000.0)),
+                    (int) Math.Round(val * 1000.0)),
                 Gender = DecodeParamCurve(svParams.Gender, VoiceSettings.MasterGender, val =>
-                    (int) Math.Round((val + VoiceSettings.MasterGender) * -1000.0)),
+                    (int) Math.Round(val * -1000.0)),
                 Strength = DecodeParamCurve(svParams.Tension, VoiceSettings.MasterTension, val =>
-                    (int) Math.Round((val + VoiceSettings.MasterTension) * 1000.0))
+                    (int) Math.Round(val * 1000.0))
             };
             return parameters;
         }
@@ -143,7 +142,7 @@ namespace Plugin.SynthV
             var generator = new CurveGenerator(
                 svCurve.Points.ConvertAll(
                     point => new Tuple<int, int>(
-                        DecodePosition(point.Item1) + FirstBarTick, Clip(mappingFunc(point.Item2)))),
+                        DecodePosition(point.Item1) + FirstBarTick, Clip(mappingFunc(point.Item2 + baseValue)))),
                 interpolation);
             curve.PointList = generator.GetCurve(5, Clip(mappingFunc(baseValue)));
             return curve;
