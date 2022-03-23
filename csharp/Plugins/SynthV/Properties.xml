@@ -12,6 +12,13 @@
     <LibraryPath>SynthV\Plugin.SynthV.dll</LibraryPath>
     <Converter>SynthV.Stream.SynthVConverter</Converter>
     <InputOptions>
+        <Option Name="pitch" Type="enum" Default="edited">
+            <Notes>音高参数属性输入模式</Notes>
+            <EnumChoices>
+                <Choice Name="输入完整音高曲线" Tag="full"/>
+                <Choice Name="仅输入已编辑部分" Tag="edited"/>
+            </EnumChoices>
+        </Option>
         <Option Name="breath" Type="enum" Default="ignore">
             <Notes>换气音符处理方式</Notes>
             <EnumChoices>
