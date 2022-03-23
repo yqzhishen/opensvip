@@ -18,6 +18,8 @@ namespace Plugin.SynthV
 
         private double FirstBPM;
 
+        private TimeSynchronizer Synchronizer;
+
         private SVVoice VoiceSettings;
 
         private List<string> LyricsPinyin;
@@ -33,6 +35,7 @@ namespace Plugin.SynthV
             
             project.SongTempoList = ScoreMarkUtils.ShiftTempoList(time.Tempos.ConvertAll(DecodeTempo), FirstBarTick);
             project.TimeSignatureList = ScoreMarkUtils.ShiftBeatList(time.Meters.ConvertAll(DecodeMeter), 1);
+            Synchronizer = new TimeSynchronizer(project.SongTempoList);
             
             foreach (var svTrack in svProject.Tracks)
             {
@@ -192,6 +195,93 @@ namespace Plugin.SynthV
                     throw new ArgumentOutOfRangeException();
             }
             // TODO: decode phones
+            LyricsPinyin = PhonemeUtils.LyricsToPinyin(noteList.ConvertAll(note =>
+            {
+                if (!string.IsNullOrEmpty(note.Pronunciation))
+                {
+                    return note.Pronunciation;
+                }
+                var validChars = Regex.Replace(
+                    note.Lyric,
+                    "[\\s\\(\\)\\[\\]\\{\\}\\^_*×――—（）$%~!@#$…&%￥—+=<>《》!！??？:：•`·、。，；,.;\"‘’“”0-9a-zA-Z]",
+                    "la");
+                return validChars == "" ? "la" : validChars[0].ToString();
+            }));
+            if (!noteList.Any())
+            {
+                return noteList;
+            }
+
+            var currentSVNote = svNotes[0];
+            var currentDuration = currentSVNote.Attributes.PhoneDurations;
+            var currentPhoneMarks = PhonemeUtils.DefaultPhoneMarks(LyricsPinyin[0]);
+            // head part of the first note
+            if (currentPhoneMarks[0] > 0 && currentDuration != null && !currentDuration[0].Equals(1.0))
+            {
+                noteList[0].EditedPhones = new Phones
+                {
+                    HeadLengthInSecs = (float) Math.Min(1.8, currentPhoneMarks[0] * currentDuration[0])
+                };
+            }
+            var i = 0;
+            for (; i < svNotes.Count - 1; i++)
+            {
+                var nextSVNote = svNotes[i + 1];
+                var nextDuration = nextSVNote.Attributes.PhoneDurations;
+                var nextPhoneMarks = PhonemeUtils.DefaultPhoneMarks(LyricsPinyin[i + 1]);
+
+                var index = currentPhoneMarks[0] > 0 ? 1 : 0;
+                var currentMainPartEdited =
+                    currentPhoneMarks[1] > 0
+                    && currentDuration != null
+                    && currentDuration.Length > index + 1;
+                var nextHeadPartEdited =
+                    nextPhoneMarks[0] > 0
+                    && nextDuration != null
+                    && nextDuration.Any();
+
+                if (currentMainPartEdited)
+                {
+                    if (noteList[i].EditedPhones == null)
+                    {
+                        noteList[i].EditedPhones = new Phones();
+                    }
+                    noteList[i].EditedPhones.MidRatioOverTail =
+                        (float) (currentPhoneMarks[1] * currentDuration[index] / currentDuration[index + 1]);
+                }
+
+                if (nextHeadPartEdited)
+                {
+                    if (noteList[i + 1].EditedPhones == null)
+                    {
+                        noteList[i + 1].EditedPhones = new Phones();
+                    }
+                    var spaceInSecs = Synchronizer.GetDurationSecsFromTicks(
+                        noteList[i].StartPos + FirstBarTick,
+                        noteList[i + 1].StartPos + FirstBarTick);
+                    var ratio = nextPhoneMarks[0] * nextDuration[0];
+                    if (currentMainPartEdited)
+                    {
+                        ratio *= 2 / (currentDuration[index] + currentDuration[index + 1]);
+                    }
+                    noteList[i + 1].EditedPhones.HeadLengthInSecs = (float) Math.Min(0.8 * spaceInSecs, ratio);
+                }
+                
+                currentDuration = nextDuration;
+                currentPhoneMarks = nextPhoneMarks;
+            }
+            // main part of the last note
+            var idx = currentPhoneMarks[0] > 0 ? 1 : 0;
+            if (currentPhoneMarks[1] > 0 && currentDuration != null && currentDuration.Length > idx + 1)
+            {
+                if (noteList[i].EditedPhones == null)
+                {
+                    noteList[i].EditedPhones = new Phones();
+                }
+                noteList[i].EditedPhones.MidRatioOverTail =
+                    (float) (currentPhoneMarks[1] * currentDuration[idx] / currentDuration[idx + 1]);
+            }
+            
             return noteList;
         }
 
@@ -203,7 +293,12 @@ namespace Plugin.SynthV
                 KeyNumber = svNote.Pitch
             };
             note.Length = DecodePosition(svNote.Onset + svNote.Duration) - note.StartPos; // avoid overlapping
-            if (Regex.IsMatch(svNote.Lyrics, @"[a-zA-Z]"))
+            if (!string.IsNullOrEmpty(svNote.Phonemes))
+            {
+                note.Lyric = "啊";
+                note.Pronunciation = PhonemeUtils.XsampaToPinyin(svNote.Phonemes);
+            }
+            else if (Regex.IsMatch(svNote.Lyrics, @"[a-zA-Z]"))
             {
                 note.Lyric = "啊";
                 note.Pronunciation = svNote.Lyrics;

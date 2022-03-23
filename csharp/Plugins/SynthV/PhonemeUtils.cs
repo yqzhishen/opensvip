@@ -12,11 +12,13 @@ namespace Plugin.SynthV
     {
         private static readonly Dictionary<string, string[]> PhonemeDictionary;
 
+        private static readonly Dictionary<string, string> XsampaDictionary;
+
         private static readonly Dictionary<string, double> DefaultDurations = new Dictionary<string, double>
         {
             {"stop", 0.10},
-            {"affricate", 0.120},
-            {"fricative", 0.120},
+            {"affricate", 0.125},
+            {"fricative", 0.125},
             {"aspirate", 0.094},
             {"liquid", 0.062},
             {"nasal", 0.094},
@@ -30,15 +32,25 @@ namespace Plugin.SynthV
         static PhonemeUtils()
         {
             var stream = new FileStream(
-                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\PhonemeDict.json",
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty,
+                    "PhonemeDict.json"),
                 FileMode.Open,
                 FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.Default);
             PhonemeDictionary = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
+            stream = new FileStream(
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty,
+                    "XsampaDict.json"),
+                FileMode.Open,
+                FileAccess.Read);
+            reader = new StreamReader(stream, Encoding.Default);
+            XsampaDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(reader.ReadToEnd());
+            stream.Close();
+            reader.Close();
         }
-        public static List<string> LyricsToPinyin(IEnumerable<string> lyrics)
+        public static List<string> LyricsToPinyin(List<string> lyrics)
         {
             var pinyinList = new List<string>();
             var builder = new StringBuilder();
@@ -63,6 +75,12 @@ namespace Plugin.SynthV
                 pinyinList.AddRange(Regex.Split(Pinyin.GetPinyin(builder.ToString()).Trim(' '), "\\s+"));
             }
             return pinyinList;
+        }
+
+        public static string XsampaToPinyin(string xsampa)
+        {
+            xsampa = Regex.Replace(xsampa, @"\s+", " ").Trim(' ');
+            return !XsampaDictionary.ContainsKey(xsampa) ? "la" : XsampaDictionary[xsampa];
         }
 
         public static int NumberOfPhones(string pinyin)

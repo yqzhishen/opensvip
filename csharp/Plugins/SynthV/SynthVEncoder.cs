@@ -381,6 +381,7 @@ namespace Plugin.SynthV
                     && notes[i + 1].EditedPhones != null
                     && notes[i + 1].EditedPhones.HeadLengthInSecs > 0;
 
+                var index = currentPhoneMarks[0] > 0 ? 1 : 0;
                 if (currentMainPartEdited && nextHeadPartEdited) // three parts should all be adjusted
                 {
                     var currentMainRatio = notes[i].EditedPhones.MidRatioOverTail / currentPhoneMarks[1];
@@ -395,8 +396,8 @@ namespace Plugin.SynthV
                         y *= finalRatio;
                         z *= finalRatio;
                     }
-                    currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
-                    currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
+                    currentSVNote.Attributes.SetPhoneDuration(index, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
+                    currentSVNote.Attributes.SetPhoneDuration(index + 1, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
                     nextSVNote.Attributes.SetPhoneDuration(0, z < 0.2 ? 0.2 : z > 1.8 ? 1.8 : z);
                 }
                 else if (currentMainPartEdited) // only main part of current note should be adjusted
@@ -404,8 +405,8 @@ namespace Plugin.SynthV
                     var ratio = notes[i].EditedPhones.MidRatioOverTail / currentPhoneMarks[1];
                     var x = 2 * ratio / (1 + ratio);
                     var y = 2 / (1 + ratio);
-                    currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
-                    currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
+                    currentSVNote.Attributes.SetPhoneDuration(index, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
+                    currentSVNote.Attributes.SetPhoneDuration(index + 1, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
                 }
                 else if (nextHeadPartEdited) // only head part of next note should be adjusted
                 {
@@ -416,10 +417,10 @@ namespace Plugin.SynthV
                         var ratioXY = 2 / (1 + ratio);
                         ratioZ = ratioZ < 0.2 ? 0.2 : ratioZ > 1.8 ? 1.8 : ratioZ;
                         ratioXY = ratioXY < 0.2 ? 0.2 : ratioXY > 1.8 ? 1.8 : ratioXY;
-                        currentSVNote.Attributes.SetPhoneDuration(1, ratioXY);
+                        currentSVNote.Attributes.SetPhoneDuration(index, ratioXY);
                         if (currentPhoneMarks[1] > 0.0)
                         {
-                            currentSVNote.Attributes.SetPhoneDuration(2, ratioXY);
+                            currentSVNote.Attributes.SetPhoneDuration(index + 1, ratioXY);
                         }
                         ratio = ratioZ;
                     }
@@ -444,8 +445,9 @@ namespace Plugin.SynthV
                 var ratio = notes[i].EditedPhones.MidRatioOverTail / currentPhoneMarks[1];
                 var x = 2 * ratio / (1 + ratio);
                 var y = 2 / (1 + ratio);
-                currentSVNote.Attributes.SetPhoneDuration(1, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
-                currentSVNote.Attributes.SetPhoneDuration(2, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
+                var index = currentPhoneMarks[0] > 0 ? 1 : 0;
+                currentSVNote.Attributes.SetPhoneDuration(index, x < 0.2 ? 0.2 : x > 1.8 ? 1.8 : x);
+                currentSVNote.Attributes.SetPhoneDuration(index + 1, y < 0.2 ? 0.2 : y > 1.8 ? 1.8 : y);
             }
             // check length of phone duration array if edited
             if (currentSVNote.Attributes.PhoneDurations != null)
