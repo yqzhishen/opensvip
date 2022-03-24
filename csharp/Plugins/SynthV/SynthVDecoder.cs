@@ -234,13 +234,13 @@ namespace Plugin.SynthV
                 var currentMainPartEdited =
                     currentPhoneMarks[1] > 0
                     && currentDuration != null
-                    && currentDuration.Length > index + 1;
+                    && currentDuration.Length > index;
                 var nextHeadPartEdited =
                     nextPhoneMarks[0] > 0
                     && nextDuration != null
                     && nextDuration.Any();
 
-                if (currentMainPartEdited)
+                if (currentMainPartEdited && currentDuration.Length > index + 1)
                 {
                     if (noteList[i].EditedPhones == null)
                     {
@@ -262,7 +262,14 @@ namespace Plugin.SynthV
                     var ratio = nextPhoneMarks[0] * nextDuration[0];
                     if (currentMainPartEdited)
                     {
-                        ratio *= 2 / (currentDuration[index] + currentDuration[index + 1]);
+                        if (currentDuration.Length > index + 1)
+                        {
+                            ratio *= 2 / (currentDuration[index] + currentDuration[index + 1]);
+                        }
+                        else
+                        {
+                            ratio /= currentDuration[index];
+                        }
                     }
                     noteList[i + 1].EditedPhones.HeadLengthInSecs = (float) Math.Min(0.8 * spaceInSecs, ratio);
                 }
