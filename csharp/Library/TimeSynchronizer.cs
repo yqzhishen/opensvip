@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using OpenSvip.Model;
 
 namespace OpenSvip.Library
@@ -60,17 +60,17 @@ namespace OpenSvip.Library
         /// <summary>
         /// 将原始谱面位置（梯）转换为对齐后的实际谱面时间坐标（秒）。
         /// </summary>
-        /// <param name="ticks"></param>
-        /// <returns></returns>
         public double GetActualSecsFromTicks(int ticks)
         {
             return GetDurationSecsFromTicks(0, ticks);
         }
 
+        /// <summary>
+        /// 将原始谱面时间坐标（秒）转换为对齐后的实际谱面位置（梯）。
+        /// </summary>
         public double GetActualTicksFromSecs(double secs)
         {
-            // maybe useless
-            throw new NotImplementedException();
+            return GetActualTicksFromSecsOffset(0, secs);
         }
 
         /// <summary>
@@ -102,10 +102,35 @@ namespace OpenSvip.Library
             return secs;
         }
 
+        /// <summary>
+        /// 计算原始谱面上从某位置（梯）开始经过给定时间（秒）后所对应的实际位置（梯）。
+        /// </summary>
         public double GetActualTicksFromSecsOffset(int startTicks, double offsetSecs)
         {
-            // maybe useless
-            throw new NotImplementedException();
+            if (IsAbsoluteTimeMode)
+            {
+                return GetActualTicksFromTicks(startTicks) + DefaultTempo * 8 * offsetSecs;
+            }
+
+            var startTempoIndex = TempoList.FindLastIndex(tempo => tempo.Position <= startTicks);
+            double ticks = startTicks;
+            var secs = offsetSecs;
+            for (var i = startTempoIndex; i < TempoList.Count - 1; i++)
+            {
+                var dur = (TempoList[i + 1].Position - ticks) / TempoList[i].BPM / 8;
+                if (dur < secs)
+                {
+                    ticks = TempoList[i + 1].Position;
+                    secs -= dur;
+                }
+                else
+                {
+                    ticks += (TempoList[i + 1].Position - ticks) * secs / dur;
+                    return ticks;
+                }
+            }
+            ticks += TempoList.Last().BPM * 8 * secs;
+            return ticks;
         }
     }
 }
