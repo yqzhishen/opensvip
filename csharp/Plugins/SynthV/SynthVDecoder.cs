@@ -256,22 +256,23 @@ namespace Plugin.SynthV
                     {
                         noteList[i + 1].EditedPhones = new Phones();
                     }
-                    var spaceInSecs = Synchronizer.GetDurationSecsFromTicks(
+                    var spaceInSecs = Math.Min(2.0, Synchronizer.GetDurationSecsFromTicks(
                         noteList[i].StartPos + FirstBarTick,
-                        noteList[i + 1].StartPos + FirstBarTick);
-                    var ratio = nextPhoneMarks[0] * nextDuration[0];
+                        noteList[i + 1].StartPos + FirstBarTick));
+                    var length = nextPhoneMarks[0] * nextDuration[0];
                     if (currentMainPartEdited)
                     {
-                        if (currentDuration.Length > index + 1)
+                        var ratio = currentDuration.Length > index + 1
+                            ? 2 / (currentDuration[index] + currentDuration[index + 1])
+                            : 1 / currentDuration[index];
+                        if (length * ratio > Synchronizer.GetDurationSecsFromTicks(
+                                noteList[i].StartPos + noteList[i].Length + FirstBarTick,
+                                noteList[i + 1].StartPos + FirstBarTick))
                         {
-                            ratio *= 2 / (currentDuration[index] + currentDuration[index + 1]);
-                        }
-                        else
-                        {
-                            ratio /= currentDuration[index];
+                            length *= ratio;
                         }
                     }
-                    noteList[i + 1].EditedPhones.HeadLengthInSecs = (float) Math.Min(0.8 * spaceInSecs, ratio);
+                    noteList[i + 1].EditedPhones.HeadLengthInSecs = (float) Math.Min(0.9 * spaceInSecs, length);
                 }
                 
                 currentDuration = nextDuration;
