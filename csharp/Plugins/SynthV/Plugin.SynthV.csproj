@@ -50,6 +50,7 @@
         <Compile Include="CurveGenerator.cs" />
         <Compile Include="Interpolation.cs" />
         <Compile Include="PhonemeUtils.cs" />
+        <Compile Include="PitchGenerator.cs" />
         <Compile Include="PitchOptions.cs" />
         <Compile Include="PitchSimulator.cs" />
         <Compile Include="PitchSlide.cs" />

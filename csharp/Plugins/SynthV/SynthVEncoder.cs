@@ -105,10 +105,8 @@ namespace Plugin.SynthV
                     svTrack.MainRef.Database.PhoneSet = "xsampa";
                     
                     NoteBuffer = singingTrack.NoteList;
-                    PitchSimulator = new PitchSimulator(
-                        singingTrack.NoteList,
-                        Synchronizer,
-                        PitchSlide.SigmoidSlide());
+                    PitchSimulator = new PitchSimulator(Synchronizer,
+                        singingTrack.NoteList, PitchSlide.SigmoidSlide());
                     
                     svTrack.MainGroup.Params = EncodeParams(singingTrack.EditedParams);
                     

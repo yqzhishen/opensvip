@@ -8,18 +8,18 @@ namespace Plugin.SynthV
 {
     public class PitchSimulator
     {
-        private readonly List<Note> NoteList;
-
         private readonly TimeSynchronizer Synchronizer;
+
+        private readonly List<Note> NoteList;
 
         private readonly PitchSlide Slide;
 
         private readonly List<Tuple<double, int>> PitchTags = new List<Tuple<double, int>>();
 
-        public PitchSimulator(List<Note> noteList, TimeSynchronizer synchronizer, PitchSlide slide)
+        public PitchSimulator(TimeSynchronizer synchronizer, List<Note> noteList, PitchSlide slide)
         {
-            NoteList = noteList;
             Synchronizer = synchronizer;
+            NoteList = noteList;
             Slide = slide;
             GenerateTags();
         }

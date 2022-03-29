@@ -22,6 +22,8 @@ namespace Plugin.SynthV
 
         private SVVoice VoiceSettings;
 
+        private List<SVNote> NoteList;
+
         private List<string> LyricsPinyin;
 
         private List<Track> GroupTracksBuffer = new List<Track>(); // reserved for note groups
@@ -77,6 +79,7 @@ namespace Plugin.SynthV
             else
             {
                 VoiceSettings = track.MainRef.Voice;
+                NoteList = track.MainGroup.Notes;
                 var singingTrack = new SingingTrack
                 {
                     NoteList = DecodeNoteList(track.MainGroup.Notes),
@@ -104,7 +107,7 @@ namespace Plugin.SynthV
         {
             var parameters = new Params
             {
-                // TODO: decode pitch
+                Pitch = DecodePitchCurve(svParams.Pitch, svParams.VibratoEnvelope),
                 Volume = DecodeParamCurve(svParams.Loudness, VoiceSettings.MasterLoudness, val =>
                     val >= 0.0
                         ? (int) Math.Round(val / 12.0 * 1000.0)
@@ -117,6 +120,70 @@ namespace Plugin.SynthV
                     (int) Math.Round(val * 1000.0))
             };
             return parameters;
+        }
+
+        private ParamCurve DecodePitchCurve(SVParamCurve pitchDiff, SVParamCurve vibratoEnv, int step = 5)
+        {
+            var curve = new ParamCurve();
+            if (!NoteList.Any())
+            {
+                return curve;
+            }
+            var generator = new PitchGenerator(Synchronizer, NoteList, pitchDiff, vibratoEnv);
+            var currentNote = NoteList[0];
+            var currentBegin = DecodePosition(currentNote.Onset);
+            var currentEnd = DecodePosition(currentNote.Onset + currentNote.Duration);
+            curve.PointList.Add(new Tuple<int, int>(currentBegin - 120 + FirstBarTick, -100));
+            for (var j = currentBegin - 120; j < currentBegin; j += step)
+            {
+                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+            }
+            var i = 0;
+            for (; i < NoteList.Count - 1; i++)
+            {
+                var nextNote = NoteList[i + 1];
+                var nextBegin = DecodePosition(nextNote.Onset);
+                var nextEnd = DecodePosition(nextNote.Onset + nextNote.Duration);
+
+                for (var j = currentBegin; j < currentEnd; j += step)
+                {
+                    curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                }
+
+                if (nextBegin - currentEnd > 240)
+                {
+                    for (var j = currentEnd; j < currentEnd + 120; j += step)
+                    {
+                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                    }
+                    curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.PitchAtTicks(currentEnd + 120)));
+                    curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
+                    curve.PointList.Add(new Tuple<int, int>(nextBegin - 120 + FirstBarTick, -100));
+                    for (var j = nextBegin - 120; j < nextBegin; j += step)
+                    {
+                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                    }
+                }
+                else
+                {
+                    for (var j = currentEnd; j < nextBegin; j += step)
+                    {
+                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                    }
+                }
+                
+                currentNote = nextNote;
+                currentBegin = nextBegin;
+                currentEnd = nextEnd;
+            }
+            
+            for (var j = currentBegin; j < currentEnd + 120; j += step)
+            {
+                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+            }
+            curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.PitchAtTicks(currentEnd + 120)));
+            curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
+            return curve;
         }
 
         private ParamCurve DecodeParamCurve(SVParamCurve svCurve, double baseValue,
@@ -146,8 +213,9 @@ namespace Plugin.SynthV
                 svCurve.Points.ConvertAll(
                     point => new Tuple<int, int>(
                         DecodePosition(point.Item1) + FirstBarTick, Clip(mappingFunc(point.Item2 + baseValue)))),
-                interpolation);
-            curve.PointList = generator.GetCurve(5, Clip(mappingFunc(baseValue)));
+                interpolation,
+                Clip(mappingFunc(baseValue)));
+            curve.PointList = generator.GetConvertedCurve(5);
             return curve;
         }
 
@@ -194,7 +262,6 @@ namespace Plugin.SynthV
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            // TODO: decode phones
             LyricsPinyin = PhonemeUtils.LyricsToPinyin(noteList.ConvertAll(note =>
             {
                 if (!string.IsNullOrEmpty(note.Pronunciation))
