@@ -15,20 +15,12 @@ namespace Gjgj.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            try
-            {
-                var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
-                var reader = new StreamReader(stream, Encoding.UTF8);
-                var gjProject = JsonConvert.DeserializeObject<GjProject>(reader.ReadToEnd());
-                stream.Close();
-                reader.Close();
-                return new GjgjDecoder().DecodeProject(gjProject);
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                return null;
-            }
+            var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+            var reader = new StreamReader(stream, Encoding.UTF8);
+            var gjProject = JsonConvert.DeserializeObject<GjProject>(reader.ReadToEnd());
+            stream.Close();
+            reader.Close();
+            return new GjgjDecoder().DecodeProject(gjProject);
         }
 
         public void Save(string path, Project project, ConverterOptions options)

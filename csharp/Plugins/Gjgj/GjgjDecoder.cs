@@ -1,10 +1,11 @@
 ﻿using System;
-using OpenSvip.Model;
-using Gjgj.Model;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Linq;
+using OpenSvip.Model;
+using OpenSvip.Library;
+using Gjgj.Model;
 
 namespace Plugin.Gjgj
 {
@@ -12,25 +13,18 @@ namespace Plugin.Gjgj
     {
         public Project DecodeProject(GjProject gjProject)
         {
-            try
-            {
-                var project = new Project();
-                project.Version = "SVIP7.0.0";
-                DecodeTempo(gjProject, project);
-                DecodeTimeSignature(gjProject, project);
-                DecodeTracks(gjProject, project);
-                return project;
-            }
-            catch(Exception e)
-            {
-                MessageBox.Show(e.Message);
-                return null;
-            }
+            var project = new Project();
+            project.Version = "SVIP7.0.0";
+            DecodeTempo(gjProject, project);
+            TimeSynchronizer timeSynchronizer = new TimeSynchronizer(project.SongTempoList);
+            DecodeTimeSignature(gjProject, project);
+            DecodeTracks(timeSynchronizer, gjProject, project);
+            return project;
         }
 
-        private void DecodeTracks(GjProject gjProject, Project project)
+        private void DecodeTracks(TimeSynchronizer timeSynchronizer, GjProject gjProject, Project project)
         {
-            DecodeSingingTracks(gjProject, project);
+            DecodeSingingTracks(timeSynchronizer, gjProject, project);
             DecodeInstrumentalTracks(gjProject, project);
         }
 
@@ -52,14 +46,14 @@ namespace Plugin.Gjgj
             }
         }
 
-        private void DecodeSingingTracks(GjProject gjProject, Project project)
+        private void DecodeSingingTracks(TimeSynchronizer timeSynchronizer, GjProject gjProject, Project project)
         {
             for (int singingTrackIndex = 0; singingTrackIndex < gjProject.Tracks.Count; singingTrackIndex++)
             {
                 List<Note> noteListFromGj = new List<Note>();
                 for (int noteIndex = 0; noteIndex < gjProject.Tracks[singingTrackIndex].BeatItems.Count; noteIndex++)
                 {
-                    Note noteFromGj = DecodeNote(gjProject, singingTrackIndex, noteIndex);
+                    Note noteFromGj = DecodeNote(gjProject, singingTrackIndex, noteIndex, timeSynchronizer);
                     noteListFromGj.Add(noteFromGj);
                 }
                 Params paramsFromGj = new Params();
@@ -136,21 +130,54 @@ namespace Plugin.Gjgj
             paramsFromGj.Volume = paramCurveVolume;
         }
 
-        private static Note DecodeNote(GjProject gjProject, int singingTrackIndex, int noteIndex)
+        private static Note DecodeNote(GjProject gjProject, int singingTrackIndex, int noteIndex, TimeSynchronizer timeSynchronizer)
         {
+            int noteDurationFromGj = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].Duration;
+            int convertedStartPosition = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].StartTick - 1920 * gjProject.TempoMap.TimeSignature[0].Numerator / gjProject.TempoMap.TimeSignature[0].Denominator;
+            double preTimeFromGj = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].PreTime;
+            double postTimeFromGj = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].PostTime;
+            float headLengthInSecsFromGj = 0.0f;
+            float midRatioOverTailFromGj = 0.0f;
+            double essentialVowelLength = 0;
+            double tailVowelLength = 0;
+            int delta = 0;
+            Phones phones = new Phones();
+            if (preTimeFromGj != 0.0)
+            {
+                delta = convertedStartPosition + (int)(preTimeFromGj / 1000.0 * 480.0);
+                if (delta > 0)
+                {
+                    headLengthInSecsFromGj = (float)(timeSynchronizer.GetActualSecsFromTicks(convertedStartPosition) - timeSynchronizer.GetActualSecsFromTicks(delta));
+                    phones.HeadLengthInSecs = headLengthInSecsFromGj;
+                }
+            }
+            if (postTimeFromGj != 0.0)
+            {
+                essentialVowelLength = noteDurationFromGj * 1000 / 480 + postTimeFromGj;
+                tailVowelLength = -postTimeFromGj;
+                midRatioOverTailFromGj = (float)(essentialVowelLength / tailVowelLength);
+                phones.MidRatioOverTail = midRatioOverTailFromGj;
+            }
+            //用于调试
+            //MessageBox.Show("convertedStartPosition = " + convertedStartPosition +
+            //    "\nconvertedPreTime" + (int)(preTimeFromGj / 1000.0 * 480.0) +
+            //    "\nessentialVowelLength = " + essentialVowelLength +
+            //    "\ntailVowelLength = " + tailVowelLength + 
+            //    "\nMidRatioOverTail = " + midRatioOverTailFromGj);
             return new Note
             {
-                StartPos = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].StartTick - 1920 * gjProject.TempoMap.TimeSignature[0].Numerator / gjProject.TempoMap.TimeSignature[0].Denominator,
-                Length = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].Duration,
+                StartPos = convertedStartPosition,
+                Length = noteDurationFromGj,
                 KeyNumber = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].Track + 24,
                 Lyric = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].Lyric,
                 Pronunciation = gjProject.Tracks[singingTrackIndex].BeatItems[noteIndex].Pinyin ?? null,
+                EditedPhones = phones
             };
         }
 
         private static void DecodeTimeSignature(GjProject gjProject, Project project)
         {
-            if(gjProject.TempoMap.TimeSignature.Count == 0)//如果拍号只有4/4，gjgj不存
+            if (gjProject.TempoMap.TimeSignature.Count == 0)//如果拍号只有4/4，gjgj不存
             {
                 TimeSignature timeSignature = new TimeSignature
                 {
@@ -212,7 +239,7 @@ namespace Plugin.Gjgj
                     }
                 }
             }
-            
+
         }
 
         private static void DecodeTempo(GjProject gjProject, Project project)
