@@ -125,8 +125,10 @@ namespace Plugin.SynthV
         private ParamCurve DecodePitchCurve(SVParamCurve pitchDiff, SVParamCurve vibratoEnv, int step = 5)
         {
             var curve = new ParamCurve();
+            curve.PointList.Add(new Tuple<int, int>(-192000, -100));
             if (!NoteList.Any())
             {
+                curve.PointList.Add(new Tuple<int, int>(1073741823, -100));
                 return curve;
             }
             var generator = new PitchGenerator(Synchronizer, NoteList, pitchDiff, vibratoEnv);
@@ -172,7 +174,6 @@ namespace Plugin.SynthV
                     }
                 }
                 
-                currentNote = nextNote;
                 currentBegin = nextBegin;
                 currentEnd = nextEnd;
             }
@@ -183,6 +184,7 @@ namespace Plugin.SynthV
             }
             curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.PitchAtTicks(currentEnd + 120)));
             curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
+            curve.PointList.Add(new Tuple<int, int>(1073741823, -100));
             return curve;
         }
 
