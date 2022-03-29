@@ -123,7 +123,11 @@ namespace OpenSvip.Stream
                     sTrack.EditedVolumeLine = paramDict["Volume"];
                     sTrack.EditedBreathLine = paramDict["Breath"];
                     sTrack.EditedGenderLine = paramDict["Gender"];
-                    sTrack.EditedPowerLine = paramDict["Strength"];
+                    var powerLineProperty = sTrack.GetType().GetProperty("EditedPowerLine");
+                    if (powerLineProperty != null)
+                    {
+                        powerLineProperty.SetValue(sTrack, paramDict["Strength"]);
+                    }
                     resultTrack = sTrack;
                     break;
                 case InstrumentalTrack instrumentalTrack:

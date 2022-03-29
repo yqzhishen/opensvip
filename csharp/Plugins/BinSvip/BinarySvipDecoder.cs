@@ -165,9 +165,14 @@ namespace OpenSvip.Stream
             {
                 @params.Gender = DecodeParamCurve(track.EditedGenderLine);
             }
-            if (track.EditedPowerLine != null)
+            var powerLineProperty = track.GetType().GetProperty("EditedPowerLine");
+            if (powerLineProperty != null)
             {
-                @params.Strength = DecodeParamCurve(track.EditedPowerLine);
+                var powerLine = (SingingTool.Model.Line.LineParam) powerLineProperty.GetValue(track);
+                if (powerLine != null)
+                {
+                    @params.Strength = DecodeParamCurve(powerLine);
+                }
             }
             return @params;
         }
@@ -179,7 +184,7 @@ namespace OpenSvip.Stream
             var paramCurve = new ParamCurve();
             op = op ?? (x => x);
             var point = line.Begin;
-            for (var i = 0; i < paramCurve.TotalPointsCount && point != null; i++)
+            for (var i = 0; i < line.Length(); i++)
             {
                 var value = point.Value;
                 paramCurve.PointList.Add(new Tuple<int, int>(value.Pos, op(value.Value)));
