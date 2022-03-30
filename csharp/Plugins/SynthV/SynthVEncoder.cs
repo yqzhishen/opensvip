@@ -466,7 +466,7 @@ namespace Plugin.SynthV
             {
                 Onset = TicksToPosition(note.StartPos),
                 Pitch = note.KeyNumber,
-                Lyrics = note.Pronunciation ?? note.Lyric
+                Lyrics = string.IsNullOrWhiteSpace(note.Pronunciation) ? note.Lyric : note.Pronunciation
             };
             svNote.Duration = TicksToPosition(note.StartPos + note.Length) - svNote.Onset;
             return svNote;
