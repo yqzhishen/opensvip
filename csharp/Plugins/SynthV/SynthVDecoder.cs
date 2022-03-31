@@ -138,7 +138,7 @@ namespace Plugin.SynthV
             curve.PointList.Add(new Tuple<int, int>(currentBegin - 120 + FirstBarTick, -100));
             for (var j = currentBegin - 120; j < currentBegin; j += step)
             {
-                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
             }
             var i = 0;
             for (; i < NoteList.Count - 1; i++)
@@ -149,28 +149,28 @@ namespace Plugin.SynthV
 
                 for (var j = currentBegin; j < currentEnd; j += step)
                 {
-                    curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                    curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
                 }
 
                 if (nextBegin - currentEnd > 240)
                 {
                     for (var j = currentEnd; j < currentEnd + 120; j += step)
                     {
-                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
                     }
-                    curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.PitchAtTicks(currentEnd + 120)));
+                    curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.ValueAtTicks(currentEnd + 120)));
                     curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
                     curve.PointList.Add(new Tuple<int, int>(nextBegin - 120 + FirstBarTick, -100));
                     for (var j = nextBegin - 120; j < nextBegin; j += step)
                     {
-                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
                     }
                 }
                 else
                 {
                     for (var j = currentEnd; j < nextBegin; j += step)
                     {
-                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
                     }
                 }
                 
@@ -180,9 +180,9 @@ namespace Plugin.SynthV
             
             for (var j = currentBegin; j < currentEnd + 120; j += step)
             {
-                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.PitchAtTicks(j)));
+                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
             }
-            curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.PitchAtTicks(currentEnd + 120)));
+            curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.ValueAtTicks(currentEnd + 120)));
             curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
             curve.PointList.Add(new Tuple<int, int>(1073741823, -100));
             return curve;

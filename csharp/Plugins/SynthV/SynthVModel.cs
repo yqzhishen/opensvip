@@ -10,7 +10,7 @@ namespace SynthV.Model
     {
         [JsonProperty("version")] public int Version { get; set; } = 113;
         [JsonProperty("time")] public SVTime Time { get; set; } = new SVTime();
-        [JsonProperty("library")] public object[] Library = Array.Empty<object>();
+        [JsonProperty("library")] public List<SVGroup> Library = new List<SVGroup>();
         [JsonProperty("tracks")] public List<SVTrack> Tracks { get; set; } = new List<SVTrack>();
         [JsonProperty("renderConfig")] public SVConfig RenderConfig { get; set; } = new SVConfig();
     }
@@ -43,7 +43,7 @@ namespace SynthV.Model
         [JsonProperty("mixer")] public SVMixer Mixer { get; set; } = new SVMixer();
         [JsonProperty("mainGroup")] public SVGroup MainGroup { get; set; } = new SVGroup();
         [JsonProperty("mainRef")] public SVRef MainRef { get; set; } = new SVRef();
-        [JsonProperty("groups")] public List<SVGroup> Groups { get; set; } = new List<SVGroup>();
+        [JsonProperty("groups")] public List<SVRef> Groups { get; set; } = new List<SVRef>();
     }
 
     public class SVMixer
@@ -61,6 +61,28 @@ namespace SynthV.Model
         [JsonProperty("uuid")] public string UUID { get; set; } = "aba7184c-14a3-4caf-a740-69d9cdc35a80";
         [JsonProperty("parameters")] public SVParams Params = new SVParams();
         [JsonProperty("notes")] public List<SVNote> Notes = new List<SVNote>();
+
+        public static SVGroup operator +(SVGroup group, long blickOffset)
+        {
+            return new SVGroup
+            {
+                Name = group.Name,
+                UUID = group.UUID,
+                Params = group.Params + blickOffset,
+                Notes = group.Notes.ConvertAll(note => note + blickOffset)
+            };
+        }
+
+        public static SVGroup operator ^(SVGroup group, int pitchOffset)
+        {
+            return new SVGroup
+            {
+                Name = group.Name,
+                UUID = group.UUID,
+                Params = group.Params,
+                Notes = group.Notes.ConvertAll(note => note ^ pitchOffset)
+            };
+        }
     }
 
     public class SVParams
@@ -72,6 +94,22 @@ namespace SynthV.Model
         [JsonProperty("breathiness")] public SVParamCurve Breath { get; set; } = new SVParamCurve();
         [JsonProperty("voicing")] public SVParamCurve Voicing { get; set; } = new SVParamCurve();
         [JsonProperty("gender")] public SVParamCurve Gender { get; set; } = new SVParamCurve();
+        [JsonProperty("toneShift")] public SVParamCurve ToneShift { get; set; } = new SVParamCurve();
+
+        public static SVParams operator +(SVParams parameters, long offset)
+        {
+            return new SVParams
+            {
+                Pitch = parameters.Pitch + offset,
+                VibratoEnvelope = parameters.VibratoEnvelope + offset,
+                Loudness = parameters.Loudness + offset,
+                Tension = parameters.Tension + offset,
+                Breath = parameters.Breath + offset,
+                Voicing = parameters.Voicing + offset,
+                Gender = parameters.Gender + offset,
+                ToneShift = parameters.ToneShift + offset
+            };
+        }
     }
 
     public class SVParamCurve
@@ -81,6 +119,15 @@ namespace SynthV.Model
         [JsonProperty("points")]
         [JsonConverter(typeof(SVPointListJsonConverter))]
         public List<Tuple<long, double>> Points { get; set; } = new List<Tuple<long, double>>();
+
+        public static SVParamCurve operator +(SVParamCurve curve, long offset)
+        {
+            return new SVParamCurve
+            {
+                Mode = curve.Mode,
+                Points = curve.Points.ConvertAll(point => new Tuple<long, double>(point.Item1 + offset, point.Item2))
+            };
+        }
     }
 
     public class SVNote
@@ -91,6 +138,32 @@ namespace SynthV.Model
         [JsonProperty("phonemes")] public string Phonemes { get; set; } = "";
         [JsonProperty("pitch")] public int Pitch { get; set; }
         [JsonProperty("attributes")] public SVNoteAttributes Attributes { get; set; } = new SVNoteAttributes();
+
+        public static SVNote operator +(SVNote note, long blickOffset)
+        {
+            return new SVNote
+            {
+                Onset = note.Onset + blickOffset,
+                Duration = note.Duration,
+                Lyrics = note.Lyrics,
+                Phonemes = note.Phonemes,
+                Pitch = note.Pitch,
+                Attributes = note.Attributes
+            };
+        }
+
+        public static SVNote operator ^(SVNote note, int pitchOffset)
+        {
+            return new SVNote
+            {
+                Onset = note.Onset,
+                Duration = note.Duration,
+                Lyrics = note.Lyrics,
+                Phonemes = note.Phonemes,
+                Pitch = note.Pitch + pitchOffset,
+                Attributes = note.Attributes
+            };
+        }
     }
 
     public class SVNoteAttributes
@@ -213,6 +286,9 @@ namespace SynthV.Model
         
         [JsonProperty("paramGender", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double MasterGender { get; set; }
+        
+        [JsonProperty("paramToneShift", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double MasterToneShift { get; set; }
     }
 
     public class SVConfig

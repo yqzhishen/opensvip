@@ -48,7 +48,10 @@
     <ItemGroup>
         <Compile Include="BreathOptions.cs" />
         <Compile Include="CurveGenerator.cs" />
+        <Compile Include="GroupOptions.cs" />
         <Compile Include="Interpolation.cs" />
+        <Compile Include="IParamExpression.cs" />
+        <Compile Include="CompoundParam.cs" />
         <Compile Include="PhonemeUtils.cs" />
         <Compile Include="PitchGenerator.cs" />
         <Compile Include="PitchOptions.cs" />
@@ -61,6 +64,8 @@
         <Compile Include="SynthVSerialization.cs" />
         <Compile Include="SynthVModel.cs" />
         <Compile Include="Test.cs" />
+        <Compile Include="ScaledParam.cs" />
+        <Compile Include="TranslationalParam.cs" />
         <Compile Include="VibratoOptions.cs" />
     </ItemGroup>
     <ItemGroup>

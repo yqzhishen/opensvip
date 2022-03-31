@@ -6,7 +6,7 @@ using SynthV.Model;
 
 namespace Plugin.SynthV
 {
-    public class PitchGenerator
+    public class PitchGenerator : IParamExpression
     {
         private readonly TimeSynchronizer Synchronizer;
 
@@ -277,12 +277,12 @@ namespace Plugin.SynthV
             });
         }
 
-        public int PitchAtTicks(int ticks)
+        public override int ValueAtTicks(int ticks)
         {
-            return PitchAtSecs(Synchronizer.GetActualSecsFromTicks(ticks));
+            return ValueAtSecs(Synchronizer.GetActualSecsFromTicks(ticks));
         }
 
-        public int PitchAtSecs(double secs)
+        public int ValueAtSecs(double secs)
         {
             var nodeHits = PitchNodes.FindAll(node => node.Begin <= secs && node.End > secs);
             var basePitch = nodeHits.Average(node => node.BasePitch(secs)) +

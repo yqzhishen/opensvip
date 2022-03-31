@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Plugin.SynthV
 {
-    public class CurveGenerator
+    public class CurveGenerator : IParamExpression
     {
         private readonly List<Tuple<int, int>> PointList;
 
@@ -42,7 +42,7 @@ namespace Plugin.SynthV
             BaseValue = baseValue;
         }
 
-        public int ValueAtTicks(int ticks)
+        public override int ValueAtTicks(int ticks)
         {
             if (!PointList.Any())
             {

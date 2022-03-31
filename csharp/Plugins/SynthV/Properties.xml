@@ -27,6 +27,12 @@
                 <Choice Name="转换为换气标记" Tag="convert"/>
             </EnumChoices>
         </Option>
+        <Option Name="group" Type="enum" Default="merge">
+            <EnumChoices>
+                <Choice Name="全部拆分为轨道" Tag="split"/>
+                <Choice Name="尽量保留原始位置" Tag="merge"/>
+            </EnumChoices>
+        </Option>
     </InputOptions>
     <OutputOptions>
         <Option Name="vibrato" Type="enum" Default="hybrid">
