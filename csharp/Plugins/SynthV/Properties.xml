@@ -29,8 +29,12 @@
         </Option>
         <Option Name="group" Type="enum" Default="merge">
             <EnumChoices>
-                <Choice Name="全部拆分为轨道" Tag="split"/>
-                <Choice Name="尽量保留原始位置" Tag="merge"/>
+                <Choice Name="全部拆分为轨道" Tag="split">
+                    <Label>为每个音符组引用生成一个单独的音轨</Label>
+                </Choice>
+                <Choice Name="保留原始位置" Tag="merge">
+                    <Label>仅在出现音符重叠时将音符组拆分至单独的音轨</Label>
+                </Choice>
             </EnumChoices>
         </Option>
     </InputOptions>
@@ -38,9 +42,15 @@
         <Option Name="vibrato" Type="enum" Default="hybrid">
             <Notes>自动颤音处理方式</Notes>
             <EnumChoices>
-                <Choice Name="全部丢弃" Tag="none"/>
-                <Choice Name="全部保留" Tag="always"/>
-                <Choice Name="音高无参处保留" Tag="hybrid"/>
+                <Choice Name="全部丢弃" Tag="none">
+                    <Label>所有音符的颤音深度将被设置为 0，以保证输出的音高曲线与输入一致</Label>
+                </Choice>
+                <Choice Name="全部保留" Tag="always">
+                    <Label>保持所有音符的默认颤音，但可能造成输入与输出音高曲线不一致</Label>
+                </Choice>
+                <Choice Name="混合保留" Tag="hybrid">
+                    <Label>在输入音高被编辑过的区域去除颤音，其余部分保留默认颤音</Label>
+                </Choice>
             </EnumChoices>
         </Option>
     </OutputOptions>

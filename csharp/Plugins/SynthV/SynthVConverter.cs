@@ -20,7 +20,8 @@ namespace SynthV.Stream
             return new SynthVDecoder
             {
                 PitchOption = options.GetValueAsEnum("pitch", PitchOptions.Edited),
-                BreathOption = options.GetValueAsEnum("breath", BreathOptions.Convert)
+                BreathOption = options.GetValueAsEnum("breath", BreathOptions.Convert),
+                GroupOption = options.GetValueAsEnum("group", GroupOptions.Merge)
             }.DecodeProject(svProject);
         }
 

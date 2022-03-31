@@ -14,6 +14,8 @@ namespace Plugin.SynthV
         
         public PitchOptions PitchOption { get; set; }
         
+        public GroupOptions GroupOption { get; set; }
+        
         private int FirstBarTick;
 
         private double FirstBPM;
