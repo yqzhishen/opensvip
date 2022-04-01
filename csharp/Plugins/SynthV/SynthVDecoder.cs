@@ -28,7 +28,11 @@ namespace Plugin.SynthV
 
         private List<string> LyricsPinyin;
 
-        private List<Track> GroupTracksBuffer = new List<Track>(); // reserved for note groups
+        private readonly Dictionary<string, SVGroup> GroupLibrary = new Dictionary<string, SVGroup>();
+
+        private readonly Dictionary<string, int> GroupSplitCounts = new Dictionary<string, int>();
+
+        private readonly List<Track> TracksFromGroups = new List<Track>(); // reserved for note groups
 
         public Project DecodeProject(SVProject svProject)
         {
@@ -40,11 +44,18 @@ namespace Plugin.SynthV
             project.SongTempoList = ScoreMarkUtils.ShiftTempoList(time.Tempos.ConvertAll(DecodeTempo), FirstBarTick);
             project.TimeSignatureList = ScoreMarkUtils.ShiftBeatList(time.Meters.ConvertAll(DecodeMeter), 1);
             Synchronizer = new TimeSynchronizer(project.SongTempoList);
+
+            foreach (var svGroup in svProject.Library)
+            {
+                GroupLibrary[svGroup.UUID] = svGroup;
+                GroupSplitCounts[svGroup.UUID] = 0;
+            }
             
             foreach (var svTrack in svProject.Tracks)
             {
                 project.TrackList.Add(DecodeTrack(svTrack));
             }
+            project.TrackList.AddRange(TracksFromGroups);
             return project;
         }
 
@@ -87,7 +98,54 @@ namespace Plugin.SynthV
                     NoteList = DecodeNoteList(track.MainGroup.Notes),
                     EditedParams = DecodeParams(track.MainGroup.Params)
                 };
-                // TODO: decode note groups
+                switch (GroupOption)
+                {
+                    case GroupOptions.Split:
+                        foreach (var svRef in track.Groups)
+                        {
+                            var group = GroupLibrary[svRef.GroupId] + svRef.BlickOffset ^ svRef.PitchOffset;
+                            VoiceSettings = svRef.Voice;
+                            NoteList = group.Notes;
+                            TracksFromGroups.Add(new SingingTrack
+                            {
+                                Title = $"{group.Name} ({++GroupSplitCounts[svRef.GroupId]})",
+                                NoteList = DecodeNoteList(group.Notes),
+                                EditedParams = DecodeParams(group.Params, track.MainGroup.Params)
+                            });
+                        }
+                        break;
+                    case GroupOptions.Merge:
+                        var mergedGroup = track.MainGroup;
+                        foreach (var svRef in track.Groups)
+                        {
+                            var group = GroupLibrary[svRef.GroupId] + svRef.BlickOffset ^ svRef.PitchOffset;
+                            VoiceSettings = svRef.Voice;
+                            NoteList = group.Notes;
+                            if (mergedGroup.IsOverlappedWith(group))
+                            {
+                                TracksFromGroups.Add(new SingingTrack
+                                {
+                                    Title = $"{group.Name} ({++GroupSplitCounts[svRef.GroupId]})",
+                                    NoteList = DecodeNoteList(group.Notes),
+                                    EditedParams = DecodeParams(group.Params, track.MainGroup.Params)
+                                });
+                            }
+                            else
+                            {
+                                singingTrack.OverrideWith(
+                                    DecodeNoteList(group.Notes),
+                                    DecodeParams(group.Params, track.MainGroup.Params),
+                                    FirstBarTick);
+                                mergedGroup.Notes = mergedGroup.Notes
+                                    .Concat(group.Notes)
+                                    .OrderBy(note => note.Onset)
+                                    .ToList();
+                            }
+                        }
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
                 svipTrack = singingTrack;
             }
             svipTrack.Title = track.Name;
@@ -105,26 +163,58 @@ namespace Plugin.SynthV
                 : Math.Pow(10, gain / 20.0);
         }
 
-        private Params DecodeParams(SVParams svParams)
+        private Params DecodeParams(SVParams svParams, SVParams masterParams = null, List<SVNote> masterNotes = null)
         {
             var parameters = new Params
             {
-                Pitch = DecodePitchCurve(svParams.Pitch, svParams.VibratoEnvelope),
-                Volume = DecodeParamCurve(svParams.Loudness, VoiceSettings.MasterLoudness, val =>
-                    val >= 0.0
-                        ? (int) Math.Round(val / 12.0 * 1000.0)
-                        : (int) Math.Round(1000.0 * Math.Pow(10, val / 20.0) - 1000.0)),
-                Breath = DecodeParamCurve(svParams.Breath, VoiceSettings.MasterBreath, val =>
-                    (int) Math.Round(val * 1000.0)),
-                Gender = DecodeParamCurve(svParams.Gender, VoiceSettings.MasterGender, val =>
-                    (int) Math.Round(val * -1000.0)),
-                Strength = DecodeParamCurve(svParams.Tension, VoiceSettings.MasterTension, val =>
-                    (int) Math.Round(val * 1000.0))
+                Pitch = DecodePitchCurve(
+                    svParams.Pitch,
+                    svParams.VibratoEnvelope,
+                    5,
+                    masterParams?.Pitch,
+                    masterParams?.VibratoEnvelope,
+                    masterNotes),
+                Volume = DecodeParamCurve(
+                    svParams.Loudness,
+                    val =>
+                        val >= 0.0
+                            ? (int) Math.Round(val / 12.0 * 1000.0)
+                            : (int) Math.Round(1000.0 * Math.Pow(10, val / 20.0) - 1000.0),
+                    VoiceSettings.MasterLoudness,
+                    masterParams?.Loudness,
+                    masterNotes),
+                Breath = DecodeParamCurve(
+                    svParams.Breath,
+                    val =>
+                        (int) Math.Round(val * 1000.0),
+                    VoiceSettings.MasterBreath,
+                    masterParams?.Breath,
+                    masterNotes),
+                Gender = DecodeParamCurve(
+                    svParams.Gender,
+                    val =>
+                        (int) Math.Round(val * -1000.0),
+                    VoiceSettings.MasterGender,
+                    masterParams?.Gender,
+                    masterNotes),
+                Strength = DecodeParamCurve(
+                    svParams.Tension,
+                    val =>
+                        (int) Math.Round(val * 1000.0),
+                    VoiceSettings.MasterTension,
+                    masterParams?.Tension,
+                    masterNotes)
             };
             return parameters;
         }
 
-        private ParamCurve DecodePitchCurve(SVParamCurve pitchDiff, SVParamCurve vibratoEnv, int step = 5)
+        private ParamCurve DecodePitchCurve(
+            SVParamCurve pitchDiff,
+            SVParamCurve vibratoEnv,
+            int step = 5,
+            SVParamCurve masterPitchDiff = null,
+            SVParamCurve masterVibratoEnv = null,
+            List<SVNote> masterNotes = null)
         {
             var curve = new ParamCurve();
             curve.PointList.Add(new Tuple<int, int>(-192000, -100));
@@ -133,7 +223,35 @@ namespace Plugin.SynthV
                 curve.PointList.Add(new Tuple<int, int>(1073741823, -100));
                 return curve;
             }
-            var generator = new PitchGenerator(Synchronizer, NoteList, pitchDiff, vibratoEnv);
+
+            ParamExpression pitchDiffExpr = new CurveGenerator(pitchDiff.Points.ConvertAll(
+                    point => new Tuple<int, int>(
+                        DecodePosition(point.Item1),
+                        (int) Math.Round(point.Item2))),
+                DecodeInterpolation(pitchDiff.Mode));
+            ParamExpression vibratoEnvExpr = new CurveGenerator(vibratoEnv.Points.ConvertAll(
+                    point => new Tuple<int, int>(
+                        DecodePosition(point.Item1),
+                        (int) Math.Round(point.Item2 * 1000))),
+                DecodeInterpolation(vibratoEnv.Mode),
+                1000);
+            if (masterPitchDiff != null)
+            {
+                pitchDiffExpr += new CurveGenerator(masterPitchDiff.Points.ConvertAll(
+                        point => new Tuple<int, int>(
+                            DecodePosition(point.Item1),
+                            (int) Math.Round(point.Item2))),
+                    DecodeInterpolation(masterPitchDiff.Mode));
+            }
+            if (masterVibratoEnv != null)
+            {
+                vibratoEnvExpr += new CurveGenerator(masterVibratoEnv.Points.ConvertAll(
+                        point => new Tuple<int, int>(
+                            DecodePosition(point.Item1),
+                            (int) Math.Round(point.Item2 * 1000))),
+                    DecodeInterpolation(vibratoEnv.Mode));
+            }
+            var generator = new PitchGenerator(Synchronizer, NoteList, pitchDiffExpr, vibratoEnvExpr);
             var currentNote = NoteList[0];
             var currentBegin = DecodePosition(currentNote.Onset);
             var currentEnd = DecodePosition(currentNote.Onset + currentNote.Duration);
@@ -190,8 +308,12 @@ namespace Plugin.SynthV
             return curve;
         }
 
-        private ParamCurve DecodeParamCurve(SVParamCurve svCurve, double baseValue,
-            Func<double, int> mappingFunc)
+        private ParamCurve DecodeParamCurve(
+            SVParamCurve svCurve,
+            Func<double, int> mappingFunc,
+            double baseValue = 0.0,
+            SVParamCurve masterCurve = null,
+            List<SVNote> masterNotes = null)
         {
             int Clip(int val)
             {
@@ -199,28 +321,123 @@ namespace Plugin.SynthV
             }
             
             var curve = new ParamCurve();
-            Func<double, double> interpolation;
-            switch (svCurve.Mode)
-            {
-                case "cosine":
-                    interpolation = Interpolation.CosineInterpolation();
-                    break;
-                case "cubic":
-                    interpolation = Interpolation.CubicInterpolation();
-                    break;
-                default:
-                    interpolation = Interpolation.LinearInterpolation();
-                    break;
-            }
+            var interpolation = DecodeInterpolation(svCurve.Mode);
+            var decodedBaseValue = mappingFunc(baseValue);
 
             var generator = new CurveGenerator(
                 svCurve.Points.ConvertAll(
                     point => new Tuple<int, int>(
-                        DecodePosition(point.Item1) + FirstBarTick, Clip(mappingFunc(point.Item2 + baseValue)))),
+                        DecodePosition(point.Item1) + FirstBarTick, mappingFunc(point.Item2 + baseValue))),
                 interpolation,
-                Clip(mappingFunc(baseValue)));
-            curve.PointList = generator.GetConvertedCurve(5);
+                decodedBaseValue);
+            if (masterCurve == null || !masterCurve.Points.Any())
+            {
+                // completely no edited parameter
+                curve.PointList = generator
+                    .GetConvertedCurve(5)
+                    .ConvertAll(point => new Tuple<int, int>(point.Item1, Clip(point.Item2)));
+                return curve;
+            }
+            
+            if (!svCurve.Points.Any())
+            {
+                // no edited parameter in group; use master parameter
+                curve.PointList = new CurveGenerator(
+                    masterCurve.Points.ConvertAll(
+                        point => new Tuple<int, int>(
+                            DecodePosition(point.Item1) + FirstBarTick, mappingFunc(point.Item2 + baseValue))),
+                    interpolation,
+                    decodedBaseValue)
+                    .GetConvertedCurve(5)
+                    .ConvertAll(point => new Tuple<int, int>(point.Item1, Clip(point.Item2)));
+                return curve;
+            }
+            // combine group & master parameters
+            var groupExpr = new CurveGenerator(
+                svCurve.Points.ConvertAll(
+                    point => new Tuple<int, int>(
+                        DecodePosition(point.Item1) + FirstBarTick,
+                        (int) Math.Round(point.Item2 * 1000.0))),
+                DecodeInterpolation(svCurve.Mode),
+                (int) Math.Round(baseValue * 1000.0));
+            var masterExpr =
+                new CurveGenerator(masterCurve.Points.ConvertAll(
+                        point => new Tuple<int, int>(
+                            DecodePosition(point.Item1) + FirstBarTick,
+                            (int) Math.Round(point.Item2 * 1000.0))),
+                    DecodeInterpolation(masterCurve.Mode));
+            var compoundExpr = groupExpr + masterExpr;
+            var groupPoints = groupExpr.PointList;
+            var masterPoints = masterExpr.PointList;
+            
+            int ActualValueAt(int ticks)
+            {
+                return Clip(mappingFunc(compoundExpr.ValueAtTicks(ticks) / 1000.0));
+            }
+
+            int i = 0, j = 0;
+            Tuple<int, int> prevPoint;
+            bool prevPointIsBase;
+            if (groupPoints[i].Item1 <= masterPoints[j].Item1)
+            {
+                prevPoint = groupPoints[i++];
+                prevPointIsBase = prevPoint.Item2 == (int) Math.Round(baseValue * 1000.0);
+            }
+            else
+            {
+                prevPoint = masterPoints[j++];
+                prevPointIsBase = prevPoint.Item2 == 0;
+            }
+            curve.PointList.Add(new Tuple<int, int>(-192000, ActualValueAt(0)));
+            curve.PointList.Add(new Tuple<int, int>(prevPoint.Item1, ActualValueAt(prevPoint.Item1)));
+            while (i < groupPoints.Count || j < masterPoints.Count)
+            {
+                Tuple<int, int> currentPoint;
+                bool currentPointIsBase;
+                if (i < groupPoints.Count
+                    && (j >= masterPoints.Count || groupPoints[i].Item1 <= masterPoints[j].Item1))
+                {
+                    currentPoint = groupPoints[i++];
+                    currentPointIsBase = currentPoint.Item2 == (int) Math.Round(baseValue * 1000.0);
+                }
+                else
+                {
+                    currentPoint = masterPoints[j++];
+                    currentPointIsBase = currentPoint.Item2 == 0;
+                }
+
+                if (prevPointIsBase && currentPointIsBase && prevPoint.Item1 < currentPoint.Item1)
+                {
+                    curve.PointList.Add(new Tuple<int, int>(prevPoint.Item1, ActualValueAt(prevPoint.Item1)));
+                    curve.PointList.Add(new Tuple<int, int>(currentPoint.Item1, ActualValueAt(currentPoint.Item1)));
+                }
+                else
+                {
+                    for (var p = prevPoint.Item1; p < currentPoint.Item1; p += 5)
+                    {
+                        curve.PointList.Add(new Tuple<int, int>(p, ActualValueAt(p)));
+                    }
+                }
+                
+                prevPoint = currentPoint;
+                prevPointIsBase = currentPointIsBase;
+            }
+            curve.PointList.Add(new Tuple<int, int>(prevPoint.Item1, ActualValueAt(prevPoint.Item1)));
+            curve.PointList.Add(new Tuple<int, int>(1073741823, ActualValueAt(prevPoint.Item1)));
             return curve;
+        }
+
+        private Func<double, double> DecodeInterpolation(string mode)
+        {
+            switch (mode)
+            {
+                case "cosine":
+                    return Interpolation.CosineInterpolation();
+                case "cubic":
+                    return Interpolation.CubicInterpolation();
+                default:
+                    return Interpolation.LinearInterpolation();
+            }
         }
 
         private List<Note> DecodeNoteList(List<SVNote> svNotes)

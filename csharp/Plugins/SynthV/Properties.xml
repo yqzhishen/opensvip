@@ -27,7 +27,7 @@
                 <Choice Name="转换为换气标记" Tag="convert"/>
             </EnumChoices>
         </Option>
-        <Option Name="group" Type="enum" Default="merge">
+        <Option Name="group" Type="enum" Default="split">
             <EnumChoices>
                 <Choice Name="全部拆分为轨道" Tag="split">
                     <Label>为每个音符组引用生成一个单独的音轨</Label>

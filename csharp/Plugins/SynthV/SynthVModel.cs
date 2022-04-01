@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Newtonsoft.Json;
 using Plugin.SynthV;
 
@@ -62,6 +63,22 @@ namespace SynthV.Model
         [JsonProperty("parameters")] public SVParams Params = new SVParams();
         [JsonProperty("notes")] public List<SVNote> Notes = new List<SVNote>();
 
+        public bool IsOverlappedWith(SVGroup another)
+        {
+            return Notes.Any(
+                selfNote => another.Notes.Any(
+                    otherNote =>
+                    {
+                        var x = selfNote.Onset - (otherNote.Onset + otherNote.Duration);
+                        var y = selfNote.Onset + selfNote.Duration - otherNote.Onset;
+                        if (x == 0 || y == 0)
+                        {
+                            return false;
+                        }
+                        return (x > 0) ^ (y > 0);
+                    }));
+        }
+
         public static SVGroup operator +(SVGroup group, long blickOffset)
         {
             return new SVGroup
@@ -69,7 +86,10 @@ namespace SynthV.Model
                 Name = group.Name,
                 UUID = group.UUID,
                 Params = group.Params + blickOffset,
-                Notes = group.Notes.ConvertAll(note => note + blickOffset)
+                Notes = group.Notes
+                    .Select(note => note + blickOffset)
+                    .Where(note => note.Onset + blickOffset >= 0)
+                    .ToList()
             };
         }
 

@@ -7,15 +7,15 @@ namespace Plugin.SynthV
         Add, Sub, Mul, Div
     }
     
-    public class CompoundParam : IParamExpression
+    public class CompoundParam : ParamExpression
     {
-        private readonly IParamExpression Expr1;
+        private readonly ParamExpression Expr1;
 
-        private readonly IParamExpression Expr2;
+        private readonly ParamExpression Expr2;
 
         private readonly ParamOperators Operator;
 
-        public CompoundParam(IParamExpression expr1, ParamOperators op, IParamExpression expr2)
+        public CompoundParam(ParamExpression expr1, ParamOperators op, ParamExpression expr2)
         {
             Expr1 = expr1;
             Operator = op;

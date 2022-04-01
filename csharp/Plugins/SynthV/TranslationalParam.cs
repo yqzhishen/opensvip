@@ -1,12 +1,12 @@
 ﻿namespace Plugin.SynthV
 {
-    public class TranslationalParam : IParamExpression
+    public class TranslationalParam : ParamExpression
     {
-        private readonly IParamExpression Expression;
+        private readonly ParamExpression Expression;
 
         private readonly int Offset;
 
-        public TranslationalParam(IParamExpression expression, int offset)
+        public TranslationalParam(ParamExpression expression, int offset)
         {
             Expression = expression;
             Offset = offset;

@@ -21,7 +21,7 @@ namespace SynthV.Stream
             {
                 PitchOption = options.GetValueAsEnum("pitch", PitchOptions.Edited),
                 BreathOption = options.GetValueAsEnum("breath", BreathOptions.Convert),
-                GroupOption = options.GetValueAsEnum("group", GroupOptions.Merge)
+                GroupOption = options.GetValueAsEnum("group", GroupOptions.Split)
             }.DecodeProject(svProject);
         }
 

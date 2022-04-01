@@ -2,13 +2,13 @@
 
 namespace Plugin.SynthV
 {
-    public class ScaledParam : IParamExpression
+    public class ScaledParam : ParamExpression
     {
-        private readonly IParamExpression Expression;
+        private readonly ParamExpression Expression;
 
         private readonly double Ratio;
 
-        public ScaledParam(IParamExpression expression, double ratio)
+        public ScaledParam(ParamExpression expression, double ratio)
         {
             Expression = expression;
             Ratio = ratio;
