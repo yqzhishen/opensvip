@@ -11,5 +11,8 @@ namespace OpenSvip.Framework
         public string Name { get; set; }
         [XmlAttribute]
         public string Tag { get; set; }
+        
+        [XmlElement]
+        public string Label { get; set; }
     }
 }

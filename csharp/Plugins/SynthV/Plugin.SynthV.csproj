@@ -5,7 +5,7 @@
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
         <ProjectGuid>{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}</ProjectGuid>
-        <OutputType>Library</OutputType>
+        <OutputType>Exe</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
         <RootNamespace>Plugin.SynthV</RootNamespace>
         <AssemblyName>Plugin.SynthV</AssemblyName>
@@ -48,7 +48,11 @@
     <ItemGroup>
         <Compile Include="BreathOptions.cs" />
         <Compile Include="CurveGenerator.cs" />
+        <Compile Include="GroupOptions.cs" />
         <Compile Include="Interpolation.cs" />
+        <Compile Include="ParamExpression.cs" />
+        <Compile Include="CompoundParam.cs" />
+        <Compile Include="TrackMergeUtils.cs" />
         <Compile Include="PhonemeUtils.cs" />
         <Compile Include="PitchGenerator.cs" />
         <Compile Include="PitchOptions.cs" />
@@ -61,6 +65,8 @@
         <Compile Include="SynthVSerialization.cs" />
         <Compile Include="SynthVModel.cs" />
         <Compile Include="Test.cs" />
+        <Compile Include="ScaledParam.cs" />
+        <Compile Include="TranslationalParam.cs" />
         <Compile Include="VibratoOptions.cs" />
     </ItemGroup>
     <ItemGroup>

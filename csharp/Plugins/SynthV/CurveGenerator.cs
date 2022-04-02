@@ -4,15 +4,15 @@ using System.Linq;
 
 namespace Plugin.SynthV
 {
-    public class CurveGenerator
+    public class CurveGenerator : ParamExpression
     {
-        private readonly List<Tuple<int, int>> PointList;
+        public List<Tuple<int, int>> PointList { get; }
 
         private readonly Func<double, double> Interpolation;
 
         private readonly int BaseValue;
 
-        public CurveGenerator(IEnumerable<Tuple<int, int>> pointList, Func<double, double> interpolation, int baseValue)
+        public CurveGenerator(IEnumerable<Tuple<int, int>> pointList, Func<double, double> interpolation, int baseValue = 0)
         {
             PointList = new List<Tuple<int, int>>();
             var currentPos = -1;
@@ -42,7 +42,7 @@ namespace Plugin.SynthV
             BaseValue = baseValue;
         }
 
-        public int ValueAtTicks(int ticks)
+        public override int ValueAtTicks(int ticks)
         {
             if (!PointList.Any())
             {
@@ -89,7 +89,6 @@ namespace Plugin.SynthV
                         var v = (int) Math.Round((1 - r) * prevPoint.Item2 + r * currentPoint.Item2);
                         result.Add(new Tuple<int, int>(p, v));
                     }
-                    result.Add(new Tuple<int, int>(currentPoint.Item1, currentPoint.Item2));
                 }
                 prevPoint = currentPoint;
             }

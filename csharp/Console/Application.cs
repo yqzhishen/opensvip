@@ -102,7 +102,15 @@ namespace OpenSvip.Console
                                 System.Console.WriteLine("  可用值如下：");
                                 foreach (var choice in option.EnumChoices)
                                 {
-                                    System.Console.WriteLine($"    {choice.Tag}\t=>\t{choice.Name}");
+                                    System.Console.Write($"    {choice.Tag}\t=>\t{choice.Name}");
+                                    if (string.IsNullOrWhiteSpace(choice.Label))
+                                    {
+                                        System.Console.WriteLine();
+                                    }
+                                    else
+                                    {
+                                        System.Console.WriteLine($"（{choice.Label}）");
+                                    }
                                 }
                             }
                             break;

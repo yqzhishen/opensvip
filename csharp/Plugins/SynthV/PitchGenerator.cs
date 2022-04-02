@@ -6,45 +6,29 @@ using SynthV.Model;
 
 namespace Plugin.SynthV
 {
-    public class PitchGenerator
+    public class PitchGenerator : ParamExpression
     {
         private readonly TimeSynchronizer Synchronizer;
 
-        private readonly CurveGenerator PitchDiff;
+        private readonly ParamExpression PitchDiff;
 
-        private readonly CurveGenerator VibratoEnv;
+        private readonly ParamExpression VibratoEnv;
 
         private readonly List<PitchNode> PitchNodes = new List<PitchNode>();
 
         private readonly List<VibratoNode> VibratoNodes = new List<VibratoNode>();
 
         private const double MinimumInterval = 0.01;
-
-        private readonly Dictionary<string, Func<double, double>> InterpolationDict =
-            new Dictionary<string, Func<double, double>>
-            {
-                {"linear", Interpolation.LinearInterpolation()},
-                {"cosine", Interpolation.CosineInterpolation()},
-                {"cubic", Interpolation.CubicInterpolation()}
-            };
-
+        
         public PitchGenerator(
             TimeSynchronizer synchronizer,
             List<SVNote> noteList,
-            SVParamCurve pitchDiff,
-            SVParamCurve vibratoEnv)
+            ParamExpression pitchDiff,
+            ParamExpression vibratoEnv)
         {
             Synchronizer = synchronizer;
-            PitchDiff = new CurveGenerator(
-                pitchDiff.Points.ConvertAll(point => new Tuple<int, int>(
-                    PosToTicks(point.Item1), (int) Math.Round(point.Item2))),
-                InterpolationDict[pitchDiff.Mode],
-                0);
-            VibratoEnv = new CurveGenerator(
-                vibratoEnv.Points.ConvertAll(point => new Tuple<int, int>(
-                    PosToTicks(point.Item1), (int) Math.Round(point.Item2 * 1000.0))),
-                InterpolationDict[vibratoEnv.Mode],
-                1000);
+            PitchDiff = pitchDiff;
+            VibratoEnv = vibratoEnv;
             
             if (!noteList.Any())
             {
@@ -277,12 +261,12 @@ namespace Plugin.SynthV
             });
         }
 
-        public int PitchAtTicks(int ticks)
+        public override int ValueAtTicks(int ticks)
         {
-            return PitchAtSecs(Synchronizer.GetActualSecsFromTicks(ticks));
+            return ValueAtSecs(Synchronizer.GetActualSecsFromTicks(ticks));
         }
 
-        public int PitchAtSecs(double secs)
+        public int ValueAtSecs(double secs)
         {
             var nodeHits = PitchNodes.FindAll(node => node.Begin <= secs && node.End > secs);
             var basePitch = nodeHits.Average(node => node.BasePitch(secs)) +
