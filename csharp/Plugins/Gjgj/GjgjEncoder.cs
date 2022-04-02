@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenSvip.Model;
 using Gjgj.Model;
-using System.Windows.Forms;
 
 namespace Plugin.Gjgj
 {
@@ -11,20 +9,12 @@ namespace Plugin.Gjgj
     {
         public GjProject EncodeProject(Project project)
         {
-            try
-            {
-                GjProject gjProject = new GjProject();
-                SetGjProjectProperties(gjProject);
-                EncodeTempo(project, gjProject);
-                EncodeTimeSignature(project, gjProject);
-                EncodeTracks(project, gjProject);
-                return gjProject;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                return null;
-            }
+            GjProject gjProject = new GjProject();
+            SetGjProjectProperties(gjProject);
+            EncodeTempo(project, gjProject);
+            EncodeTimeSignature(project, gjProject);
+            EncodeTracks(project, gjProject);
+            return gjProject;
         }
 
         private void EncodeTracks(Project project, GjProject gjProject)
@@ -145,132 +135,146 @@ namespace Plugin.Gjgj
 
         private static void EncodeVolumeParam(SingingTrack singingTrack, GjTracksItem gjTracksItem)
         {
-            gjTracksItem.VolumeParam = new List<GjVolumeMapItem>();
-            List<int> volumePointTimeBuffer = new List<int>();
-            List<double> volumePointValueBuffer = new List<double>();
-            int volumePointTimeFromXS;
-            double volumeFromXS;
-            double convertedVolumeValueFromXS;
-            int lastVolumePointTimeFromXS = 0;
-
-            for (int volumeParamPointIndex = 1; volumeParamPointIndex < singingTrack.EditedParams.Volume.PointList.Count - 1; volumeParamPointIndex++)
+            try
             {
-                volumePointTimeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item1;
-                volumeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2;
-                convertedVolumeValueFromXS = (singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2 + 1000.0) / 1000.0;
+                gjTracksItem.VolumeParam = new List<GjVolumeMapItem>();
+                List<int> volumePointTimeBuffer = new List<int>();
+                List<double> volumePointValueBuffer = new List<double>();
+                int volumePointTimeFromXS;
+                double volumeFromXS;
+                double convertedVolumeValueFromXS;
+                int lastVolumePointTimeFromXS = 0;
 
-                if (lastVolumePointTimeFromXS == singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2)
+                for (int volumeParamPointIndex = 1; volumeParamPointIndex < singingTrack.EditedParams.Volume.PointList.Count - 1; volumeParamPointIndex++)
                 {
+                    volumePointTimeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item1;
+                    volumeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2;
+                    convertedVolumeValueFromXS = (singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2 + 1000.0) / 1000.0;
 
-                }
-                else
-                {
-                    if (volumeFromXS != 0)
+                    if (lastVolumePointTimeFromXS == singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2)
                     {
-                        volumePointTimeBuffer.Add(volumePointTimeFromXS);
-                        volumePointValueBuffer.Add(convertedVolumeValueFromXS);
+
                     }
                     else
                     {
-                        if (volumePointTimeBuffer.Count == 0 || volumePointValueBuffer.Count == 0)
+                        if (volumeFromXS != 0)
                         {
-
+                            volumePointTimeBuffer.Add(volumePointTimeFromXS);
+                            volumePointValueBuffer.Add(convertedVolumeValueFromXS);
                         }
                         else
                         {
-                            for (int volumePointTimeBufferIndex = 0; volumePointTimeBufferIndex < volumePointTimeBuffer.Count; volumePointTimeBufferIndex += 5)
+                            if (volumePointTimeBuffer.Count == 0 || volumePointValueBuffer.Count == 0)
                             {
-                                GjVolumeMapItem gjVolumeMapItem = new GjVolumeMapItem
-                                {
-                                    Time = volumePointTimeBuffer[volumePointTimeBufferIndex],
-                                    Value = volumePointValueBuffer[volumePointTimeBufferIndex]
-                                };
-                                gjTracksItem.VolumeParam.Add(gjVolumeMapItem);
+
                             }
-
-                            GjVolumeMapItem gjVolumeParamLeftEndpoint = new GjVolumeMapItem
+                            else
                             {
-                                Time = volumePointTimeBuffer[0] - 5,
-                                Value = 1.0
-                            };
-                            gjTracksItem.VolumeParam.Add(gjVolumeParamLeftEndpoint);
+                                for (int volumePointTimeBufferIndex = 0; volumePointTimeBufferIndex < volumePointTimeBuffer.Count; volumePointTimeBufferIndex += 5)
+                                {
+                                    GjVolumeMapItem gjVolumeMapItem = new GjVolumeMapItem
+                                    {
+                                        Time = volumePointTimeBuffer[volumePointTimeBufferIndex],
+                                        Value = volumePointValueBuffer[volumePointTimeBufferIndex]
+                                    };
+                                    gjTracksItem.VolumeParam.Add(gjVolumeMapItem);
+                                }
 
-                            GjVolumeMapItem gjVolumeParamRightEndpoint = new GjVolumeMapItem
-                            {
-                                Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 5,
-                                Value = 1.0
-                            };
-                            gjTracksItem.VolumeParam.Add(gjVolumeParamRightEndpoint);
+                                GjVolumeMapItem gjVolumeParamLeftEndpoint = new GjVolumeMapItem
+                                {
+                                    Time = volumePointTimeBuffer[0] - 5,
+                                    Value = 1.0
+                                };
+                                gjTracksItem.VolumeParam.Add(gjVolumeParamLeftEndpoint);
+
+                                GjVolumeMapItem gjVolumeParamRightEndpoint = new GjVolumeMapItem
+                                {
+                                    Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 5,
+                                    Value = 1.0
+                                };
+                                gjTracksItem.VolumeParam.Add(gjVolumeParamRightEndpoint);
 
 
-                            volumePointTimeBuffer.Clear();
-                            volumePointValueBuffer.Clear();
+                                volumePointTimeBuffer.Clear();
+                                volumePointValueBuffer.Clear();
+                            }
                         }
                     }
-                }
 
-                lastVolumePointTimeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item1;
+                    lastVolumePointTimeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item1;
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
 
         private void EncodePitchParam(SingingTrack singingTrack, GjTracksItem gjTracksItem)
         {
-            gjTracksItem.PitchParam = new GjTone();
-            double convertedPitchFromXS;
-            List<double> pitchPointBufferX = new List<double>();
-            List<double> pitchPointBufferY = new List<double>();
-            gjTracksItem.PitchParam.PitchPointList = new List<GjModifysItem>();
-            int lastPitchPointTimeFromXS = -100;
-            int currentPitchFromXS;
-            double convertedTimeFromXS;
-            gjTracksItem.PitchParam.ModifyRanges = new List<GjModifyRangesItem>();
-            for (int l = 0; l < singingTrack.EditedParams.Pitch.PointList.Count; l++)
+            try
             {
-                convertedTimeFromXS = (singingTrack.EditedParams.Pitch.PointList[l].Item1 / 5.0);
-                currentPitchFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item2;
-                convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2 - 2400.0) / 100.0));
-
-                if (lastPitchPointTimeFromXS == singingTrack.EditedParams.Pitch.PointList[l].Item1)
+                gjTracksItem.PitchParam = new GjTone();
+                double convertedPitchFromXS;
+                List<double> pitchPointBufferX = new List<double>();
+                List<double> pitchPointBufferY = new List<double>();
+                gjTracksItem.PitchParam.PitchPointList = new List<GjModifysItem>();
+                int lastPitchPointTimeFromXS = -100;
+                int currentPitchFromXS;
+                double convertedTimeFromXS;
+                gjTracksItem.PitchParam.ModifyRanges = new List<GjModifyRangesItem>();
+                for (int l = 0; l < singingTrack.EditedParams.Pitch.PointList.Count; l++)
                 {
+                    convertedTimeFromXS = (singingTrack.EditedParams.Pitch.PointList[l].Item1 / 5.0);
+                    currentPitchFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item2;
+                    convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2 - 2400.0) / 100.0));
 
-                }
-                else
-                {
-                    if (currentPitchFromXS != -100)
+                    if (lastPitchPointTimeFromXS == singingTrack.EditedParams.Pitch.PointList[l].Item1)
                     {
-                        pitchPointBufferX.Add(convertedTimeFromXS);
-                        pitchPointBufferY.Add(convertedPitchFromXS);
+
                     }
                     else
                     {
-                        if (pitchPointBufferX.Count == 0 || pitchPointBufferY.Count == 0)
+                        if (currentPitchFromXS != -100)
                         {
-
+                            pitchPointBufferX.Add(convertedTimeFromXS);
+                            pitchPointBufferY.Add(convertedPitchFromXS);
                         }
                         else
                         {
-                            for (int j = 0; j < pitchPointBufferX.Count; j++)
+                            if (pitchPointBufferX.Count == 0 || pitchPointBufferY.Count == 0)
                             {
-                                GjModifysItem gjModifysItem = new GjModifysItem
-                                {
-                                    Time = pitchPointBufferX[j],
-                                    Value = pitchPointBufferY[j]
-                                };
-                                gjTracksItem.PitchParam.PitchPointList.Add(gjModifysItem);
+
                             }
-                            GjModifyRangesItem gjModifyRangesItem = new GjModifyRangesItem
+                            else
                             {
-                                Left = pitchPointBufferX[0],
-                                Right = pitchPointBufferX[pitchPointBufferY.Count - 1]
-                            };
-                            gjTracksItem.PitchParam.ModifyRanges.Add(gjModifyRangesItem);
-                            pitchPointBufferX.Clear();
-                            pitchPointBufferY.Clear();
+                                for (int j = 0; j < pitchPointBufferX.Count; j++)
+                                {
+                                    GjModifysItem gjModifysItem = new GjModifysItem
+                                    {
+                                        Time = pitchPointBufferX[j],
+                                        Value = pitchPointBufferY[j]
+                                    };
+                                    gjTracksItem.PitchParam.PitchPointList.Add(gjModifysItem);
+                                }
+                                GjModifyRangesItem gjModifyRangesItem = new GjModifyRangesItem
+                                {
+                                    Left = pitchPointBufferX[0],
+                                    Right = pitchPointBufferX[pitchPointBufferY.Count - 1]
+                                };
+                                gjTracksItem.PitchParam.ModifyRanges.Add(gjModifyRangesItem);
+                                pitchPointBufferX.Clear();
+                                pitchPointBufferY.Clear();
+                            }
                         }
                     }
-                }
 
-                lastPitchPointTimeFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item1;
+                    lastPitchPointTimeFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item1;
+                }
+            }
+            catch (Exception)
+            {
+
             }
         }
 
