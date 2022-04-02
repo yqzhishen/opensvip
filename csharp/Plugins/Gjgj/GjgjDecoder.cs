@@ -98,24 +98,30 @@ namespace Plugin.Gjgj
             Tuple<int, int> defaultLeftEndpoint = Tuple.Create(-192000, -100);
             paramCurvePitch.PointList.Add(defaultLeftEndpoint);
 
-            var index = -1;
-            foreach (var range in gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges)
+            try
             {
-                Tuple<int, int> leftEndpoint = Tuple.Create(GetPitchParamTimeFromGj(range.Left), -100);//左间断点
-                Tuple<int, int> rightEndpoint = Tuple.Create(GetPitchParamTimeFromGj(range.Right), -100);//右间断点
-                paramCurvePitch.PointList.Add(leftEndpoint);//添加左间断点
-                //查找左间断点所对应的索引
-                index = gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
-                if (index == -1)
-                    continue;
-                for (; (index < gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList.Count) && (gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList[index].Time <= range.Right); ++index)
+                var index = -1;
+                foreach (var range in gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges)
                 {
-                    int pitchParamTime = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList[index].Time);
-                    int pitchParamValue = GetPitchParamValueFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList[index].Value);
-                    Tuple<int, int> pitchParamPoint = Tuple.Create(pitchParamTime, pitchParamValue);
-                    paramCurvePitch.PointList.Add(pitchParamPoint);
+                    Tuple<int, int> leftEndpoint = Tuple.Create(GetPitchParamTimeFromGj(range.Left), -100);//左间断点
+                    Tuple<int, int> rightEndpoint = Tuple.Create(GetPitchParamTimeFromGj(range.Right), -100);//右间断点
+                    paramCurvePitch.PointList.Add(leftEndpoint);//添加左间断点
+                    index = gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
+                    if (index == -1)
+                        continue;
+                    for (; (index < gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList.Count) && (gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList[index].Time <= range.Right); ++index)
+                    {
+                        int pitchParamTime = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList[index].Time);
+                        int pitchParamValue = GetPitchParamValueFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.PitchPointList[index].Value);
+                        Tuple<int, int> pitchParamPoint = Tuple.Create(pitchParamTime, pitchParamValue);
+                        paramCurvePitch.PointList.Add(pitchParamPoint);
+                    }
+                    paramCurvePitch.PointList.Add(rightEndpoint);//添加右间断点
                 }
-                paramCurvePitch.PointList.Add(rightEndpoint);//添加右间断点
+            }
+            catch (Exception)
+            {
+
             }
 
             Tuple<int, int> defaultRightEndpoint = Tuple.Create(1073741823, -100);
@@ -124,60 +130,74 @@ namespace Plugin.Gjgj
 
         private void DecodeOriginalPitchParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj, ParamCurve paramCurvePitch)
         {
-            int value;
-            int leftEndpoint;
-            int rightEndpoint;
-            int time;
-            bool isInModifyRange;
-            List<int> pitchPointBufferTime = new List<int>();
-            List<int> pitchPointBufferPitch = new List<int>();
-
-            for (int originPitchIndex = 0; originPitchIndex < gjProject.Tracks[singingTrackIndex].PitchParam.DefaultPitchPointList.Count - 1; originPitchIndex++)//遍历所有默认音高参数点
+            try
             {
-                time = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.DefaultPitchPointList[originPitchIndex].Time);
-                value = GetPitchParamValueFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.DefaultPitchPointList[originPitchIndex].Value);
-                isInModifyRange = false;
-                for (int index = 0; index < gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges.Count; index++)//判断当前默认音高参数点是否在ModifyRange内
+                int value;
+                int leftEndpoint;
+                int rightEndpoint;
+                int time;
+                bool isInModifyRange;
+                List<int> pitchPointBufferTime = new List<int>();
+                List<int> pitchPointBufferPitch = new List<int>();
+
+                for (int originPitchIndex = 0; originPitchIndex < gjProject.Tracks[singingTrackIndex].PitchParam.DefaultPitchPointList.Count - 1; originPitchIndex++)//遍历所有默认音高参数点
                 {
-                    leftEndpoint = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges[index].Left);
-                    rightEndpoint = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges[index].Right);
-                    if (time >= leftEndpoint && time <= rightEndpoint)
+                    time = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.DefaultPitchPointList[originPitchIndex].Time);
+                    value = GetPitchParamValueFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.DefaultPitchPointList[originPitchIndex].Value);
+                    isInModifyRange = false;
+                    for (int index = 0; index < gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges.Count; index++)//判断当前默认音高参数点是否在ModifyRange内
                     {
-                        isInModifyRange = true;
-                        break;
+                        leftEndpoint = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges[index].Left);
+                        rightEndpoint = GetPitchParamTimeFromGj(gjProject.Tracks[singingTrackIndex].PitchParam.ModifyRanges[index].Right);
+                        if (time >= leftEndpoint && time <= rightEndpoint)
+                        {
+                            isInModifyRange = true;
+                            break;
+                        }
+                    }
+                    if (!isInModifyRange)//不在ModifyRange内才写入
+                    {
+                        pitchPointBufferTime.Add(time);
+                        pitchPointBufferPitch.Add(value);
                     }
                 }
-                if (!isInModifyRange)//不在ModifyRange内才写入
+
+                for (int i = 0; i < pitchPointBufferTime.Count; i++)
                 {
-                    pitchPointBufferTime.Add(time);
-                    pitchPointBufferPitch.Add(value);
+                    Tuple<int, int> pitchParamPoint = Tuple.Create(pitchPointBufferTime[i], pitchPointBufferPitch[i]);
+                    paramCurvePitch.PointList.Add(pitchParamPoint);
                 }
             }
-
-            for (int i = 0; i < pitchPointBufferTime.Count; i++)
+            catch (Exception)
             {
-                Tuple<int, int> pitchParamPoint = Tuple.Create(pitchPointBufferTime[i], pitchPointBufferPitch[i]);
-                paramCurvePitch.PointList.Add(pitchParamPoint);
+
             }
         }
 
         private void DecodeVolumeParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj)
         {
-            List<double> timeBuffer = new List<double>();
-            List<double> valueBuffer = new List<double>();
-            int time;
-            int value;
-            ParamCurve paramCurveVolume = new ParamCurve();
-            for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.Tracks[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
+            try
             {
-                time = GetVolumeParamTimeFromGj(gjProject, singingTrackIndex, volumeParamPointIndex);
-                value = GetVolumeParamValueFromGj(gjProject.Tracks[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
-                Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
-                paramCurveVolume.PointList.Add(volumeParamPoint);
-            }
+                List<double> timeBuffer = new List<double>();
+                List<double> valueBuffer = new List<double>();
+                int time;
+                int value;
+                ParamCurve paramCurveVolume = new ParamCurve();
+                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.Tracks[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
+                {
+                    time = GetVolumeParamTimeFromGj(gjProject, singingTrackIndex, volumeParamPointIndex);
+                    value = GetVolumeParamValueFromGj(gjProject.Tracks[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
+                    Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
+                    paramCurveVolume.PointList.Add(volumeParamPoint);
+                }
 
-            paramCurveVolume.PointList.OrderBy(x => x.Item1).ToList();
-            paramsFromGj.Volume = paramCurveVolume;
+                paramCurveVolume.PointList.OrderBy(x => x.Item1).ToList();
+                paramsFromGj.Volume = paramCurveVolume;
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         private Note DecodeNote(GjProject gjProject, int singingTrackIndex, int noteIndex, TimeSynchronizer timeSynchronizer, Project project)
@@ -186,11 +206,11 @@ namespace Plugin.Gjgj
             int convertedStartPosition = gjProject.Tracks[singingTrackIndex].NoteList[noteIndex].StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
             double preTimeFromGj = gjProject.Tracks[singingTrackIndex].NoteList[noteIndex].PreTime;
             double postTimeFromGj = gjProject.Tracks[singingTrackIndex].NoteList[noteIndex].PostTime;
-            float headLengthInSecsFromGj = 0.0f;
-            float midRatioOverTailFromGj = 0.0f;
-            double essentialVowelLength = 0;
-            double tailVowelLength = 0;
-            int delta = 0;
+            float headLengthInSecsFromGj;
+            float midRatioOverTailFromGj;
+            double essentialVowelLength;
+            double tailVowelLength;
+            int delta;
             Phones phones = new Phones();
             try
             {
