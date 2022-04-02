@@ -163,7 +163,7 @@ namespace Plugin.SynthV
                 : Math.Pow(10, gain / 20.0);
         }
 
-        private Params DecodeParams(SVParams svParams, SVParams masterParams = null, List<SVNote> masterNotes = null)
+        private Params DecodeParams(SVParams svParams, SVParams masterParams = null)
         {
             var parameters = new Params
             {
@@ -172,8 +172,7 @@ namespace Plugin.SynthV
                     svParams.VibratoEnvelope,
                     5,
                     masterParams?.Pitch,
-                    masterParams?.VibratoEnvelope,
-                    masterNotes),
+                    masterParams?.VibratoEnvelope),
                 Volume = DecodeParamCurve(
                     svParams.Loudness,
                     val =>
@@ -181,29 +180,25 @@ namespace Plugin.SynthV
                             ? (int) Math.Round(val / 12.0 * 1000.0)
                             : (int) Math.Round(1000.0 * Math.Pow(10, val / 20.0) - 1000.0),
                     VoiceSettings.MasterLoudness,
-                    masterParams?.Loudness,
-                    masterNotes),
+                    masterParams?.Loudness),
                 Breath = DecodeParamCurve(
                     svParams.Breath,
                     val =>
                         (int) Math.Round(val * 1000.0),
                     VoiceSettings.MasterBreath,
-                    masterParams?.Breath,
-                    masterNotes),
+                    masterParams?.Breath),
                 Gender = DecodeParamCurve(
                     svParams.Gender,
                     val =>
                         (int) Math.Round(val * -1000.0),
                     VoiceSettings.MasterGender,
-                    masterParams?.Gender,
-                    masterNotes),
+                    masterParams?.Gender),
                 Strength = DecodeParamCurve(
                     svParams.Tension,
                     val =>
                         (int) Math.Round(val * 1000.0),
                     VoiceSettings.MasterTension,
-                    masterParams?.Tension,
-                    masterNotes)
+                    masterParams?.Tension)
             };
             return parameters;
         }
@@ -213,8 +208,7 @@ namespace Plugin.SynthV
             SVParamCurve vibratoEnv,
             int step = 5,
             SVParamCurve masterPitchDiff = null,
-            SVParamCurve masterVibratoEnv = null,
-            List<SVNote> masterNotes = null)
+            SVParamCurve masterVibratoEnv = null)
         {
             var curve = new ParamCurve();
             curve.PointList.Add(new Tuple<int, int>(-192000, -100));
@@ -312,8 +306,7 @@ namespace Plugin.SynthV
             SVParamCurve svCurve,
             Func<double, int> mappingFunc,
             double baseValue = 0.0,
-            SVParamCurve masterCurve = null,
-            List<SVNote> masterNotes = null)
+            SVParamCurve masterCurve = null)
         {
             int Clip(int val)
             {
