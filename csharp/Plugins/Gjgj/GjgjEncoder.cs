@@ -21,22 +21,22 @@ namespace Plugin.Gjgj
         {
             int noteID = 1;
             int trackID = 1;
-            gjProject.Tracks = new List<GjTracksItem>(project.TrackList.Count);
-            gjProject.Instrumental = new List<GjAccompanimentsItem>();
+            gjProject.SingingTracks = new List<GjSingingTracksItem>(project.TrackList.Count);
+            gjProject.InstrumentalTracks = new List<GjInstrumentalTracksItem>();
             int trackIndex = 0;
             foreach (var track in project.TrackList)
             {
                 switch (track)
                 {
                     case SingingTrack singingTrack:
-                        GjTracksItem gjTracksItem = EncodeSingingTrack(project, ref noteID, trackID, singingTrack);
-                        gjProject.Tracks.Add(gjTracksItem);
+                        GjSingingTracksItem gjTracksItem = EncodeSingingTrack(project, ref noteID, trackID, singingTrack);
+                        gjProject.SingingTracks.Add(gjTracksItem);
                         trackID++;
                         break;
                     case InstrumentalTrack instrumentalTrack:
-                        GjAccompanimentsItem gjAccompanimentsItem = new GjAccompanimentsItem();
+                        GjInstrumentalTracksItem gjAccompanimentsItem = new GjInstrumentalTracksItem();
                         EncodeInstrumentalTrack(project, trackID, instrumentalTrack, gjAccompanimentsItem);
-                        gjProject.Instrumental.Add(gjAccompanimentsItem);
+                        gjProject.InstrumentalTracks.Add(gjAccompanimentsItem);
                         trackID++;
                         break;
                     default:
@@ -46,9 +46,9 @@ namespace Plugin.Gjgj
             }
         }
 
-        private static void EncodeInstrumentalTrack(Project project, int trackID, InstrumentalTrack instrumentalTrack, GjAccompanimentsItem gjAccompanimentsItem)
+        private static void EncodeInstrumentalTrack(Project project, int trackID, InstrumentalTrack instrumentalTrack, GjInstrumentalTracksItem gjAccompanimentsItem)
         {
-            gjAccompanimentsItem.ID = Convert.ToString(trackID);
+            gjAccompanimentsItem.TrackID = Convert.ToString(trackID);
             gjAccompanimentsItem.Path = instrumentalTrack.AudioFilePath;
             //int offsetFromXS = instrumentalTrack.Offset;
             int convertedAccompanimentsOffset = 0;
@@ -76,7 +76,7 @@ namespace Plugin.Gjgj
                 convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (offsetFromXS - lastTempoPosition) / 480.0 * 10000000.0);
             }*/
             gjAccompanimentsItem.Offset = convertedAccompanimentsOffset;
-            gjAccompanimentsItem.MasterVolume = new GjMasterVolume
+            gjAccompanimentsItem.TrackVolume = new GjTrackVolume
             {
                 Volume = 1.0f,
                 LeftVolume = 1.0f,
@@ -86,13 +86,13 @@ namespace Plugin.Gjgj
             gjAccompanimentsItem.EQProgram = "";
         }
 
-        private GjTracksItem EncodeSingingTrack(Project project, ref int noteID, int trackID, SingingTrack singingTrack)
+        private GjSingingTracksItem EncodeSingingTrack(Project project, ref int noteID, int trackID, SingingTrack singingTrack)
         {
-            GjTracksItem gjTracksItem = new GjTracksItem
+            GjSingingTracksItem gjTracksItem = new GjSingingTracksItem
             {
                 TrackID = Convert.ToString(trackID),
                 Name = "513singer",//扇宝
-                NoteList = new List<GjBeatItemsItem>()
+                NoteList = new List<GjNoteListItem>()
             };
             foreach (var note in singingTrack.NoteList)
             {
@@ -105,9 +105,9 @@ namespace Plugin.Gjgj
             return gjTracksItem;
         }
 
-        private static void EncodeNotes(Project project, int noteID, GjTracksItem gjTracksItem, Note note)
+        private static void EncodeNotes(Project project, int noteID, GjSingingTracksItem gjTracksItem, Note note)
         {
-            GjBeatItemsItem gjBeatItemsItem = new GjBeatItemsItem
+            GjNoteListItem gjBeatItemsItem = new GjNoteListItem
             {
                 NoteID = noteID,
                 Lyric = note.Lyric,
@@ -115,29 +115,29 @@ namespace Plugin.Gjgj
                 StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator,
                 Duration = note.Length,
                 KeyNumber = note.KeyNumber - 24,
-                PreTime = 0,
-                PostTime = 0,
+                PhonePreTime = 0,
+                PhonePostTime = 0,
                 Style = 0
             };
             gjTracksItem.NoteList.Add(gjBeatItemsItem);
         }
 
-        private static void EncodeSingsingTrackSettings(SingingTrack singingTrack, GjTracksItem gjTracksItem)
+        private static void EncodeSingsingTrackSettings(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
         {
-            GjMasterVolume gjMasterVolume = new GjMasterVolume();
-            gjTracksItem.MasterVolume = gjMasterVolume;
-            gjTracksItem.MasterVolume.Volume = 1.0f;
-            gjTracksItem.MasterVolume.LeftVolume = 1.0f;
-            gjTracksItem.MasterVolume.RightVolume = 1.0f;
-            gjTracksItem.MasterVolume.Mute = singingTrack.Mute;
+            GjTrackVolume gjMasterVolume = new GjTrackVolume();
+            gjTracksItem.TrackVolume = gjMasterVolume;
+            gjTracksItem.TrackVolume.Volume = 1.0f;
+            gjTracksItem.TrackVolume.LeftVolume = 1.0f;
+            gjTracksItem.TrackVolume.RightVolume = 1.0f;
+            gjTracksItem.TrackVolume.Mute = singingTrack.Mute;
             gjTracksItem.EQProgram = "";
         }
 
-        private static void EncodeVolumeParam(SingingTrack singingTrack, GjTracksItem gjTracksItem)
+        private static void EncodeVolumeParam(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
         {
             try
             {
-                gjTracksItem.VolumeParam = new List<GjVolumeMapItem>();
+                gjTracksItem.VolumeParam = new List<GjVolumeParamItem>();
                 List<int> volumePointTimeBuffer = new List<int>();
                 List<double> volumePointValueBuffer = new List<double>();
                 int volumePointTimeFromXS;
@@ -172,7 +172,7 @@ namespace Plugin.Gjgj
                             {
                                 for (int volumePointTimeBufferIndex = 0; volumePointTimeBufferIndex < volumePointTimeBuffer.Count; volumePointTimeBufferIndex += 5)
                                 {
-                                    GjVolumeMapItem gjVolumeMapItem = new GjVolumeMapItem
+                                    GjVolumeParamItem gjVolumeMapItem = new GjVolumeParamItem
                                     {
                                         Time = volumePointTimeBuffer[volumePointTimeBufferIndex],
                                         Value = volumePointValueBuffer[volumePointTimeBufferIndex]
@@ -180,14 +180,14 @@ namespace Plugin.Gjgj
                                     gjTracksItem.VolumeParam.Add(gjVolumeMapItem);
                                 }
 
-                                GjVolumeMapItem gjVolumeParamLeftEndpoint = new GjVolumeMapItem
+                                GjVolumeParamItem gjVolumeParamLeftEndpoint = new GjVolumeParamItem
                                 {
                                     Time = volumePointTimeBuffer[0] - 5,
                                     Value = 1.0
                                 };
                                 gjTracksItem.VolumeParam.Add(gjVolumeParamLeftEndpoint);
 
-                                GjVolumeMapItem gjVolumeParamRightEndpoint = new GjVolumeMapItem
+                                GjVolumeParamItem gjVolumeParamRightEndpoint = new GjVolumeParamItem
                                 {
                                     Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 5,
                                     Value = 1.0
@@ -210,15 +210,15 @@ namespace Plugin.Gjgj
             }
         }
 
-        private void EncodePitchParam(SingingTrack singingTrack, GjTracksItem gjTracksItem)
+        private void EncodePitchParam(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
         {
             try
             {
-                gjTracksItem.PitchParam = new GjTone();
+                gjTracksItem.PitchParam = new GjPitchParam();
                 double convertedPitchFromXS;
                 List<double> pitchPointBufferX = new List<double>();
                 List<double> pitchPointBufferY = new List<double>();
-                gjTracksItem.PitchParam.PitchPointList = new List<GjModifysItem>();
+                gjTracksItem.PitchParam.PitchPointList = new List<GjPitchPointListItem>();
                 int lastPitchPointTimeFromXS = -100;
                 int currentPitchFromXS;
                 double convertedTimeFromXS;
@@ -250,7 +250,7 @@ namespace Plugin.Gjgj
                             {
                                 for (int j = 0; j < pitchPointBufferX.Count; j++)
                                 {
-                                    GjModifysItem gjModifysItem = new GjModifysItem
+                                    GjPitchPointListItem gjModifysItem = new GjPitchPointListItem
                                     {
                                         Time = pitchPointBufferX[j],
                                         Value = pitchPointBufferY[j]
