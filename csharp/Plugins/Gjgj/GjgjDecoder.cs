@@ -210,16 +210,16 @@ namespace Plugin.Gjgj
             float midRatioOverTailFromGj;
             double essentialVowelLength;
             double tailVowelLength;
-            int delta;
+            int difference;
             Phones phones = new Phones();
             try
             {
                 if (preTimeFromGj != 0.0)
                 {
-                    delta = convertedStartPosition + (int)(preTimeFromGj / 1000.0 * 480.0);
-                    if (delta > 0)
+                    difference = convertedStartPosition + (int)(preTimeFromGj / 1000.0 * 480.0);
+                    if (difference > 0)
                     {
-                        headLengthInSecsFromGj = (float)(timeSynchronizer.GetActualSecsFromTicks(convertedStartPosition) - timeSynchronizer.GetActualSecsFromTicks(delta));
+                        headLengthInSecsFromGj = (float)(timeSynchronizer.GetActualSecsFromTicks(convertedStartPosition) - timeSynchronizer.GetActualSecsFromTicks(difference));
                         phones.HeadLengthInSecs = headLengthInSecsFromGj;
                     }
                 }
@@ -252,6 +252,7 @@ namespace Plugin.Gjgj
                 KeyNumber = GetKeyNumberFromGj(gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].KeyNumber),
                 Lyric = gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].Lyric,
                 EditedPhones = phones,
+                //HeadTag = GetNoteHeadTagFromGj(gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].Style)//当前歌叽歌叽版本不支持换气或停顿，暂不转换
             };
             if (pronunciation == "")
             {
@@ -429,6 +430,21 @@ namespace Plugin.Gjgj
         private static int GetNumerator(GjProject gjProject, int index)
         {
             return gjProject.TempoMap.TimeSignature[index].Numerator;
+        }
+
+        private string GetNoteHeadTagFromGj(int origin)
+        {
+            switch (origin)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return "V";
+                case 2:
+                    return "0";
+                default:
+                    return null;
+            }
         }
     }
 }

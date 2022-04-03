@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OpenSvip.Model;
 using Gjgj.Model;
+using OpenSvip.Library;
 
 namespace Plugin.Gjgj
 {
@@ -12,12 +13,13 @@ namespace Plugin.Gjgj
             GjProject gjProject = new GjProject();
             SetGjProjectProperties(gjProject);
             EncodeTempo(project, gjProject);
+            TimeSynchronizer timeSynchronizer = new TimeSynchronizer(project.SongTempoList);
             EncodeTimeSignature(project, gjProject);
-            EncodeTracks(project, gjProject);
+            EncodeTracks(project, gjProject, timeSynchronizer);
             return gjProject;
         }
 
-        private void EncodeTracks(Project project, GjProject gjProject)
+        private void EncodeTracks(Project project, GjProject gjProject, TimeSynchronizer timeSynchronizer)
         {
             int noteID = 1;
             int trackID = 1;
@@ -29,7 +31,7 @@ namespace Plugin.Gjgj
                 switch (track)
                 {
                     case SingingTrack singingTrack:
-                        GjSingingTracksItem gjTracksItem = EncodeSingingTrack(project, ref noteID, trackID, singingTrack);
+                        GjSingingTracksItem gjTracksItem = EncodeSingingTrack(project, gjProject, ref noteID, trackID, singingTrack, timeSynchronizer);
                         gjProject.SingingTracks.Add(gjTracksItem);
                         trackID++;
                         break;
@@ -86,7 +88,7 @@ namespace Plugin.Gjgj
             gjAccompanimentsItem.EQProgram = "";
         }
 
-        private GjSingingTracksItem EncodeSingingTrack(Project project, ref int noteID, int trackID, SingingTrack singingTrack)
+        private GjSingingTracksItem EncodeSingingTrack(Project project, GjProject gjProject, ref int noteID, int trackID, SingingTrack singingTrack, TimeSynchronizer timeSynchronizer)
         {
             GjSingingTracksItem gjTracksItem = new GjSingingTracksItem
             {
@@ -96,7 +98,7 @@ namespace Plugin.Gjgj
             };
             foreach (var note in singingTrack.NoteList)
             {
-                EncodeNotes(project, noteID, gjTracksItem, note);
+                EncodeNotes(project, gjProject, noteID, gjTracksItem, note, timeSynchronizer);
                 noteID++;
             }
             EncodePitchParam(singingTrack, gjTracksItem);
@@ -105,7 +107,7 @@ namespace Plugin.Gjgj
             return gjTracksItem;
         }
 
-        private static void EncodeNotes(Project project, int noteID, GjSingingTracksItem gjTracksItem, Note note)
+        private void EncodeNotes(Project project, GjProject gjProject, int noteID, GjSingingTracksItem gjTracksItem, Note note, TimeSynchronizer timeSynchronizer)
         {
             GjNoteListItem gjBeatItemsItem = new GjNoteListItem
             {
@@ -117,7 +119,8 @@ namespace Plugin.Gjgj
                 KeyNumber = note.KeyNumber - 24,
                 PhonePreTime = 0,
                 PhonePostTime = 0,
-                Style = 0
+                Style = 0,
+                //Style = GetNoteStyleFromXS(note.HeadTag)//当前歌叽歌叽版本不支持换气或停顿，暂不转换
             };
             gjTracksItem.NoteList.Add(gjBeatItemsItem);
         }
@@ -332,5 +335,21 @@ namespace Plugin.Gjgj
         {
             return (71.0 - tone + 0.5) * 18.0;
         }
+
+        private int GetNoteStyleFromXS(string origin)
+        {
+            switch (origin)
+            {
+                case null:
+                    return 0;
+                case "V":
+                    return 1;
+                case "0":
+                    return 2;
+                default:
+                    return 0;
+            }
+        }
+
     }
 }
