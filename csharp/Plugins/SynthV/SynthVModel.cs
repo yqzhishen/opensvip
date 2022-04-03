@@ -38,8 +38,8 @@ namespace SynthV.Model
     public class SVTrack
     {
         [JsonProperty("name")] public string Name { get; set; } = "Track 1";
-        [JsonProperty("dispColor")] public string DispColor { get; set; } = "ff7db235";
-        [JsonProperty("dispOrder")] public int DispOrder { get; set; }
+        [JsonProperty("dispColor")] public string DisplayColor { get; set; } = "ff7db235";
+        [JsonProperty("dispOrder")] public int DisplayOrder { get; set; }
         [JsonProperty("renderEnabled")] public bool RenderEnabled { get; set; }
         [JsonProperty("mixer")] public SVMixer Mixer { get; set; } = new SVMixer();
         [JsonProperty("mainGroup")] public SVGroup MainGroup { get; set; } = new SVGroup();

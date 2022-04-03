@@ -57,7 +57,7 @@ namespace Plugin.SynthV
             var id = 0;
             foreach (var svTrack in project.TrackList.Select(EncodeTrack))
             {
-                svTrack.DispOrder = id;
+                svTrack.DisplayOrder = id;
                 svProject.Tracks.Add(svTrack);
                 ++id;
             }
@@ -100,7 +100,7 @@ namespace Plugin.SynthV
             {
                 case SingingTrack singingTrack:
                     svTrack.MainRef.IsInstrumental = false;
-                    svTrack.DispColor = "ff7db235";
+                    svTrack.DisplayColor = "ff7db235";
                     svTrack.MainRef.Database.Language = "mandarin";
                     svTrack.MainRef.Database.PhoneSet = "xsampa";
                     
@@ -146,7 +146,7 @@ namespace Plugin.SynthV
                     break;
                 case InstrumentalTrack instrumentalTrack:
                     svTrack.MainRef.IsInstrumental = true;
-                    svTrack.DispColor = "ff4794cb";
+                    svTrack.DisplayColor = "ff4794cb";
                     svTrack.MainRef.Audio.Filename = instrumentalTrack.AudioFilePath;
                     svTrack.MainRef.BlickOffset = EncodeAudioOffset(instrumentalTrack.Offset);
                     try

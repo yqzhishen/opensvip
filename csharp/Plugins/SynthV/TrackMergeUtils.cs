@@ -98,7 +98,16 @@ namespace Plugin.SynthV
             var mainRightIndex = mainCurve.PointList.FindIndex(point => point.Item1 > end);
             var overrideLeftIndex = overrideCurve.PointList.FindLastIndex(point => point.Item1 < start);
             var overrideRightIndex = overrideCurve.PointList.FindIndex(point => point.Item1 > end);
-            if (mainCurve.PointList[mainLeftIndex].Item1 != termination && mainCurve.PointList[mainLeftIndex + 1].Item1 != termination)
+            var mainLeftDefined = mainCurve.PointList[mainLeftIndex].Item1 != termination
+                                  && mainCurve.PointList[mainLeftIndex + 1].Item1 != termination;
+            var overrideLeftDefined = overrideCurve.PointList[overrideLeftIndex].Item1 != termination
+                                      && overrideCurve.PointList[overrideLeftIndex + 1].Item1 != termination;
+            var mainRightDefined = mainCurve.PointList[mainRightIndex - 1].Item1 != termination
+                                   && mainCurve.PointList[mainRightIndex].Item1 != termination;
+            var overrideRightDefined = overrideCurve.PointList[overrideRightIndex - 1].Item1 != termination
+                                       && overrideCurve.PointList[overrideRightIndex].Item1 != termination;
+            
+            if (mainLeftDefined)
             {
                 var r = (double) (start - mainCurve.PointList[mainLeftIndex].Item1)
                          / (mainCurve.PointList[mainLeftIndex + 1].Item1 - mainCurve.PointList[mainLeftIndex].Item1);
@@ -107,10 +116,13 @@ namespace Plugin.SynthV
                     (int) Math.Round(
                         (1 - r) * mainCurve.PointList[mainLeftIndex].Item2
                         + r * mainCurve.PointList[mainLeftIndex + 1].Item2)));
+            }
+
+            if (mainLeftDefined ^ overrideLeftDefined)
+            {
                 insertedPoints.Add(new Tuple<int, int>(start, termination));
             }
-            insertedPoints.Add(new Tuple<int, int>(start, termination));
-            if (overrideCurve.PointList[overrideLeftIndex].Item1 != termination && overrideCurve.PointList[overrideLeftIndex + 1].Item1 != termination)
+            if (overrideLeftDefined)
             {
                 var r = (double) (start - overrideCurve.PointList[overrideLeftIndex].Item1)
                          / (overrideCurve.PointList[overrideLeftIndex + 1].Item1 - overrideCurve.PointList[overrideLeftIndex].Item1);
@@ -120,12 +132,13 @@ namespace Plugin.SynthV
                         (1 - r) * overrideCurve.PointList[overrideLeftIndex].Item2
                         + r * overrideCurve.PointList[overrideLeftIndex + 1].Item2)));
             }
+            
             for (var i = overrideLeftIndex + 1; i < overrideRightIndex; i++)
             {
                 insertedPoints.Add(overrideCurve.PointList[i]);
             }
-
-            if (overrideCurve.PointList[overrideRightIndex - 1].Item1 != termination && overrideCurve.PointList[overrideRightIndex].Item1 != termination)
+            
+            if (overrideRightDefined)
             {
                 var r = (double) (end - overrideCurve.PointList[overrideRightIndex - 1].Item1)
                          / (overrideCurve.PointList[overrideRightIndex].Item1 - overrideCurve.PointList[overrideRightIndex - 1].Item1);
@@ -135,10 +148,12 @@ namespace Plugin.SynthV
                         (1 - r) * overrideCurve.PointList[overrideRightIndex - 1].Item2
                         + r * overrideCurve.PointList[overrideRightIndex].Item2)));
             }
-            insertedPoints.Add(new Tuple<int, int>(end, termination));
-            if (overrideCurve.PointList[overrideRightIndex - 1].Item1 != termination && overrideCurve.PointList[overrideRightIndex].Item1 != termination)
+            if (mainRightDefined ^ overrideRightDefined)
             {
                 insertedPoints.Add(new Tuple<int, int>(end, termination));
+            }
+            if (mainRightDefined)
+            {
                 var r = (double) (end - mainCurve.PointList[mainRightIndex - 1].Item1)
                          / (mainCurve.PointList[mainRightIndex].Item1 - mainCurve.PointList[mainRightIndex - 1].Item1);
                 insertedPoints.Add(new Tuple<int, int>(
