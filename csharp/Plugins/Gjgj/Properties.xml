@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>Gjgj</Name>
+    <Version>1.1.0</Version>
+    <Author>笛鹿FlutyDeer</Author>
+    <HomePage>https://space.bilibili.com/386270936</HomePage>
+    <Descriptions>歌叽歌叽工程格式转换插件。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>歌叽歌叽工程文件</Format>
+    <Suffix>gj</Suffix>
+    <Identifier>gj</Identifier>
+    <LibraryPath>Gjgj\Plugin.Gjgj.dll</LibraryPath>
+    <Converter>Gjgj.Stream.GjgjConverter</Converter>
+    <InputOptions/>
+    <OutputOptions/>
+</Plugin>
