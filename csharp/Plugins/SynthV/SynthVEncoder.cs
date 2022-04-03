@@ -13,6 +13,8 @@ namespace Plugin.SynthV
     {
         public VibratoOptions VibratoOption { get; set; } = VibratoOptions.Hybrid;
 
+        public int ParamSampleInterval { get; set; }
+
         private int FirstBarTick;
 
         private List<SongTempo> FirstBarTempo;
@@ -176,16 +178,20 @@ namespace Plugin.SynthV
         {
             var svParams = new SVParams
             {
-                Pitch = EncodePitchCurve(parameters.Pitch),
-                Loudness = EncodeParamCurve(parameters.Volume, 0, 0.0,
+                Pitch = EncodePitchCurve(parameters.Pitch.ReduceSampleRate(ParamSampleInterval, -100)),
+                Loudness = EncodeParamCurve(parameters.Volume.ReduceSampleRate(ParamSampleInterval),
+                    0, 0.0,
                     val => val >= 0
                         ? val / 1000.0 * 12.0
                         : Math.Max(20 * Math.Log10(val > -997 ? val / 1000.0 + 1.0 : 0.0039), -48.0)),
-                Tension = EncodeParamCurve(parameters.Strength, 0, 0.0,
+                Tension = EncodeParamCurve(parameters.Strength.ReduceSampleRate(ParamSampleInterval),
+                    0, 0.0,
                     val => val / 1000.0),
-                Breath = EncodeParamCurve(parameters.Breath, 0, 0.0,
+                Breath = EncodeParamCurve(parameters.Breath.ReduceSampleRate(ParamSampleInterval),
+                    0, 0.0,
                     val => val / 1000.0),
-                Gender = EncodeParamCurve(parameters.Gender, 0, 0.0,
+                Gender = EncodeParamCurve(parameters.Gender.ReduceSampleRate(ParamSampleInterval),
+                    0, 0.0,
                     val => -val / 1000.0)
             };
             return svParams;

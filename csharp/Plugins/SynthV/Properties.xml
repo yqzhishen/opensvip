@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>SynthV</Name>
-    <Version>1.5.1</Version>
+    <Version>1.5.2</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>Synthesizer V 工程格式转换插件。</Descriptions>
@@ -52,6 +52,9 @@
                     <Label>在输入音高被编辑过的区域去除颤音，其余部分保留默认颤音</Label>
                 </Choice>
             </EnumChoices>
+        </Option>
+        <Option Name="desample" Type="integer" Default="40">
+            <Notes>设置参数点的采样间隔以改善性能（0 为不限制）</Notes>
         </Option>
     </OutputOptions>
 </Plugin>

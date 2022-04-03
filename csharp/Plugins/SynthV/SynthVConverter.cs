@@ -29,7 +29,8 @@ namespace SynthV.Stream
         {
             var svProject = new SynthVEncoder
             {
-                VibratoOption = options.GetValueAsEnum("vibrato", VibratoOptions.Hybrid)
+                VibratoOption = options.GetValueAsEnum("vibrato", VibratoOptions.Hybrid),
+                ParamSampleInterval = options.GetValueAsInteger("desample", 40)
             }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);
