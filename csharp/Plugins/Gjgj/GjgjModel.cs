@@ -9,7 +9,7 @@ namespace Gjgj.Model
         public string EQAfterMix { get; set; }
     }
 
-    public class GjMasterVolume
+    public class GjTrackVolume
     {
         public float Volume { get; set; }
         public float LeftVolume { get; set; }
@@ -17,16 +17,16 @@ namespace Gjgj.Model
         public bool Mute { get; set; }
     }
 
-    public class GjAccompanimentsItem
+    public class GjInstrumentalTracksItem
     {
-        public string ID { get; set; }
+        [JsonProperty("ID")]public string TrackID { get; set; }
         public string Path { get; set; }
         public int Offset { get; set; }
-        public GjMasterVolume MasterVolume { get; set; }
+        [JsonProperty("MasterVolume")]public GjTrackVolume TrackVolume { get; set; }
         public string EQProgram { get; set; }
     }
 
-    public class GjBeatItemsItem
+    public class GjNoteListItem
     {
         [JsonProperty("ID")]public int NoteID { get; set; }
         public string Lyric { get; set; }
@@ -34,18 +34,18 @@ namespace Gjgj.Model
         public int StartTick { get; set; }
         public int Duration { get; set; }
         [JsonProperty("Track")]public int KeyNumber { get; set; }
-        public double PreTime { get; set; }
-        public double PostTime { get; set; }
+        [JsonProperty("PreTime")]public double PhonePreTime { get; set; }
+        [JsonProperty("PostTime")]public double PhonePostTime { get; set; }
         public int Style { get; set; }
     }
 
-    public class GjModifysItem
+    public class GjPitchPointListItem
     {
         [JsonProperty("X")]public double Time { get; set; }
         [JsonProperty("Y")]public double Value { get; set; }
     }
 
-    public class GjOriginsItem
+    public class GjDefaultPitchPointListItem
     {
         [JsonProperty("X")]public double Time { get; set; }
         [JsonProperty("Y")]public double Value { get; set; }
@@ -57,27 +57,27 @@ namespace Gjgj.Model
         [JsonProperty("Y")]public double Right { get; set; }
     }
 
-    public class GjTone
+    public class GjPitchParam
     {
-        [JsonProperty("Modifys")]public List<GjModifysItem> PitchPointList { get; set; }
-        [JsonProperty("Origins")]public List<GjOriginsItem> DefaultPitchPointList { get; set; }
+        [JsonProperty("Modifys")]public List<GjPitchPointListItem> PitchPointList { get; set; }
+        [JsonProperty("Origins")]public List<GjDefaultPitchPointListItem> DefaultPitchPointList { get; set; }
         public List<GjModifyRangesItem> ModifyRanges { get; set; }
     }
 
-    public class GjVolumeMapItem
+    public class GjVolumeParamItem
     {
         public double Time { get; set; }
         [JsonProperty("Volume")]public double Value { get; set; }
     }
 
-    public class GjTracksItem
+    public class GjSingingTracksItem
     {
         [JsonProperty("ID")]public string TrackID { get; set; }
         public string Name { get; set; }
-        [JsonProperty("BeatItems")]public List<GjBeatItemsItem> NoteList { get; set; }
-        [JsonProperty("Tone")]public GjTone PitchParam { get; set; }
-        [JsonProperty("VolumeMap")]public List<GjVolumeMapItem> VolumeParam { get; set; }
-        public GjMasterVolume MasterVolume { get; set; }
+        [JsonProperty("BeatItems")]public List<GjNoteListItem> NoteList { get; set; }
+        [JsonProperty("Tone")]public GjPitchParam PitchParam { get; set; }
+        [JsonProperty("VolumeMap")]public List<GjVolumeParamItem> VolumeParam { get; set; }
+        [JsonProperty("MasterVolume")]public GjTrackVolume TrackVolume { get; set; }
         public string EQProgram { get; set; }
     }
 
@@ -105,8 +105,8 @@ namespace Gjgj.Model
     {
         public int gjgjVersion { get; set; }
         public GjProjectSetting ProjectSetting { get; set; }
-        [JsonProperty("Accompaniments")]public List<GjAccompanimentsItem> Instrumental { get; set; }
-        public List<GjTracksItem> Tracks { get; set; }
+        [JsonProperty("Accompaniments")]public List<GjInstrumentalTracksItem> InstrumentalTracks { get; set; }
+        [JsonProperty("Tracks")]public List<GjSingingTracksItem> SingingTracks { get; set; }
         public GjTempoMap TempoMap { get; set; }
     }
 }
