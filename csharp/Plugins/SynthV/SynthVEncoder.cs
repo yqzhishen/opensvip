@@ -331,6 +331,10 @@ namespace Plugin.SynthV
             }
             if (!buffer.Any())
             {
+                if (lastPoint != null)
+                {
+                    pointList.Add(new Tuple<long, double>(TicksToPosition(lastPoint.Item1 + minInterval), defaultValue));
+                }
                 return svCurve;
             }
             if (lastPoint == null || lastPoint.Item1 + minInterval < buffer[0].Item1)
