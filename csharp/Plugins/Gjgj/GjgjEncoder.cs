@@ -230,7 +230,7 @@ namespace Plugin.Gjgj
                 {
                     convertedTimeFromXS = (singingTrack.EditedParams.Pitch.PointList[l].Item1 / 5.0);
                     currentPitchFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item2;
-                    convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2 - 2400.0) / 100.0));
+                    convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2 - 5600.0) / 100.0));
 
                     if (lastPitchPointTimeFromXS == singingTrack.EditedParams.Pitch.PointList[l].Item1)
                     {
