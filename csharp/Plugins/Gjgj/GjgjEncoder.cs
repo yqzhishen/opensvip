@@ -46,6 +46,7 @@ namespace Plugin.Gjgj
                 }
                 trackIndex++;
             }
+            gjProject.MIDITracks = new List<GjMIDITracks>();
         }
 
         private static void EncodeInstrumentalTrack(Project project, int trackID, InstrumentalTrack instrumentalTrack, GjInstrumentalTracksItem gjAccompanimentsItem)
@@ -86,6 +87,7 @@ namespace Plugin.Gjgj
                 Mute = instrumentalTrack.Mute
             };
             gjAccompanimentsItem.EQProgram = "";
+            gjAccompanimentsItem.SortIndex = 0;
         }
 
         private GjSingingTracksItem EncodeSingingTrack(Project project, GjProject gjProject, ref int noteID, int trackID, SingingTrack singingTrack, TimeSynchronizer timeSynchronizer)
@@ -93,7 +95,9 @@ namespace Plugin.Gjgj
             GjSingingTracksItem gjTracksItem = new GjSingingTracksItem
             {
                 TrackID = Convert.ToString(trackID),
+                Type = 0,
                 Name = "513singer",//扇宝
+                SortIndex = 0,
                 NoteList = new List<GjNoteListItem>()
             };
             foreach (var note in singingTrack.NoteList)
@@ -119,20 +123,27 @@ namespace Plugin.Gjgj
                 KeyNumber = note.KeyNumber - 24,
                 PhonePreTime = 0,
                 PhonePostTime = 0,
-                Style = GetNoteStyleFromXS(note.HeadTag)
+                Style = GetNoteStyleFromXS(note.HeadTag),
+                Velocity = 127
             };
             gjTracksItem.NoteList.Add(gjBeatItemsItem);
         }
 
         private static void EncodeSingsingTrackSettings(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
         {
+            GjKeyboard gjKeyboard = new GjKeyboard
+            {
+                KeyMode = 1,
+                KeyType = 0
+            };
+            gjTracksItem.Keyboard = gjKeyboard;
             GjTrackVolume gjMasterVolume = new GjTrackVolume();
             gjTracksItem.TrackVolume = gjMasterVolume;
             gjTracksItem.TrackVolume.Volume = 1.0f;
             gjTracksItem.TrackVolume.LeftVolume = 1.0f;
             gjTracksItem.TrackVolume.RightVolume = 1.0f;
             gjTracksItem.TrackVolume.Mute = singingTrack.Mute;
-            gjTracksItem.EQProgram = "";
+            gjTracksItem.EQProgram = "无";
         }
 
         private static void EncodeVolumeParam(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
@@ -322,11 +333,14 @@ namespace Plugin.Gjgj
 
         private static void SetGjProjectProperties(GjProject gjProject)
         {
-            gjProject.gjgjVersion = 1;
+            gjProject.gjgjVersion = 2;
             gjProject.ProjectSetting = new GjProjectSetting
             {
                 No1KeyName = "C",
-                EQAfterMix = ""
+                EQAfterMix = "",
+                ProjectType = 0,
+                Denominator = 4,
+                SynMode = 0
             };
         }
 
