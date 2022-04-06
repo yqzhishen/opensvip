@@ -252,7 +252,7 @@ namespace Plugin.Gjgj
                 KeyNumber = GetKeyNumberFromGj(gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].KeyNumber),
                 Lyric = gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].Lyric,
                 EditedPhones = phones,
-                //HeadTag = GetNoteHeadTagFromGj(gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].Style)//当前歌叽歌叽版本不支持换气或停顿，暂不转换
+                HeadTag = GetNoteHeadTagFromGj(gjProject.SingingTracks[singingTrackIndex].NoteList[noteIndex].Style)
             };
             if (pronunciation == "")
             {

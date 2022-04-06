@@ -119,8 +119,7 @@ namespace Plugin.Gjgj
                 KeyNumber = note.KeyNumber - 24,
                 PhonePreTime = 0,
                 PhonePostTime = 0,
-                Style = 0,
-                //Style = GetNoteStyleFromXS(note.HeadTag)//当前歌叽歌叽版本不支持换气或停顿，暂不转换
+                Style = GetNoteStyleFromXS(note.HeadTag)
             };
             gjTracksItem.NoteList.Add(gjBeatItemsItem);
         }
