@@ -1,42 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenSvip.Library;
 using OpenSvip.Model;
 
 namespace Plugin.SynthV
 {
     public static class TrackMergeUtils
     {
-        private class Scope
-        {
-            public int Start;
-            public int End;
-            
-            public Scope() {}
-
-            public Scope(int start, int end)
-            {
-                Start = start;
-                End = end;
-            }
-        }
-        
         public static void OverrideWith(this SingingTrack track, List<Note> noteList, Params @params, int firstBarTick)
         {
             var mainNoteList = track.NoteList;
             
-            // calculate override scopes
-            var scopes = new List<Scope>();
+            // calculate override range
+            var range = Range.Create();
             var mainLeftIndex = -1;
             var mainRightIndex = -1;
             for (var i = 0; i < noteList.Count; i++)
             {
-                var scope = new Scope();
                 mainLeftIndex = mainLeftIndex < mainNoteList.Count - 1
                     ? track.NoteList.FindLastIndex(mainLeftIndex + 1, note => note.StartPos < noteList[i].StartPos)
                     : -1;
                 var mainLeftNote = mainLeftIndex >= 0 ? mainNoteList[mainLeftIndex] : null;
-                scope.Start = mainLeftNote == null || mainLeftNote.StartPos + mainLeftNote.Length <= noteList[i].StartPos - 240
+                var start = mainLeftNote == null || mainLeftNote.StartPos + mainLeftNote.Length <= noteList[i].StartPos - 240
                     ? noteList[i].StartPos - 120
                     : (mainLeftNote.StartPos + mainLeftNote.Length + noteList[i].StartPos) / 2;
                 while (i < noteList.Count - 1 && noteList[i].StartPos + noteList[i].Length == noteList[i + 1].StartPos)
@@ -47,25 +33,10 @@ namespace Plugin.SynthV
                     ? track.NoteList.FindIndex(mainLeftIndex + 1, note => note.StartPos > noteList[i].StartPos)
                     : -1;
                 var mainRightNote = mainRightIndex >= 0 ? mainNoteList[mainRightIndex] : null;
-                scope.End = mainRightNote == null || mainRightNote.StartPos >= noteList[i].StartPos + noteList[i].Length + 240
+                var end = mainRightNote == null || mainRightNote.StartPos >= noteList[i].StartPos + noteList[i].Length + 240
                     ? noteList[i].StartPos + noteList[i].Length + 120
                     : (noteList[i].StartPos + noteList[i].Length + mainRightNote.StartPos) / 2;
-                scopes.Add(scope);
-            }
-            
-            // merge overlapped scopes
-            var j = 0;
-            while (j < scopes.Count)
-            {
-                while (j < scopes.Count - 1 && scopes[j].End >= scopes[j + 1].Start)
-                {
-                    if (scopes[j].End < scopes[j + 1].End)
-                    {
-                        scopes[j].End = scopes[j + 1].End;
-                    }
-                    scopes.RemoveAt(j + 1);
-                }
-                ++j;
+                range |= Range.Create(new Tuple<int, int>(start, end));
             }
             
             // override notes
@@ -75,9 +46,9 @@ namespace Plugin.SynthV
                 .ToList();
             
             // override params
-            foreach (var scope in scopes.ConvertAll(scope => new Scope(scope.Start + firstBarTick, scope.End + firstBarTick)))
+            foreach (var (start, end) in (range >> firstBarTick).SubRanges())
             {
-                track.EditedParams.OverrideWith(@params, scope.Start, scope.End);
+                track.EditedParams.OverrideWith(@params, start, end);
             }
         }
         

@@ -52,6 +52,7 @@
         <Compile Include="Interpolation.cs" />
         <Compile Include="ParamExpression.cs" />
         <Compile Include="CompoundParam.cs" />
+        <Compile Include="RangeUtils.cs" />
         <Compile Include="TrackMergeUtils.cs" />
         <Compile Include="PhonemeUtils.cs" />
         <Compile Include="PitchGenerator.cs" />
