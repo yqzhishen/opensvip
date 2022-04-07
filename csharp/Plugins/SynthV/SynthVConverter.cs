@@ -21,6 +21,7 @@ namespace SynthV.Stream
             return new SynthVDecoder
             {
                 PitchOption = options.GetValueAsEnum("pitch", PitchOptions.Plain),
+                ImportInstantPitch = options.GetValueAsBoolean("instant", true) && svProject.InstantModeEnabled,
                 BreathOption = options.GetValueAsEnum("breath", BreathOptions.Convert),
                 GroupOption = options.GetValueAsEnum("group", GroupOptions.Split)
             }.DecodeProject(svProject);

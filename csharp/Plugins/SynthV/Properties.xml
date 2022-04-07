@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>SynthV</Name>
-    <Version>1.6.0</Version>
+    <Version>1.7.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>Synthesizer V 工程格式转换插件。</Descriptions>
@@ -25,6 +25,9 @@
                     <Label>仅输入已编辑部分的音高曲线；未经编辑的默认颤音将被忽略</Label>
                 </Choice>
             </EnumChoices>
+        </Option>
+        <Option Name="instant" Type="boolean" Default="true">
+            <Notes>遵循即时音高模式设置</Notes>
         </Option>
         <Option Name="breath" Type="enum" Default="ignore">
             <Notes>换气音符处理方式</Notes>
@@ -62,7 +65,7 @@
             </EnumChoices>
         </Option>
         <Option Name="desample" Type="integer" Default="40">
-            <Notes>设置参数点的采样间隔以改善性能（0 为不限制）</Notes>
+            <Notes>设置参数点的平均采样间隔以改善性能（0 为无限制）</Notes>
         </Option>
     </OutputOptions>
 </Plugin>

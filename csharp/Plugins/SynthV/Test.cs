@@ -18,7 +18,7 @@ namespace SynthV.Test
 
         private static void Svp2Json()
         {
-            var project = new SynthVConverter().Load(@"C:\Users\YQ之神\Desktop\phase.svp", new ConverterOptions(new Dictionary<string, string>()));
+            var project = new SynthVConverter().Load(@"C:\Users\YQ之神\Desktop\instant.svp", new ConverterOptions(new Dictionary<string, string>()));
             var stream = new FileStream(
                 @"C:\Users\YQ之神\Desktop\test.json",
                 FileMode.Create,

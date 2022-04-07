@@ -13,9 +13,11 @@ namespace SynthV.Core
 {
     public class SynthVDecoder
     {
-        public BreathOptions BreathOption { get; set; }
-        
         public PitchOptions PitchOption { get; set; }
+        
+        public bool ImportInstantPitch { get; set; }
+        
+        public BreathOptions BreathOption { get; set; }
         
         public GroupOptions GroupOption { get; set; }
         
@@ -26,6 +28,8 @@ namespace SynthV.Core
         private TimeSynchronizer Synchronizer;
 
         private SVVoice VoiceSettings;
+
+        private SVParamCurve InstantPitch;
 
         private List<SVNote> NoteList;
 
@@ -95,7 +99,13 @@ namespace SynthV.Core
             else
             {
                 VoiceSettings = track.MainRef.Voice;
+                var masterNoteAttributes = VoiceSettings.ToAttributes();
+                if (ImportInstantPitch)
+                {
+                    InstantPitch = track.MainRef.InstantPitch;
+                }
                 NoteList = track.MainGroup.Notes;
+                NoteList.ForEach(note => note.MasterAttributes = masterNoteAttributes);
                 var singingTrack = new SingingTrack
                 {
                     NoteList = DecodeNoteList(track.MainGroup.Notes),
@@ -108,7 +118,13 @@ namespace SynthV.Core
                         {
                             var group = GroupLibrary[svRef.GroupId] + svRef.BlickOffset ^ svRef.PitchOffset;
                             VoiceSettings = svRef.Voice;
+                            masterNoteAttributes = VoiceSettings.ToAttributes();
+                            if (ImportInstantPitch)
+                            {
+                                InstantPitch = svRef.InstantPitch;
+                            }
                             NoteList = group.Notes;
+                            NoteList.ForEach(note => note.MasterAttributes = masterNoteAttributes);
                             TracksFromGroups.Add(new SingingTrack
                             {
                                 Title = $"{group.Name} ({++GroupSplitCounts[svRef.GroupId]})",
@@ -123,7 +139,13 @@ namespace SynthV.Core
                         {
                             var group = GroupLibrary[svRef.GroupId] + svRef.BlickOffset ^ svRef.PitchOffset;
                             VoiceSettings = svRef.Voice;
+                            masterNoteAttributes = VoiceSettings.ToAttributes();
+                            if (ImportInstantPitch)
+                            {
+                                InstantPitch = svRef.InstantPitch;
+                            }
                             NoteList = group.Notes;
+                            NoteList.ForEach(note => note.MasterAttributes = masterNoteAttributes);
                             if (mergedGroup.IsOverlappedWith(group))
                             {
                                 TracksFromGroups.Add(new SingingTrack
@@ -248,6 +270,14 @@ namespace SynthV.Core
                             (int) Math.Round(point.Item2 * 1000))),
                     DecodeInterpolation(vibratoEnv.Mode));
             }
+            if (ImportInstantPitch)
+            {
+                pitchDiffExpr += new CurveGenerator(InstantPitch.Points.ConvertAll(
+                        point => new Tuple<int, int>(
+                            DecodePosition(point.Item1),
+                            (int) Math.Round(point.Item2))),
+                    DecodeInterpolation(InstantPitch.Mode));
+            }
             var range = Range
                 .Create(
                     NoteList.ConvertAll(note => new Tuple<int, int>(
@@ -264,7 +294,7 @@ namespace SynthV.Core
                     var regardDefaultVibratoAsUnedited = PitchOption == PitchOptions.Plain;
                     const double interval = 0.1;
                     var noteEditedRange = NoteList
-                        .Where(note => note.PitchEdited(regardDefaultVibratoAsUnedited))
+                        .Where(note => note.PitchEdited(regardDefaultVibratoAsUnedited, ImportInstantPitch))
                         .Aggregate(
                             Range.Create(),
                             (current, note) =>
@@ -285,14 +315,15 @@ namespace SynthV.Core
                     }
                     if (masterVibratoEnv != null)
                     {
-                        paramEditedRange |= masterVibratoEnv.EditedRange();
+                        paramEditedRange |= masterVibratoEnv.EditedRange(1.0);
                     }
                     range &= noteEditedRange | paramEditedRange;
                     if (regardDefaultVibratoAsUnedited)
                     {
                         NoteList.ForEach(note =>
                         {
-                            if (note.PitchEdited() || note.Attributes.VibratoDepth == 0.0)
+                            if (note.PitchEdited(considerInstantPitchMode: ImportInstantPitch)
+                                || note.Attributes.VibratoDepth == 0.0)
                             {
                                 return;
                             }

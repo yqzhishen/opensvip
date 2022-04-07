@@ -13,6 +13,7 @@ namespace SynthV.Model
         [JsonProperty("library")] public List<SVGroup> Library = new List<SVGroup>();
         [JsonProperty("tracks")] public List<SVTrack> Tracks { get; set; } = new List<SVTrack>();
         [JsonProperty("renderConfig")] public SVConfig RenderConfig { get; set; } = new SVConfig();
+        [JsonProperty("instantModeEnabled")] public bool InstantModeEnabled { get; set; }
     }
 
     public class SVTime
@@ -158,9 +159,31 @@ namespace SynthV.Model
         [JsonProperty("pitch")] public int Pitch { get; set; }
         [JsonProperty("attributes")] public SVNoteAttributes Attributes { get; set; } = new SVNoteAttributes();
 
-        public bool PitchEdited(bool regardDefaultVibratoAsUnedited = true)
+        [JsonProperty("systemAttributes", NullValueHandling = NullValueHandling.Ignore)]
+        public SVNoteAttributes MasterAttributes
         {
-            return Attributes.PitchEdited(regardDefaultVibratoAsUnedited);
+            get => null;
+            set => MergeAttributes(value);
+        }
+
+        private void MergeAttributes(SVNoteAttributes attributes)
+        {
+            foreach (var field in Attributes.GetType().GetFields()
+                         .Where(field => field.FieldType == typeof(double) && !field.IsLiteral))
+            {
+                var incomingValue = field.GetValue(attributes);
+                if (double.NaN.Equals(field.GetValue(Attributes)) && !double.NaN.Equals(incomingValue))
+                {
+                    field.SetValue(Attributes, incomingValue);
+                }
+            }
+        }
+
+        public bool PitchEdited(
+            bool regardDefaultVibratoAsUnedited = true,
+            bool considerInstantPitchMode = true)
+        {
+            return Attributes.PitchEdited(regardDefaultVibratoAsUnedited, considerInstantPitchMode);
         }
 
         public static SVNote operator +(SVNote note, long blickOffset)
@@ -192,53 +215,150 @@ namespace SynthV.Model
 
     public class SVNoteAttributes
     {
-        [DefaultValue(0.0)]
-        [JsonProperty("tF0Offset", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double TransitionOffset { get; set; }
+        public const double DefaultPitchTransition = 0.0;
+        public const double DefaultPitchSlide = 0.07;
+        public const double DefaultPitchDepth = 0.15;
+        public const double DefaultVibratoStart = 0.25;
+        public const double DefaultVibratoFade = 0.2;
+        public const double DefaultVibratoDepth = 1.0;
+        public const double DefaultVibratoFrequency = 5.5;
+        public const double DefaultVibratoPhase = 0.0;
+        public const double DefaultVibratoJitter = 1.0;
 
-        [DefaultValue(0.07)]
-        [JsonProperty("tF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double SlideLeft { get; set; } = 0.07;
+        public const double SystemPitchSlide = 0.1;
+        public const double SystemPitchDepth = 0.0;
 
-        [DefaultValue(0.07)]
-        [JsonProperty("tF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double SlideRight { get; set; } = 0.07;
+        [JsonIgnore]
+        public double TransitionOffset
+        {
+            get => double.IsNaN(tF0Offset) ? DefaultPitchTransition : tF0Offset;
+            set => tF0Offset = value;
+        }
 
-        [DefaultValue(0.15)]
-        [JsonProperty("dF0Left", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double DepthLeft { get; set; } = 0.15;
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0Offset = double.NaN;
 
-        [DefaultValue(0.15)]
-        [JsonProperty("dF0Right", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double DepthRight { get; set; } = 0.15;
+        [JsonIgnore]
+        public double SlideLeft
+        {
+            get => double.IsNaN(tF0Left) ? DefaultPitchSlide : tF0Left;
+            set => tF0Left = value;
+        }
 
-        [DefaultValue(0.250)]
-        [JsonProperty("tF0VbrStart", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoStart { get; set; } = 0.250;
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0Left = double.NaN;
 
-        [DefaultValue(0.20)]
-        [JsonProperty("tF0VbrLeft", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoLeft { get; set; } = 0.20;
+        [JsonIgnore]
+        public double SlideRight
+        {
+            get => double.IsNaN(tF0Right) ? DefaultPitchSlide : tF0Right;
+            set => tF0Right = value;
+        }
 
-        [DefaultValue(0.20)]
-        [JsonProperty("tF0VbrRight", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoRight { get; set; } = 0.20;
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0Right = double.NaN;
 
-        [DefaultValue(1.00)]
-        [JsonProperty("dF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoDepth { get; set; } = 1.00;
+        [JsonIgnore]
+        public double DepthLeft
+        {
+            get => double.IsNaN(dF0Left) ? DefaultPitchDepth : dF0Left;
+            set => dF0Left = value;
+        }
 
-        [DefaultValue(5.50)]
-        [JsonProperty("fF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoFrequency { get; set; } = 5.50;
-        
-        [DefaultValue(0.0)]
-        [JsonProperty("pF0Vbr", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoPhase { get; set; }
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Left = double.NaN;
 
-        [DefaultValue(1.0)]
-        [JsonProperty("dF0Jitter", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public double VibratoJitter { get; set; } = 1.0;
+        [JsonIgnore]
+        public double DepthRight
+        {
+            get => double.IsNaN(dF0Right) ? DefaultPitchDepth : dF0Right;
+            set => dF0Right = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Right = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoStart
+        {
+            get => double.IsNaN(tF0VbrStart) ? DefaultVibratoStart : tF0VbrStart;
+            set => tF0VbrStart = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0VbrStart = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoLeft
+        {
+            get => double.IsNaN(tF0VbrLeft) ? DefaultVibratoFade : tF0VbrLeft;
+            set => tF0VbrLeft = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0VbrLeft = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoRight
+        {
+            get => double.IsNaN(tF0VbrRight) ? DefaultVibratoFade : tF0VbrRight;
+            set => tF0VbrRight = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0VbrRight = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoDepth
+        {
+            get => double.IsNaN(dF0Vbr) ? DefaultVibratoDepth : dF0Vbr;
+            set => dF0Vbr = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Vbr = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoFrequency
+        {
+            get => double.IsNaN(fF0Vbr) ? DefaultVibratoFrequency : fF0Vbr;
+            set => fF0Vbr = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double fF0Vbr = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoPhase
+        {
+            get => double.IsNaN(pF0Vbr) ? DefaultVibratoPhase : pF0Vbr;
+            set => pF0Vbr = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double pF0Vbr = double.NaN;
+
+        [JsonIgnore]
+        public double VibratoJitter
+        {
+            get => double.IsNaN(dF0Jitter) ? DefaultVibratoJitter : dF0Jitter;
+            set => dF0Jitter = value;
+        }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Jitter = double.NaN;
 
         [DefaultValue(null)]
         [JsonProperty("dur", NullValueHandling = NullValueHandling.Ignore)]
@@ -270,24 +390,36 @@ namespace SynthV.Model
             PhoneDurations[index] = value;
         }
 
-        public bool PitchEdited(bool regardDefaultVibratoAsUnedited = true)
+        public bool PitchEdited(
+            bool regardDefaultVibratoAsUnedited = true,
+            bool considerInstantPitchMode = true)
         {
             const double tolerance = 1e-6;
-            var transitionEdited = TransitionOffset != 0.0
-                                   || Math.Abs(SlideLeft - 0.07) >= tolerance
-                                   || Math.Abs(SlideRight - 0.07) >= tolerance
-                                   || Math.Abs(DepthLeft - 0.15) >= tolerance
-                                   || Math.Abs(DepthRight - 0.15) >= tolerance;
+
+            var transitionEdited = !double.IsNaN(tF0Offset)
+                                   || !double.IsNaN(tF0Left)
+                                   || !double.IsNaN(tF0Right)
+                                   || !double.IsNaN(dF0Left)
+                                   || !double.IsNaN(dF0Right);
+            if (considerInstantPitchMode)
+            {
+                transitionEdited &= Math.Abs(SlideLeft - SystemPitchSlide) >= tolerance
+                                    || Math.Abs(SlideRight - SystemPitchSlide) >= tolerance
+                                    || Math.Abs(DepthLeft - SystemPitchDepth) >= tolerance
+                                    || Math.Abs(DepthRight - SystemPitchDepth) >= tolerance;
+            }
+            
             var vibratoEdited = VibratoDepth != 0.0;
             if (regardDefaultVibratoAsUnedited)
             {
-                vibratoEdited &= Math.Abs(VibratoDepth - 1.00) >= tolerance
-                                 || Math.Abs(VibratoStart - 0.250) >= tolerance
-                                 || Math.Abs(VibratoLeft - 0.20) >= tolerance
-                                 || Math.Abs(VibratoRight - 0.20) >= tolerance
-                                 || Math.Abs(VibratoFrequency - 5.50) >= tolerance
-                                 || VibratoPhase != 0.0;
+                vibratoEdited &= !double.IsNaN(dF0Vbr)
+                                 || !double.IsNaN(tF0VbrStart)
+                                 || !double.IsNaN(tF0VbrLeft)
+                                 || !double.IsNaN(tF0VbrRight)
+                                 || !double.IsNaN(fF0Vbr)
+                                 || !double.IsNaN(pF0Vbr);
             }
+            
             return transitionEdited || vibratoEdited;
         }
     }
@@ -299,6 +431,8 @@ namespace SynthV.Model
         [JsonProperty("blickOffset")] public long BlickOffset { get; set; }
         [JsonProperty("pitchOffset")] public int PitchOffset { get; set; }
         [JsonProperty("isInstrumental")] public bool IsInstrumental { get; set; }
+
+        [JsonProperty("systemPitchDelta")] public SVParamCurve InstantPitch { get; set; } = new SVParamCurve();
         [JsonProperty("database")] public SVDatabase Database { get; set; } = new SVDatabase();
         [JsonProperty("audio")] public SVAudio Audio { get; set; } = new SVAudio();
         [JsonProperty("dictionary")] public string Dictionary { get; set; } = "";
@@ -334,6 +468,58 @@ namespace SynthV.Model
         
         [JsonProperty("paramToneShift", DefaultValueHandling = DefaultValueHandling.Ignore)]
         public double MasterToneShift { get; set; }
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0Left = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0Right = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Left = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Right = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0VbrStart = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0VbrLeft = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double tF0VbrRight = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double dF0Vbr = double.NaN;
+
+        [DefaultValue(double.NaN)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
+        public double fF0Vbr = double.NaN;
+
+        public SVNoteAttributes ToAttributes()
+        {
+            var attributes = new SVNoteAttributes();
+            var thisType = GetType();
+            foreach (var field in attributes.GetType().GetFields()
+                         .Where(field => field.FieldType == typeof(double) && !field.IsLiteral))
+            {
+                var thisField = thisType.GetField(field.Name);
+                if (thisField != null)
+                {
+                    field.SetValue(attributes, thisField.GetValue(this));
+                }
+            }
+            return attributes;
+        }
     }
 
     public class SVConfig
