@@ -306,10 +306,6 @@ namespace Plugin.SynthV
                             {
                                 range |= vibratoRange;
                             }
-                            else
-                            {
-                                note.Attributes.VibratoDepth = 0.0;
-                            }
                         });
                     }
                     break;
