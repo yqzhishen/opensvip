@@ -4,7 +4,7 @@ using System.Linq;
 using OpenSvip.Library;
 using OpenSvip.Model;
 
-namespace Plugin.SynthV
+namespace SynthV.Param
 {
     public class PitchSimulator
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Plugin.SynthV
+namespace SynthV.Param
 {
     public class CurveGenerator : ParamExpression
     {

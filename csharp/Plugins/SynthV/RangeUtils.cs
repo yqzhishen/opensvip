@@ -3,7 +3,7 @@ using System.Linq;
 using OpenSvip.Library;
 using SynthV.Model;
 
-namespace Plugin.SynthV
+namespace SynthV.Utils
 {
     public static class RangeUtils
     {

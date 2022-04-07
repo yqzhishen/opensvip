@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using NPinyin;
 
-namespace Plugin.SynthV
+namespace SynthV.Utils
 {
     public static class PhonemeUtils
     {

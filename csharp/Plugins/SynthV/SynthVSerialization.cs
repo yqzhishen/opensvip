@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Plugin.SynthV
+namespace SynthV.Model
 {
     public class SVPointListJsonConverter : JsonConverter<List<Tuple<long, double>>>
     {

@@ -3,8 +3,9 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Model;
 using OpenSvip.Framework;
-using Plugin.SynthV;
+using SynthV.Core;
 using SynthV.Model;
+using SynthV.Options;
 
 namespace SynthV.Stream
 {

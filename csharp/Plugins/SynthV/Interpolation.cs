@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Plugin.SynthV
+namespace SynthV.Param
 {
     public static class Interpolation
     {

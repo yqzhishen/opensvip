@@ -1,4 +1,4 @@
-﻿namespace Plugin.SynthV
+﻿namespace SynthV.Param
 {
     public class TranslationalParam : ParamExpression
     {

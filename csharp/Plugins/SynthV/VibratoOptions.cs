@@ -1,4 +1,4 @@
-﻿namespace Plugin.SynthV
+﻿namespace SynthV.Options
 {
     public enum VibratoOptions
     {

@@ -6,8 +6,11 @@ using NAudio.Wave;
 using OpenSvip.Model;
 using OpenSvip.Library;
 using SynthV.Model;
+using SynthV.Options;
+using SynthV.Utils;
+using SynthV.Param;
 
-namespace Plugin.SynthV
+namespace SynthV.Core
 {
     public class SynthVEncoder
     {

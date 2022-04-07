@@ -5,8 +5,11 @@ using System.Text.RegularExpressions;
 using OpenSvip.Library;
 using OpenSvip.Model;
 using SynthV.Model;
+using SynthV.Options;
+using SynthV.Param;
+using SynthV.Utils;
 
-namespace Plugin.SynthV
+namespace SynthV.Core
 {
     public class SynthVDecoder
     {

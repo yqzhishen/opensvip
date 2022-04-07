@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
-using Plugin.SynthV;
 
 namespace SynthV.Model
 {

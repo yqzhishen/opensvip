@@ -4,7 +4,7 @@ using System.Linq;
 using OpenSvip.Library;
 using SynthV.Model;
 
-namespace Plugin.SynthV
+namespace SynthV.Param
 {
     public class PitchGenerator : ParamExpression
     {
@@ -19,7 +19,7 @@ namespace Plugin.SynthV
         private readonly List<VibratoNode> VibratoNodes = new List<VibratoNode>();
 
         private const double MinimumInterval = 0.01;
-        
+
         public PitchGenerator(
             TimeSynchronizer synchronizer,
             List<SVNote> noteList,
@@ -29,7 +29,7 @@ namespace Plugin.SynthV
             Synchronizer = synchronizer;
             PitchDiff = pitchDiff;
             VibratoEnv = vibratoEnv;
-            
+
             if (!noteList.Any())
             {
                 return;
@@ -96,12 +96,12 @@ namespace Plugin.SynthV
                 var nextEnd = Synchronizer.GetActualSecsFromTicks(PosToTicks(nextNote.Onset + nextNote.Duration));
                 double nextMain;
                 double nextBody;
-                
+
                 var interval = nextBegin - currentEnd;
                 if (interval > MinimumInterval) // two notes are far from each other
                 {
                     nextMain = nextBegin;
-                    
+
                     // main part of current note
                     PitchNodes.Add(new PlainNode
                     {
@@ -109,7 +109,7 @@ namespace Plugin.SynthV
                         End = currentEnd,
                         Pitch = currentNote.Pitch * 100
                     });
-                    
+
                     nextBody = Math.Min(nextBegin + nextNote.Attributes.SlideLeft, nextEnd);
                     var mainEnd = Math.Max(currentBegin, currentEnd - currentNote.Attributes.SlideRight);
 
@@ -122,7 +122,7 @@ namespace Plugin.SynthV
                         BaseKey = currentNote.Pitch,
                         Depth = currentNote.Attributes.DepthRight
                     });
-                    
+
                     // interpolation between two notes
                     var mid = (currentEnd + nextBegin) / 2;
                     if (nextBegin - currentEnd > 0.14)
@@ -167,7 +167,7 @@ namespace Plugin.SynthV
                             DepthRight = 0
                         });
                     }
-                    
+
                     // head part of next note
                     PitchNodes.Add(new BoundaryNode
                     {
@@ -182,7 +182,7 @@ namespace Plugin.SynthV
                 {
                     nextMain = Math.Max((currentBegin + currentEnd) / 2, Math.Min((nextBegin + nextEnd) / 2,
                         nextBegin + nextNote.Attributes.TransitionOffset));
-                    
+
                     // main part of current note
                     if (currentMain < nextMain)
                     {
@@ -193,12 +193,12 @@ namespace Plugin.SynthV
                             Pitch = currentNote.Pitch * 100
                         });
                     }
-                    
+
                     nextBody = Math.Max((currentBegin + currentEnd) / 2, Math.Min((nextBegin + nextEnd) / 2,
                         nextBegin + 1.25 * nextNote.Attributes.SlideLeft + nextNote.Attributes.TransitionOffset));
                     var mainEnd = Math.Max((currentBegin + currentEnd) / 2, Math.Min((nextBegin + nextEnd) / 2,
                         currentEnd - currentNote.Attributes.SlideRight + nextNote.Attributes.TransitionOffset + interval));
-                    
+
                     // transition part of two notes
                     double Sigmoid(double x)
                     {
@@ -209,7 +209,7 @@ namespace Plugin.SynthV
                     {
                         return Math.Sqrt(x * y);
                     }
-                    
+
                     var node = new TransitionNode
                     {
                         Middle = Math.Max(mainEnd, Math.Min(nextBody,
@@ -230,7 +230,7 @@ namespace Plugin.SynthV
                     node.Zoom = Math.Min(10, 1 / Math.Pow(ratio, 2.2));
                     PitchNodes.Add(node);
                 }
-                
+
                 currentNote = nextNote;
                 currentBegin = nextBegin;
                 currentEnd = nextEnd;
@@ -243,7 +243,7 @@ namespace Plugin.SynthV
                 End = currentEnd,
                 Pitch = currentNote.Pitch * 100
             });
-            
+
             // tail part of the last note
             PitchNodes.Add(new BoundaryNode
             {
@@ -272,26 +272,26 @@ namespace Plugin.SynthV
             var basePitch = nodeHits.Average(node => node.BasePitch(secs)) +
                             nodeHits.Sum(node => node.PitchAtSecs(secs) - node.BasePitch(secs));
             var vibrato = VibratoNodes.Find(node => node.Begin <= secs && node.End > secs);
-            var ticks = (int) Math.Round(Synchronizer.GetActualTicksFromSecs(secs));
+            var ticks = (int)Math.Round(Synchronizer.GetActualTicksFromSecs(secs));
             if (vibrato == null)
             {
-                return (int) Math.Round(basePitch + PitchDiff.ValueAtTicks(ticks));
+                return (int)Math.Round(basePitch + PitchDiff.ValueAtTicks(ticks));
             }
-            return (int) Math.Round(basePitch
+            return (int)Math.Round(basePitch
                    + vibrato.PitchDiffAtSecs(secs) * VibratoEnv.ValueAtTicks(ticks) / 1000.0
                    + PitchDiff.ValueAtTicks(ticks));
         }
 
         private static int PosToTicks(long pos)
         {
-            return (int) Math.Round(pos / 1470000.0);
+            return (int)Math.Round(pos / 1470000.0);
         }
 
         private static Func<double, double> GaussFunc(double a, double b, double c)
         {
             return x => a * Math.Exp(-Math.Pow((x - b) / c, 2) / 2);
         }
-        
+
         private abstract class PitchNode
         {
             public double Begin;
