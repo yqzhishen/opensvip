@@ -6,21 +6,41 @@ using OpenSvip.Framework;
 using OpenSvip.Model;
 using SynthV.Stream;
 
-namespace Plugin.SynthV
+namespace SynthV.Test
 {
-    public class Test
+    public static class Test
     {
         public static void Main(string[] args)
         {
+            // Json2Svp();
+            Svp2Json();
+        }
+
+        private static void Svp2Json()
+        {
+            var project = new SynthVConverter().Load(@"C:\Users\YQ之神\Desktop\phase.svp", new ConverterOptions(new Dictionary<string, string>()));
             var stream = new FileStream(
-                @"C:\Users\YQ之神\Desktop\当你.json",
+                @"C:\Users\YQ之神\Desktop\test.json",
+                FileMode.Create,
+                FileAccess.Write);
+            var writer = new StreamWriter(stream, new UTF8Encoding(false));
+            writer.Write(JsonConvert.SerializeObject(project));
+            writer.Flush();
+            stream.Flush();
+            writer.Close();
+            stream.Close();
+        }
+        private static void Json2Svp()
+        {
+            var stream = new FileStream(
+                @"C:\Users\YQ之神\Desktop\黏黏黏黏.json",
                 FileMode.Open,
                 FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
             var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            new SynthVConverter().Save(@"C:\Users\YQ之神\Desktop\当你.svp", project, new ConverterOptions(new Dictionary<string, string>()));
+            new SynthVConverter().Save(@"C:\Users\YQ之神\Desktop\test.svp", project, new ConverterOptions(new Dictionary<string, string>()));
         }
     }
 }
