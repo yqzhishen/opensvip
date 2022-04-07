@@ -341,6 +341,8 @@ namespace Plugin.Gjgj
                     return "扇宝";
                 case "514singer":
                     return "SING-林嘉慧";
+                case "881singer":
+                    return "Rocky";
                 default:
                     return "演唱轨";
             }
@@ -348,7 +350,7 @@ namespace Plugin.Gjgj
 
         private double YToTone(double y)
         {
-            return 71.5 - y / 18.0;
+            return 127 + 0.5 - y / 18.0;
         }
 
         private int GetPitchParamTimeFromGj(double origin)
@@ -358,7 +360,7 @@ namespace Plugin.Gjgj
 
         private int GetPitchParamValueFromGj(double origin)
         {
-            return (int)(YToTone(origin) * 100.0 + 2400.0);
+            return (int)(YToTone(origin) * 100.0);
         }
 
         private int GetVolumeParamTimeFromGj(GjProject gjProject, int singingTrackIndex, int volumeParamPointIndex)
@@ -378,7 +380,7 @@ namespace Plugin.Gjgj
 
         private int GetKeyNumberFromGj(int origin)
         {
-            return origin + 24;
+            return origin;
         }
 
         private static string GetDefaultReverbPreset()

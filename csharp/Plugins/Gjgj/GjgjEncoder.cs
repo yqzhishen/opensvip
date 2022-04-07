@@ -120,7 +120,7 @@ namespace Plugin.Gjgj
                 Pinyin = note.Pronunciation ?? "",
                 StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator,
                 Duration = note.Length,
-                KeyNumber = note.KeyNumber - 24,
+                KeyNumber = note.KeyNumber,
                 PhonePreTime = 0,
                 PhonePostTime = 0,
                 Style = GetNoteStyleFromXS(note.HeadTag),
@@ -240,7 +240,7 @@ namespace Plugin.Gjgj
                 {
                     convertedTimeFromXS = (singingTrack.EditedParams.Pitch.PointList[l].Item1 / 5.0);
                     currentPitchFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item2;
-                    convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2 - 5600.0) / 100.0));
+                    convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2) / 100.0));
 
                     if (lastPitchPointTimeFromXS == singingTrack.EditedParams.Pitch.PointList[l].Item1)
                     {
@@ -346,7 +346,7 @@ namespace Plugin.Gjgj
 
         private double ToneToY(double tone)
         {
-            return (71.0 - tone + 0.5) * 18.0;
+            return (127 - tone + 0.5) * 18.0;
         }
 
         private int GetNoteStyleFromXS(string origin)
