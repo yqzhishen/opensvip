@@ -18,8 +18,8 @@
 
 - X Studio 工程文件 (*.svip)
 - OpenSVIP 文件 (*.json)
-- Synthesizer V 工程文件 (*.svp)（已完整支持输出端，输入端正在开发中）
-- 歌叽歌叽工程文件 (*.gj)（开发中）
+- Synthesizer V 工程文件 (*.svp)（测试中）
+- 歌叽歌叽工程文件 (*.gj)（测试中）
 - MIDI 文件 (*.mid)（计划中）
 
 ## 使用方法
