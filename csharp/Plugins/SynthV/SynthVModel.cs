@@ -159,6 +159,11 @@ namespace SynthV.Model
         [JsonProperty("pitch")] public int Pitch { get; set; }
         [JsonProperty("attributes")] public SVNoteAttributes Attributes { get; set; } = new SVNoteAttributes();
 
+        public bool PitchEdited(bool regardDefaultVibratoAsUnedited = true)
+        {
+            return Attributes.PitchEdited(regardDefaultVibratoAsUnedited);
+        }
+
         public static SVNote operator +(SVNote note, long blickOffset)
         {
             return new SVNote
@@ -264,6 +269,27 @@ namespace SynthV.Model
                 PhoneDurations = newArr;
             }
             PhoneDurations[index] = value;
+        }
+
+        public bool PitchEdited(bool regardDefaultVibratoAsUnedited = true)
+        {
+            const double tolerance = 1e-6;
+            var transitionEdited = TransitionOffset != 0.0
+                                   || Math.Abs(SlideLeft - 0.07) >= tolerance
+                                   || Math.Abs(SlideRight - 0.07) >= tolerance
+                                   || Math.Abs(DepthLeft - 0.15) >= tolerance
+                                   || Math.Abs(DepthRight - 0.15) >= tolerance;
+            var vibratoEdited = VibratoDepth != 0.0;
+            if (regardDefaultVibratoAsUnedited)
+            {
+                vibratoEdited &= Math.Abs(VibratoDepth - 1.00) >= tolerance
+                                 || Math.Abs(VibratoStart - 0.250) >= tolerance
+                                 || Math.Abs(VibratoLeft - 0.20) >= tolerance
+                                 || Math.Abs(VibratoRight - 0.20) >= tolerance
+                                 || Math.Abs(VibratoFrequency - 5.50) >= tolerance
+                                 || VibratoPhase != 0.0;
+            }
+            return transitionEdited || vibratoEdited;
         }
     }
 

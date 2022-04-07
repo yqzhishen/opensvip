@@ -211,9 +211,9 @@ namespace Plugin.SynthV
             SVParamCurve masterVibratoEnv = null)
         {
             var curve = new ParamCurve();
-            curve.PointList.Add(new Tuple<int, int>(-192000, -100));
             if (!NoteList.Any())
             {
+                curve.PointList.Add(new Tuple<int, int>(-192000, -100));
                 curve.PointList.Add(new Tuple<int, int>(1073741823, -100));
                 return curve;
             }
@@ -245,59 +245,90 @@ namespace Plugin.SynthV
                             (int) Math.Round(point.Item2 * 1000))),
                     DecodeInterpolation(vibratoEnv.Mode));
             }
+            var range = Range
+                .Create(
+                    NoteList.ConvertAll(note => new Tuple<int, int>(
+                            DecodePosition(note.Onset),
+                            DecodePosition(note.Onset + note.Duration)))
+                        .ToArray())
+                .Expand(120);
+            switch (PitchOption)
+            {
+                case PitchOptions.Full:
+                    break;
+                case PitchOptions.Vibrato:
+                case PitchOptions.Plain:
+                    var regardDefaultVibratoAsUnedited = PitchOption == PitchOptions.Plain;
+                    const double interval = 0.1;
+                    var noteEditedRange = NoteList
+                        .Where(note => note.PitchEdited(regardDefaultVibratoAsUnedited))
+                        .Aggregate(
+                            Range.Create(),
+                            (current, note) =>
+                            {
+                                var startSecs =
+                                    Synchronizer.GetActualSecsFromTicks(DecodePosition(note.Onset))
+                                    - Math.Max(0.0, note.Attributes.TransitionOffset) - interval;
+                                var endSecs =
+                                    Synchronizer.GetActualSecsFromTicks(DecodePosition(note.Onset + note.Duration)) + interval;
+                                return current.Union(Range.Create(new Tuple<int, int>(
+                                    (int) Math.Round(Synchronizer.GetActualTicksFromSecs(Math.Max(0, startSecs))),
+                                    (int) Math.Round(Synchronizer.GetActualTicksFromSecs(endSecs)))));
+                            });
+                    var paramEditedRange = pitchDiff.EditedRange() | vibratoEnv.EditedRange(1.0);
+                    if (masterPitchDiff != null)
+                    {
+                        paramEditedRange |= masterPitchDiff.EditedRange();
+                    }
+                    if (masterVibratoEnv != null)
+                    {
+                        paramEditedRange |= masterVibratoEnv.EditedRange();
+                    }
+                    range &= noteEditedRange | paramEditedRange;
+                    if (regardDefaultVibratoAsUnedited)
+                    {
+                        NoteList.ForEach(note =>
+                        {
+                            if (note.PitchEdited() || note.Attributes.VibratoDepth == 0.0)
+                            {
+                                return;
+                            }
+                            var vibStartTicks = (int) Math.Round(Synchronizer.GetActualTicksFromSecsOffset(
+                                DecodePosition(note.Onset),
+                                note.Attributes.VibratoStart));
+                            var vibEndTicks = DecodePosition(note.Onset + note.Duration);
+                            var vibratoRange = Range.Create(new Tuple<int, int>(vibStartTicks, vibEndTicks));
+                            if (vibratoRange.CoveredBy(range))
+                            {
+                                return;
+                            }
+                            if (!vibratoRange.Intersect(range).IsEmpty())
+                            {
+                                range |= vibratoRange;
+                            }
+                            else
+                            {
+                                note.Attributes.VibratoDepth = 0.0;
+                            }
+                        });
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             var generator = new PitchGenerator(Synchronizer, NoteList, pitchDiffExpr, vibratoEnvExpr);
-            var currentNote = NoteList[0];
-            var currentBegin = DecodePosition(currentNote.Onset);
-            var currentEnd = DecodePosition(currentNote.Onset + currentNote.Duration);
-            curve.PointList.Add(new Tuple<int, int>(currentBegin - 120 + FirstBarTick, -100));
-            for (var j = currentBegin - 120; j < currentBegin; j += step)
-            {
-                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
-            }
-            var i = 0;
-            for (; i < NoteList.Count - 1; i++)
-            {
-                var nextNote = NoteList[i + 1];
-                var nextBegin = DecodePosition(nextNote.Onset);
-                var nextEnd = DecodePosition(nextNote.Onset + nextNote.Duration);
-
-                for (var j = currentBegin; j < currentEnd; j += step)
-                {
-                    curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
-                }
-
-                if (nextBegin - currentEnd > 240)
-                {
-                    for (var j = currentEnd; j < currentEnd + 120; j += step)
-                    {
-                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
-                    }
-                    curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.ValueAtTicks(currentEnd + 120)));
-                    curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
-                    curve.PointList.Add(new Tuple<int, int>(nextBegin - 120 + FirstBarTick, -100));
-                    for (var j = nextBegin - 120; j < nextBegin; j += step)
-                    {
-                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
-                    }
-                }
-                else
-                {
-                    for (var j = currentEnd; j < nextBegin; j += step)
-                    {
-                        curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
-                    }
-                }
-                
-                currentBegin = nextBegin;
-                currentEnd = nextEnd;
-            }
             
-            for (var j = currentBegin; j < currentEnd + 120; j += step)
+            curve.PointList.Add(new Tuple<int, int>(-192000, -100));
+            foreach (var (start, end) in range.Shift(FirstBarTick).SubRanges())
             {
-                curve.PointList.Add(new Tuple<int, int>(j + FirstBarTick, generator.ValueAtTicks(j)));
+                curve.PointList.Add(new Tuple<int, int>(start, -100));
+                for (var i = start; i < end; i += step)
+                {
+                    curve.PointList.Add(new Tuple<int, int>(i, generator.ValueAtTicks(i - FirstBarTick)));
+                }
+                curve.PointList.Add(new Tuple<int, int>(end, generator.ValueAtTicks(end - FirstBarTick)));
+                curve.PointList.Add(new Tuple<int, int>(end, -100));
             }
-            curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, generator.ValueAtTicks(currentEnd + 120)));
-            curve.PointList.Add(new Tuple<int, int>(currentEnd + 120 + FirstBarTick, -100));
             curve.PointList.Add(new Tuple<int, int>(1073741823, -100));
             return curve;
         }

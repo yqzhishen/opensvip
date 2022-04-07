@@ -2,6 +2,6 @@
 {
     public enum PitchOptions
     {
-        Full, Edited
+        Full, Vibrato, Plain
     }
 }

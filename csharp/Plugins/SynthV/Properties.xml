@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>SynthV</Name>
-    <Version>1.5.2</Version>
+    <Version>1.6.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>Synthesizer V 工程格式转换插件。</Descriptions>
@@ -12,11 +12,18 @@
     <LibraryPath>SynthV\Plugin.SynthV.dll</LibraryPath>
     <Converter>SynthV.Stream.SynthVConverter</Converter>
     <InputOptions>
-        <Option Name="pitch" Type="enum" Default="edited">
+        <Option Name="pitch" Type="enum" Default="plain">
             <Notes>音高参数属性输入模式</Notes>
             <EnumChoices>
-                <Choice Name="输入完整音高曲线" Tag="full"/>
-                <Choice Name="仅输入已编辑部分" Tag="edited"/>
+                <Choice Name="输入完整音高曲线" Tag="plain">
+                    <Label>不论是否经过编辑，均输入整条音高曲线</Label>
+                </Choice>
+                <Choice Name="仅输入已编辑部分（颤音模式）" Tag="vibrato">
+                    <Label>仅输入已编辑部分的音高曲线；未经编辑的默认颤音也将被导入</Label>
+                </Choice>
+                <Choice Name="仅输入已编辑部分（平整模式）" Tag="plain">
+                    <Label>仅输入已编辑部分的音高曲线；未经编辑的默认颤音将被忽略</Label>
+                </Choice>
             </EnumChoices>
         </Option>
         <Option Name="breath" Type="enum" Default="ignore">
