@@ -115,20 +115,27 @@ namespace Plugin.Gjgj
         {
             double phonePreTime = 0.0;
             double phonePostTime = 0.0;
-            if (note.EditedPhones.HeadLengthInSecs != -1.0)
+            try
             {
-                int noteStartPositionInTicks = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-                double noteStartPositionInSeconds = timeSynchronizer.GetActualSecsFromTicks(noteStartPositionInTicks);
-                double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
-                double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
-                double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
-                phonePreTime = -difference * 1000.0 / 480.0;
+                if (note.EditedPhones.HeadLengthInSecs != -1.0)
+                {
+                    int noteStartPositionInTicks = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+                    double noteStartPositionInSeconds = timeSynchronizer.GetActualSecsFromTicks(noteStartPositionInTicks);
+                    double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
+                    double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
+                    double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
+                    phonePreTime = -difference * 1000.0 / 480.0;
+                }
+                if (note.EditedPhones.MidRatioOverTail != -1.0)
+                {
+                    double noteLength = note.Length;
+                    double ratio = note.EditedPhones.MidRatioOverTail;
+                    phonePostTime = -(noteLength / (1.0 + ratio)) * 1000.0 / 480.0;
+                }
             }
-            if (note.EditedPhones.MidRatioOverTail != -1.0)
+            catch (Exception)
             {
-                double noteLength = note.Length;
-                double ratio = note.EditedPhones.MidRatioOverTail;
-                phonePostTime = -(noteLength / (1.0 + ratio)) * 1000.0 / 480.0;
+                
             }
             GjNoteListItem gjBeatItemsItem = new GjNoteListItem
             {
