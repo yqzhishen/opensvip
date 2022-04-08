@@ -1676,7 +1676,7 @@ namespace Plugin.Gjgj
 			};
 		}
 
-		public bool IsPinyinSupported(string pinyin)
+		public bool IsGjSupportedPinyin(string pinyin)
 		{
 			return SupportedPinyinList().ContainsKey(pinyin.ToLower());
 		}

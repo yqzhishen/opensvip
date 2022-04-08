@@ -20,7 +20,7 @@ namespace Gjgj.Model
         public bool Mute { get; set; }
     }
 
-    public class GjInstrumentalTracksItem
+    public class GjInstrumentalTrack
     {
         [JsonProperty("ID")]public string TrackID { get; set; }
         public string Path { get; set; }
@@ -30,7 +30,7 @@ namespace Gjgj.Model
         public int SortIndex { get; set; }
     }
 
-    public class GjNoteListItem
+    public class GjNote
     {
         [JsonProperty("ID")]public int NoteID { get; set; }
         public string Lyric { get; set; }
@@ -44,19 +44,19 @@ namespace Gjgj.Model
         public int Velocity { get; set; }
     }
 
-    public class GjPitchPointListItem
+    public class GjPitchParamPoint
     {
         [JsonProperty("X")]public double Time { get; set; }
         [JsonProperty("Y")]public double Value { get; set; }
     }
 
-    public class GjDefaultPitchPointListItem
+    public class GjDefaultPitchParamPoint
     {
         [JsonProperty("X")]public double Time { get; set; }
         [JsonProperty("Y")]public double Value { get; set; }
     }
 
-    public class GjModifyRangesItem
+    public class GjModifyRange
     {
         [JsonProperty("X")]public double Left { get; set; }
         [JsonProperty("Y")]public double Right { get; set; }
@@ -64,26 +64,26 @@ namespace Gjgj.Model
 
     public class GjPitchParam
     {
-        [JsonProperty("Modifys")]public List<GjPitchPointListItem> PitchPointList { get; set; }
-        [JsonProperty("Origins")]public List<GjDefaultPitchPointListItem> DefaultPitchPointList { get; set; }
-        public List<GjModifyRangesItem> ModifyRanges { get; set; }
+        [JsonProperty("Modifys")]public List<GjPitchParamPoint> PitchParamPointList { get; set; }
+        [JsonProperty("Origins")]public List<GjDefaultPitchParamPoint> DefaultPitchParamPointList { get; set; }
+        [JsonProperty("ModifyRanges")]public List<GjModifyRange> ModifyRangeList { get; set; }
     }
 
-    public class GjVolumeParamItem
+    public class GjVolumeParamPoint
     {
         public double Time { get; set; }
         [JsonProperty("Volume")]public double Value { get; set; }
     }
 
-    public class GjSingingTracksItem
+    public class GjSingingTrack
     {
         [JsonProperty("ID")]public string TrackID { get; set; }
         public int Type { get; set; }
         public string Name { get; set; }
         public int SortIndex { get; set; }
-        [JsonProperty("BeatItems")]public List<GjNoteListItem> NoteList { get; set; }
+        [JsonProperty("BeatItems")]public List<GjNote> NoteList { get; set; }
         [JsonProperty("Tone")]public GjPitchParam PitchParam { get; set; }
-        [JsonProperty("VolumeMap")]public List<GjVolumeParamItem> VolumeParam { get; set; }
+        [JsonProperty("VolumeMap")]public List<GjVolumeParamPoint> VolumeParam { get; set; }
         public GjKeyboard Keyboard { get; set; }
         [JsonProperty("MasterVolume")]public GjTrackVolume TrackVolume { get; set; }
         public string EQProgram { get; set; }
@@ -95,13 +95,13 @@ namespace Gjgj.Model
         public int KeyType { get; set; }
     }
 
-    public class GjTemposItem
+    public class GjTempo
     {
         public int Time { get; set; }
         public int MicrosecondsPerQuarterNote { get; set; }
     }
 
-    public class GjTimeSignatureItem
+    public class GjTimeSignature
     {
         public int Time { get; set; }
         public int Numerator { get; set; }
@@ -111,21 +111,21 @@ namespace Gjgj.Model
     public class GjTempoMap
     {
         public int TicksPerQuarterNote { get; set; }
-        public List<GjTemposItem> Tempos { get; set; }
-        public List<GjTimeSignatureItem> TimeSignature { get; set; }
+        [JsonProperty("Tempos")]public List<GjTempo> TempoList { get; set; }
+        [JsonProperty("TimeSignature")]public List<GjTimeSignature> TimeSignatureList { get; set; }
     }
 
     public class GjProject
     {
         public int gjgjVersion { get; set; }
         public GjProjectSetting ProjectSetting { get; set; }
-        [JsonProperty("Accompaniments")]public List<GjInstrumentalTracksItem> InstrumentalTracks { get; set; }
-        [JsonProperty("Tracks")]public List<GjSingingTracksItem> SingingTracks { get; set; }
-        public List<GjMIDITracks> MIDITracks { get; set; }
+        [JsonProperty("Accompaniments")]public List<GjInstrumentalTrack> InstrumentalTrackList { get; set; }
+        [JsonProperty("Tracks")]public List<GjSingingTrack> SingingTrackList { get; set; }
+        [JsonProperty("MIDITracks")]public List<GjMIDITrack> MIDITrackList { get; set; }
         public GjTempoMap TempoMap { get; set; }
     }
 
-    public class GjMIDITracks
+    public class GjMIDITrack
     {
 
     }
