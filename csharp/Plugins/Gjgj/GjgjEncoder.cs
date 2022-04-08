@@ -8,6 +8,8 @@ namespace Plugin.Gjgj
 {
     public class GjgjEncoder
     {
+        GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
+        
         public GjProject EncodeProject(Project project)
         {
             GjProject gjProject = new GjProject();
@@ -137,11 +139,16 @@ namespace Plugin.Gjgj
             {
                 
             }
+            string pinyin = note.Pronunciation ?? "";
+            if (pinyin != "" && !gjgjSupportedPinyin.IsPinyinSupported(pinyin))
+            {
+                pinyin = "";
+            }
             GjNoteListItem gjBeatItemsItem = new GjNoteListItem
             {
                 NoteID = noteID,
                 Lyric = note.Lyric,
-                Pinyin = note.Pronunciation ?? "",
+                Pinyin = pinyin,
                 StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator,
                 Duration = note.Length,
                 KeyNumber = note.KeyNumber,
