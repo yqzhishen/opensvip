@@ -16,29 +16,37 @@ namespace OpenSvip.Framework
 
         static PluginManager()
         {
-            foreach (var pluginDir in Directory.GetDirectories(PluginPath))
+            try
             {
-                var propertiesPath = Path.Combine(pluginDir, "Properties.xml");
-                if (!File.Exists(propertiesPath))
+                foreach (var pluginDir in Directory.GetDirectories(PluginPath))
                 {
-                    continue;
+                    var propertiesPath = Path.Combine(pluginDir, "Properties.xml");
+                    if (!File.Exists(propertiesPath))
+                    {
+                        continue;
+                    }
+
+                    var stream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read);
+                    var reader = new StreamReader(stream, new UTF8Encoding(false));
+                    try
+                    {
+                        var plugin = (Plugin) new XmlSerializer(typeof(Plugin)).Deserialize(reader);
+                        Plugins[plugin.Identifier] = plugin;
+                    }
+                    catch (Exception)
+                    {
+                        // ignored
+                    }
+                    finally
+                    {
+                        stream.Close();
+                        reader.Close();
+                    }
                 }
-                var stream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read);
-                var reader = new StreamReader(stream, new UTF8Encoding(false));
-                try
-                {
-                    var plugin = (Plugin) new XmlSerializer(typeof(Plugin)).Deserialize(reader);
-                    Plugins[plugin.Identifier] = plugin;
-                }
-                catch (Exception)
-                {
-                    // ignored
-                }
-                finally
-                {
-                    stream.Close();
-                    reader.Close();
-                }
+            }
+            catch (IOException)
+            {
+                // ignored
             }
         }
 
@@ -54,7 +62,7 @@ namespace OpenSvip.Framework
         {
             if (!Plugins.ContainsKey(identifier))
             {
-                throw new ArgumentException("找不到标识符所对应的转换插件。");
+                throw new ArgumentException($"找不到标识符“{identifier}”所对应的转换插件。");
             }
             return Plugins[identifier];
         }

@@ -28,7 +28,7 @@ namespace OpenSvip.Console
 
         [Option("output-options", Separator = ';', Required = false,
             HelpText = "输出转换选项，格式为 [选项名]=[选项值]。多个选项之间以 \";\" 分隔。")]
-        public IEnumerable<string> _outputOptions { get; set; } = Array.Empty<string>();
+        public IEnumerable<string> _outputOptions { private get; set; } = Array.Empty<string>();
 
         public ConverterOptions InputOptions => new ConverterOptions(OptionsToDictionary(_inputOptions));
 
