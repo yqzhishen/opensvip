@@ -1,6 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
 using CommandLine;
 using OpenSvip.Framework;
+using OpenSvip.Model;
 
 namespace OpenSvip.Console
 {
@@ -17,15 +21,75 @@ namespace OpenSvip.Console
 
         private static int ConvertFile(ConvertOptions options)
         {
-            var inputConverter = PluginManager.GetConverter(options.InType);
-            var outputConverter = PluginManager.GetConverter(options.OutType);
-            outputConverter.Save(
-                options.OutPath, 
-                inputConverter.Load(
-                    options.InPath,
-                    options.InputOptions),
-                options.OutputOptions);
+            Project project;
+            IProjectConverter inputConverter;
+            IProjectConverter outputConverter;
+            try
+            {
+                inputConverter = PluginManager.GetConverter(options.InType);
+                outputConverter = PluginManager.GetConverter(options.OutType);
+            }
+            catch (Exception e)
+            {
+                HandleError(e, ErrorTypes.Prepare);
+                return 2;
+            }
+            
+            try
+            {
+                project = inputConverter.Load(options.InPath, options.InputOptions);
+                
+                var warnings = Warnings.GetWarnings();
+                if (warnings.Any())
+                {
+                    System.Console.WriteLine($"来自输入插件 {PluginManager.GetPlugin(options.InType).Name} 的警告信息：");
+                    foreach (var warning in warnings)
+                    {
+                        System.Console.WriteLine(warning);
+                    }
+
+                    Warnings.ClearWarnings();
+                }
+            }
+            catch (Exception e)
+            {
+                HandleError(e, ErrorTypes.Import);
+                return 3;
+            }
+
+            try
+            {
+                outputConverter.Save(options.OutPath, project, options.OutputOptions);
+                
+                var warnings = Warnings.GetWarnings();
+                if (warnings.Any())
+                {
+                    System.Console.WriteLine($"来自输出插件 {PluginManager.GetPlugin(options.InType).Name} 的警告信息：");
+                    foreach (var warning in warnings)
+                    {
+                        System.Console.WriteLine(warning);
+                    }
+
+                    Warnings.ClearWarnings();
+                }
+            }
+            catch (Exception e)
+            {
+                HandleError(e, ErrorTypes.Export);
+                return 3;
+            }
             return 0;
+        }
+
+        private static void HandleError(Exception exception, ErrorTypes type)
+        {
+            var ty = typeof(ErrorTypes);
+            var situation = ty.GetField(ty.GetEnumName(type)).GetCustomAttribute<DescriptionAttribute>().Description;
+#if RELEASE
+            System.Console.WriteLine($"{situation}发生错误：" + exception.Message);
+#else
+            System.Console.WriteLine($"{situation}发生错误。\n{exception.StackTrace}");
+#endif
         }
 
         private static int ManagePlugins(PluginsOptions options)
