@@ -110,9 +110,26 @@ namespace Plugin.Gjgj
             EncodeSingsingTrackSettings(singingTrack, gjTracksItem);
             return gjTracksItem;
         }
-
+        
         private void EncodeNotes(Project project, GjProject gjProject, int noteID, GjSingingTracksItem gjTracksItem, Note note, TimeSynchronizer timeSynchronizer)
         {
+            double phonePreTime = 0.0;
+            double phonePostTime = 0.0;
+            if (note.EditedPhones.HeadLengthInSecs != -1.0)
+            {
+                int noteStartPositionInTicks = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+                double noteStartPositionInSeconds = timeSynchronizer.GetActualSecsFromTicks(noteStartPositionInTicks);
+                double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
+                double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
+                double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
+                phonePreTime = -difference * 1000.0 / 480.0;
+            }
+            if (note.EditedPhones.MidRatioOverTail != -1.0)
+            {
+                double noteLength = note.Length;
+                double ratio = note.EditedPhones.MidRatioOverTail;
+                phonePostTime = -(noteLength / (1.0 + ratio)) * 1000.0 / 480.0;
+            }
             GjNoteListItem gjBeatItemsItem = new GjNoteListItem
             {
                 NoteID = noteID,
@@ -121,8 +138,8 @@ namespace Plugin.Gjgj
                 StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator,
                 Duration = note.Length,
                 KeyNumber = note.KeyNumber,
-                PhonePreTime = 0,
-                PhonePostTime = 0,
+                PhonePreTime = phonePreTime,
+                PhonePostTime = phonePostTime,
                 Style = GetNoteStyleFromXS(note.HeadTag),
                 Velocity = 127
             };
@@ -363,6 +380,5 @@ namespace Plugin.Gjgj
                     return 0;
             }
         }
-
     }
 }
