@@ -10,13 +10,13 @@ namespace Plugin.Gjgj
 {
     public class GjgjDecoder
     {
-        private GjProject gjProjectT;
+        private GjProject gjProject;
 
         private TimeSynchronizer timeSynchronizer;
 
         public Project DecodeProject(GjProject originalProject)
         {
-            gjProjectT = originalProject;
+            gjProject = originalProject;
             var xsProject = new Project
             {
                 Version = GetSvipProjectVersion(),
@@ -40,12 +40,12 @@ namespace Plugin.Gjgj
         private List<Track> DecodeSingingTracks(Project project)
         {
             List<Track> singingTrackList = new List<Track>();
-            for (int index = 0; index < gjProjectT.SingingTrackList.Count; index++)
+            for (int index = 0; index < gjProject.SingingTrackList.Count; index++)
             {
                 Track track = new SingingTrack
                 {
                     Title = GetSingingTrackTitle(index),
-                    Mute = gjProjectT.SingingTrackList[index].TrackVolume.Mute,
+                    Mute = gjProject.SingingTrackList[index].TrackVolume.Mute,
                     Solo = false,
                     Volume = 0.7,
                     Pan = 0.0,
@@ -62,7 +62,7 @@ namespace Plugin.Gjgj
         private List<Track> DecodeInstrumentalTracks()
         {
             List<Track> instrumentalTrackList = new List<Track>();
-            for (int index = 0; index < gjProjectT.InstrumentalTrackList.Count; index++)
+            for (int index = 0; index < gjProject.InstrumentalTrackList.Count; index++)
             {
                 Track track = new InstrumentalTrack
                 {
@@ -81,7 +81,7 @@ namespace Plugin.Gjgj
 
         private string GetSingingTrackTitle(int index)
         {
-            switch (gjProjectT.SingingTrackList[index].Name)
+            switch (gjProject.SingingTrackList[index].Name)
             {
                 case "513singer":
                     return "扇宝";
@@ -97,7 +97,7 @@ namespace Plugin.Gjgj
         private List<Note> DecodeNoteList(int singingTrackIndex, Project project)
         {
             List<Note> noteList = new List<Note>();
-            for (int noteIndex = 0; noteIndex < gjProjectT.SingingTrackList[singingTrackIndex].NoteList.Count; noteIndex++)
+            for (int noteIndex = 0; noteIndex < gjProject.SingingTrackList[singingTrackIndex].NoteList.Count; noteIndex++)
             {
                 noteList.Add(DecodeNote(singingTrackIndex, noteIndex, project));
             }
@@ -109,9 +109,9 @@ namespace Plugin.Gjgj
             Note note = new Note
             {
                 StartPos = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project),
-                Length = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration,
-                KeyNumber = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].KeyNumber,
-                Lyric = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Lyric,
+                Length = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration,
+                KeyNumber = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].KeyNumber,
+                Lyric = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Lyric,
                 Pronunciation = DecodePronunciation(singingTrackIndex, noteIndex),
                 EditedPhones = DecodePhones(singingTrackIndex, noteIndex, project),
                 HeadTag = DecodeNoteHeadTag(singingTrackIndex, noteIndex)
@@ -121,12 +121,12 @@ namespace Plugin.Gjgj
 
         private int DecodeNoteStartPosition(int singingTrackIndex, int noteIndex, Project project)//用了xs的拍号列表，是因为gj可能存在拍号列表里面没有拍号的情况
         {
-            return gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+            return gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
         }
 
         private string DecodePronunciation(int singingTrackIndex, int noteIndex)
         {
-            string pinyin = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Pinyin;
+            string pinyin = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Pinyin;
             string pronunciation;
             if (pinyin == "")
             {
@@ -141,10 +141,10 @@ namespace Plugin.Gjgj
 
         private Phones DecodePhones(int singingTrackIndex, int noteIndex, Project project)
         {
-            int duration = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration;
+            int duration = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration;
             int startPosition = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project);
-            double preTime = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePreTime;
-            double postTime = gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePostTime;
+            double preTime = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePreTime;
+            double postTime = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePostTime;
             Phones phones = new Phones();
             try
             {
@@ -200,7 +200,7 @@ namespace Plugin.Gjgj
 
         private string DecodeNoteHeadTag(int singingTrackIndex, int noteIndex)
         {
-            switch (gjProjectT.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Style)
+            switch (gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Style)
             {
                 case 0:
                     return null;
@@ -232,10 +232,10 @@ namespace Plugin.Gjgj
                 List<double> valueBuffer = new List<double>();
                 int time;
                 int value;
-                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProjectT.SingingTrackList[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
+                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.SingingTrackList[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
                 {
                     time = GetVolumeParamTimeFromGj(singingTrackIndex, volumeParamPointIndex);
-                    value = GetVolumeParamValueFromGj(gjProjectT.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
+                    value = GetVolumeParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
                     Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
                     paramCurve.PointList.Add(volumeParamPoint);
                 }
@@ -266,18 +266,18 @@ namespace Plugin.Gjgj
             try
             {
                 var index = -1;
-                foreach (var range in gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList)
+                foreach (var range in gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList)
                 {
                     Tuple<int, int> leftEndpoint = Tuple.Create(GetPitchParamTimeFromGj(range.Left), -100);//左间断点
                     Tuple<int, int> rightEndpoint = Tuple.Create(GetPitchParamTimeFromGj(range.Right), -100);//右间断点
                     paramCurvePitch.PointList.Add(leftEndpoint);//添加左间断点
-                    index = gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
+                    index = gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
                     if (index == -1)
                         continue;
-                    for (; (index < gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.Count) && (gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time <= range.Right); ++index)
+                    for (; (index < gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.Count) && (gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time <= range.Right); ++index)
                     {
-                        int pitchParamTime = GetPitchParamTimeFromGj(gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time);
-                        int pitchParamValue = GetPitchParamValueFromGj(gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Value);
+                        int pitchParamTime = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time);
+                        int pitchParamValue = GetPitchParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Value);
                         Tuple<int, int> pitchParamPoint = Tuple.Create(pitchParamTime, pitchParamValue);
                         paramCurvePitch.PointList.Add(pitchParamPoint);
                     }
@@ -305,15 +305,15 @@ namespace Plugin.Gjgj
                 List<int> timeBuffer = new List<int>();
                 List<int> valueBuffer = new List<int>();
 
-                for (int originPitchIndex = 0; originPitchIndex < gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList.Count - 1; originPitchIndex++)//遍历所有默认音高参数点
+                for (int originPitchIndex = 0; originPitchIndex < gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList.Count - 1; originPitchIndex++)//遍历所有默认音高参数点
                 {
-                    time = GetPitchParamTimeFromGj(gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Time);
-                    value = GetPitchParamValueFromGj(gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Value);
+                    time = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Time);
+                    value = GetPitchParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Value);
                     isInModifyRange = false;
-                    for (int index = 0; index < gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList.Count; index++)//判断当前默认音高参数点是否在ModifyRange内
+                    for (int index = 0; index < gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList.Count; index++)//判断当前默认音高参数点是否在ModifyRange内
                     {
-                        left = GetPitchParamTimeFromGj(gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Left);
-                        right = GetPitchParamTimeFromGj(gjProjectT.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Right);
+                        left = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Left);
+                        right = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Right);
                         if (time >= left && time <= right)
                         {
                             isInModifyRange = true;
@@ -342,23 +342,23 @@ namespace Plugin.Gjgj
         private List<TimeSignature> DecodeTimeSignatureList()
         {
             List<TimeSignature> timeSignatureList = new List<TimeSignature>();
-            if (gjProjectT.TempoMap.TimeSignatureList.Count == 0)//如果拍号只有4/4，gjgj不存
+            if (gjProject.TempoMap.TimeSignatureList.Count == 0)//如果拍号只有4/4，gjgj不存
             {
                 timeSignatureList.Add(GetInitialTimeSignature());
             }
             else
             {
-                if (gjProjectT.TempoMap.TimeSignatureList[0].Time != 0)//如果存的第一个拍号不在0处，说明0处的拍号是4/4
+                if (gjProject.TempoMap.TimeSignatureList[0].Time != 0)//如果存的第一个拍号不在0处，说明0处的拍号是4/4
                 {
                     timeSignatureList.Add(GetInitialTimeSignature());
 
                     int sumOfTime = 0;
-                    for (int index = 0; index < gjProjectT.TempoMap.TimeSignatureList.Count; index++)
+                    for (int index = 0; index < gjProject.TempoMap.TimeSignatureList.Count; index++)
                     {
                         TimeSignature timeSignature = new TimeSignature();
                         if (index == 0)
                         {
-                            sumOfTime += gjProjectT.TempoMap.TimeSignatureList[0].Time / 1920;
+                            sumOfTime += gjProject.TempoMap.TimeSignatureList[0].Time / 1920;
                             timeSignature.BarIndex = sumOfTime;
                         }
                         else
@@ -374,7 +374,7 @@ namespace Plugin.Gjgj
                 else
                 {
                     int sumOfTime = 0;
-                    for (int index = 0; index < gjProjectT.TempoMap.TimeSignatureList.Count; index++)
+                    for (int index = 0; index < gjProject.TempoMap.TimeSignatureList.Count; index++)
                     {
                         TimeSignature timeSignature = new TimeSignature();
                         if (index == 0)
@@ -398,7 +398,7 @@ namespace Plugin.Gjgj
         private List<SongTempo> DecodeSongTempoList()
         {
             List<SongTempo> songTempoList = new List<SongTempo>();
-            for (int i = 0; i < gjProjectT.TempoMap.TempoList.Count; i++)
+            for (int i = 0; i < gjProject.TempoMap.TempoList.Count; i++)
             {
                 songTempoList.Add(DecodeSongTempo(i));
             }
@@ -417,12 +417,12 @@ namespace Plugin.Gjgj
 
         private int GetSongTempoPosition(int index)
         {
-            return gjProjectT.TempoMap.TempoList[index].Time;
+            return gjProject.TempoMap.TempoList[index].Time;
         }
 
         private float GetSongTempoBPM(int index)
         {
-            double origin = gjProjectT.TempoMap.TempoList[index].MicrosecondsPerQuarterNote;
+            double origin = gjProject.TempoMap.TempoList[index].MicrosecondsPerQuarterNote;
             return (float)(60.0 / origin * 1000000.0);
         }
 
@@ -443,7 +443,7 @@ namespace Plugin.Gjgj
 
         private int GetVolumeParamTimeFromGj(int singingTrackIndex, int volumeParamPointIndex)
         {
-            return (int)gjProjectT.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Time;
+            return (int)gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Time;
         }
 
         private int GetVolumeParamValueFromGj(double origin)
@@ -463,17 +463,17 @@ namespace Plugin.Gjgj
 
         private string GetInstrumentalFilePath(int instrumentalTrackIndex)
         {
-            return gjProjectT.InstrumentalTrackList[instrumentalTrackIndex].Path;
+            return gjProject.InstrumentalTrackList[instrumentalTrackIndex].Path;
         }
 
         private string GetInstrumentalName(int instrumentalTrackIndex)
         {
-            return Path.GetFileNameWithoutExtension(gjProjectT.InstrumentalTrackList[instrumentalTrackIndex].Path);//获取伴奏文件名作为轨道标题
+            return Path.GetFileNameWithoutExtension(gjProject.InstrumentalTrackList[instrumentalTrackIndex].Path);//获取伴奏文件名作为轨道标题
         }
 
         private bool GetInstrumentalMute(int instrumentalTrackIndex)
         {
-            return gjProjectT.InstrumentalTrackList[instrumentalTrackIndex].TrackVolume.Mute;
+            return gjProject.InstrumentalTrackList[instrumentalTrackIndex].TrackVolume.Mute;
         }
 
         private static string GetSvipProjectVersion()
@@ -494,17 +494,17 @@ namespace Plugin.Gjgj
 
         private int GetGjTimeSignatureTime(int index)
         {
-            return gjProjectT.TempoMap.TimeSignatureList[index].Time;
+            return gjProject.TempoMap.TimeSignatureList[index].Time;
         }
 
         private int GetDenominator(int index)
         {
-            return gjProjectT.TempoMap.TimeSignatureList[index].Denominator;
+            return gjProject.TempoMap.TimeSignatureList[index].Denominator;
         }
 
         private int GetNumerator(int index)
         {
-            return gjProjectT.TempoMap.TimeSignatureList[index].Numerator;
+            return gjProject.TempoMap.TimeSignatureList[index].Numerator;
         }
 
     }

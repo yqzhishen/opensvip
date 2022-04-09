@@ -173,11 +173,11 @@ namespace Plugin.Gjgj
                 double valueOrigin;
                 double value;
                 int lastTime = 0;
-
-                for (int index = 1; index < singingTrack.EditedParams.Volume.PointList.Count - 1; index++)
+                ParamCurve paramCurve = ParamCurveUtils.ReduceSampleRate(singingTrack.EditedParams.Volume, 50);
+                for (int index = 1; index < paramCurve.PointList.Count - 1; index++)
                 {
-                    time = GetVolumeParamPointTime(index, singingTrack);
-                    valueOrigin = GetOriginalVolumeParamPointValue(index, singingTrack);
+                    time = GetVolumeParamPointTime(index, paramCurve);
+                    valueOrigin = GetOriginalVolumeParamPointValue(index, paramCurve);
                     value = GetVolumeParamPointValue(valueOrigin);
 
                     if (lastTime != time)
@@ -195,7 +195,7 @@ namespace Plugin.Gjgj
                             }
                             else
                             {
-                                for (int bufferIndex = 0; bufferIndex < timeBuffer.Count; bufferIndex += 5)
+                                for (int bufferIndex = 0; bufferIndex < timeBuffer.Count; bufferIndex++)
                                 {
                                     gjVolumeParam.Add(EncodeVolumeParamPoint(timeBuffer[bufferIndex], valueBuffer[bufferIndex]));
                                 }
@@ -211,19 +211,19 @@ namespace Plugin.Gjgj
             }
             catch (Exception)
             {
-
+                
             }
             return gjVolumeParam;
         }
 
-        private int GetVolumeParamPointTime(int index, SingingTrack singingTrack)
+        private int GetVolumeParamPointTime(int index, ParamCurve paramCurve)
         {
-            return singingTrack.EditedParams.Volume.PointList[index].Item1;
+            return paramCurve.PointList[index].Item1;
         }
 
-        private double GetOriginalVolumeParamPointValue(int index, SingingTrack singingTrack)
+        private double GetOriginalVolumeParamPointValue(int index, ParamCurve paramCurve)
         {
-            return singingTrack.EditedParams.Volume.PointList[index].Item2;
+            return paramCurve.PointList[index].Item2;
         }
 
         private GjVolumeParamPoint EncodeVolumeParamPoint(double time, double value)
