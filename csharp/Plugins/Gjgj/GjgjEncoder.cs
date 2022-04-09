@@ -9,6 +9,8 @@ namespace Plugin.Gjgj
 {
     public class GjgjEncoder
     {
+        public int ParamSampleInterval { get; set; }
+
         private Project xsProject;
         
         private GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
@@ -173,7 +175,7 @@ namespace Plugin.Gjgj
                 double valueOrigin;
                 double value;
                 int lastTime = 0;
-                ParamCurve paramCurve = ParamCurveUtils.ReduceSampleRate(singingTrack.EditedParams.Volume, 50);
+                ParamCurve paramCurve = ParamCurveUtils.ReduceSampleRate(singingTrack.EditedParams.Volume, ParamSampleInterval);
                 for (int index = 1; index < paramCurve.PointList.Count - 1; index++)
                 {
                     time = GetVolumeParamPointTime(index, paramCurve);

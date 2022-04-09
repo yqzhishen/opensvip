@@ -25,7 +25,10 @@ namespace Gjgj.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            var gjProject = new GjgjEncoder().EncodeProject(project);
+            var gjProject = new GjgjEncoder
+            {
+                ParamSampleInterval = options.GetValueAsInteger("desample", 32)
+            }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);
             var jsonString = JsonConvert.SerializeObject(gjProject);
