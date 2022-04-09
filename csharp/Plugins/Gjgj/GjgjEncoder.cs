@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenSvip.Model;
 using Gjgj.Model;
 using OpenSvip.Library;
+using OpenSvip.Framework;
 
 namespace Plugin.Gjgj
 {
@@ -15,6 +16,10 @@ namespace Plugin.Gjgj
         private GjProject gjProject;
         
         private TimeSynchronizer timeSynchronizer;
+
+        private bool isUnsupportedPinyinExist = false;
+
+        private List<string> unsupportedPinyinList = new List<string>();
 
         public GjProject EncodeProject(Project project)
         {
@@ -53,6 +58,11 @@ namespace Plugin.Gjgj
                         break;
                 }
                 trackIndex++;
+            }
+            if (isUnsupportedPinyinExist)
+            {
+                string unsupportedPinyin = string.Join(",", unsupportedPinyinList);
+                Warnings.AddWarning("当前工程文件有歌叽歌叽不支持的拼音，将不会对其进行转换。不支持的拼音：" + unsupportedPinyin);
             }
             gjProject.MIDITrackList = EncodeMIDITrackList();
         }
@@ -465,6 +475,8 @@ namespace Plugin.Gjgj
                 string pinyin = origin;
                 if (pinyin != "" && !gjgjSupportedPinyin.IsGjSupportedPinyin(pinyin))
                 {
+                    isUnsupportedPinyinExist = true;
+                    unsupportedPinyinList.Add(pinyin);
                     pinyin = "";//过滤不支持的拼音
                 }
                 return pinyin;
