@@ -61,8 +61,8 @@ namespace Plugin.Gjgj
             }
             if (isUnsupportedPinyinExist)
             {
-                string unsupportedPinyin = string.Join(",", unsupportedPinyinList);
-                Warnings.AddWarning("当前工程文件有歌叽歌叽不支持的拼音，将不会对其进行转换。不支持的拼音：" + unsupportedPinyin);
+                string unsupportedPinyin = string.Join("、", unsupportedPinyinList);
+                Warnings.AddWarning("当前工程文件有歌叽歌叽不支持的拼音，已忽略。不支持的拼音：" + unsupportedPinyin, type: WarningTypes.Lyrics);
             }
             gjProject.MIDITrackList = EncodeMIDITrackList();
         }
