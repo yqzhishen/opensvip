@@ -8,37 +8,45 @@ namespace Plugin.Gjgj
 {
     public class GjgjEncoder
     {
+        private Project xsProject;
+        
+        private GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
+        
+        private GjProject gjProject;
+        
+        private TimeSynchronizer timeSynchronizer;
+
         public GjProject EncodeProject(Project project)
         {
-            GjProject gjProject = new GjProject();
-            SetGjProjectProperties(gjProject);
-            EncodeTempo(project, gjProject);
-            TimeSynchronizer timeSynchronizer = new TimeSynchronizer(project.SongTempoList);
-            EncodeTimeSignature(project, gjProject);
-            EncodeTracks(project, gjProject, timeSynchronizer);
+            xsProject = project;
+            timeSynchronizer = new TimeSynchronizer(xsProject.SongTempoList);
+            gjProject = new GjProject
+            {
+                gjgjVersion = 2,
+                ProjectSetting = EncodeProjectSetting(),
+                TempoMap = EncodeTempoMap()
+            };
+            EncodeTracks();
             return gjProject;
         }
 
-        private void EncodeTracks(Project project, GjProject gjProject, TimeSynchronizer timeSynchronizer)
+        private void EncodeTracks()
         {
             int noteID = 1;
             int trackID = 1;
-            gjProject.SingingTracks = new List<GjSingingTracksItem>(project.TrackList.Count);
-            gjProject.InstrumentalTracks = new List<GjInstrumentalTracksItem>();
+            gjProject.SingingTrackList = new List<GjSingingTrack>(xsProject.TrackList.Count);
+            gjProject.InstrumentalTrackList = new List<GjInstrumentalTrack>();
             int trackIndex = 0;
-            foreach (var track in project.TrackList)
+            foreach (var track in xsProject.TrackList)
             {
                 switch (track)
                 {
                     case SingingTrack singingTrack:
-                        GjSingingTracksItem gjTracksItem = EncodeSingingTrack(project, gjProject, ref noteID, trackID, singingTrack, timeSynchronizer);
-                        gjProject.SingingTracks.Add(gjTracksItem);
+                        gjProject.SingingTrackList.Add(EncodeSingingTrack(ref noteID, trackID, singingTrack));
                         trackID++;
                         break;
                     case InstrumentalTrack instrumentalTrack:
-                        GjInstrumentalTracksItem gjAccompanimentsItem = new GjInstrumentalTracksItem();
-                        EncodeInstrumentalTrack(project, trackID, instrumentalTrack, gjAccompanimentsItem);
-                        gjProject.InstrumentalTracks.Add(gjAccompanimentsItem);
+                        gjProject.InstrumentalTrackList.Add(EncodeInstrumentalTrack(trackID, instrumentalTrack));
                         trackID++;
                         break;
                     default:
@@ -46,312 +54,371 @@ namespace Plugin.Gjgj
                 }
                 trackIndex++;
             }
-            gjProject.MIDITracks = new List<GjMIDITracks>();
+            gjProject.MIDITrackList = EncodeMIDITrackList();
         }
 
-        private static void EncodeInstrumentalTrack(Project project, int trackID, InstrumentalTrack instrumentalTrack, GjInstrumentalTracksItem gjAccompanimentsItem)
+        private GjInstrumentalTrack EncodeInstrumentalTrack(int trackID, InstrumentalTrack instrumentalTrack)
         {
-            gjAccompanimentsItem.TrackID = Convert.ToString(trackID);
-            gjAccompanimentsItem.Path = instrumentalTrack.AudioFilePath;
-            //int offsetFromXS = instrumentalTrack.Offset;
-            int convertedAccompanimentsOffset = 0;
-            /*int tempoIndex = 0;
-            int lastTempoPosition = 0;
-            if (project.SongTempoList.Count == 1)
-            {
-                convertedAccompanimentsOffset += (int)((project.SongTempoList[0].BPM / 60.0) * offsetFromXS / 480.0 * 10000000.0);
-            }
-            else
-            {
-                while (project.SongTempoList[tempoIndex].Position <= offsetFromXS)
-                {
-                    convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (project.SongTempoList[tempoIndex].Position - lastTempoPosition) / 480.0 * 10000000.0);
-                    lastTempoPosition = project.SongTempoList[tempoIndex].Position;
-                    if (tempoIndex < project.SongTempoList.Count - 1)
-                    {
-                        tempoIndex++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                convertedAccompanimentsOffset += (int)((project.SongTempoList[tempoIndex].BPM / 60.0) * (offsetFromXS - lastTempoPosition) / 480.0 * 10000000.0);
-            }*/
-            gjAccompanimentsItem.Offset = convertedAccompanimentsOffset;
-            gjAccompanimentsItem.TrackVolume = new GjTrackVolume
+            GjTrackVolume gjTrackVolume = new GjTrackVolume
             {
                 Volume = 1.0f,
                 LeftVolume = 1.0f,
                 RightVolume = 1.0f,
                 Mute = instrumentalTrack.Mute
             };
-            gjAccompanimentsItem.EQProgram = "";
-            gjAccompanimentsItem.SortIndex = 0;
+            GjInstrumentalTrack gjInstrumentalTracksItem = new GjInstrumentalTrack
+            {
+                TrackID = Convert.ToString(trackID),
+                Path = instrumentalTrack.AudioFilePath,
+                Offset = 0,//暂不转换伴奏位置偏移
+                EQProgram = "",
+                SortIndex = 0,
+                TrackVolume = gjTrackVolume
+            };
+            return gjInstrumentalTracksItem;
         }
 
-        private GjSingingTracksItem EncodeSingingTrack(Project project, GjProject gjProject, ref int noteID, int trackID, SingingTrack singingTrack, TimeSynchronizer timeSynchronizer)
+        private GjSingingTrack EncodeSingingTrack(ref int noteID, int trackID, SingingTrack singingTrack)
         {
-            GjSingingTracksItem gjTracksItem = new GjSingingTracksItem
+            GjSingingTrack gjSingingTracksItem = new GjSingingTrack
             {
                 TrackID = Convert.ToString(trackID),
                 Type = 0,
                 Name = "513singer",//扇宝
                 SortIndex = 0,
-                NoteList = new List<GjNoteListItem>()
+                NoteList = EncodeNoteList(noteID, singingTrack),
+                VolumeParam = EncodeVolumeParam(singingTrack),
+                PitchParam = EncodePitchParam(singingTrack),
+                Keyboard = EncodeKeyboard(),
+                TrackVolume = EncodeTrackVolume(singingTrack),
+                EQProgram = "无"
             };
+            return gjSingingTracksItem;
+        }
+
+        private List<GjMIDITrack> EncodeMIDITrackList()
+        {
+            return new List<GjMIDITrack>();
+        }
+
+        private List<GjNote> EncodeNoteList(int noteID, SingingTrack singingTrack)
+        {
+            List<GjNote> gjNoteListItems = new List<GjNote>();
             foreach (var note in singingTrack.NoteList)
             {
-                EncodeNotes(project, gjProject, noteID, gjTracksItem, note, timeSynchronizer);
+                gjNoteListItems.Add(EncodeNote(noteID, note));
                 noteID++;
             }
-            EncodePitchParam(singingTrack, gjTracksItem);
-            EncodeVolumeParam(singingTrack, gjTracksItem);
-            EncodeSingsingTrackSettings(singingTrack, gjTracksItem);
-            return gjTracksItem;
+            return gjNoteListItems;
         }
-        
-        private void EncodeNotes(Project project, GjProject gjProject, int noteID, GjSingingTracksItem gjTracksItem, Note note, TimeSynchronizer timeSynchronizer)
+
+        private GjNote EncodeNote(int noteID, Note note)
         {
-            double phonePreTime = 0.0;
-            double phonePostTime = 0.0;
-            if (note.EditedPhones.HeadLengthInSecs != -1.0)
-            {
-                int noteStartPositionInTicks = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-                double noteStartPositionInSeconds = timeSynchronizer.GetActualSecsFromTicks(noteStartPositionInTicks);
-                double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
-                double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
-                double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
-                phonePreTime = -difference * 1000.0 / 480.0;
-            }
-            if (note.EditedPhones.MidRatioOverTail != -1.0)
-            {
-                double noteLength = note.Length;
-                double ratio = note.EditedPhones.MidRatioOverTail;
-                phonePostTime = -(noteLength / (1.0 + ratio)) * 1000.0 / 480.0;
-            }
-            GjNoteListItem gjBeatItemsItem = new GjNoteListItem
+            GjNote gjNoteListItem = new GjNote
             {
                 NoteID = noteID,
                 Lyric = note.Lyric,
-                Pinyin = note.Pronunciation ?? "",
-                StartTick = note.StartPos + 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator,
+                Pinyin = GetNotePinyin(note.Pronunciation),
+                StartTick = GetNoteStartTick(note.StartPos),
                 Duration = note.Length,
                 KeyNumber = note.KeyNumber,
-                PhonePreTime = phonePreTime,
-                PhonePostTime = phonePostTime,
-                Style = GetNoteStyleFromXS(note.HeadTag),
+                PhonePreTime = GetNotePhonePreTime(note),
+                PhonePostTime = GetNotePhonePostTime(note),
+                Style = GetNoteStyle(note.HeadTag),
                 Velocity = 127
             };
-            gjTracksItem.NoteList.Add(gjBeatItemsItem);
+            return gjNoteListItem;
         }
 
-        private static void EncodeSingsingTrackSettings(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
+        private GjKeyboard EncodeKeyboard()
         {
             GjKeyboard gjKeyboard = new GjKeyboard
             {
                 KeyMode = 1,
                 KeyType = 0
             };
-            gjTracksItem.Keyboard = gjKeyboard;
-            GjTrackVolume gjMasterVolume = new GjTrackVolume();
-            gjTracksItem.TrackVolume = gjMasterVolume;
-            gjTracksItem.TrackVolume.Volume = 1.0f;
-            gjTracksItem.TrackVolume.LeftVolume = 1.0f;
-            gjTracksItem.TrackVolume.RightVolume = 1.0f;
-            gjTracksItem.TrackVolume.Mute = singingTrack.Mute;
-            gjTracksItem.EQProgram = "无";
+            return gjKeyboard;
+        }
+        
+        private GjTrackVolume EncodeTrackVolume(SingingTrack singingTrack)
+        {
+            GjTrackVolume gjTrackVolume = new GjTrackVolume
+            {
+                Volume = 1.0f,
+                LeftVolume = 1.0f,
+                RightVolume = 1.0f,
+                Mute = singingTrack.Mute
+            };
+            return gjTrackVolume;
         }
 
-        private static void EncodeVolumeParam(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
+        private List<GjVolumeParamPoint> EncodeVolumeParam(SingingTrack singingTrack)
         {
+            List<GjVolumeParamPoint> gjVolumeParam = new List<GjVolumeParamPoint>();
             try
             {
-                gjTracksItem.VolumeParam = new List<GjVolumeParamItem>();
-                List<int> volumePointTimeBuffer = new List<int>();
-                List<double> volumePointValueBuffer = new List<double>();
-                int volumePointTimeFromXS;
-                double volumeFromXS;
-                double convertedVolumeValueFromXS;
-                int lastVolumePointTimeFromXS = 0;
+                List<int> timeBuffer = new List<int>();
+                List<double> valueBuffer = new List<double>();
+                int time;
+                double valueOrigin;
+                double value;
+                int lastTime = 0;
 
-                for (int volumeParamPointIndex = 1; volumeParamPointIndex < singingTrack.EditedParams.Volume.PointList.Count - 1; volumeParamPointIndex++)
+                for (int index = 1; index < singingTrack.EditedParams.Volume.PointList.Count - 1; index++)
                 {
-                    volumePointTimeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item1;
-                    volumeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2;
-                    convertedVolumeValueFromXS = (singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2 + 1000.0) / 1000.0;
+                    time = GetVolumeParamPointTime(index, singingTrack);
+                    valueOrigin = GetOriginalVolumeParamPointValue(index, singingTrack);
+                    value = GetVolumeParamPointValue(valueOrigin);
 
-                    if (lastVolumePointTimeFromXS == singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item2)
+                    if (lastTime != time)
                     {
-
-                    }
-                    else
-                    {
-                        if (volumeFromXS != 0)
+                        if (valueOrigin != 0)
                         {
-                            volumePointTimeBuffer.Add(volumePointTimeFromXS);
-                            volumePointValueBuffer.Add(convertedVolumeValueFromXS);
+                            timeBuffer.Add(time);
+                            valueBuffer.Add(value);
                         }
                         else
                         {
-                            if (volumePointTimeBuffer.Count == 0 || volumePointValueBuffer.Count == 0)
+                            if (timeBuffer.Count == 0 || valueBuffer.Count == 0)
                             {
 
                             }
                             else
                             {
-                                for (int volumePointTimeBufferIndex = 0; volumePointTimeBufferIndex < volumePointTimeBuffer.Count; volumePointTimeBufferIndex += 5)
+                                for (int bufferIndex = 0; bufferIndex < timeBuffer.Count; bufferIndex += 5)
                                 {
-                                    GjVolumeParamItem gjVolumeMapItem = new GjVolumeParamItem
-                                    {
-                                        Time = volumePointTimeBuffer[volumePointTimeBufferIndex],
-                                        Value = volumePointValueBuffer[volumePointTimeBufferIndex]
-                                    };
-                                    gjTracksItem.VolumeParam.Add(gjVolumeMapItem);
+                                    gjVolumeParam.Add(EncodeVolumeParamPoint(timeBuffer[bufferIndex], valueBuffer[bufferIndex]));
                                 }
-
-                                GjVolumeParamItem gjVolumeParamLeftEndpoint = new GjVolumeParamItem
-                                {
-                                    Time = volumePointTimeBuffer[0] - 5,
-                                    Value = 1.0
-                                };
-                                gjTracksItem.VolumeParam.Add(gjVolumeParamLeftEndpoint);
-
-                                GjVolumeParamItem gjVolumeParamRightEndpoint = new GjVolumeParamItem
-                                {
-                                    Time = volumePointTimeBuffer[volumePointTimeBuffer.Count - 1] + 5,
-                                    Value = 1.0
-                                };
-                                gjTracksItem.VolumeParam.Add(gjVolumeParamRightEndpoint);
-
-
-                                volumePointTimeBuffer.Clear();
-                                volumePointValueBuffer.Clear();
+                                gjVolumeParam.Add(EncodeVolumeParamPoint(timeBuffer[0] - 5, 1.0));//左间断点
+                                gjVolumeParam.Add(EncodeVolumeParamPoint(timeBuffer[timeBuffer.Count - 1] + 5, 1.0));//右间断点
+                                timeBuffer.Clear();
+                                valueBuffer.Clear();
                             }
                         }
                     }
-
-                    lastVolumePointTimeFromXS = singingTrack.EditedParams.Volume.PointList[volumeParamPointIndex].Item1;
+                    lastTime = time;
                 }
             }
             catch (Exception)
             {
 
             }
+            return gjVolumeParam;
         }
 
-        private void EncodePitchParam(SingingTrack singingTrack, GjSingingTracksItem gjTracksItem)
+        private int GetVolumeParamPointTime(int index, SingingTrack singingTrack)
+        {
+            return singingTrack.EditedParams.Volume.PointList[index].Item1;
+        }
+
+        private double GetOriginalVolumeParamPointValue(int index, SingingTrack singingTrack)
+        {
+            return singingTrack.EditedParams.Volume.PointList[index].Item2;
+        }
+
+        private GjVolumeParamPoint EncodeVolumeParamPoint(double time, double value)
+        {
+            GjVolumeParamPoint gjVolumeParamPoint = new GjVolumeParamPoint
+            {
+                Time = time,
+                Value = value
+            };
+            return gjVolumeParamPoint;
+        }
+
+        private double GetVolumeParamPointValue(double volume)
+        {
+            return (volume + 1000.0) / 1000.0;
+        }
+
+        private GjPitchParam EncodePitchParam(SingingTrack singingTrack)
         {
             try
             {
-                gjTracksItem.PitchParam = new GjPitchParam();
-                double convertedPitchFromXS;
-                List<double> pitchPointBufferX = new List<double>();
-                List<double> pitchPointBufferY = new List<double>();
-                gjTracksItem.PitchParam.PitchPointList = new List<GjPitchPointListItem>();
-                int lastPitchPointTimeFromXS = -100;
-                int currentPitchFromXS;
-                double convertedTimeFromXS;
-                gjTracksItem.PitchParam.ModifyRanges = new List<GjModifyRangesItem>();
-                for (int l = 0; l < singingTrack.EditedParams.Pitch.PointList.Count; l++)
+                List<double> timeBuffer = new List<double>();
+                List<double> valueBuffer = new List<double>();
+                int lastTimeOrigin = -100;
+                int timeOrigin;
+                int valueOrigin;
+                List<GjPitchParamPoint> pitchParamPointList = new List<GjPitchParamPoint>();
+                List<GjModifyRange> modifyRangeList = new List<GjModifyRange>();
+                for (int index = 0; index < singingTrack.EditedParams.Pitch.PointList.Count; index++)
                 {
-                    convertedTimeFromXS = (singingTrack.EditedParams.Pitch.PointList[l].Item1 / 5.0);
-                    currentPitchFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item2;
-                    convertedPitchFromXS = ToneToY((double)((singingTrack.EditedParams.Pitch.PointList[l].Item2) / 100.0));
+                    timeOrigin = GetOriginalPitchParamPointTime(index, singingTrack);
+                    valueOrigin = GetOriginalPitchParamPointValue(index, singingTrack);
 
-                    if (lastPitchPointTimeFromXS == singingTrack.EditedParams.Pitch.PointList[l].Item1)
+                    if (lastTimeOrigin != timeOrigin)
                     {
-
-                    }
-                    else
-                    {
-                        if (currentPitchFromXS != -100)
+                        if (valueOrigin != -100)
                         {
-                            pitchPointBufferX.Add(convertedTimeFromXS);
-                            pitchPointBufferY.Add(convertedPitchFromXS);
+                            timeBuffer.Add(GetPitchParamPointTime(timeOrigin));
+                            valueBuffer.Add(GetPitchParamPointValue(valueOrigin));
                         }
                         else
                         {
-                            if (pitchPointBufferX.Count == 0 || pitchPointBufferY.Count == 0)
+                            if (timeBuffer.Count == 0 || valueBuffer.Count == 0)
                             {
 
                             }
                             else
                             {
-                                for (int j = 0; j < pitchPointBufferX.Count; j++)
+                                for (int bufferIndex = 0; bufferIndex < timeBuffer.Count; bufferIndex++)
                                 {
-                                    GjPitchPointListItem gjModifysItem = new GjPitchPointListItem
-                                    {
-                                        Time = pitchPointBufferX[j],
-                                        Value = pitchPointBufferY[j]
-                                    };
-                                    gjTracksItem.PitchParam.PitchPointList.Add(gjModifysItem);
+                                    pitchParamPointList.Add(EncodePitchParamPoint(timeBuffer[bufferIndex], valueBuffer[bufferIndex]));
                                 }
-                                GjModifyRangesItem gjModifyRangesItem = new GjModifyRangesItem
-                                {
-                                    Left = pitchPointBufferX[0],
-                                    Right = pitchPointBufferX[pitchPointBufferY.Count - 1]
-                                };
-                                gjTracksItem.PitchParam.ModifyRanges.Add(gjModifyRangesItem);
-                                pitchPointBufferX.Clear();
-                                pitchPointBufferY.Clear();
+                                modifyRangeList.Add(EncodeModifyRange(timeBuffer[0], timeBuffer[valueBuffer.Count - 1]));
+                                timeBuffer.Clear();
+                                valueBuffer.Clear();
                             }
                         }
                     }
-
-                    lastPitchPointTimeFromXS = singingTrack.EditedParams.Pitch.PointList[l].Item1;
+                    lastTimeOrigin = timeOrigin;
                 }
+                GjPitchParam gjPitchParam = new GjPitchParam
+                {
+                    PitchParamPointList = pitchParamPointList,
+                    ModifyRangeList = modifyRangeList
+                };
+                return gjPitchParam;
             }
             catch (Exception)
             {
-
+                return new GjPitchParam();
             }
         }
 
-        private static void EncodeTimeSignature(Project project, GjProject gjProject)
+        private int GetOriginalPitchParamPointTime(int index, SingingTrack singingTrack)
         {
-            gjProject.TempoMap.TimeSignature = new List<GjTimeSignatureItem>(project.TimeSignatureList.Count);
-            int sumOfTime = 0;
-            for (int j = 0; j < project.TimeSignatureList.Count; j++)
+            return singingTrack.EditedParams.Pitch.PointList[index].Item1;
+        }
+
+        private int GetOriginalPitchParamPointValue(int index, SingingTrack singingTrack)
+        {
+            return singingTrack.EditedParams.Pitch.PointList[index].Item2;
+        }
+
+        private GjPitchParamPoint EncodePitchParamPoint(double time, double value)
+        {
+            GjPitchParamPoint gjPitchParamPoint = new GjPitchParamPoint
             {
-                GjTimeSignatureItem gjTimeSignatureItem = new GjTimeSignatureItem();
-                if (j == 0)
-                {
-                    gjTimeSignatureItem.Time = project.TimeSignatureList[0].BarIndex * 1920 * project.TimeSignatureList[j].Numerator / project.TimeSignatureList[j].Denominator;
-                }
-                else
-                {
-                    sumOfTime += (project.TimeSignatureList[j].BarIndex - project.TimeSignatureList[j - 1].BarIndex) * 1920 * project.TimeSignatureList[j - 1].Numerator / project.TimeSignatureList[j - 1].Denominator;
-                    gjTimeSignatureItem.Time = sumOfTime;
-                }
-                gjTimeSignatureItem.Numerator = project.TimeSignatureList[j].Numerator;
-                gjTimeSignatureItem.Denominator = project.TimeSignatureList[j].Denominator;
-                gjProject.TempoMap.TimeSignature.Add(gjTimeSignatureItem);
-            }
+                Time = time,
+                Value = value
+            };
+            return gjPitchParamPoint;
         }
 
-        private static void EncodeTempo(Project project, GjProject gjProject)
+        private GjModifyRange EncodeModifyRange(double left, double right)
         {
-            gjProject.TempoMap = new GjTempoMap
+            GjModifyRange gjModifyRange = new GjModifyRange
+            {
+                Left = left,
+                Right = right
+            };
+            return gjModifyRange;
+        }
+
+        private double GetPitchParamPointTime(double origin)
+        {
+            return origin / 5.0;
+        }
+
+        private double GetPitchParamPointValue(double origin)
+        {
+            return ToneToY((double)((origin) / 100.0));
+        }
+
+        private GjTempoMap EncodeTempoMap()
+        {
+            GjTempoMap gjTempoMap = new GjTempoMap
             {
                 TicksPerQuarterNote = 480,
-                Tempos = new List<GjTemposItem>(project.SongTempoList.Count)
+                TempoList = EncodeTempoList(),
+                TimeSignatureList = EncodeTimeSignatureList()
             };
-            for (int i = 0; i < project.SongTempoList.Count; i++)
-            {
-                GjTemposItem gjTemposItem = new GjTemposItem
-                {
-                    Time = project.SongTempoList[i].Position,
-                    MicrosecondsPerQuarterNote = (int)(60.0 / project.SongTempoList[i].BPM * 1000000.0)
-                };
-                gjProject.TempoMap.Tempos.Add(gjTemposItem);
-            }
+            return gjTempoMap;
         }
 
-        private static void SetGjProjectProperties(GjProject gjProject)
+        private List<GjTempo> EncodeTempoList()
         {
-            gjProject.gjgjVersion = 2;
-            gjProject.ProjectSetting = new GjProjectSetting
+            List<GjTempo> gjTempoList = new List<GjTempo>();
+            for (int index = 0; index < xsProject.SongTempoList.Count; index++)
+            {
+                gjTempoList.Add(EncodeTempo(index));
+            }
+            return gjTempoList;
+        }
+
+        private GjTempo EncodeTempo(int index)
+        {
+            GjTempo gjTempo = new GjTempo
+            {
+                Time = xsProject.SongTempoList[index].Position,
+                MicrosecondsPerQuarterNote = GetMicrosecondsPerQuarterNote(index)
+            };
+            return gjTempo;
+        }
+
+        private List<GjTimeSignature> EncodeTimeSignatureList()
+        {
+            List<GjTimeSignature> gjTimeSignatureList = new List<GjTimeSignature>(xsProject.TimeSignatureList.Count);
+            int sumOfTime = 0;
+            for (int index = 0; index < xsProject.TimeSignatureList.Count; index++)
+            {
+
+                gjTimeSignatureList.Add(EncodeTimeSignature(sumOfTime, index));
+            }
+            return gjTimeSignatureList;
+        }
+
+        private GjTimeSignature EncodeTimeSignature(int sumOfTime, int index)
+        {
+            GjTimeSignature gjTimeSignatureItem = new GjTimeSignature
+            {
+                Time = GetTimeSignatureTime(sumOfTime, index),
+                Numerator = GetNumerator(index),
+                Denominator = GetDenominator(index)
+            };
+            return gjTimeSignatureItem;
+        }
+        
+        private int GetTimeSignatureTime(int sumOfTime, int index)
+        {
+            int time;
+            if (index == 0)
+            {
+                time = GetBarIndex(0) * 1920 * GetNumerator(index) / GetDenominator(index);
+            }
+            else
+            {
+                sumOfTime += (GetBarIndex(index) - GetBarIndex(index - 1)) * 1920 * GetNumerator(index - 1) / GetDenominator(index - 1);
+                time = sumOfTime;
+            }
+            return time;
+        }
+        
+        private int GetBarIndex(int index)
+        {
+            return xsProject.TimeSignatureList[index].BarIndex;
+        }
+
+        private int GetNumerator(int index)
+        {
+            return xsProject.TimeSignatureList[index].Numerator;
+        }
+
+        private int GetDenominator(int index)
+        {
+            return xsProject.TimeSignatureList[index].Denominator;
+        }
+
+        private int GetMicrosecondsPerQuarterNote(int index)
+        {
+            return (int)(60.0 / xsProject.SongTempoList[index].BPM * 1000000.0);
+        }
+
+        private GjProjectSetting EncodeProjectSetting()
+        {
+            GjProjectSetting gjProjectSetting = new GjProjectSetting
             {
                 No1KeyName = "C",
                 EQAfterMix = "",
@@ -359,6 +426,7 @@ namespace Plugin.Gjgj
                 Denominator = 4,
                 SynMode = 0
             };
+            return gjProjectSetting;
         }
 
         private double ToneToY(double tone)
@@ -366,7 +434,7 @@ namespace Plugin.Gjgj
             return (127 - tone + 0.5) * 18.0;
         }
 
-        private int GetNoteStyleFromXS(string origin)
+        private int GetNoteStyle(string origin)
         {
             switch (origin)
             {
@@ -379,6 +447,69 @@ namespace Plugin.Gjgj
                 default:
                     return 0;
             }
+        }
+
+        private int GetNoteStartTick(int origin)
+        {
+            return origin + 1920 * GetNumerator(0) / GetDenominator(0);
+        }
+
+        private string GetNotePinyin(string origin)
+        {
+            if (origin == null)
+            {
+                return "";
+            }
+            else
+            {
+                string pinyin = origin;
+                if (pinyin != "" && !gjgjSupportedPinyin.IsGjSupportedPinyin(pinyin))
+                {
+                    pinyin = "";//过滤不支持的拼音
+                }
+                return pinyin;
+            }
+        }
+        
+        private double GetNotePhonePreTime(Note note)
+        {
+            double phonePreTime = 0.0;
+            try
+            {
+                if (note.EditedPhones.HeadLengthInSecs != -1.0)
+                {
+                    int noteStartPositionInTicks = note.StartPos + (1920 * GetNumerator(0) / GetDenominator(0));
+                    double noteStartPositionInSeconds = timeSynchronizer.GetActualSecsFromTicks(noteStartPositionInTicks);
+                    double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
+                    double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
+                    double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
+                    phonePreTime = -difference * 1000.0 / 480.0;
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            return phonePreTime; 
+        }
+        
+        private double GetNotePhonePostTime(Note note)
+        {
+            double phonePostTime = 0.0;
+            try
+            {
+                if (note.EditedPhones.MidRatioOverTail != -1.0)
+                {
+                    double noteLength = note.Length;
+                    double ratio = note.EditedPhones.MidRatioOverTail;
+                    phonePostTime = -(noteLength / (1.0 + ratio)) * 1000.0 / 480.0;
+                }
+            }
+            catch (Exception)
+            {
+                
+            }
+            return phonePostTime;
         }
     }
 }

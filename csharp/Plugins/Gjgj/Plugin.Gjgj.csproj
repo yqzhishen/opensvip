@@ -60,6 +60,7 @@
     <Compile Include="GjgjDecoder.cs" />
     <Compile Include="GjgjEncoder.cs" />
     <Compile Include="GjgjModel.cs" />
+    <Compile Include="GjgjSupportedPinyin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
