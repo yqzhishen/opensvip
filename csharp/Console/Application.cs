@@ -64,7 +64,7 @@ namespace OpenSvip.Console
                 var warnings = Warnings.GetWarnings();
                 if (warnings.Any())
                 {
-                    System.Console.WriteLine($"来自输出插件 {PluginManager.GetPlugin(options.InType).Name} 的警告信息：");
+                    System.Console.WriteLine($"来自输出插件 {PluginManager.GetPlugin(options.OutType).Name} 的警告信息：");
                     foreach (var warning in warnings)
                     {
                         System.Console.WriteLine(warning);
