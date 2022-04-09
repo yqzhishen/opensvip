@@ -476,7 +476,10 @@ namespace Plugin.Gjgj
                 if (pinyin != "" && !gjgjSupportedPinyin.IsGjSupportedPinyin(pinyin))
                 {
                     isUnsupportedPinyinExist = true;
-                    unsupportedPinyinList.Add(pinyin);
+                    if (!unsupportedPinyinList.Contains(pinyin))
+                    {
+                        unsupportedPinyinList.Add(pinyin);
+                    }
                     pinyin = "";//过滤不支持的拼音
                 }
                 return pinyin;
