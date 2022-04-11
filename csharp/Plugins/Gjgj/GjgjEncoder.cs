@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using OpenSvip.Model;
 using Gjgj.Model;
 using OpenSvip.Library;
+using OpenSvip.Framework;
 
 namespace Plugin.Gjgj
 {
     public class GjgjEncoder
     {
+        public int ParamSampleInterval { get; set; }
+
         private Project xsProject;
         
         private GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
@@ -15,6 +18,10 @@ namespace Plugin.Gjgj
         private GjProject gjProject;
         
         private TimeSynchronizer timeSynchronizer;
+
+        private bool isUnsupportedPinyinExist = false;
+
+        private List<string> unsupportedPinyinList = new List<string>();
 
         public GjProject EncodeProject(Project project)
         {
@@ -53,6 +60,11 @@ namespace Plugin.Gjgj
                         break;
                 }
                 trackIndex++;
+            }
+            if (isUnsupportedPinyinExist)
+            {
+                string unsupportedPinyin = string.Join("、", unsupportedPinyinList);
+                Warnings.AddWarning("当前工程文件有歌叽歌叽不支持的拼音，已忽略。不支持的拼音：" + unsupportedPinyin, type: WarningTypes.Lyrics);
             }
             gjProject.MIDITrackList = EncodeMIDITrackList();
         }
@@ -163,11 +175,11 @@ namespace Plugin.Gjgj
                 double valueOrigin;
                 double value;
                 int lastTime = 0;
-
-                for (int index = 1; index < singingTrack.EditedParams.Volume.PointList.Count - 1; index++)
+                ParamCurve paramCurve = ParamCurveUtils.ReduceSampleRate(singingTrack.EditedParams.Volume, ParamSampleInterval);
+                for (int index = 1; index < paramCurve.PointList.Count - 1; index++)
                 {
-                    time = GetVolumeParamPointTime(index, singingTrack);
-                    valueOrigin = GetOriginalVolumeParamPointValue(index, singingTrack);
+                    time = GetVolumeParamPointTime(index, paramCurve);
+                    valueOrigin = GetOriginalVolumeParamPointValue(index, paramCurve);
                     value = GetVolumeParamPointValue(valueOrigin);
 
                     if (lastTime != time)
@@ -185,7 +197,7 @@ namespace Plugin.Gjgj
                             }
                             else
                             {
-                                for (int bufferIndex = 0; bufferIndex < timeBuffer.Count; bufferIndex += 5)
+                                for (int bufferIndex = 0; bufferIndex < timeBuffer.Count; bufferIndex++)
                                 {
                                     gjVolumeParam.Add(EncodeVolumeParamPoint(timeBuffer[bufferIndex], valueBuffer[bufferIndex]));
                                 }
@@ -201,19 +213,19 @@ namespace Plugin.Gjgj
             }
             catch (Exception)
             {
-
+                
             }
             return gjVolumeParam;
         }
 
-        private int GetVolumeParamPointTime(int index, SingingTrack singingTrack)
+        private int GetVolumeParamPointTime(int index, ParamCurve paramCurve)
         {
-            return singingTrack.EditedParams.Volume.PointList[index].Item1;
+            return paramCurve.PointList[index].Item1;
         }
 
-        private double GetOriginalVolumeParamPointValue(int index, SingingTrack singingTrack)
+        private double GetOriginalVolumeParamPointValue(int index, ParamCurve paramCurve)
         {
-            return singingTrack.EditedParams.Volume.PointList[index].Item2;
+            return paramCurve.PointList[index].Item2;
         }
 
         private GjVolumeParamPoint EncodeVolumeParamPoint(double time, double value)
@@ -465,6 +477,11 @@ namespace Plugin.Gjgj
                 string pinyin = origin;
                 if (pinyin != "" && !gjgjSupportedPinyin.IsGjSupportedPinyin(pinyin))
                 {
+                    isUnsupportedPinyinExist = true;
+                    if (!unsupportedPinyinList.Contains(pinyin))
+                    {
+                        unsupportedPinyinList.Add(pinyin);
+                    }
                     pinyin = "";//过滤不支持的拼音
                 }
                 return pinyin;

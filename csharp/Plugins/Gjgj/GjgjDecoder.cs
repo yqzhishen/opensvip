@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Windows.Forms;
 using System.Linq;
 using OpenSvip.Model;
 using OpenSvip.Library;
@@ -11,89 +10,254 @@ namespace Plugin.Gjgj
 {
     public class GjgjDecoder
     {
-        public Project DecodeProject(GjProject gjProject)
+        private GjProject gjProject;
+
+        private TimeSynchronizer timeSynchronizer;
+
+        public Project DecodeProject(GjProject originalProject)
         {
-            var project = new Project
+            gjProject = originalProject;
+            var xsProject = new Project
             {
-                Version = GetSvipProjectVersion()
+                Version = GetSvipProjectVersion(),
+                SongTempoList = DecodeSongTempoList(),
+                TimeSignatureList = DecodeTimeSignatureList()
             };
-            DecodeTempo(gjProject, project);
-            TimeSynchronizer timeSynchronizer = new TimeSynchronizer(project.SongTempoList);
-            DecodeTimeSignature(gjProject, project);
-            DecodeTracks(timeSynchronizer, gjProject, project);
-            return project;
+            timeSynchronizer = new TimeSynchronizer(xsProject.SongTempoList);
+            xsProject.TrackList = DecodeTrackList(xsProject);
+            return xsProject;
 
         }
 
-        private void DecodeTracks(TimeSynchronizer timeSynchronizer, GjProject gjProject, Project project)
+        private List<Track> DecodeTrackList(Project project)
         {
-            DecodeSingingTracks(timeSynchronizer, gjProject, project);
-            DecodeInstrumentalTracks(gjProject, project);
+            List<Track> trackList = new List<Track>();
+            trackList.AddRange(DecodeSingingTracks(project));
+            trackList.AddRange(DecodeInstrumentalTracks());
+            return trackList;
         }
 
-        private static void DecodeInstrumentalTracks(GjProject gjProject, Project project)
+        private List<Track> DecodeSingingTracks(Project project)
         {
-            for (int instrumentalTrackIndex = 0; instrumentalTrackIndex < gjProject.InstrumentalTrackList.Count; instrumentalTrackIndex++)
+            List<Track> singingTrackList = new List<Track>();
+            for (int index = 0; index < gjProject.SingingTrackList.Count; index++)
             {
-                Track svipTrack = new InstrumentalTrack
+                Track track = new SingingTrack
                 {
-                    Title = GetInstrumentalName(gjProject, instrumentalTrackIndex),
-                    Mute = GetInstrumentalMute(gjProject, instrumentalTrackIndex),
-                    Solo = false,
-                    Volume = 0.3,
-                    Pan = 0.0,
-                    AudioFilePath = GetInstrumentalFilePath(gjProject, instrumentalTrackIndex),
-                    Offset = 0
-                };
-                project.TrackList.Add(svipTrack);
-            }
-        }
-
-        private void DecodeSingingTracks(TimeSynchronizer timeSynchronizer, GjProject gjProject, Project project)
-        {
-            for (int singingTrackIndex = 0; singingTrackIndex < gjProject.SingingTrackList.Count; singingTrackIndex++)
-            {
-                List<Note> noteListFromGj = new List<Note>();
-                for (int noteIndex = 0; noteIndex < gjProject.SingingTrackList[singingTrackIndex].NoteList.Count; noteIndex++)
-                {
-                    Note noteFromGj = DecodeNote(gjProject, singingTrackIndex, noteIndex, timeSynchronizer, project);
-                    noteListFromGj.Add(noteFromGj);
-                }
-                Params paramsFromGj = new Params();
-                DecodeParams(gjProject, singingTrackIndex, paramsFromGj);
-
-                Track svipTrack = new SingingTrack
-                {
-                    Title = GetSingerNameFromGj(gjProject.SingingTrackList[singingTrackIndex].Name),
-                    Mute = gjProject.SingingTrackList[singingTrackIndex].TrackVolume.Mute,
+                    Title = GetSingingTrackTitle(index),
+                    Mute = gjProject.SingingTrackList[index].TrackVolume.Mute,
                     Solo = false,
                     Volume = 0.7,
                     Pan = 0.0,
-                    AISingerName = GetDefaultSingerName(),
+                    AISingerName = GetDefaultAISingerName(),
                     ReverbPreset = GetDefaultReverbPreset(),
-                    NoteList = noteListFromGj,
-                    EditedParams = paramsFromGj
+                    NoteList = DecodeNoteList(index, project),
+                    EditedParams = DecodeParams(index)
                 };
-                project.TrackList.Add(svipTrack);
+                singingTrackList.Add(track);
+            }
+            return singingTrackList;
+        }
+        
+        private List<Track> DecodeInstrumentalTracks()
+        {
+            List<Track> instrumentalTrackList = new List<Track>();
+            for (int index = 0; index < gjProject.InstrumentalTrackList.Count; index++)
+            {
+                Track track = new InstrumentalTrack
+                {
+                    Title = GetInstrumentalName(index),
+                    Mute = GetInstrumentalMute(index),
+                    Solo = false,
+                    Volume = 0.3,
+                    Pan = 0.0,
+                    AudioFilePath = GetInstrumentalFilePath(index),
+                    Offset = 0
+                };
+                instrumentalTrackList.Add(track);
+            }
+            return instrumentalTrackList;
+        }
+
+        private string GetSingingTrackTitle(int index)
+        {
+            switch (gjProject.SingingTrackList[index].Name)
+            {
+                case "513singer":
+                    return "扇宝";
+                case "514singer":
+                    return "SING-林嘉慧";
+                case "881singer":
+                    return "Rocky";
+                default:
+                    return "演唱轨";
             }
         }
 
-        private void DecodeParams(GjProject gjProject, int singingTrackIndex, Params paramsFromGj)
+        private List<Note> DecodeNoteList(int singingTrackIndex, Project project)
         {
-            DecodeVolumeParam(gjProject, singingTrackIndex, paramsFromGj);
-            DecodePitchParam(gjProject, singingTrackIndex, paramsFromGj);
+            List<Note> noteList = new List<Note>();
+            for (int noteIndex = 0; noteIndex < gjProject.SingingTrackList[singingTrackIndex].NoteList.Count; noteIndex++)
+            {
+                noteList.Add(DecodeNote(singingTrackIndex, noteIndex, project));
+            }
+            return noteList;
         }
 
-        private void DecodePitchParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj)
+        private Note DecodeNote(int singingTrackIndex, int noteIndex, Project project)
+        {
+            Note note = new Note
+            {
+                StartPos = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project),
+                Length = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration,
+                KeyNumber = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].KeyNumber,
+                Lyric = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Lyric,
+                Pronunciation = DecodePronunciation(singingTrackIndex, noteIndex),
+                EditedPhones = DecodePhones(singingTrackIndex, noteIndex, project),
+                HeadTag = DecodeNoteHeadTag(singingTrackIndex, noteIndex)
+            };
+            return note;
+        }
+
+        private int DecodeNoteStartPosition(int singingTrackIndex, int noteIndex, Project project)//用了xs的拍号列表，是因为gj可能存在拍号列表里面没有拍号的情况
+        {
+            return gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+        }
+
+        private string DecodePronunciation(int singingTrackIndex, int noteIndex)
+        {
+            string pinyin = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Pinyin;
+            string pronunciation;
+            if (pinyin == "")
+            {
+                pronunciation = null;
+            }
+            else
+            {
+                pronunciation = pinyin;
+            }
+            return pronunciation;
+        }
+
+        private Phones DecodePhones(int singingTrackIndex, int noteIndex, Project project)
+        {
+            int duration = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration;
+            int startPosition = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project);
+            double preTime = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePreTime;
+            double postTime = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePostTime;
+            Phones phones = new Phones();
+            try
+            {
+                if (preTime != 0.0)
+                {
+                    phones.HeadLengthInSecs = DecodeHeadLengthInSecs(startPosition, preTime);
+                }
+                if (postTime != 0.0)
+                {
+                    phones.MidRatioOverTail = DecodeMidRatioOverTail(duration, postTime);
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+            return phones;
+        }
+        
+        private float DecodeHeadLengthInSecs(int startPosition, double preTime)
+        {
+            int difference;
+            float headLengthInSecs;
+            difference = startPosition + (int)(preTime / 1000.0 * 480.0);
+            if (difference > 0)
+            {
+                headLengthInSecs = (float)(timeSynchronizer.GetActualSecsFromTicks(startPosition) - timeSynchronizer.GetActualSecsFromTicks(difference));
+            }
+            else
+            {
+                headLengthInSecs = -1.0f;
+            }
+            return headLengthInSecs;
+        }
+        
+        private float DecodeMidRatioOverTail(int duration, double postTime)
+        {
+            float midRatioOverTail;
+            double essentialVowelLength;
+            double tailVowelLength;
+            if (postTime != 0)
+            {
+                essentialVowelLength = duration * 1000 / 480 + postTime;
+                tailVowelLength = -postTime;
+                midRatioOverTail = (float)(essentialVowelLength / tailVowelLength);
+            }
+            else
+            {
+                midRatioOverTail = -1.0f;
+            }
+            return midRatioOverTail;
+        }
+
+        private string DecodeNoteHeadTag(int singingTrackIndex, int noteIndex)
+        {
+            switch (gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Style)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return "V";
+                case 2:
+                    return "0";
+                default:
+                    return null;
+            }
+        }
+
+        private Params DecodeParams(int singingTrackIndex)
+        {
+            Params paramsFromGj = new Params
+            {
+                Volume = DecodeVolumeParam(singingTrackIndex),
+                Pitch = DecodePitchParam(singingTrackIndex)
+            };
+            return paramsFromGj;
+        }
+
+        private ParamCurve DecodeVolumeParam(int singingTrackIndex)
+        {
+            ParamCurve paramCurve = new ParamCurve();
+            try
+            {
+                List<double> timeBuffer = new List<double>();
+                List<double> valueBuffer = new List<double>();
+                int time;
+                int value;
+                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.SingingTrackList[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
+                {
+                    time = GetVolumeParamTimeFromGj(singingTrackIndex, volumeParamPointIndex);
+                    value = GetVolumeParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
+                    Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
+                    paramCurve.PointList.Add(volumeParamPoint);
+                }
+
+                paramCurve.PointList.OrderBy(x => x.Item1).ToList();
+            }
+            catch (Exception)
+            {
+
+            }
+            return paramCurve;
+        }
+
+        private ParamCurve DecodePitchParam(int singingTrackIndex)
         {
             ParamCurve paramCurvePitch = new ParamCurve();
-            DecodeModifiedPitchParam(gjProject, singingTrackIndex, paramCurvePitch);
-            DecodeOriginalPitchParam(gjProject, singingTrackIndex, paramsFromGj, paramCurvePitch);
+            DecodeModifiedPitchParam(singingTrackIndex, paramCurvePitch);
             paramCurvePitch.PointList.OrderBy(x => x.Item1).ToList();
-            paramsFromGj.Pitch = paramCurvePitch;
+            return paramCurvePitch;
         }
 
-        private void DecodeModifiedPitchParam(GjProject gjProject, int singingTrackIndex, ParamCurve paramCurvePitch)
+        private void DecodeModifiedPitchParam(int singingTrackIndex, ParamCurve paramCurvePitch)
         {
             Tuple<int, int> defaultLeftEndpoint = Tuple.Create(-192000, -100);
             paramCurvePitch.PointList.Add(defaultLeftEndpoint);
@@ -128,154 +292,18 @@ namespace Plugin.Gjgj
             paramCurvePitch.PointList.Add(defaultRightEndpoint);
         }
 
-        private void DecodeOriginalPitchParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj, ParamCurve paramCurvePitch)
+        private List<TimeSignature> DecodeTimeSignatureList()
         {
-            try
-            {
-                int value;
-                int leftEndpoint;
-                int rightEndpoint;
-                int time;
-                bool isInModifyRange;
-                List<int> pitchPointBufferTime = new List<int>();
-                List<int> pitchPointBufferPitch = new List<int>();
-
-                for (int originPitchIndex = 0; originPitchIndex < gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList.Count - 1; originPitchIndex++)//遍历所有默认音高参数点
-                {
-                    time = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Time);
-                    value = GetPitchParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Value);
-                    isInModifyRange = false;
-                    for (int index = 0; index < gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList.Count; index++)//判断当前默认音高参数点是否在ModifyRange内
-                    {
-                        leftEndpoint = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Left);
-                        rightEndpoint = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Right);
-                        if (time >= leftEndpoint && time <= rightEndpoint)
-                        {
-                            isInModifyRange = true;
-                            break;
-                        }
-                    }
-                    if (!isInModifyRange)//不在ModifyRange内才写入
-                    {
-                        pitchPointBufferTime.Add(time);
-                        pitchPointBufferPitch.Add(value);
-                    }
-                }
-
-                for (int i = 0; i < pitchPointBufferTime.Count; i++)
-                {
-                    Tuple<int, int> pitchParamPoint = Tuple.Create(pitchPointBufferTime[i], pitchPointBufferPitch[i]);
-                    paramCurvePitch.PointList.Add(pitchParamPoint);
-                }
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-        private void DecodeVolumeParam(GjProject gjProject, int singingTrackIndex, Params paramsFromGj)
-        {
-            try
-            {
-                List<double> timeBuffer = new List<double>();
-                List<double> valueBuffer = new List<double>();
-                int time;
-                int value;
-                ParamCurve paramCurveVolume = new ParamCurve();
-                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.SingingTrackList[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
-                {
-                    time = GetVolumeParamTimeFromGj(gjProject, singingTrackIndex, volumeParamPointIndex);
-                    value = GetVolumeParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
-                    Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
-                    paramCurveVolume.PointList.Add(volumeParamPoint);
-                }
-
-                paramCurveVolume.PointList.OrderBy(x => x.Item1).ToList();
-                paramsFromGj.Volume = paramCurveVolume;
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-        private Note DecodeNote(GjProject gjProject, int singingTrackIndex, int noteIndex, TimeSynchronizer timeSynchronizer, Project project)
-        {
-            int noteDurationFromGj = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration;
-            int convertedStartPosition = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-            double preTimeFromGj = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePreTime;
-            double postTimeFromGj = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePostTime;
-            float headLengthInSecsFromGj;
-            float midRatioOverTailFromGj;
-            double essentialVowelLength;
-            double tailVowelLength;
-            int difference;
-            Phones phones = new Phones();
-            try
-            {
-                if (preTimeFromGj != 0.0)
-                {
-                    difference = convertedStartPosition + (int)(preTimeFromGj / 1000.0 * 480.0);
-                    if (difference > 0)
-                    {
-                        headLengthInSecsFromGj = (float)(timeSynchronizer.GetActualSecsFromTicks(convertedStartPosition) - timeSynchronizer.GetActualSecsFromTicks(difference));
-                        phones.HeadLengthInSecs = headLengthInSecsFromGj;
-                    }
-                }
-                if (postTimeFromGj != 0.0)
-                {
-                    essentialVowelLength = noteDurationFromGj * 1000 / 480 + postTimeFromGj;
-                    tailVowelLength = -postTimeFromGj;
-                    midRatioOverTailFromGj = (float)(essentialVowelLength / tailVowelLength);
-                    phones.MidRatioOverTail = midRatioOverTailFromGj;
-                }
-            }
-            catch (Exception)
-            {
-
-            }
-
-            //用于调试
-            //MessageBox.Show("convertedStartPosition = " + convertedStartPosition +
-            //    "\nconvertedPreTime" + (int)(preTimeFromGj / 1000.0 * 480.0) +
-            //    "\nessentialVowelLength = " + essentialVowelLength +
-            //    "\ntailVowelLength = " + tailVowelLength + 
-            //    "\nMidRatioOverTail = " + midRatioOverTailFromGj);
-            string pronunciation = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Pinyin;
-
-
-            Note note = new Note
-            {
-                StartPos = convertedStartPosition,
-                Length = noteDurationFromGj,
-                KeyNumber = GetKeyNumberFromGj(gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].KeyNumber),
-                Lyric = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Lyric,
-                EditedPhones = phones,
-                HeadTag = GetNoteHeadTagFromGj(gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Style)
-            };
-            if (pronunciation == "")
-            {
-                note.Pronunciation = null;
-            }
-            else
-            {
-                note.Pronunciation = pronunciation;
-            }
-            return note;
-        }
-
-        private void DecodeTimeSignature(GjProject gjProject, Project project)
-        {
+            List<TimeSignature> timeSignatureList = new List<TimeSignature>();
             if (gjProject.TempoMap.TimeSignatureList.Count == 0)//如果拍号只有4/4，gjgj不存
             {
-                project.TimeSignatureList.Add(GetInitialTimeSignature());
+                timeSignatureList.Add(GetInitialTimeSignature());
             }
             else
             {
                 if (gjProject.TempoMap.TimeSignatureList[0].Time != 0)//如果存的第一个拍号不在0处，说明0处的拍号是4/4
                 {
-                    project.TimeSignatureList.Add(GetInitialTimeSignature());
+                    timeSignatureList.Add(GetInitialTimeSignature());
 
                     int sumOfTime = 0;
                     for (int index = 0; index < gjProject.TempoMap.TimeSignatureList.Count; index++)
@@ -288,12 +316,12 @@ namespace Plugin.Gjgj
                         }
                         else
                         {
-                            sumOfTime += (gjProject.TempoMap.TimeSignatureList[index].Time - gjProject.TempoMap.TimeSignatureList[index - 1].Time) * GetDenominator(gjProject, index - 1) / 1920 / GetNumerator(gjProject, index - 1);
+                            sumOfTime += (GetGjTimeSignatureTime(index) - GetGjTimeSignatureTime(index - 1)) * GetDenominator(index - 1) / 1920 / GetNumerator(index - 1);
                             timeSignature.BarIndex = sumOfTime;
                         }
-                        timeSignature.Numerator = GetNumerator(gjProject, index);
-                        timeSignature.Denominator = GetDenominator(gjProject, index);
-                        project.TimeSignatureList.Add(timeSignature);
+                        timeSignature.Numerator = GetNumerator(index);
+                        timeSignature.Denominator = GetDenominator(index);
+                        timeSignatureList.Add(timeSignature);
                     }
                 }
                 else
@@ -308,44 +336,47 @@ namespace Plugin.Gjgj
                         }
                         else
                         {
-                            sumOfTime += (gjProject.TempoMap.TimeSignatureList[index].Time - gjProject.TempoMap.TimeSignatureList[index - 1].Time) * GetDenominator(gjProject, index - 1) / 1920 / GetNumerator(gjProject, index - 1);
+                            sumOfTime += (GetGjTimeSignatureTime(index) - GetGjTimeSignatureTime(index - 1)) * GetDenominator(index - 1) / 1920 / GetNumerator(index - 1);
                             timeSignature.BarIndex = sumOfTime;
                         }
-                        timeSignature.Numerator = GetNumerator(gjProject, index);
-                        timeSignature.Denominator = GetDenominator(gjProject, index);
-                        project.TimeSignatureList.Add(timeSignature);
+                        timeSignature.Numerator = GetNumerator(index);
+                        timeSignature.Denominator = GetDenominator(index);
+                        timeSignatureList.Add(timeSignature);
                     }
                 }
             }
-
+            return timeSignatureList;
         }
 
-        private void DecodeTempo(GjProject gjProject, Project project)
+        private List<SongTempo> DecodeSongTempoList()
         {
+            List<SongTempo> songTempoList = new List<SongTempo>();
             for (int i = 0; i < gjProject.TempoMap.TempoList.Count; i++)
             {
-                SongTempo songTempo = new SongTempo
-                {
-                    Position = gjProject.TempoMap.TempoList[i].Time,
-                    BPM = GetBPMFromGj(gjProject.TempoMap.TempoList[i].MicrosecondsPerQuarterNote)
-                };
-                project.SongTempoList.Add(songTempo);
+                songTempoList.Add(DecodeSongTempo(i));
             }
+            return songTempoList;
         }
 
-        private string GetSingerNameFromGj(string origin)
+        private SongTempo DecodeSongTempo(int index)
         {
-            switch (origin)
+            SongTempo songTempo = new SongTempo
             {
-                case "513singer":
-                    return "扇宝";
-                case "514singer":
-                    return "SING-林嘉慧";
-                case "881singer":
-                    return "Rocky";
-                default:
-                    return "演唱轨";
-            }
+                Position = GetSongTempoPosition(index),
+                BPM = GetSongTempoBPM(index)
+            };
+            return songTempo;
+        }
+
+        private int GetSongTempoPosition(int index)
+        {
+            return gjProject.TempoMap.TempoList[index].Time;
+        }
+
+        private float GetSongTempoBPM(int index)
+        {
+            double origin = gjProject.TempoMap.TempoList[index].MicrosecondsPerQuarterNote;
+            return (float)(60.0 / origin * 1000000.0);
         }
 
         private double YToTone(double y)
@@ -363,7 +394,7 @@ namespace Plugin.Gjgj
             return (int)(YToTone(origin) * 100.0);
         }
 
-        private int GetVolumeParamTimeFromGj(GjProject gjProject, int singingTrackIndex, int volumeParamPointIndex)
+        private int GetVolumeParamTimeFromGj(int singingTrackIndex, int volumeParamPointIndex)
         {
             return (int)gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Time;
         }
@@ -373,37 +404,27 @@ namespace Plugin.Gjgj
             return (int)origin * 1000 - 1000;
         }
 
-        private float GetBPMFromGj(double origin)
-        {
-            return (float)(60.0 / origin * 1000000.0);
-        }
-
-        private int GetKeyNumberFromGj(int origin)
-        {
-            return origin;
-        }
-
         private static string GetDefaultReverbPreset()
         {
             return "干声";
         }
 
-        private static string GetDefaultSingerName()
+        private static string GetDefaultAISingerName()
         {
             return "陈水若";
         }
 
-        private static string GetInstrumentalFilePath(GjProject gjProject, int instrumentalTrackIndex)
+        private string GetInstrumentalFilePath(int instrumentalTrackIndex)
         {
             return gjProject.InstrumentalTrackList[instrumentalTrackIndex].Path;
         }
 
-        private static string GetInstrumentalName(GjProject gjProject, int instrumentalTrackIndex)
+        private string GetInstrumentalName(int instrumentalTrackIndex)
         {
             return Path.GetFileNameWithoutExtension(gjProject.InstrumentalTrackList[instrumentalTrackIndex].Path);//获取伴奏文件名作为轨道标题
         }
 
-        private static bool GetInstrumentalMute(GjProject gjProject, int instrumentalTrackIndex)
+        private bool GetInstrumentalMute(int instrumentalTrackIndex)
         {
             return gjProject.InstrumentalTrackList[instrumentalTrackIndex].TrackVolume.Mute;
         }
@@ -424,29 +445,20 @@ namespace Plugin.Gjgj
             return defaultTimeSignature;
         }
 
-        private static int GetDenominator(GjProject gjProject, int index)
+        private int GetGjTimeSignatureTime(int index)
+        {
+            return gjProject.TempoMap.TimeSignatureList[index].Time;
+        }
+
+        private int GetDenominator(int index)
         {
             return gjProject.TempoMap.TimeSignatureList[index].Denominator;
         }
 
-        private static int GetNumerator(GjProject gjProject, int index)
+        private int GetNumerator(int index)
         {
             return gjProject.TempoMap.TimeSignatureList[index].Numerator;
         }
 
-        private string GetNoteHeadTagFromGj(int origin)
-        {
-            switch (origin)
-            {
-                case 0:
-                    return null;
-                case 1:
-                    return "V";
-                case 2:
-                    return "0";
-                default:
-                    return null;
-            }
-        }
     }
 }
