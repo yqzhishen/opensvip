@@ -194,30 +194,18 @@ namespace OpenSvip.Library
             {
                 return EmptyRange.Instance;
             }
-            var startIndex = ranges.FindIndex(e => Start <= e.Item1);
-            var endIndex = ranges.FindLastIndex(e => End >= e.Item2);
-            if (startIndex == -1 && endIndex == -1)
+            var startIndex = ranges.FindIndex(e => Start <= e.Item2);
+            var endIndex = ranges.FindLastIndex(e => End >= e.Item1);
+            if (startIndex == endIndex)
             {
-                return this;
+                return new SingleRange(Math.Max(Start, ranges[startIndex].Item1), Math.Min(End, ranges[endIndex].Item2));
             }
-            if (startIndex == -1)
+            var intersectRanges = new List<Tuple<int, int>>
             {
-                return new SingleRange(Start, ranges[endIndex].Item2);
-            }
-            if (endIndex == -1)
-            {
-                return new SingleRange(ranges[startIndex].Item1, End);
-            }
-            var intersectRanges = new List<Tuple<int, int>>();
-            if (startIndex > 0)
-            {
-                intersectRanges.Add(new Tuple<int, int>(Start, ranges[startIndex - 1].Item2));
-            }
+                new Tuple<int, int>(Math.Max(Start, ranges[startIndex].Item1), ranges[startIndex].Item2)
+            };
             intersectRanges.AddRange(ranges.GetRange(startIndex, endIndex - startIndex + 1));
-            if (endIndex < ranges.Count - 1)
-            {
-                intersectRanges.Add(new Tuple<int, int>(ranges[endIndex + 1].Item1, End));
-            }
+            intersectRanges.Add(new Tuple<int, int>(ranges[endIndex].Item1, Math.Min(End, ranges[endIndex].Item2)));
 
             return intersectRanges.Count == 1
                 ? (Range) new SingleRange(intersectRanges[0].Item1, intersectRanges[0].Item2)
@@ -268,7 +256,7 @@ namespace OpenSvip.Library
             }
             var ranges = exceptRange.SubRanges();
             return ranges.Length == 1
-                ? (Range) new SingleRange(ranges[0].Item1, ranges[1].Item2)
+                ? (Range) new SingleRange(ranges[0].Item1, ranges[0].Item2)
                 : exceptRange;
         }
 

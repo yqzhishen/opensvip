@@ -1,0 +1,30 @@
+﻿<Application x:Class="OpenSvip.GUI.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OpenSvip.GUI"
+             StartupUri="MainWindow.xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.indigo.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:IndexToBooleanConverter x:Key="IndexToBooleanConverter"/>
+            <local:CollectionToVisibilityConverter x:Key="CollectionToVisibilityConverter"/>
+            <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <local:ReversedVisibilityConverter x:Key="ReversedVisibilityConverter"/>
+            <local:CollectionElementConverter x:Key="CollectionElementConverter"/>
+            <local:BooleanNotOperationConverter x:Key="BooleanNotOperationConverter"/>
+            <local:BooleanOrOperationConverter x:Key="BooleanOrOperationConverter"/>
+            <local:BooleanSwitchOperationConverter x:Key="BooleanSwitchOperationConverter"/>
+            <local:PluginToFormatConverter x:Key="PluginToFormatConverter"/>
+            <local:DoubleConstantSubConverter x:Key="DoubleConstantSubConverter"/>
+            <local:IntegerConstantEqualsConverter x:Key="IntegerConstantEqualsConverter"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
