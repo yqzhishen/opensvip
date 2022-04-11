@@ -90,8 +90,22 @@ namespace Plugin.Gjgj
                 case "881singer":
                     return "Rocky";
                 default:
-                    return "演唱轨";
+                    return GetUserMadeSingerName(index);
             }
+        }
+
+        private string GetUserMadeSingerName(int index)
+        {
+            string singerName = "演唱轨";
+            try
+            {
+                singerName = gjProject.SingingTrackList[index].SingerInfo.SingerName;
+            }
+            catch
+            {
+                
+            }
+            return singerName;
         }
 
         private List<Note> DecodeNoteList(int singingTrackIndex, Project project)
