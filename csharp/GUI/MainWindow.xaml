@@ -232,32 +232,47 @@
                                         Grid.IsSharedSizeScope="True">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="{x:Type local:Task}">
-                                                <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-                                                    <Grid Height="40" Margin="0 -5 0 0" HorizontalAlignment="Stretch">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition/>
-                                                            <ColumnDefinition Width="40"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition/>
-                                                            <RowDefinition Height="3"/>
-                                                        </Grid.RowDefinitions>
-                                                        <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="5 2 0 0">
+                                                <Grid Height="40" Margin="0 0 0 5" HorizontalAlignment="Stretch">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="40"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition Height="3"/>
+                                                    </Grid.RowDefinitions>
+                                                    <DockPanel Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5 2 10 0">
+                                                        <StackPanel>
                                                             <TextBlock Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="15"/>
                                                             <TextBlock Text="{Binding ImportDirectory}"/>
                                                         </StackPanel>
-                                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0 0 5 0">
-                                                            <Button
-                                                                x:Name="RemoveTaskButton"
-                                                                Padding="0"
-                                                                Content="{materialDesign:PackIcon DeleteOutline}"
-                                                                Style="{StaticResource MaterialDesignRaisedLightButton}"
-                                                                ToolTip="移除"
-                                                                Click="RemoveTaskButton_Click"/>
+                                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 -2 0 0" Orientation="Horizontal">
+                                                            <materialDesign:PackIcon
+                                                                VerticalAlignment="Center"
+                                                                Margin="0 4 5 0"
+                                                                Width="20"
+                                                                Height="20"
+                                                                Kind="Export"
+                                                                Opacity="{Binding IsEnabled,ElementName=StartExecutionButton,Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=1;0.5, Mode=OneWay}"/>
+                                                            <TextBox
+                                                                Margin="0 5 0 0"
+                                                                Width="120"
+                                                                materialDesign:HintAssist.Hint="输出文件名"
+                                                                Text="{Binding ExportFilename}"/>
                                                         </StackPanel>
-                                                        <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="0 2 0 0" VerticalAlignment="Center"/>
-                                                    </Grid>
-                                                </ListViewItem>
+                                                    </DockPanel>
+                                                    <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Margin="0 0 5 0">
+                                                        <Button
+                                                            x:Name="RemoveTaskButton"
+                                                            VerticalAlignment="Center"
+                                                            Padding="0"
+                                                            Content="{materialDesign:PackIcon DeleteOutline}"
+                                                            Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                                            ToolTip="移除"
+                                                            Click="RemoveTaskButton_Click"/>
+                                                    </StackPanel>
+                                                    <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="0 2 0 0" VerticalAlignment="Center"/>
+                                                </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
@@ -394,7 +409,7 @@
                                 Content="{materialDesign:PackIcon Folder}"
                                 IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
                                 Click="BrowseExportFolderButton_Click"
-                                ToolTip="浏览"/>
+                                ToolTip="浏览文件夹"/>
                             <StackPanel Orientation="Horizontal">
                                 <TextBox
                                     VerticalAlignment="Center"
@@ -409,8 +424,8 @@
                                 </TextBox>
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Margin="10 0 10 5" Orientation="Horizontal">
-                            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <StackPanel Grid.Row="1" Margin="0 0 10 5" Orientation="Horizontal">
+                            <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
                                 <ToggleButton
                                         x:Name="OpenExportFolderToggle"
                                         VerticalAlignment="Center"
@@ -450,7 +465,7 @@
                             materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
                             materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding ExecutionInProgress}"
                             FontSize="20"
-                            Content="开始转换"
+                            Content="{Binding ExecutionInProgress, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=转换中;开始转换}"
                             IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource BooleanNotOperationConverter}}"
                             Click="StartExecutionButton_Click"/>
                     </Grid>

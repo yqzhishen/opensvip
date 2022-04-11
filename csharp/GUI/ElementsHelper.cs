@@ -50,8 +50,7 @@ namespace OpenSvip.GUI
             return foundChild;
         }
 
-        public static List<T> FindChildren<T>(DependencyObject parent, string childName)
-   where T : DependencyObject
+        public static List<T> FindChildren<T>(DependencyObject parent, string childName) where T : DependencyObject
         {
             var list = new List<T>();
             if (parent == null) return list;

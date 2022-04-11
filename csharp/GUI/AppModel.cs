@@ -119,8 +119,10 @@ namespace OpenSvip.GUI
         }
     }
 
-    public class Task
+    public class Task : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public Plugin InputPlugin { get; set; }
         
         public Plugin OutputPlugin { get; set; }
@@ -134,6 +136,8 @@ namespace OpenSvip.GUI
         {
             get => Path.GetDirectoryName(ImportPath);
         }
+
+        public string ExportFilename { get; set; }
 
         public string ImportPath { get; set; }
 

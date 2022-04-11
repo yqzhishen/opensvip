@@ -79,9 +79,13 @@ namespace OpenSvip.GUI
 
             foreach (var filename in newFilenames)
             {
+                var exportFilename = Model.SelectedOutputPluginIndex >= 0
+                    ? Path.GetFileNameWithoutExtension(filename) + "." + Model.Plugins[Model.SelectedOutputPluginIndex].Suffix
+                    : Path.GetFileName(filename);
                 Model.TaskList.Add(new Task
                 {
                     ImportPath = filename,
+                    ExportFilename = exportFilename,
                     Status = "ready"
                 });
             }
@@ -98,9 +102,8 @@ namespace OpenSvip.GUI
                 var outputConverter = PluginManager.GetConverter(Model.Plugins[Model.SelectedOutputPluginIndex].Identifier);
                 foreach (var task in Model.TaskList)
                 {
-                    var exportFilename = Path.GetFileNameWithoutExtension(task.ImportFilename) + "." + Model.Plugins[Model.SelectedInputPluginIndex].Suffix;
                     outputConverter.Save(
-                        Path.Combine(Model.ExportPath, exportFilename),
+                        Path.Combine(Model.ExportPath, task.ExportFilename),
                         inputConverter.Load(
                             task.ImportPath,
                             new ConverterOptions(new Dictionary<string, string>())),
@@ -168,8 +171,8 @@ namespace OpenSvip.GUI
 
         private void RemoveTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            var buttons = ElementsHelper.FindChildren<System.Windows.Controls.Button>(TaskListView, "RemoveTaskButton");
-            Model.TaskList.RemoveAt(buttons.IndexOf((System.Windows.Controls.Button) sender));
+            var grid = ElementsHelper.FindParent<Grid>(sender as System.Windows.Controls.Button);
+            Model.TaskList.Remove(grid.DataContext as Task);
         }
 
         private void ClearTaskButton_Click(object sender, RoutedEventArgs e)
