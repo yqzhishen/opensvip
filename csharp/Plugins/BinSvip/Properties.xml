@@ -4,7 +4,7 @@
     <Version>1.1.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
-    <Descriptions>原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，&#x000A;请修改 SingerDict.json。
+    <Descriptions>原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，请修改 SingerDict.json。
     </Descriptions>
     <Requirements>系统上需要安装 X Studio，并设置为 .svip 文件默认打开方式。&#x000A;建议使用 2.0 或更高版本；最低可兼容 1.8 版本，但无法导入与导出力度参数。</Requirements>
     <Format>X Studio 工程文件</Format>
