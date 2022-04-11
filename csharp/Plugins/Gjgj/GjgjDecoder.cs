@@ -253,7 +253,6 @@ namespace Plugin.Gjgj
         {
             ParamCurve paramCurvePitch = new ParamCurve();
             DecodeModifiedPitchParam(singingTrackIndex, paramCurvePitch);
-            DecodeOriginalPitchParam(singingTrackIndex, paramCurvePitch);
             paramCurvePitch.PointList.OrderBy(x => x.Item1).ToList();
             return paramCurvePitch;
         }
@@ -291,52 +290,6 @@ namespace Plugin.Gjgj
 
             Tuple<int, int> defaultRightEndpoint = Tuple.Create(1073741823, -100);
             paramCurvePitch.PointList.Add(defaultRightEndpoint);
-        }
-
-        private void DecodeOriginalPitchParam(int singingTrackIndex, ParamCurve paramCurvePitch)
-        {
-            try
-            {
-                int value;
-                int left;
-                int right;
-                int time;
-                bool isInModifyRange;
-                List<int> timeBuffer = new List<int>();
-                List<int> valueBuffer = new List<int>();
-
-                for (int originPitchIndex = 0; originPitchIndex < gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList.Count - 1; originPitchIndex++)//遍历所有默认音高参数点
-                {
-                    time = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Time);
-                    value = GetPitchParamValueFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.DefaultPitchParamPointList[originPitchIndex].Value);
-                    isInModifyRange = false;
-                    for (int index = 0; index < gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList.Count; index++)//判断当前默认音高参数点是否在ModifyRange内
-                    {
-                        left = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Left);
-                        right = GetPitchParamTimeFromGj(gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList[index].Right);
-                        if (time >= left && time <= right)
-                        {
-                            isInModifyRange = true;
-                            break;
-                        }
-                    }
-                    if (!isInModifyRange)//不在ModifyRange内才写入
-                    {
-                        timeBuffer.Add(time);
-                        valueBuffer.Add(value);
-                    }
-                }
-
-                for (int i = 0; i < timeBuffer.Count; i++)
-                {
-                    Tuple<int, int> pitchParamPoint = Tuple.Create(timeBuffer[i], valueBuffer[i]);
-                    paramCurvePitch.PointList.Add(pitchParamPoint);
-                }
-            }
-            catch (Exception)
-            {
-
-            }
         }
 
         private List<TimeSignature> DecodeTimeSignatureList()
