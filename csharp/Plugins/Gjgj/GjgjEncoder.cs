@@ -101,6 +101,7 @@ namespace Plugin.Gjgj
                 NoteList = EncodeNoteList(noteID, singingTrack),
                 VolumeParam = EncodeVolumeParam(singingTrack),
                 PitchParam = EncodePitchParam(singingTrack),
+                SingerInfo = new GjSingerInfo(),
                 Keyboard = EncodeKeyboard(),
                 TrackVolume = EncodeTrackVolume(singingTrack),
                 EQProgram = "无"
