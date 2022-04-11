@@ -168,7 +168,7 @@ namespace Plugin.Gjgj
         {
             int difference;
             float headLengthInSecs;
-            difference = startPosition + (int)(preTime / 1000.0 * 480.0);
+            difference = startPosition + (int)(preTime * 480.0 * 3.0 / 2000.0);
             if (difference > 0)
             {
                 headLengthInSecs = (float)(timeSynchronizer.GetActualSecsFromTicks(startPosition) - timeSynchronizer.GetActualSecsFromTicks(difference));
@@ -187,7 +187,7 @@ namespace Plugin.Gjgj
             double tailVowelLength;
             if (postTime != 0)
             {
-                essentialVowelLength = duration * 1000 / 480 + postTime;
+                essentialVowelLength = duration * (2000.0 / 3.0) / 480 + postTime;
                 tailVowelLength = -postTime;
                 midRatioOverTail = (float)(essentialVowelLength / tailVowelLength);
             }
