@@ -37,7 +37,7 @@ namespace OpenSvip.Framework
         {
             var type = typeof(WarningTypes);
             var ty = type.GetField(type.GetEnumName(Type)).GetCustomAttribute<DescriptionAttribute>().Description;
-            var loc = Location == null ? null : Location + ": ";
+            var loc = string.IsNullOrWhiteSpace(Location) ? "" : Location + ": ";
             return $"[{ty}] {loc}{Message}";
         }
     }
