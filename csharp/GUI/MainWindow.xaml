@@ -1,0 +1,461 @@
+﻿<Window
+    x:Class="OpenSvip.GUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:materialDesignExtensions="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+    xmlns:Framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    mc:Ignorable="d"
+    Title="OpenSVIP - 歌声合成工程文件转换器" Height="800" Width="1200">
+    <Window.DataContext>
+        <local:AppModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <Style x:Key="PluginComboBox" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="materialDesign:HintAssist.HintOpacity" Value="0.8"/>
+            <Setter Property="materialDesign:HintAssist.Foreground" Value="#0277bd"/>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="WhiteSmoke"/>
+        <DockPanel x:Name="MenuPanel" Grid.Row="0">
+            <Menu IsMainMenu="True" Margin="20 0 0 0" Height="25" FontFamily="Microsoft YaHei UI" FontSize="13" FontWeight="Normal">
+                <MenuItem Header="_文件(F)" Padding="10 0">
+                    <MenuItem
+                        Height="30"
+                        Header="导入文件..."
+                        InputGestureText="Ctrl+I"
+                        Icon="{materialDesign:PackIcon Kind=Import, Size=17}"
+                        Click="FileMaskPanel_Click">
+                    </MenuItem>
+                    <MenuItem Height="30" Header="导出文件" Icon="{materialDesign:PackIcon Kind=ExportVariant, Size=17}">
+                        <MenuItem Height="30" Header="立即开始转换" InputGestureText="Ctrl+E"/>
+                        <MenuItem Height="30" Header="选择输出路径..." InputGestureText="Ctrl+Shift+E"/>
+                    </MenuItem>
+                    <MenuItem Height="30" Header="重置列表" Icon="{materialDesign:PackIcon Kind=Autorenew, Size=17}" InputGestureText="Ctrl+R"/>
+                </MenuItem>
+                <MenuItem Header="_设置(O)" Padding="10 0">
+                    <MenuItem Height="30" Header="{Binding Text, ElementName=AutoDetectText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
+                    <MenuItem Height="30" Header="{Binding Text, ElementName=AutoResetText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoResetToggle}"/>
+                    <MenuItem Height="30" Header="{Binding Text, ElementName=OpenExportFolderText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
+                    <MenuItem Height="30" Header="{Binding Text, ElementName=OverwriteOptionText}" HorizontalContentAlignment="Stretch">
+                        <MenuItem Height="30" Header="覆盖" IsCheckable="True" Margin="-10 0 -5 0"
+                                  IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"/>
+                        <MenuItem Height="30" Header="跳过" IsCheckable="True" Margin="-10 0 -5 0"
+                                  IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"/>
+                        <MenuItem Height="30" Header="询问" IsCheckable="True" Margin="-10 0 -5 0"
+                                  IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="外观主题">
+                        <MenuItem Height="30" Header="浅色" IsCheckable="True" IsChecked="True" Margin="-10 0 -5 0"/>
+                        <MenuItem Height="30" Header="深色" IsCheckable="True" IsChecked="False" Margin="-10 0 -5 0"/>
+                        <MenuItem Height="30" Header="系统" IsCheckable="True" IsChecked="False" Margin="-10 0 -5 0"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="帮助(H)" Padding="10 0">
+                    <MenuItem Header="_在线用户手册" Command="Cut" Icon="{materialDesign:PackIcon Kind=TextBoxSearchOutline}" InputGestureText="Ctrl+H"/>
+                    <MenuItem Header="_关于 OpenSVIP..." Command="Copy" Icon="{materialDesign:PackIcon Kind=InformationOutline}" InputGestureText="Ctrl+A"/>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <materialDesign:Card
+                    x:Name="ImportPluginCard"
+                    Grid.Row="0"
+                    Margin="20 20 10 10"
+                    Background="Honeydew">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="25"/>
+                        </Grid.RowDefinitions>
+                        <ComboBox
+                            x:Name="ImportPluginComboBox"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            Padding="16 5"
+                            Margin="15 0 0 0"
+                            Style="{StaticResource PluginComboBox}"
+                            materialDesign:HintAssist.Hint="导入工程格式"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                            SelectedIndex="{Binding SelectedInputPluginIndex}"
+                            SelectionChanged="ImportPluginComboBox_SelectionChanged">
+                        </ComboBox>
+                        <materialDesign:PopupBox
+                            Grid.Column="1"
+                            Margin="10 10 0 8"
+                            Grid.Row="0"
+                            PlacementMode="BottomAndAlignCentres"
+                            StaysOpen="True"
+                            ToolTip="查看详细信息"
+                            IsEnabled="{Binding SelectedIndex, ElementName=ImportPluginComboBox, Converter={StaticResource IndexToBooleanConverter}}"
+                            UnfurlOrientation="Horizontal"
+                            Cursor="Hand">
+                            <materialDesign:PopupBox.ToggleContent>
+                                <Grid>
+                                    <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="#424242"/>
+                                    <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="#424242"/>
+                                </Grid>
+                            </materialDesign:PopupBox.ToggleContent>
+                            <local:PluginDetailsBoard>
+                                <local:PluginDetailsBoard.DataContext>
+                                    <MultiBinding Converter="{StaticResource CollectionElementConverter}">
+                                        <Binding Path="Plugins"/>
+                                        <Binding Path="SelectedInputPluginIndex"/>
+                                    </MultiBinding>
+                                </local:PluginDetailsBoard.DataContext>
+                            </local:PluginDetailsBoard>
+                    </materialDesign:PopupBox>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="-2 -8 0 5" Orientation="Horizontal">
+                            <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
+                                <ToggleButton
+                                    x:Name="AutoDetectToggle"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                    Width="40"
+                                    Height="20"
+                                    Cursor="Hand"
+                                    IsChecked="{Binding AutoDetectFormat}"/>
+                                <TextBlock x:Name="AutoDetectText" VerticalAlignment="Center" Margin="5" Text="自动检测导入格式" FontSize="14" Foreground="DimGray"/>
+                            </StackPanel>
+                            <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
+                                <ToggleButton
+                                    x:Name="AutoResetToggle"
+                                    VerticalAlignment="Center"
+                                    Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                    Width="40"
+                                    Height="20"
+                                    Cursor="Hand"
+                                    IsChecked="{Binding AutoResetTasks}"/>
+                                <TextBlock x:Name="AutoResetText" VerticalAlignment="Center" Margin="5" Text="切换格式时重置列表" FontSize="14" Foreground="DimGray"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </materialDesign:Card>
+
+                <materialDesign:Card
+                    x:Name="ConverterTaskCard"
+                    Grid.Row="1"
+                    Margin="20 10 10 20"
+                    Background="AliceBlue">
+                    <Grid>
+                        <DockPanel x:Name="FileDropPanel" Visibility="{Binding Visibility, ElementName=TaskListView, Converter={StaticResource ReversedVisibilityConverter}}">
+                            <Grid>
+                                <StackPanel
+                                    x:Name="FileDropAndClickMaskPanel"
+                                    Background="Black"
+                                    Opacity="0"
+                                    Panel.ZIndex="16"
+                                    AllowDrop="True"
+                                    Cursor="Hand"
+                                    MouseEnter="FileMaskPanel_Focus"
+                                    MouseLeave="FileMaskPanel_UnFocus"
+                                    MouseDown="FileMaskPanel_Click"
+                                    Drop="FileMaskPanel_Drop"
+                                    DragEnter="FileMaskPanel_Focus"
+                                    DragLeave="FileMaskPanel_UnFocus"/>
+                                <DockPanel Height="240" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                    <materialDesign:PackIcon
+                                        x:Name="FileDropIcon"
+                                        DockPanel.Dock="Top"
+                                        Kind="TrayArrowDown"
+                                        Margin="0 50 0 0"
+                                        HorizontalAlignment="Center"
+                                        Width="100"
+                                        Height="100"
+                                        Opacity="0.4"
+                                        Foreground="#01579b"/>
+                                    <TextBlock
+                                        x:Name="FileDropText"
+                                        DockPanel.Dock="Bottom"
+                                        Text="拖拽或单击以导入文件"
+                                        HorizontalAlignment="Center"
+                                        FontSize="25"
+                                        Opacity="{Binding Opacity, ElementName=FileDropIcon}"
+                                        Foreground="#01579b"/>
+                                </DockPanel>
+                                <Rectangle
+                                    x:Name="FileDropRectangle"
+                                    Margin="10 10 10 10"
+                                    Stroke="#01579b"
+                                    Opacity="{Binding Opacity, ElementName=FileDropIcon}"
+                                    StrokeThickness="3"
+                                    StrokeLineJoin="Round"
+                                    RadiusX="5"
+                                    RadiusY="5"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeDashArray="5 3"/>
+                            </Grid>
+                        </DockPanel>
+                        <DockPanel x:Name="TaskListPanel" Visibility="{Binding Visibility, ElementName=TaskListView}">
+                            <Grid>
+                                <ScrollViewer
+                                    Margin="0 0 0 50"
+                                    VerticalScrollBarVisibility="Auto"
+                                    AllowDrop="True"
+                                    Drop="FileMaskPanel_Drop"
+                                    DragEnter="FileMaskPanel_Focus"
+                                    DragLeave="FileMaskPanel_UnFocus">
+                                    <ItemsControl
+                                        x:Name="TaskListView"
+                                        Margin="5"
+                                        ItemsSource="{Binding TaskList}"
+                                        Visibility="{Binding HasItems, ElementName=TaskListView, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                        IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                        Grid.IsSharedSizeScope="True">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type local:Task}">
+                                                <ListViewItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                                                    <Grid Height="40" Margin="0 -5 0 0" HorizontalAlignment="Stretch">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition Width="40"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition Height="3"/>
+                                                        </Grid.RowDefinitions>
+                                                        <StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Margin="5 2 0 0">
+                                                            <TextBlock Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="15"/>
+                                                            <TextBlock Text="{Binding ImportDirectory}"/>
+                                                        </StackPanel>
+                                                        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0 0 5 0">
+                                                            <Button
+                                                                x:Name="RemoveTaskButton"
+                                                                Padding="0"
+                                                                Content="{materialDesign:PackIcon DeleteOutline}"
+                                                                Style="{StaticResource MaterialDesignRaisedLightButton}"
+                                                                ToolTip="移除"
+                                                                Click="RemoveTaskButton_Click"/>
+                                                        </StackPanel>
+                                                        <Separator Grid.Row="1" Grid.ColumnSpan="2" Margin="0 2 0 0" VerticalAlignment="Center"/>
+                                                    </Grid>
+                                                </ListViewItem>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                                <materialDesign:PopupBox
+                                    Grid.Row="1"
+                                    Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}"
+                                    Width="40"
+                                    Height="40"
+                                    Visibility="{Binding HasItems, ElementName=TaskListView, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                    PopupMode="MouseOver"
+                                    PlacementMode="RightAndAlignMiddles"
+                                    UnfurlOrientation="Horizontal"
+                                    ToolTip="操作"
+                                    Margin="15 0 0 15"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}">
+                                    <materialDesign:PopupBox.ToggleContent>
+                                        <materialDesign:PackIcon Kind="Tools" Width="20" Height="20"/>
+                                    </materialDesign:PopupBox.ToggleContent>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button
+                                            Margin="5 0"
+                                            Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                                            ToolTip="添加文件"
+                                            Click="FileMaskPanel_Click">
+                                            <materialDesign:PackIcon Kind="Add"/>
+                                        </Button>
+                                        <Button
+                                            Margin="5 0"
+                                            Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                                            ToolTip="重置列表"
+                                            Click="ClearTaskButton_Click">
+                                            <materialDesign:PackIcon Kind="Refresh"/>
+                                        </Button>
+                                    </StackPanel>
+                                </materialDesign:PopupBox>
+                            </Grid>
+                        </DockPanel>
+                    </Grid>
+                </materialDesign:Card>
+            </Grid>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="120"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="120"/>
+                </Grid.RowDefinitions>
+                
+                <materialDesign:Card
+                    x:Name="ConvertOptionsCard"
+                    Grid.Row="0"
+                    Margin="10 20 20 10"
+                    Background="Beige">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="70"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="25"/>
+                        </Grid.RowDefinitions>
+                        <ComboBox
+                            x:Name="ExportPluginComboBox"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            Margin="15 0 0 0"
+                            Padding="16 5"
+                            Style="{StaticResource PluginComboBox}"
+                            materialDesign:HintAssist.Hint="导出工程格式"
+                            VerticalContentAlignment="Center"
+                            IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                            SelectedIndex="{Binding SelectedOutputPluginIndex}"/>
+                        <materialDesign:PopupBox
+                            Grid.Column="1"
+                            Margin="10 10 0 8"
+                            Grid.Row="0"
+                            PlacementMode="BottomAndAlignCentres"
+                            StaysOpen="True"
+                            ToolTip="查看详细信息"
+                            IsEnabled="{Binding SelectedIndex, ElementName=ExportPluginComboBox, Converter={StaticResource IndexToBooleanConverter}}"
+                            UnfurlOrientation="Horizontal"
+                            Cursor="Hand">
+                            <materialDesign:PopupBox.ToggleContent>
+                                <Grid>
+                                    <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="#424242"/>
+                                    <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="#424242"/>
+                                </Grid>
+                            </materialDesign:PopupBox.ToggleContent>
+                            <local:PluginDetailsBoard>
+                                <local:PluginDetailsBoard.DataContext>
+                                    <MultiBinding Converter="{StaticResource CollectionElementConverter}">
+                                        <Binding Path="Plugins"/>
+                                        <Binding Path="SelectedOutputPluginIndex"/>
+                                    </MultiBinding>
+                                </local:PluginDetailsBoard.DataContext>
+                            </local:PluginDetailsBoard>
+                        </materialDesign:PopupBox>
+                    </Grid>
+                </materialDesign:Card>
+
+                <materialDesign:Card
+                    x:Name="ConverterOptionsCard"
+                    Grid.Row="1"
+                    Margin="10 10 20 10"
+                    Background="BlanchedAlmond"/>
+
+                <materialDesign:Card
+                    x:Name="TaskExecutionCard"
+                    Grid.Row="2"
+                    Margin="10 10 20 20"
+                    Background="LightYellow">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1.5*"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="150"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="5 0">
+                            <Button
+                                x:Name="BrowseExportFolderButton"
+                                VerticalAlignment="Bottom"
+                                Padding="0"
+                                Margin="5 0 0 7"
+                                Height="40"
+                                Width="40"
+                                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
+                                Content="{materialDesign:PackIcon Folder}"
+                                IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                Click="BrowseExportFolderButton_Click"
+                                ToolTip="浏览"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox
+                                    VerticalAlignment="Center"
+                                    Margin="10 0"
+                                    Width="{Binding ActualWidth, ElementName=TaskExecutionCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=225, Mode=OneWay}"
+                                    materialDesign:HintAssist.Hint="输出路径"
+                                    Text="{Binding ExportPath}"
+                                    FontSize="16"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                    IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                    Cursor="Arrow">
+                                </TextBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Margin="10 0 10 5" Orientation="Horizontal">
+                            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                <ToggleButton
+                                        x:Name="OpenExportFolderToggle"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                        Width="40"
+                                        Height="20"
+                                        Cursor="Hand"
+                                        IsChecked="{Binding OpenExportFolder}"/>
+                                <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="转换完成后打开输出路径" FontSize="14" Foreground="DimGray"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
+                                <TextBlock x:Name="OverwriteOptionText" VerticalAlignment="Center" Margin="5" Text="遇到同名文件时" FontSize="14" Foreground="DimGray"/>
+                                <ComboBox
+                                    x:Name="OverwriteOptionComboBox"
+                                    Margin="2"
+                                    FontSize="14"
+                                    materialDesign:ComboBoxAssist.ShowSelectedItem="False"
+                                    IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}">
+                                    <ComboBoxItem IsSelected="True" Content="覆盖"/>
+                                    <ComboBoxItem Content="跳过"/>
+                                    <ComboBoxItem Content="询问"/>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                        <Button
+                            x:Name="StartExecutionButton"
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Width="130"
+                            Height="60"
+                            HorizontalAlignment="Center"
+                            Margin="-10 0 0 0"
+                            materialDesign:ButtonAssist.CornerRadius="10"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            materialDesign:ButtonProgressAssist.Value="-1"
+                            materialDesign:ButtonProgressAssist.IsIndicatorVisible="True"
+                            materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding ExecutionInProgress}"
+                            FontSize="20"
+                            Content="开始转换"
+                            IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource BooleanNotOperationConverter}}"
+                            Click="StartExecutionButton_Click"/>
+                    </Grid>
+                </materialDesign:Card>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>
