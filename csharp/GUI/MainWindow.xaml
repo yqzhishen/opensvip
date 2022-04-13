@@ -88,7 +88,8 @@
                     <materialDesign:Card
                         x:Name="PluginSelectionCard"
                         Grid.Row="0"
-                        Margin="20 20 10 10">
+                        Margin="20 20 10 10"
+                        Padding="0 0 0 5">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
