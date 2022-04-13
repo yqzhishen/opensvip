@@ -1,7 +1,10 @@
 ﻿using OpenSvip.Framework;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Data;
 
@@ -75,6 +78,35 @@ namespace OpenSvip.GUI
         }
     }
 
+    public class IndexToEnumValueConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var enumValues = ((Type)parameter).GetEnumValues().OfType<object>().ToArray();
+            return Array.IndexOf(enumValues, value);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((Type)parameter).GetEnumValues().OfType<object>().ElementAt((int)value);
+        }
+    }
+
+    public class EnumValueDescriptionConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var fields = value.GetType().GetFields().Skip(1).ToArray();
+            var enumValues = value.GetType().GetEnumValues().OfType<object>().ToArray();
+            return fields[Array.IndexOf(enumValues, value)].GetCustomAttribute<DescriptionAttribute>().Description;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     public class BooleanNotOperationConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -140,7 +172,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (double)value - double.Parse(parameter.ToString());
+            return Math.Max(0, (double)value - double.Parse(parameter.ToString()));
         }
 
         public object ConvertBack(object value, Type targetTypes, object parameter, CultureInfo culture)

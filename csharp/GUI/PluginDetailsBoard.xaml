@@ -3,116 +3,114 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:OpenSvip.GUI"
     xmlns:Framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
-xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    mc:Ignorable="d" 
-    d:DesignHeight="600"
-    d:DesignWidth="400"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    d:Background="White"
+    d:DataContext="{d:DesignInstance Type=Framework:Plugin}"
     MaxWidth="400">
-    <UserControl.DataContext>
-        <Framework:Plugin/>
-    </UserControl.DataContext>
-    <Grid>
-        <StackPanel Background="White">
-            <Grid Margin="10">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1.5*"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <materialDesign:PackIcon
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        Grid.RowSpan="3"
-                        Kind="Puzzle"
-                        Foreground="#424242"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Width="80"
-                        Height="80"/>
-                    <StackPanel
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Margin="0 0 20 0"
-                        Orientation="Horizontal">
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Margin="10 10 10 0"
-                            FontSize="32"
-                            FontWeight="Bold"
-                            Text="{Binding Name}"/>
-                        <TextBlock
-                            VerticalAlignment="Center"
-                            Margin="0 25 0 0"
-                            Text="{Binding Version}"
-                            FontSize="16"/>
-                    </StackPanel>
-                    <StackPanel
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Margin="10 0 20 15"
-                        Orientation="Horizontal">
-                        <materialDesign:PackIcon
-                            VerticalAlignment="Center"
-                            Kind="Account"
-                            Width="20"
-                            Height="20"
-                            Foreground="{Binding Foreground, ElementName=AuthorName}"/>
-                        <TextBlock VerticalAlignment="Center" Margin="5 0">
-                            <Hyperlink
-                                FontSize="16"
-                                Foreground="#01579b"
-                                TextDecorations="Underline"
-                                NavigateUri="{Binding HomePage}"
-                                ToolTip="{Binding HomePage}"
-                                Cursor="Hand"
-                                Click="AuthorHomePageLink_Click">
-                                <TextBlock
-                                    x:Name="AuthorName"
-                                    Text="{Binding Author}"/>
-                            </Hyperlink>
-                        </TextBlock>
-                        <materialDesign:PackIcon
-                            Margin="-5 -5 0 0"
-                            VerticalAlignment="Center"
-                            Kind="ArrowTopRightThick"
-                            Width="10"
-                            Height="10"
-                            Foreground="{Binding Foreground, ElementName=AuthorName}"/>
-                    </StackPanel>
-                </Grid>
-                <Separator Grid.Row="1"/>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1.5*"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <materialDesign:PackIcon
+                Grid.Column="0"
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                Kind="Puzzle"
+                Foreground="#424242"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Width="80"
+                Height="80"/>
+            <StackPanel
+                Grid.Row="0"
+                Grid.Column="1"
+                Margin="0 0 20 0"
+                Orientation="Horizontal">
                 <TextBlock
-                    Grid.Row="2"
-                    Margin="15 10"
-                    LineHeight="20"
-                    TextWrapping="Wrap"
-                    Text="{Binding Descriptions}"/>
-                <Separator Grid.Row="3"/>
-                <StackPanel Grid.Row="4" Margin="15 10" Orientation="Vertical">
-                    <TextBlock
-                        LineHeight="25"
-                        FontWeight="Bold"
-                        Text="环境要求"/>
-                    <TextBlock
-                        LineHeight="20"
-                        TextWrapping="Wrap"
-                        Text="{Binding Requirements}"/>
-                </StackPanel>
-            </Grid>
+                    VerticalAlignment="Center"
+                    Margin="10 10 10 0"
+                    FontSize="32"
+                    FontWeight="Bold"
+                    d:Text="BinSvip"
+                    Text="{Binding Name}"/>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Margin="0 25 0 0"
+                    d:Text="1.1.0"
+                    Text="{Binding Version}"
+                    FontSize="16"/>
+            </StackPanel>
+            <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="10 0 20 15"
+                Orientation="Horizontal">
+                <materialDesign:PackIcon
+                    VerticalAlignment="Center"
+                    Kind="Account"
+                    Width="20"
+                    Height="20"
+                    Foreground="{Binding Foreground, ElementName=AuthorName}"/>
+                <TextBlock VerticalAlignment="Center" Margin="5 0">
+                    <Hyperlink
+                        FontSize="16"
+                        Foreground="#01579b"
+                        TextDecorations="Underline"
+                        NavigateUri="{Binding HomePage}"
+                        ToolTip="{Binding HomePage}"
+                        Cursor="Hand"
+                        Click="AuthorHomePageLink_Click">
+                        <TextBlock
+                            x:Name="AuthorName"
+                            d:Text="YQ之神"
+                            Text="{Binding Author}"/>
+                    </Hyperlink>
+                </TextBlock>
+                <materialDesign:PackIcon
+                    Margin="-5 -5 0 0"
+                    VerticalAlignment="Center"
+                    Kind="ArrowTopRightThick"
+                    Width="10"
+                    Height="10"
+                    Foreground="{Binding Foreground, ElementName=AuthorName}"/>
+            </StackPanel>
+        </Grid>
+        <Separator Grid.Row="1"/>
+        <TextBlock
+            Grid.Row="2"
+            Margin="15 10"
+            LineHeight="20"
+            TextWrapping="Wrap"
+            d:Text="原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，请修改 SingerDict.json。"
+            Text="{Binding Descriptions}"/>
+        <Separator Grid.Row="3"/>
+        <StackPanel Grid.Row="4" Margin="15 10" Orientation="Vertical">
+            <TextBlock
+                LineHeight="25"
+                FontWeight="Bold"
+                Text="环境要求"/>
+            <TextBlock
+                LineHeight="20"
+                TextWrapping="Wrap"
+                d:Text="系统上需要安装 X Studio，并设置为 .svip 文件默认打开方式。&#x000A;建议使用 2.0 或更高版本；最低可兼容 1.8 版本，但无法导入与导出力度参数。"
+                Text="{Binding Requirements}"/>
         </StackPanel>
     </Grid>
 </UserControl>

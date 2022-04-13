@@ -73,6 +73,14 @@
       <HintPath>..\packages\MaterialDesignInXamlToolkitAddOns.0.0.4\lib\net471\MaterialDesignThemes.Wpf.AddOns.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -94,10 +102,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AsyncObservableCollection.cs" />
+    <Compile Include="FileOverwriteDialog.xaml.cs">
+      <DependentUpon>FileOverwriteDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PluginDetailsBoard.xaml.cs">
       <DependentUpon>PluginDetailsBoard.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TaskListViewItem.xaml.cs">
+      <DependentUpon>TaskListViewItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ValueConverters.cs" />
+    <Page Include="FileOverwriteDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -106,13 +125,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AppModel.cs" />
+    <Compile Include="ViewModels.cs" />
     <Compile Include="ElementsHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="PluginDetailsBoard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TaskListViewItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

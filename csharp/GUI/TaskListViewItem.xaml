@@ -1,0 +1,264 @@
+﻿<UserControl
+    x:Class="OpenSvip.GUI.TaskListViewItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:framwork="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=local:Task}"
+    d:DesignWidth="500"
+    d:Background="White"
+    Height="40">
+    <UserControl.Resources>
+        <Style x:Key="TaskStatusChip" TargetType="materialDesign:Chip" BasedOn="{StaticResource MaterialDesignOutlineChip}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <DataTemplate x:Key="Ready"/>
+        <DataTemplate x:Key="Queued">
+            <materialDesign:Card UniformCornerRadius="15" Padding="4" Height="30" Width="30" VerticalAlignment="Center"
+                materialDesign:ShadowAssist.ShadowDepth="Depth1">
+            <ProgressBar
+                x:Name="TaskQueuedProgressBar"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Height="23"
+                Width="23"
+                Padding="0"
+                Style="{StaticResource MaterialDesignCircularProgressBar}"
+                Value="0"
+                IsIndeterminate="True"/>
+        </materialDesign:Card>
+        </DataTemplate>
+        <DataTemplate x:Key="Success">
+            <materialDesign:PopupBox
+                PopupMode="Click"
+                PlacementMode="RightAndAlignMiddles"
+                StaysOpen="True"
+                ToolTip="转换成功">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:Chip
+                        x:Name="TaskSuccessChip"
+                        IsEnabled="False"
+                        IconBackground="#388e3c"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                        Style="{StaticResource TaskStatusChip}">
+                        <materialDesign:Chip.Icon>
+                            <materialDesign:PackIcon Kind="Check"/>
+                        </materialDesign:Chip.Icon>
+                    </materialDesign:Chip>
+                </materialDesign:PopupBox.ToggleContent>
+                <StackPanel Width="150" Height="110">
+                    <TextBlock
+                        Margin="24.5 10 20 10"
+                        Text="此文件已成功转换。"/>
+                    <Button
+                        x:Name="OpenProjectFileButton"
+                        Width="100"
+                        Margin="0 0 0 5"
+                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Content="打开文件"
+                        Click="OpenProjectFileButton_Click"/>
+                    <Button
+                        x:Name="OpenProjectFileFolderButton"
+                        Width="100"
+                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Content="打开目录"
+                        Click="OpenTargetFolderButton_Click"/>
+                </StackPanel>
+            </materialDesign:PopupBox>
+        </DataTemplate>
+        <DataTemplate x:Key="Warning">
+            <materialDesign:PopupBox
+                PopupMode="Click"
+                StaysOpen="True"
+                PlacementMode="RightAndAlignMiddles"
+                ToolTip="转换完成，但产生警告">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:Chip
+                        x:Name="TaskWarningChip"
+                        IsEnabled="False"
+                        IconBackground="#fbc02d"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                        Style="{StaticResource TaskStatusChip}">
+                        <materialDesign:Chip.Icon>
+                            <materialDesign:PackIcon Kind="ExclamationThick"/>
+                        </materialDesign:Chip.Icon>
+                    </materialDesign:Chip>
+                </materialDesign:PopupBox.ToggleContent>
+                <StackPanel Margin="20 10" MaxWidth="400">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" LineHeight="20" TextWrapping="Wrap" Text="此文件中存在非正常或不合法的数据。&#x000A;转换器进行了自主纠正，因此无法保证输出与输入的一致性。&#x000A;警告信息如下："/>
+                        <ScrollViewer
+                            Grid.Row="1"
+                            Margin="0"
+                            MaxHeight="400"
+                            VerticalScrollBarVisibility="Auto">
+                            <ItemsControl
+                                x:Name="WarningMessageItemsControl"
+                                ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TaskListViewItem}, Path=DataContext.Warnings, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type framwork:Warning}">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Separator Grid.Row="0" Margin="0"/>
+                                                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                                    <materialDesign:PackIcon Kind="AlertOutline" VerticalAlignment="Center"/>
+                                                    <TextBlock
+                                                        Grid.Row="1"
+                                                        Margin="5 0 10 0"
+                                                        MaxWidth="{Binding ActualWidth, ElementName=WarningMessageItemsControl, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=20}"
+                                                        HorizontalAlignment="Left"
+                                                        Text="{Binding}"
+                                                        TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </Grid>
+                </StackPanel>
+            </materialDesign:PopupBox>
+        </DataTemplate>
+        <DataTemplate x:Key="Error">
+            <materialDesign:PopupBox
+                PopupMode="Click"
+                PlacementMode="RightAndAlignMiddles"
+                StaysOpen="True"
+                ToolTip="转换失败">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:Chip
+                        x:Name="TaskErrorChip"
+                        IsEnabled="False"
+                        IconBackground="#d32f2f"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                        Style="{StaticResource TaskStatusChip}">
+                        <materialDesign:Chip.Icon>
+                            <materialDesign:PackIcon Kind="Close"/>
+                        </materialDesign:Chip.Icon>
+                    </materialDesign:Chip>
+                </materialDesign:PopupBox.ToggleContent>
+                <StackPanel Margin="15 0" MaxWidth="250">
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        Margin="0 10"
+                        Text="此文件转换失败，错误信息如下："/>
+                    <TextBlock
+                        Margin="10 0 10 10"
+                        TextWrapping="Wrap"
+                        Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TaskListViewItem}, Path=DataContext.Error, Mode=OneWay}"/>
+                    <Button
+                        x:Name="CopyErrorMessageButton"
+                        Margin="15 0 15 8"
+                        Width="140"
+                        Content="复制错误信息"
+                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Click="CopyErrorMessageButton_Click"/>
+                </StackPanel>
+            </materialDesign:PopupBox>
+        </DataTemplate>
+        <DataTemplate x:Key="Skipped">
+            <materialDesign:PopupBox PopupMode="Click" PlacementMode="RightAndAlignMiddles" StaysOpen="True">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:Chip
+                        x:Name="TaskErrorChip"
+                        IsEnabled="False"
+                        IconBackground="#64b5f6"
+                        materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                        ToolTip="已跳过"
+                        Style="{StaticResource TaskStatusChip}">
+                        <materialDesign:Chip.Icon>
+                            <materialDesign:PackIcon Kind="MinusThick"/>
+                        </materialDesign:Chip.Icon>
+                    </materialDesign:Chip>
+                </materialDesign:PopupBox.ToggleContent>
+                <StackPanel Margin="8 0" Width="230">
+                    <TextBlock Margin="4 10 0 10" HorizontalAlignment="Center" Text="由于遇到同名文件，此任务已被跳过。"/>
+                    <Button
+                        x:Name="OpenTargetFolderButton"
+                        Margin="15 0 15 8"
+                        Width="140"
+                        Content="打开所在目录"
+                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Click="OpenTargetFolderButton_Click"/>
+                </StackPanel>
+            </materialDesign:PopupBox>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="40"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="40"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="3"/>
+        </Grid.RowDefinitions>
+        <Button
+            x:Name="RemoveTaskButton"
+            Grid.Column="0"
+            Grid.Row="0"
+            VerticalAlignment="Center"
+            Margin="0 1 0 0"
+            Padding="0"
+            Height="32"
+            Width="32"
+            Style="{StaticResource MaterialDesignRaisedLightButton}"
+            Content="{materialDesign:PackIcon DeleteOutline}"
+            ToolTip="移除"
+            Click="RemoveTaskButton_Click"/>
+        <DockPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5 2 5 0">
+            <StackPanel>
+                <TextBlock d:Text="黏黏黏黏.svip" Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="14"/>
+                <TextBlock d:Text="C:\Users\YQ之神\Desktop\LongLongDirectory" Text="{Binding ImportDirectory}" MaxWidth="245" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+            <StackPanel HorizontalAlignment="Right" Margin="0 3 0 0" Orientation="Horizontal">
+                <materialDesign:PackIcon
+                    VerticalAlignment="Center"
+                    Margin="0 4 5 4"
+                    Width="20"
+                    Height="20"
+                    Kind="Export"
+                    Opacity="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=1;0.5, Mode=OneWay}"/>
+                <TextBox
+                    Width="100"
+                    VerticalAlignment="Center"
+                    materialDesign:HintAssist.Hint="输出文件名"
+                    Text="{Binding ExportTitle}"/>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Margin="5 4 0 5"
+                    d:Text=".json"
+                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>
+            </StackPanel>
+        </DockPanel>
+        <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0 2 5 0">
+            <ContentControl x:Name="TaskStatusContentControl" Content="{Binding Status}">
+                <ContentControl.ContentTemplateSelector>
+                    <local:TaskListViewItemTemplateSelector
+                    ReadyTemplate="{StaticResource Ready}"
+                    QueuedTemplate="{StaticResource Queued}"
+                    SuccessTemplate="{StaticResource Success}"
+                    WarningTemplate="{StaticResource Warning}"
+                    ErrorTemplate="{StaticResource Error}"
+                    SkippedTemplate="{StaticResource Skipped}"/>
+                </ContentControl.ContentTemplateSelector>
+            </ContentControl>
+        </StackPanel>
+        <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 2 7 0" VerticalAlignment="Center"/>
+    </Grid>
+</UserControl>

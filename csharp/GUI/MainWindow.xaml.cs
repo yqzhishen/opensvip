@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using OpenSvip.Framework;
 using System.Threading;
+using System.Diagnostics;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace OpenSvip.GUI
 {
@@ -17,7 +19,7 @@ namespace OpenSvip.GUI
     /// </summary>
     public partial class MainWindow
     {
-        public AppModel Model { get; set; } = AppModel.Model;
+        public AppModel Model { get; set; } = new AppModel();
 
         public MainWindow()
         {
@@ -52,11 +54,13 @@ namespace OpenSvip.GUI
 
         private void AddConverterTasks(IEnumerable<string> filenames)
         {
-            var newFilenames = filenames.Where(filename => !Model.TaskList.Any(task => task.ImportPath == filename));
+            var newFilenames = filenames
+                .Where(filename => Model.TaskList.All(task => task.ImportPath != filename))
+                .ToArray();
 
             if (Model.AutoDetectFormat)
             {
-                var extensions = newFilenames.Select(filename => Path.GetExtension(filename)).ToHashSet();
+                var extensions = newFilenames.Select(Path.GetExtension).ToHashSet();
                 var matchingExtensions = new HashSet<string>();
                 var index = -1;
                 foreach (var extension in extensions)
@@ -79,14 +83,11 @@ namespace OpenSvip.GUI
 
             foreach (var filename in newFilenames)
             {
-                var exportFilename = Model.SelectedOutputPluginIndex >= 0
-                    ? Path.GetFileNameWithoutExtension(filename) + "." + Model.Plugins[Model.SelectedOutputPluginIndex].Suffix
-                    : Path.GetFileName(filename);
                 Model.TaskList.Add(new Task
                 {
                     ImportPath = filename,
-                    ExportFilename = exportFilename,
-                    Status = "ready"
+                    ExportTitle = Path.GetFileNameWithoutExtension(filename),
+                    Status = TaskStates.Ready
                 });
             }
         }
@@ -96,21 +97,69 @@ namespace OpenSvip.GUI
             new Thread(() =>
             {
                 Model.ExecutionInProgress = true;
-                double progressStep = 100.0 / Model.TaskList.Count;
-
-                var inputConverter = PluginManager.GetConverter(Model.Plugins[Model.SelectedInputPluginIndex].Identifier);
-                var outputConverter = PluginManager.GetConverter(Model.Plugins[Model.SelectedOutputPluginIndex].Identifier);
+                var inputConverter = PluginManager.GetConverter(Model.SelectedInputPlugin.Identifier);
+                var outputConverter = PluginManager.GetConverter(Model.SelectedOutputPlugin.Identifier);
                 foreach (var task in Model.TaskList)
                 {
-                    outputConverter.Save(
-                        Path.Combine(Model.ExportPath, task.ExportFilename),
-                        inputConverter.Load(
-                            task.ImportPath,
-                            new ConverterOptions(new Dictionary<string, string>())),
-                        new ConverterOptions(new Dictionary<string, string>()));
+                    task.PrepareForExecution();
+                }
+                var skipSameFilename = Model.OverWriteOption == OverwriteOptions.Skip;
+                var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
+                foreach (var task in Model.TaskList)
+                {
+                    var exportPath = Path.Combine(Model.ExportPath, task.ExportTitle + Model.ExportExtension);
+                    if (File.Exists(exportPath))
+                    {
+                        if (askBeforeOverwrite)
+                        {
+                            var dialog = FileOverwriteDialog.CreateDialog(exportPath);
+                            dialog.ShowDialog();
+                            skipSameFilename = !dialog.Overwrite;
+                            askBeforeOverwrite = !dialog.KeepChoice;
+                        }
+                        if (skipSameFilename)
+                        {
+                            task.Status = TaskStates.Skipped;
+                            continue;
+                        }
+                    }
+                    try
+                    {
+                        outputConverter.Save(
+                            exportPath,
+                            inputConverter.Load(
+                                task.ImportPath,
+                                new ConverterOptions(new Dictionary<string, string>())),
+                            new ConverterOptions(new Dictionary<string, string>()));
+                    }
+                    catch (Exception e)
+                    {
+                        task.Status = TaskStates.Error;
+                        task.Error = e.Message;
+                        continue;
+                    }
+                    var warnings = Warnings.GetWarnings();
+                    if (warnings.Any())
+                    {
+                        task.Status = TaskStates.Warning;
+                        foreach (var warning in warnings)
+                        {
+                            task.Warnings.Add(warning);
+                        }
+                        Warnings.ClearWarnings();
+                    }
+                    else
+                    {
+                        task.Status = TaskStates.Success;
+                    }
                 }
                 Model.ExecutionInProgress = false;
+                if (Model.OpenExportFolder)
+                {
+                    Process.Start("explorer.exe", Model.ExportPath);
+                }
             }).Start();
+
         }
 
         private void FileMaskPanel_Focus(object sender, RoutedEventArgs e)
@@ -138,7 +187,7 @@ namespace OpenSvip.GUI
             }
             else
             {
-                filters.Add(FilterOfPlugin(Model.Plugins[Model.SelectedInputPluginIndex]));
+                filters.Add(FilterOfPlugin(Model.SelectedInputPlugin));
                 filters.Add("所有文件 (*.*)|*");
             }
 
@@ -169,30 +218,57 @@ namespace OpenSvip.GUI
             }
         }
 
-        private void RemoveTaskButton_Click(object sender, RoutedEventArgs e)
-        {
-            var grid = ElementsHelper.FindParent<Grid>(sender as System.Windows.Controls.Button);
-            Model.TaskList.Remove(grid.DataContext as Task);
-        }
-
-        private void ClearTaskButton_Click(object sender, RoutedEventArgs e)
+        private void ClearTasksButton_Click(object sender, RoutedEventArgs e)
         {
             Model.TaskList.Clear();
         }
 
-        private void BrowseExportFolderButton_Click(object sender, RoutedEventArgs e)
+        private void RestoreTasksButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new FolderBrowserDialog();
-            if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+            foreach (var task in Model.TaskList)
+            {
+                task.ExportTitle = Path.GetFileNameWithoutExtension(task.ImportPath);
+            }
+        }
+
+        private void FilterTasksButton_Click(object sender, RoutedEventArgs e)
+        {
+            var plugin = Model.SelectedInputPlugin;
+            if (plugin == null)
             {
                 return;
             }
-            Model.ExportPath = dialog.SelectedPath;
+            var i = 0;
+            while (i < Model.TaskList.Count)
+            {
+                if (Path.GetExtension(Model.TaskList[i].ImportFilename) != "." + plugin.Suffix)
+                {
+                    Model.TaskList.RemoveAt(i);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+        }
+
+        private void BrowseExportFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = "选择输出路径",
+                IsFolderPicker = true
+            };
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            Model.ExportPath = dialog.FileName;
         }
 
         private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!Model.TaskList.Any() || Model.SelectedInputPluginIndex < 0 || Model.SelectedOutputPluginIndex < 0)
+            if (!Model.TaskList.Any() || Model.SelectedInputPluginIndex < 0 || Model.SelectedOutputPluginIndex < 0 || String.IsNullOrWhiteSpace(Model.ExportPath))
             {
                 return;
             }

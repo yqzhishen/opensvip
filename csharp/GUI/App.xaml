@@ -10,7 +10,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/materialdesigncolor.indigo.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.chip.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/primary/materialdesigncolor.indigo.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -19,6 +20,8 @@
             <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <local:ReversedVisibilityConverter x:Key="ReversedVisibilityConverter"/>
             <local:CollectionElementConverter x:Key="CollectionElementConverter"/>
+            <local:IndexToEnumValueConverter x:Key="IndexToEnumValueConverter"/>
+            <local:EnumValueDescriptionConverter x:Key="EnumValueDescriptionConverter"/>
             <local:BooleanNotOperationConverter x:Key="BooleanNotOperationConverter"/>
             <local:BooleanOrOperationConverter x:Key="BooleanOrOperationConverter"/>
             <local:BooleanSwitchOperationConverter x:Key="BooleanSwitchOperationConverter"/>
