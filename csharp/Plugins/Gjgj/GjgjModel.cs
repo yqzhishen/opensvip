@@ -84,9 +84,15 @@ namespace Gjgj.Model
         [JsonProperty("BeatItems")]public List<GjNote> NoteList { get; set; }
         [JsonProperty("Tone")]public GjPitchParam PitchParam { get; set; }
         [JsonProperty("VolumeMap")]public List<GjVolumeParamPoint> VolumeParam { get; set; }
+        public GjSingerInfo SingerInfo { get; set; }
         public GjKeyboard Keyboard { get; set; }
         [JsonProperty("MasterVolume")]public GjTrackVolume TrackVolume { get; set; }
         public string EQProgram { get; set; }
+    }
+
+    public class GjSingerInfo
+    {
+        [JsonProperty("DisplayName")]public string SingerName { get; set; }
     }
 
     public class GjKeyboard

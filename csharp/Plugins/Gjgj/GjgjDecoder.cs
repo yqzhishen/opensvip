@@ -90,8 +90,22 @@ namespace Plugin.Gjgj
                 case "881singer":
                     return "Rocky";
                 default:
-                    return "演唱轨";
+                    return GetUserMadeSingerName(index);
             }
+        }
+
+        private string GetUserMadeSingerName(int index)
+        {
+            string singerName = "演唱轨";
+            try
+            {
+                singerName = gjProject.SingingTrackList[index].SingerInfo.SingerName;
+            }
+            catch
+            {
+                
+            }
+            return singerName;
         }
 
         private List<Note> DecodeNoteList(int singingTrackIndex, Project project)
@@ -168,7 +182,7 @@ namespace Plugin.Gjgj
         {
             int difference;
             float headLengthInSecs;
-            difference = startPosition + (int)(preTime / 1000.0 * 480.0);
+            difference = startPosition + (int)(preTime * 480.0 * 3.0 / 2000.0);
             if (difference > 0)
             {
                 headLengthInSecs = (float)(timeSynchronizer.GetActualSecsFromTicks(startPosition) - timeSynchronizer.GetActualSecsFromTicks(difference));
@@ -187,7 +201,7 @@ namespace Plugin.Gjgj
             double tailVowelLength;
             if (postTime != 0)
             {
-                essentialVowelLength = duration * 1000 / 480 + postTime;
+                essentialVowelLength = duration * (2000.0 / 3.0) / 480 + postTime;
                 tailVowelLength = -postTime;
                 midRatioOverTail = (float)(essentialVowelLength / tailVowelLength);
             }

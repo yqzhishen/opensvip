@@ -101,6 +101,7 @@ namespace Plugin.Gjgj
                 NoteList = EncodeNoteList(noteID, singingTrack),
                 VolumeParam = EncodeVolumeParam(singingTrack),
                 PitchParam = EncodePitchParam(singingTrack),
+                SingerInfo = new GjSingerInfo(),
                 Keyboard = EncodeKeyboard(),
                 TrackVolume = EncodeTrackVolume(singingTrack),
                 EQProgram = "无"
@@ -500,7 +501,7 @@ namespace Plugin.Gjgj
                     double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
                     double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
                     double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
-                    phonePreTime = -difference * 1000.0 / 480.0;
+                    phonePreTime = -difference * (2000.0 / 3.0) / 480.0;
                 }
             }
             catch (Exception)
@@ -519,7 +520,7 @@ namespace Plugin.Gjgj
                 {
                     double noteLength = note.Length;
                     double ratio = note.EditedPhones.MidRatioOverTail;
-                    phonePostTime = -(noteLength / (1.0 + ratio)) * 1000.0 / 480.0;
+                    phonePostTime = -(noteLength / (1.0 + ratio)) * (2000.0 / 3.0) / 480.0;
                 }
             }
             catch (Exception)
