@@ -92,6 +92,22 @@ namespace OpenSvip.GUI
             }
         }
 
+        private void FilterTasks(Predicate<Task> filter)
+        {
+            var i = 0;
+            while (i < Model.TaskList.Count)
+            {
+                if (!filter(Model.TaskList[i]))
+                {
+                    Model.TaskList.RemoveAt(i);
+                }
+                else
+                {
+                    ++i;
+                }
+            }
+        }
+
         private void ExecuteTasks()
         {
             new Thread(() =>
@@ -214,7 +230,12 @@ namespace OpenSvip.GUI
         {
             if (Model.AutoResetTasks && Model.TaskList.Any())
             {
-                Model.TaskList.Clear();
+                var plugin = Model.SelectedInputPlugin;
+                if (plugin == null)
+                {
+                    return;
+                }
+                FilterTasks(task => Path.GetExtension(task.ImportFilename) == "." + plugin.Suffix);
             }
         }
 
@@ -238,18 +259,7 @@ namespace OpenSvip.GUI
             {
                 return;
             }
-            var i = 0;
-            while (i < Model.TaskList.Count)
-            {
-                if (Path.GetExtension(Model.TaskList[i].ImportFilename) != "." + plugin.Suffix)
-                {
-                    Model.TaskList.RemoveAt(i);
-                }
-                else
-                {
-                    ++i;
-                }
-            }
+            FilterTasks(task => Path.GetExtension(task.ImportFilename) == "." + plugin.Suffix);
         }
 
         private void BrowseExportFolderButton_Click(object sender, RoutedEventArgs e)
