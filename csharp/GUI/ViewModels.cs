@@ -13,7 +13,7 @@ namespace OpenSvip.GUI
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        /* Use this to allow multiple threads to visit an ObservableCollection
+        /* Use this to allow multiple threads to visit an ObservableCollection.
         private readonly object _lock = new object();
 
         public AppModel()
@@ -21,7 +21,29 @@ namespace OpenSvip.GUI
             BindingOperations.EnableCollectionSynchronization(TaskList, _lock);
         }
         */
-        public List<Plugin> Plugins { get; set; } = PluginManager.GetAllPlugins().ToList();
+        public AppModel()
+        {
+            InputOptions = Plugins.ConvertAll(plugin =>
+            {
+                ObservableCollection<OptionViewModel> collection = new AsyncObservableCollection<OptionViewModel>();
+                foreach (var option in plugin.InputOptions)
+                {
+                    collection.Add(new OptionViewModel(option));
+                }
+                return collection;
+            });
+            OutputOptions = Plugins.ConvertAll(plugin =>
+            {
+                ObservableCollection<OptionViewModel> collection = new AsyncObservableCollection<OptionViewModel>();
+                foreach (var option in plugin.OutputOptions)
+                {
+                    collection.Add(new OptionViewModel(option));
+                }
+                return collection;
+            });
+        }
+
+        public List<Plugin> Plugins { get; } = PluginManager.GetAllPlugins().ToList();
 
         public List<string> Formats
         {
@@ -104,6 +126,7 @@ namespace OpenSvip.GUI
                 _selectedInputPluginIndex = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputPluginIndex"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputPlugin"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputOptions"));
             }
         }
 
@@ -123,6 +146,7 @@ namespace OpenSvip.GUI
                 ExportExtension = value >= 0 ? "." + SelectedOutputPlugin.Suffix : null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputPluginIndex"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputPlugin"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputOptions"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportExtension"));
             }
         }
@@ -132,7 +156,21 @@ namespace OpenSvip.GUI
             get => SelectedOutputPluginIndex >= 0 ? Plugins[SelectedOutputPluginIndex] : null;
         }
 
-        public ObservableCollection<Task> TaskList { get; set; } = new AsyncObservableCollection<Task>();
+        public ObservableCollection<TaskViewModel> TaskList { get; set; } = new AsyncObservableCollection<TaskViewModel>();
+
+        public List<ObservableCollection<OptionViewModel>> InputOptions { get; }
+
+        public ObservableCollection<OptionViewModel> SelectedInputOptions
+        {
+            get => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
+        }
+        
+        public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
+
+        public ObservableCollection<OptionViewModel> SelectedOutputOptions
+        {
+            get => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
+        }
 
         private string _exportPath;
 
@@ -190,7 +228,7 @@ namespace OpenSvip.GUI
         public bool DialogIsOpen = false;
     }
 
-    public class Task : INotifyPropertyChanged
+    public class TaskViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -252,6 +290,61 @@ namespace OpenSvip.GUI
             {
                 _error = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Status"));
+            }
+        }
+    }
+
+    public class OptionViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public OptionViewModel(Option option)
+        {
+            OptionInfo = option;
+            OptionValue = option.Default;
+            if (OptionInfo.Type == "enum")
+            {
+                for (var i = 0; i < OptionInfo.EnumChoices.Length; ++i)
+                {
+                    if (OptionInfo.EnumChoices[i].Tag == option.Default)
+                    {
+                        _choiceIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public Option OptionInfo { get; set; }
+
+        private string _optionValue;
+
+        public string OptionValue
+        {
+            get
+            {
+                if (OptionInfo.Type == "enum")
+                {
+                    return ChoiceIndex >= 0 ? OptionInfo.EnumChoices[ChoiceIndex].Tag : null;
+                }
+                return _optionValue;
+            }
+            set
+            {
+                _optionValue = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("OptionValue"));
+            }
+        }
+
+        private int _choiceIndex = -1;
+
+        public int ChoiceIndex
+        {
+            get => _choiceIndex;
+            set
+            {
+                _choiceIndex = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ChoiceIndex"));
             }
         }
     }

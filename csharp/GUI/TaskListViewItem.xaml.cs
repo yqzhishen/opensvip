@@ -21,26 +21,26 @@ namespace OpenSvip.GUI
         private void RemoveTaskButton_Click(object sender, RoutedEventArgs e)
         {
             var itemsControl = ElementsHelper.FindParent<ItemsControl>(this);
-            (itemsControl.ItemsSource as Collection<Task>).Remove(DataContext as Task);
+            (itemsControl.ItemsSource as Collection<TaskViewModel>).Remove(DataContext as TaskViewModel);
         }
 
         private void OpenProjectFileButton_Click(object sender, RoutedEventArgs e)
         {
             var model = ElementsHelper.FindParent<Window>(this).DataContext as AppModel;
-            var task = DataContext as Task;
+            var task = DataContext as TaskViewModel;
             Process.Start(Path.Combine(model.ExportPath, task.ExportTitle + model.ExportExtension));
         }
 
         private void OpenTargetFolderButton_Click(object sender, RoutedEventArgs e)
         {
             var model = ElementsHelper.FindParent<Window>(this).DataContext as AppModel;
-            var task = DataContext as Task;
+            var task = DataContext as TaskViewModel;
             Process.Start("explorer.exe", $"/select,{Path.Combine(model.ExportPath, task.ExportTitle + model.ExportExtension)}");
         }
 
         private void CopyErrorMessageButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = DataContext as Task;
+            var task = DataContext as TaskViewModel;
             Clipboard.SetText(task.Error);
             var button = sender as Button;
             button.Content = "已复制";
@@ -77,7 +77,7 @@ namespace OpenSvip.GUI
                 {
                     return ReadyTemplate;
                 }
-                var task = ElementsHelper.FindParent<TaskListViewItem>(container).DataContext as Task;
+                var task = ElementsHelper.FindParent<TaskListViewItem>(container).DataContext as TaskViewModel;
                 switch (task.Status)
                 {
                     case TaskStates.Ready:

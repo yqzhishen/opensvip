@@ -83,7 +83,7 @@ namespace OpenSvip.GUI
 
             foreach (var filename in newFilenames)
             {
-                Model.TaskList.Add(new Task
+                Model.TaskList.Add(new TaskViewModel
                 {
                     ImportPath = filename,
                     ExportTitle = Path.GetFileNameWithoutExtension(filename),
@@ -92,7 +92,7 @@ namespace OpenSvip.GUI
             }
         }
 
-        private void FilterTasks(Predicate<Task> filter)
+        private void FilterTasks(Predicate<TaskViewModel> filter)
         {
             var i = 0;
             while (i < Model.TaskList.Count)
@@ -141,12 +141,22 @@ namespace OpenSvip.GUI
                     }
                     try
                     {
+                        var inputOptionDictionary = new Dictionary<string, string>();
+                        foreach (var option in Model.SelectedInputOptions)
+                        {
+                            inputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
+                        }
+                        var outputOptionDictionary = new Dictionary<string, string>();
+                        foreach (var option in Model.SelectedOutputOptions)
+                        {
+                            outputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
+                        }
                         outputConverter.Save(
                             exportPath,
                             inputConverter.Load(
                                 task.ImportPath,
-                                new ConverterOptions(new Dictionary<string, string>())),
-                            new ConverterOptions(new Dictionary<string, string>()));
+                                new ConverterOptions(inputOptionDictionary)),
+                            new ConverterOptions(outputOptionDictionary));
                     }
                     catch (Exception e)
                     {
@@ -283,6 +293,12 @@ namespace OpenSvip.GUI
                 return;
             }
             ExecuteTasks();
+        }
+
+        private void TreeViewHeader_Click(object sender, RoutedEventArgs e)
+        {
+            var treeViewItem = ElementsHelper.FindParent<TreeViewItem>(sender as DependencyObject);
+            treeViewItem.IsExpanded = !treeViewItem.IsExpanded;
         }
     }
 }

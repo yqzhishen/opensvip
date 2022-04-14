@@ -10,7 +10,15 @@ namespace OpenSvip.GUI
     /// </summary>
     public partial class FileOverwriteDialog
     {
-        private bool _isOpen;
+        public FileOverwriteDialog()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private static bool _keepChoice;
+
+        private readonly object _lock = new object();
 
         public string OverwrittenPath
         {
@@ -24,9 +32,13 @@ namespace OpenSvip.GUI
             }
         }
 
-        public bool Overwrite { get; private set; }
+        public bool Overwrite { get; set; }
 
-        public bool KeepChoice { get; private set; }
+        public bool KeepChoice
+        {
+            get => _keepChoice;
+            set => _keepChoice = value;
+        }
 
         public static FileOverwriteDialog CreateDialog(string overwrittenPath)
         {
@@ -41,32 +53,25 @@ namespace OpenSvip.GUI
             return dialog;
         }
 
-        public FileOverwriteDialog()
-        {
-            InitializeComponent();
-        }
-
         public void ShowDialog()
         {
-            _isOpen = true;
             Dispatcher.Invoke(() =>
             {
+                Monitor.Enter(_lock);
                 DialogHost.Show(this, "RootDialogHost");
             });
-            while (_isOpen)
-            {
-                Thread.Sleep(0);
-            }
+            Monitor.Enter(_lock);
             Dispatcher.Invoke(() =>
             {
                 KeepChoice = KeepChoiceCheckBox.IsChecked ?? false;
             });
+            Monitor.Exit(_lock);
         }
 
         private void DialogButton_Click(object sender, RoutedEventArgs e)
         {
             Overwrite = (bool) ((Button) sender).CommandParameter;
-            _isOpen = false;
+            Monitor.Exit(_lock);
         }
     }
 }

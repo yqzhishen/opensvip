@@ -8,7 +8,7 @@
     xmlns:framwork="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance Type=local:Task}"
+    d:DataContext="{d:DesignInstance Type=local:TaskViewModel}"
     d:DesignWidth="500"
     d:Background="White"
     Height="40">
@@ -250,12 +250,13 @@
             <ContentControl x:Name="TaskStatusContentControl" Content="{Binding Status}">
                 <ContentControl.ContentTemplateSelector>
                     <local:TaskListViewItemTemplateSelector
-                    ReadyTemplate="{StaticResource Ready}"
-                    QueuedTemplate="{StaticResource Queued}"
-                    SuccessTemplate="{StaticResource Success}"
-                    WarningTemplate="{StaticResource Warning}"
-                    ErrorTemplate="{StaticResource Error}"
-                    SkippedTemplate="{StaticResource Skipped}"/>
+                        ReadyTemplate="{StaticResource Ready}"
+                        QueuedTemplate="{StaticResource Queued}"
+                        SuccessTemplate="{StaticResource Success}"
+                        WarningTemplate="{StaticResource Warning}"
+                        ErrorTemplate="{StaticResource Error}"
+                        SkippedTemplate="{StaticResource Skipped}">
+                    </local:TaskListViewItemTemplateSelector>
                 </ContentControl.ContentTemplateSelector>
             </ContentControl>
         </StackPanel>

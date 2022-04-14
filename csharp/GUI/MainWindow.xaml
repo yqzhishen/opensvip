@@ -5,6 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器"
@@ -148,7 +150,7 @@
                                                 Height="20"
                                                 Cursor="Hand"
                                                 IsChecked="{Binding AutoDetectFormat}"/>
-                                            <TextBlock x:Name="AutoDetectText" VerticalAlignment="Center" Margin="5" Text="自动检测导入格式" FontSize="14" Foreground="DimGray"/>
+                                            <TextBlock x:Name="AutoDetectText" VerticalAlignment="Center" Margin="5" Text="自动检测导入格式" FontSize="14" Opacity="0.8"/>
                                         </StackPanel>
                                         <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
                                             <ToggleButton
@@ -159,7 +161,7 @@
                                                 Height="20"
                                                 Cursor="Hand"
                                                 IsChecked="{Binding AutoResetTasks}"/>
-                                            <TextBlock x:Name="AutoResetText" VerticalAlignment="Center" Margin="5" Text="切换格式时重置列表" FontSize="14" Foreground="DimGray"/>
+                                            <TextBlock x:Name="AutoResetText" VerticalAlignment="Center" Margin="5" Text="切换格式时重置列表" FontSize="14" Opacity="0.8"/>
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
@@ -291,6 +293,7 @@
                                         Grid.Row="1"
                                         Margin="7 5 12 0"
                                         VerticalScrollBarVisibility="Auto"
+                                        PanningMode="VerticalOnly"
                                         AllowDrop="True"
                                         Drop="FileMaskPanel_Drop"
                                         DragEnter="FileMaskPanel_Focus"
@@ -303,7 +306,7 @@
                                             IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
                                             Grid.IsSharedSizeScope="True">
                                             <ItemsControl.ItemTemplate>
-                                                <DataTemplate DataType="{x:Type local:Task}">
+                                                <DataTemplate DataType="{x:Type local:TaskViewModel}">
                                                     <local:TaskListViewItem/>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
@@ -380,7 +383,96 @@
                                 <RowDefinition Height="35"/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="15 0" Text="高级选项" FontSize="20"/>
+                            <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="15 0" Text="高级选项" FontSize="20"/>
+                            <ScrollViewer Grid.Row="1" Margin="5 10 15 20" PanningMode="VerticalOnly" VerticalScrollBarVisibility="Auto">
+                                <StackPanel x:Name="OptionsPanel">
+                                    <StackPanel.Visibility>
+                                        <MultiBinding Converter="{StaticResource orTrueAsVisibleConverter}">
+                                            <Binding ElementName="InputOptionsTreeView" Path="HasItems"/>
+                                            <Binding ElementName="OutputOptionsTreeView" Path="HasItems"/>
+                                        </MultiBinding>
+                                    </StackPanel.Visibility>
+                                    <StackPanel.Resources>
+                                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+                                            <Setter Property="IsExpanded" Value="True"/>
+                                            <Setter Property="materialDesign:TreeViewAssist.ShowSelection" Value="False"/>
+                                            <Setter Property="materialDesign:TreeViewAssist.ExpanderSize" Value="20"/>
+                                        </Style>
+                                        <DataTemplate x:Key="OptionsTreeViewItemTemplate">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition Height="5"/>
+                                                </Grid.RowDefinitions>
+                                                <Separator Grid.Row="1" Opacity="0.6"/>
+                                                <local:OptionTreeViewItem Grid.Row="0" DataContext="{Binding}" Margin="0 -8 0 0" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </StackPanel.Resources>
+                                    <TreeView
+                                        Height="{Binding HasItems, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=Auto;0}"
+                                        Visibility="{Binding HasItems, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <TreeViewItem
+                                            x:Name="InputOptionsTreeView"
+                                            ItemsSource="{Binding SelectedInputOptions}">
+                                            <TreeViewItem.Header>
+                                                <TextBlock
+                                                    Margin="-8 0 0 0"
+                                                    Text="输入选项"
+                                                    FontSize="16"
+                                                    ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
+                                                    MouseDown="TreeViewHeader_Click"/>
+                                            </TreeViewItem.Header>
+                                            <TreeViewItem.ItemTemplate>
+                                                <StaticResource ResourceKey="OptionsTreeViewItemTemplate"/>
+                                            </TreeViewItem.ItemTemplate>
+                                        </TreeViewItem>
+                                    </TreeView>
+                                    <TreeView
+                                        Height="{Binding HasItems, ElementName=OutputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=Auto;0}"
+                                        Visibility="{Binding HasItems, ElementName=OutputOptionsTreeView, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                        <TreeViewItem
+                                            x:Name="OutputOptionsTreeView"
+                                            ItemsSource="{Binding SelectedOutputOptions}">
+                                            <TreeViewItem.Header>
+                                                <TextBlock
+                                                    Margin="-8 0 0 0"
+                                                    Text="输出选项"
+                                                    FontSize="16"
+                                                    ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
+                                                    MouseDown="TreeViewHeader_Click"/>
+                                            </TreeViewItem.Header>
+                                            <TreeViewItem.ItemTemplate>
+                                                <StaticResource ResourceKey="OptionsTreeViewItemTemplate"/>
+                                            </TreeViewItem.ItemTemplate>
+                                        </TreeViewItem>
+                                    </TreeView>
+                                </StackPanel>
+                            </ScrollViewer>
+                            <DockPanel
+                                Grid.Row="1"
+                                Height="240"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Stretch"
+                                Visibility="{Binding Visibility, ElementName=OptionsPanel, Converter={StaticResource ReversedVisibilityConverter}}">
+                                <materialDesign:PackIcon
+                                    x:Name="NoOptionsAvailableIcon"
+                                    DockPanel.Dock="Top"
+                                    Kind="TuneVariant"
+                                    Margin="0 50 0 0"
+                                    HorizontalAlignment="Center"
+                                    Width="100"
+                                    Height="100"
+                                    Opacity="0.4"
+                                    Foreground="{Binding Foreground, ElementName=FileDropIcon}"/>
+                                <TextBlock
+                                    DockPanel.Dock="Bottom"
+                                    Text="当前没有可用的选项"
+                                    HorizontalAlignment="Center"
+                                    FontSize="25"
+                                    Opacity="{Binding Opacity, ElementName=NoOptionsAvailableIcon}"
+                                    Foreground="{Binding Foreground, ElementName=FileDropIcon}"/>
+                            </DockPanel>
                         </Grid>
                     </materialDesign:Card>
 
@@ -438,13 +530,13 @@
                                             Height="20"
                                             Cursor="Hand"
                                             IsChecked="{Binding OpenExportFolder}"/>
-                                    <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="转换完成后打开输出路径" FontSize="14" Foreground="DimGray"/>
+                                    <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="转换完成后打开输出路径" FontSize="14" Opacity="0.8"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
-                                    <TextBlock x:Name="OverwriteOptionText" VerticalAlignment="Center" Margin="5" Text="遇到同名文件时" FontSize="14" Foreground="DimGray"/>
+                                    <TextBlock x:Name="OverwriteOptionText" VerticalAlignment="Center" Margin="5" Text="遇到同名文件时" FontSize="14" Opacity="0.8"/>
                                     <ComboBox
                                         x:Name="OverwriteOptionComboBox"
-                                        Margin="2.5"
+                                        Margin="2.5 3.5 2.5 2.5"
                                         FontSize="14"
                                         materialDesign:ComboBoxAssist.ShowSelectedItem="False"
                                         IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"

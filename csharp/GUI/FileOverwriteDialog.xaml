@@ -5,12 +5,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     d:Background="White"
     MinHeight="120"
     MinWidth="300"
-    MaxWidth="350">
+    MaxWidth="350"
+    d:DataContext="{d:DesignInstance Type=local:FileOverwriteDialog}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -34,7 +36,8 @@
             Margin="13.5 0 0 2"
             Padding="4 0 0 0"
             FontSize="14"
-            Content="记住选择"/>
+            Content="记住选择"
+            IsChecked="{Binding KeepChoice}"/>
         <StackPanel
             Grid.Row="1"
             Orientation="Horizontal"
@@ -52,9 +55,7 @@
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 Click="DialogButton_Click">
                 <Button.CommandParameter>
-                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                        True
-                    </system:Boolean>
+                    <sys:Boolean>true</sys:Boolean>
                 </Button.CommandParameter>
             </Button>
             <Button
@@ -68,9 +69,7 @@
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 Click="DialogButton_Click">
                 <Button.CommandParameter>
-                    <system:Boolean xmlns:system="clr-namespace:System;assembly=mscorlib">
-                        False
-                    </system:Boolean>
+                    <sys:Boolean>false</sys:Boolean>
                 </Button.CommandParameter>
             </Button>
         </StackPanel>

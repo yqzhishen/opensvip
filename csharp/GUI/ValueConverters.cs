@@ -27,7 +27,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var integer = ((IList<Task>) value).Count;
+            var integer = ((IList<TaskViewModel>) value).Count;
             return integer > 0 ? Visibility.Visible : Visibility.Hidden;
         }
 
@@ -175,7 +175,7 @@ namespace OpenSvip.GUI
             return Math.Max(0, (double)value - double.Parse(parameter.ToString()));
         }
 
-        public object ConvertBack(object value, Type targetTypes, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
@@ -188,9 +188,22 @@ namespace OpenSvip.GUI
             return (int)value == int.Parse(parameter.ToString());
         }
 
-        public object ConvertBack(object value, Type targetTypes, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return parameter;
+        }
+    }
+
+    public class DoubleSubConverter : IMultiValueConverter
+    {
+        public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return Math.Max(0, (double)value[0] - (double)value[1]);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }
