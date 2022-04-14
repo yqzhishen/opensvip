@@ -15,7 +15,7 @@
         <Option Name="pitch" Type="enum" Default="plain">
             <Notes>音高参数属性输入模式</Notes>
             <EnumChoices>
-                <Choice Name="输入完整音高曲线" Tag="plain">
+                <Choice Name="输入完整音高曲线" Tag="full">
                     <Label>不论是否经过编辑，均输入整条音高曲线</Label>
                 </Choice>
                 <Choice Name="仅输入已编辑部分（颤音模式）" Tag="vibrato">
