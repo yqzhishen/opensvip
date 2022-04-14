@@ -11,6 +11,8 @@ namespace Plugin.Gjgj
     {
         public int ParamSampleInterval { get; set; }
 
+        public string SingerName { get; set; }
+
         private Project xsProject;
         
         private GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
@@ -96,7 +98,7 @@ namespace Plugin.Gjgj
             {
                 TrackID = Convert.ToString(trackID),
                 Type = 0,
-                Name = "513singer",//扇宝
+                Name = GetSingerCode(),
                 SortIndex = 0,
                 NoteList = EncodeNoteList(noteID, singingTrack),
                 VolumeParam = EncodeVolumeParam(singingTrack),
@@ -107,6 +109,21 @@ namespace Plugin.Gjgj
                 EQProgram = "无"
             };
             return gjSingingTracksItem;
+        }
+
+        private string GetSingerCode()
+        {
+            switch (SingerName)
+            {
+                case "扇宝":
+                    return "513singer";
+                case "SING-林嘉慧":
+                    return "514singer";
+                case "Rocky":
+                    return "881singer";
+                default:
+                    return "513singer";
+            }
         }
 
         private List<GjMIDITrack> EncodeMIDITrackList()
