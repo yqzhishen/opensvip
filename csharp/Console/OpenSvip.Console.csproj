@@ -7,6 +7,15 @@
         <LangVersion>7.3</LangVersion>
         <RootNamespace>OpenSvip.Console</RootNamespace>
         <OutputType>Exe</OutputType>
+        <PlatformTarget>AnyCPU</PlatformTarget>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+      <DebugType>none</DebugType>
+    </PropertyGroup>
+
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DebugType>full</DebugType>
     </PropertyGroup>
 
     <ItemGroup>
