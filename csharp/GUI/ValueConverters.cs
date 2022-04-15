@@ -165,7 +165,28 @@ namespace OpenSvip.GUI
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var choices = ((string)parameter).Split(';');
-            return (bool)value ? choices[0] : choices[1];
+            var result = (bool)value ? choices[0] : choices[1];
+            if (targetType.Equals(typeof(int)))
+            {
+                if (!int.TryParse(result.ToString(), out int val))
+                {
+                    return DependencyProperty.UnsetValue;
+                }
+                return val;
+            }
+            else if (targetType.Equals(typeof(double)))
+            {
+                if (!double.TryParse(result.ToString(), out double val))
+                {
+                    return DependencyProperty.UnsetValue;
+                }
+                return val;
+            }
+            if (!result.GetType().IsSubclassOf(targetType))
+            {
+                return DependencyProperty.UnsetValue;
+            }
+            return result;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
