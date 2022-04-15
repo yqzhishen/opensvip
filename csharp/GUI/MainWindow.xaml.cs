@@ -11,6 +11,7 @@ using OpenSvip.Framework;
 using System.Threading;
 using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Windows.Input;
 
 namespace OpenSvip.GUI
 {
@@ -47,7 +48,11 @@ namespace OpenSvip.GUI
             {
                 From = from,
                 To = to,
-                Duration = TimeSpan.FromSeconds(0.1)
+                Duration = TimeSpan.FromSeconds(0.1),
+                EasingFunction = new BackEase
+                {
+                    EasingMode = EasingMode.EaseInOut
+                }
             };
             FileDropIcon.BeginAnimation(PackIcon.OpacityProperty, animation);
         }
@@ -299,6 +304,22 @@ namespace OpenSvip.GUI
         {
             var treeViewItem = ElementsHelper.FindParent<TreeViewItem>(sender as DependencyObject);
             treeViewItem.IsExpanded = !treeViewItem.IsExpanded;
+        }
+
+        private void OptionScrollViewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
+            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
+            eventArg.Source = e.Source;
+
+            ScrollViewer scv = (ScrollViewer)sender;
+            scv.RaiseEvent(eventArg);
+            e.Handled = true;
+        }
+
+        private void OptionTreeView_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            OptionScrollViewer_MouseWheel(OptionScrollViewer, e);
         }
     }
 }

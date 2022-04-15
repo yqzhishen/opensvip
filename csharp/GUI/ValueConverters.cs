@@ -50,6 +50,26 @@ namespace OpenSvip.GUI
         }
     }
 
+    public class AnyTrueAsVisibleConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            foreach (var v in values)
+            {
+                if ((bool)v)
+                {
+                    return Visibility.Visible;
+                }
+            }
+            return Visibility.Hidden;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     public class ReversedVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

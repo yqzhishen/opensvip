@@ -12,8 +12,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.chip.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/primary/materialdesigncolor.indigo.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <local:IndexToBooleanConverter x:Key="IndexToBooleanConverter"/>
             <local:CollectionToVisibilityConverter x:Key="CollectionToVisibilityConverter"/>
@@ -29,6 +27,7 @@
             <local:DoubleConstantSubConverter x:Key="DoubleConstantSubConverter"/>
             <local:IntegerConstantEqualsConverter x:Key="IntegerConstantEqualsConverter"/>
             <local:DoubleSubConverter x:Key="DoubleSubConverter"/>
+            <local:AnyTrueAsVisibleConverter x:Key="AnyTrueAsVisibleConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

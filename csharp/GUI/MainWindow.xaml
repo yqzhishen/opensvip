@@ -5,8 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:OpenSvip.GUI"
-    xmlns:framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器"
@@ -384,15 +382,24 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="15 0" Text="高级选项" FontSize="20"/>
-                            <ScrollViewer Grid.Row="1" Margin="5 10 15 20" PanningMode="VerticalOnly" VerticalScrollBarVisibility="Auto">
-                                <StackPanel x:Name="OptionsPanel">
+                            <ScrollViewer
+                                x:Name="OptionScrollViewer"
+                                Grid.Row="1"
+                                Margin="5 10 15 20"
+                                PanningMode="VerticalOnly"
+                                VerticalScrollBarVisibility="Auto"
+                                PreviewMouseWheel="OptionScrollViewer_MouseWheel">
+                                <StackPanel x:Name="OptionsPanel" CanVerticallyScroll="True">
                                     <StackPanel.Visibility>
-                                        <MultiBinding Converter="{StaticResource orTrueAsVisibleConverter}">
+                                        <MultiBinding Converter="{StaticResource AnyTrueAsVisibleConverter}">
                                             <Binding ElementName="InputOptionsTreeView" Path="HasItems"/>
                                             <Binding ElementName="OutputOptionsTreeView" Path="HasItems"/>
                                         </MultiBinding>
                                     </StackPanel.Visibility>
                                     <StackPanel.Resources>
+                                        <Style TargetType="TreeView" BasedOn="{StaticResource MaterialDesignTreeView}">
+                                            <EventSetter Event="PreviewMouseWheel" Handler="OptionTreeView_MouseWheel"/>
+                                        </Style>
                                         <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
                                             <Setter Property="IsExpanded" Value="True"/>
                                             <Setter Property="materialDesign:TreeViewAssist.ShowSelection" Value="False"/>
@@ -401,15 +408,29 @@
                                         <DataTemplate x:Key="OptionsTreeViewItemTemplate">
                                             <Grid>
                                                 <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
                                                     <RowDefinition/>
-                                                    <RowDefinition Height="5"/>
                                                 </Grid.RowDefinitions>
-                                                <Separator Grid.Row="1" Opacity="0.6"/>
-                                                <local:OptionTreeViewItem Grid.Row="0" DataContext="{Binding}" Margin="0 -8 0 0" VerticalAlignment="Center"/>
+                                                <materialDesign:PackIcon
+                                                    Grid.Row="0"
+                                                    Kind="TuneVariant"
+                                                    VerticalAlignment="Center"
+                                                    HorizontalAlignment="Left"
+                                                    Margin="0 0 0 10"
+                                                    Opacity="0.8"/>
+                                                <Separator Grid.Row="0" Margin="20 0 0 10" VerticalAlignment="Center" Opacity="0.6"/>
+                                                <StackPanel
+                                                    Grid.Row="1"
+                                                    Orientation="Horizontal"
+                                                    Width="{Binding ActualWidth, ElementName=ConverterOptionsCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=80}">
+                                                    <local:OptionTreeViewItem DataContext="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                                </StackPanel>
                                             </Grid>
                                         </DataTemplate>
                                     </StackPanel.Resources>
                                     <TreeView
+                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                         Height="{Binding HasItems, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=Auto;0}"
                                         Visibility="{Binding HasItems, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <TreeViewItem

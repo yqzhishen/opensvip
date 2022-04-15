@@ -20,7 +20,6 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="MaxWidth" Value="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=150}"/>
         </Style>
         <Style x:Key="OptionIntegerBox" TargetType="{x:Type local:IntegerNumericBox}" BasedOn="{StaticResource OptionTextBox}">
             <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
@@ -38,8 +37,8 @@
                 <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Text="{Binding Path=OptionValue}" MinWidth="80">
                     <TextBox.MaxWidth>
                         <MultiBinding Converter="{StaticResource DoubleSubConverter}" Mode="OneWay">
-                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}" Path="ActualWidth"/>
-                            <Binding ElementName="TextBlockNearTextBox" Path="ActualWidth" Converter="{StaticResource DoubleConstantSubConverter}" ConverterParameter="-60"/>
+                            <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}" Path="ActualWidth"/>
+                            <Binding ElementName="TextBlockNearTextBox" Path="ActualWidth" Converter="{StaticResource DoubleConstantSubConverter}" ConverterParameter="-50"/>
                         </MultiBinding>
                     </TextBox.MaxWidth>
                 </TextBox>
@@ -72,6 +71,7 @@
                     Style="{StaticResource MaterialDesignSwitchToggleButton}"
                     Width="40"
                     Height="20"
+                    Margin="-2 0 0 0"
                     Cursor="Hand"
                     IsChecked="{Binding Path=OptionValue}"/>
                 <TextBlock x:Name="AutoDetectText" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Margin="5 0" Text="{Binding Path=OptionInfo.Notes}"/>
