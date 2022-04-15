@@ -12,6 +12,8 @@ using System.Threading;
 using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Input;
+using System.Reflection;
+using Newtonsoft.Json;
 
 namespace OpenSvip.GUI
 {
@@ -20,11 +22,26 @@ namespace OpenSvip.GUI
     /// </summary>
     public partial class MainWindow
     {
-        public AppModel Model { get; set; } = new AppModel();
+        public AppModel Model { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
+            try
+            {
+                FileStream stream = new FileStream(
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Configurations.json"),
+                    FileMode.Open,
+                    FileAccess.Read);
+                StreamReader reader = new StreamReader(stream);
+                Model = JsonConvert.DeserializeObject<AppModel>(reader.ReadToEnd());
+                reader.Close();
+                stream.Close();
+            }
+            catch (Exception)
+            {
+                Model = new AppModel();
+            }
             DataContext = Model;
             foreach (var str in Model.Formats)
             {
@@ -320,6 +337,27 @@ namespace OpenSvip.GUI
         private void OptionTreeView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             OptionScrollViewer_MouseWheel(OptionScrollViewer, e);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                FileStream stream = new FileStream(
+                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Configurations.json"),
+                    FileMode.Create,
+                    FileAccess.Write);
+                StreamWriter writer = new StreamWriter(stream);
+                writer.Write(JsonConvert.SerializeObject(Model));
+                writer.Flush();
+                stream.Flush();
+                writer.Close();
+                stream.Close();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }

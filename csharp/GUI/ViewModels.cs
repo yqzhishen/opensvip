@@ -4,11 +4,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Windows.Data;
 using OpenSvip.Framework;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace OpenSvip.GUI
 {
+    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class AppModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -52,6 +54,7 @@ namespace OpenSvip.GUI
 
         private bool _autoDetectFormat = true;
 
+        [JsonProperty]
         public bool AutoDetectFormat
         {
             get => _autoDetectFormat;
@@ -64,6 +67,7 @@ namespace OpenSvip.GUI
 
         private bool _autoResetTasks = true;
 
+        [JsonProperty]
         public bool AutoResetTasks
         {
             get => _autoResetTasks;
@@ -75,6 +79,7 @@ namespace OpenSvip.GUI
 
         private bool _autoExtension = true;
 
+        [JsonProperty]
         public bool AutoExtension
         {
             get => _autoExtension;
@@ -94,6 +99,7 @@ namespace OpenSvip.GUI
 
         private bool _openExportFolder = false;
 
+        [JsonProperty]
         public bool OpenExportFolder
         {
             get => _openExportFolder;
@@ -106,6 +112,8 @@ namespace OpenSvip.GUI
 
         private OverwriteOptions _overwriteOption = OverwriteOptions.Overwrite;
 
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
         public OverwriteOptions OverWriteOption
         {
             get => _overwriteOption;
@@ -224,8 +232,6 @@ namespace OpenSvip.GUI
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExecutionInProgress"));
             }
         }
-
-        public bool DialogIsOpen = false;
     }
 
     public class TaskViewModel : INotifyPropertyChanged

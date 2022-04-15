@@ -9,7 +9,8 @@
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器"
     Height="800"
-    Width="1200">
+    Width="1200"
+    Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
     </Window.DataContext>
