@@ -11,8 +11,8 @@
     Title="OpenSVIP - 歌声合成工程文件转换器"
     Height="800"
     Width="1200"
-    MinHeight="600"
-    MinWidth="900"
+    MinHeight="510"
+    MinWidth="985"
     Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
@@ -23,7 +23,6 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="materialDesign:HintAssist.HintOpacity" Value="0.8"/>
         </Style>
-        
     </Window.Resources>
     <materialDesign:DialogHost Identifier="RootDialogHost">
         <Grid>
@@ -55,19 +54,19 @@
                             <Setter Property="Height" Value="30"/>
                         </Style>
                     </Menu.Resources>
-                    <MenuItem Header="_文件(F)" Height="25" Padding="10 0">
+                    <MenuItem Header="文件(F)" Height="25" Padding="10 0">
                         <MenuItem
                             Header="导入文件..."
                             InputGestureText="Ctrl+I"
-                            Icon="{materialDesign:PackIcon Kind=Import, Size=17}"
+                            Icon="{materialDesign:PackIcon Kind=TrayArrowDown, Size=17}"
                             IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                             Click="FileMaskPanel_Click">
                         </MenuItem>
-                        <MenuItem Header="导出文件" Icon="{materialDesign:PackIcon Kind=ExportVariant, Size=17}">
+                        <MenuItem Header="导出文件" Icon="{materialDesign:PackIcon Kind=TrayArrowUp, Size=17}">
                             <MenuItem
                                 Header="立即开始转换"
                                 InputGestureText="Ctrl+E"
-                                IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
+                                IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
                                 Click="StartExecutionButton_Click"/>
                             <MenuItem
                                 Header="选择输出路径..."
@@ -76,11 +75,11 @@
                         </MenuItem>
                         <MenuItem Header="重置列表" Icon="{materialDesign:PackIcon Kind=Autorenew, Size=17}" InputGestureText="Ctrl+R"/>
                     </MenuItem>
-                    <MenuItem Header="_设置(O)" Height="25" Padding="10 0">
+                    <MenuItem Header="设置(O)" Height="25" Padding="10 0">
                         <MenuItem Header="{Binding Text, ElementName=AutoDetectText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
                         <MenuItem Header="{Binding Text, ElementName=AutoResetText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoResetToggle}"/>
                         <MenuItem Header="{Binding Text, ElementName=AutoExtensionText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoExtensionToggle}"/>
-                        <MenuItem Header="默认导出路径">
+                        <MenuItem Header="默认输出路径">
                             <MenuItem Header="无" Margin="-10 0 -5 0" IsCheckable="True"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"
                                       IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
@@ -112,15 +111,15 @@
                         </MenuItem>
                     </MenuItem>
                     <MenuItem Header="帮助(H)" Height="25" Padding="10 0">
-                        <MenuItem Header="_在线用户手册" Command="Cut" Icon="{materialDesign:PackIcon Kind=TextBoxSearchOutline}" InputGestureText="Ctrl+H"/>
-                        <MenuItem Header="_关于 OpenSVIP..." Command="Copy" Icon="{materialDesign:PackIcon Kind=InformationOutline}" InputGestureText="Ctrl+A"/>
+                        <MenuItem Header="在线用户手册" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=TextBoxSearchOutline}" InputGestureText="Ctrl+H"/>
+                        <MenuItem Header="关于 OpenSVIP..." Icon="{materialDesign:PackIcon Kind=InformationOutline}" InputGestureText="Ctrl+A" Click="AboutMenuItem_Click"/>
                     </MenuItem>
                 </Menu>
             </DockPanel>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition MinWidth="550"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
@@ -556,7 +555,7 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2.8*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*" MaxWidth="150"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="15 0" Text="输出设置" FontSize="20"/>
                             <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10 0 0 0">
@@ -589,16 +588,16 @@
                                     </TextBox>
                                 </StackPanel>
                             </StackPanel>
-                            <StackPanel Grid.Row="2" Margin="7 0 10 5" Orientation="Horizontal">
+                            <StackPanel Grid.Row="2" Margin="7 0 10 5" Orientation="Horizontal" MinWidth="420">
                                 <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
                                     <ToggleButton
-                                            x:Name="OpenExportFolderToggle"
-                                            VerticalAlignment="Center"
-                                            Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                            Width="40"
-                                            Height="20"
-                                            Cursor="Hand"
-                                            IsChecked="{Binding OpenExportFolder}"/>
+                                        x:Name="OpenExportFolderToggle"
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                        Width="40"
+                                        Height="20"
+                                        Cursor="Hand"
+                                        IsChecked="{Binding OpenExportFolder}"/>
                                     <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="完成后打开输出路径" FontSize="14" Opacity="0.8"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">

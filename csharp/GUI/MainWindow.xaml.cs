@@ -229,7 +229,13 @@ namespace OpenSvip.GUI
                     Process.Start("explorer.exe", openFolder);
                 }
             }).Start();
+        }
 
+        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = AboutDialog.CreateDialog();
+            dialog.DataContext = Model;
+            dialog.ShowDialog();
         }
 
         private void FileMaskPanel_Focus(object sender, RoutedEventArgs e)
@@ -400,7 +406,10 @@ namespace OpenSvip.GUI
         private void BrowseAndExportMenu_Click(object sender, RoutedEventArgs e)
         {
             BrowseExportFolderButton_Click(sender, e);
-            StartExecutionButton_Click(sender, e);
+            if (StartExecutionButton.IsEnabled)
+            {
+                StartExecutionButton_Click(sender, e);
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

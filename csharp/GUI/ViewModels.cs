@@ -45,6 +45,16 @@ namespace OpenSvip.GUI
             });
         }
 
+        public string Version { get; set; } = "1.0.0 (Preview)";
+
+        public string FrameworkVersion { get; set; } = "1.2.0";
+
+        public string Author { get; set; } = "YQ之神";
+
+        public string AuthorHomePage { get; set; } = "https://space.bilibili.com/102844209";
+
+        public string GitHubRepository { get; set; } = "https://github.com/yqzhishen/opensvip";
+
         public List<Plugin> Plugins { get; } = PluginManager.GetAllPlugins().ToList();
 
         public List<string> Formats

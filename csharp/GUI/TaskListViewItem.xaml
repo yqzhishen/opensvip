@@ -9,7 +9,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:TaskViewModel}"
-    d:DesignWidth="500"
+    d:DesignWidth="550"
     d:Background="White"
     Height="40">
     <UserControl.Resources>
@@ -202,6 +202,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40"/>
             <ColumnDefinition/>
+            <ColumnDefinition Width="140"/>
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -221,31 +222,29 @@
             Content="{materialDesign:PackIcon DeleteOutline}"
             ToolTip="移除"
             Click="RemoveTaskButton_Click"/>
-        <DockPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5 2 5 0">
-            <StackPanel>
-                <TextBlock d:Text="黏黏黏黏.svip" Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="14"/>
-                <TextBlock d:Text="C:\Users\YQ之神\Desktop\LongLongDirectory" Text="{Binding ImportDirectory}" MaxWidth="245" TextTrimming="CharacterEllipsis"/>
-            </StackPanel>
-            <StackPanel HorizontalAlignment="Right" Margin="0 3 0 0" Orientation="Horizontal">
-                <materialDesign:PackIcon
-                    VerticalAlignment="Center"
-                    Margin="0 4 5 4"
-                    Width="20"
-                    Height="20"
-                    Kind="Export"
-                    Opacity="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=1;0.5, Mode=OneWay}"/>
-                <TextBox
-                    Width="100"
-                    VerticalAlignment="Center"
-                    materialDesign:HintAssist.Hint="输出文件名"
-                    Text="{Binding ExportTitle}"/>
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Margin="5 4 0 5"
-                    d:Text=".json"
-                    Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>
-            </StackPanel>
-        </DockPanel>
+        <StackPanel Grid.Column="1">
+            <TextBlock d:Text="黏黏黏黏.svip" Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis"/>
+            <TextBlock HorizontalAlignment="Left" d:Text="C:\Users\YQ之神\Desktop\LongLongDirectory" Text="{Binding ImportDirectory}" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+        <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Margin="5 5 5 0">
+            <materialDesign:PackIcon
+                VerticalAlignment="Center"
+                Margin="0 4 5 4"
+                Width="20"
+                Height="20"
+                Kind="Export"
+                Opacity="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=1;0.5, Mode=OneWay}"/>
+            <TextBox
+                Width="100"
+                VerticalAlignment="Center"
+                materialDesign:HintAssist.Hint="输出文件名"
+                Text="{Binding ExportTitle}"/>
+            <TextBlock
+                VerticalAlignment="Center"
+                Margin="5 4 0 5"
+                d:Text=".json"
+                Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>
+        </StackPanel>
         <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0 2 5 0">
             <ContentControl x:Name="TaskStatusContentControl" Content="{Binding Status}">
                 <ContentControl.ContentTemplateSelector>

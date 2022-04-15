@@ -33,7 +33,7 @@
                 Grid.Row="0"
                 Grid.RowSpan="3"
                 Kind="Puzzle"
-                Foreground="#424242"
+                Opacity="0.8"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Width="80"
