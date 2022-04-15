@@ -10,6 +10,8 @@
     Title="OpenSVIP - 歌声合成工程文件转换器"
     Height="800"
     Width="1200"
+    MinHeight="600"
+    MinWidth="900"
     Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
