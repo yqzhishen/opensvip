@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>Gjgj</Name>
-    <Version>1.4.4</Version>
+    <Version>1.5.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>歌叽歌叽工程格式转换插件。</Descriptions>
@@ -12,5 +12,12 @@
     <LibraryPath>Gjgj\Plugin.Gjgj.dll</LibraryPath>
     <Converter>Gjgj.Stream.GjgjConverter</Converter>
     <InputOptions/>
-    <OutputOptions/>
+	<OutputOptions>
+		<Option Name="desample" Type="integer" Default="32">
+			<Notes>指定音量参数点的平均采样间隔以缓解编辑器卡顿</Notes>
+		</Option>
+		<Option Name="singer" Type="string" Default="扇宝">
+			<Notes>指定默认歌手</Notes>
+		</Option>
+	</OutputOptions>
 </Plugin>

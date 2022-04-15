@@ -27,7 +27,8 @@ namespace Gjgj.Stream
         {
             var gjProject = new GjgjEncoder
             {
-                ParamSampleInterval = options.GetValueAsInteger("desample", 32)
+                ParamSampleInterval = options.GetValueAsInteger("desample", 32),
+                SingerName = options.GetValueAsString("singer", "扇宝"),
             }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);
