@@ -7,6 +7,11 @@ using System.Windows.Input;
 
 namespace OpenSvip.GUI
 {
+    /// <summary>
+    /// 作者：静游者
+    /// 来源：https://www.cnblogs.com/dingshengtao/p/6274116.html
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class NumericBox<T> : TextBox where T : IComparable
     {
         #region DependencyProperty

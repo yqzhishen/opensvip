@@ -6,6 +6,10 @@ using System.Windows.Input;
 
 namespace OpenSvip.GUI
 {
+    /// <summary>
+    /// 作者：静游者
+    /// 来源：https://www.cnblogs.com/dingshengtao/p/6274116.html
+    /// </summary>
     public class IntegerNumericBox : NumericBox<int>
     {
         #region DependencyProperty
