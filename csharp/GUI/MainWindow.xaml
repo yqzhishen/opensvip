@@ -41,11 +41,16 @@
                         </MenuItem>
                         <MenuItem Height="30" Header="导出文件" Icon="{materialDesign:PackIcon Kind=ExportVariant, Size=17}">
                             <MenuItem
-                                Height="30" Header="立即开始转换"
+                                Height="30"
+                                Header="立即开始转换"
                                 InputGestureText="Ctrl+E"
                                 IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
                                 Click="StartExecutionButton_Click"/>
-                            <MenuItem Height="30" Header="选择输出路径..." InputGestureText="Ctrl+Shift+E"/>
+                            <MenuItem
+                                Height="30"
+                                Header="选择输出路径..."
+                                InputGestureText="Ctrl+Shift+E"
+                                Click="BrowseAndExportMenu_Click"/>
                         </MenuItem>
                         <MenuItem Height="30" Header="重置列表" Icon="{materialDesign:PackIcon Kind=Autorenew, Size=17}" InputGestureText="Ctrl+R"/>
                     </MenuItem>

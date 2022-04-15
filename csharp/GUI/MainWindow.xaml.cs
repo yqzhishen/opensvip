@@ -79,6 +79,10 @@ namespace OpenSvip.GUI
             var newFilenames = filenames
                 .Where(filename => Model.TaskList.All(task => task.ImportPath != filename))
                 .ToArray();
+            if (!Model.TaskList.Any() && filenames.Any())
+            {
+                Model.ExportPath = Path.GetDirectoryName(filenames.First());
+            }
 
             if (Model.AutoDetectFormat)
             {
@@ -310,11 +314,25 @@ namespace OpenSvip.GUI
 
         private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!Model.TaskList.Any() || Model.SelectedInputPluginIndex < 0 || Model.SelectedOutputPluginIndex < 0 || String.IsNullOrWhiteSpace(Model.ExportPath))
+            if (!Model.TaskList.Any() || Model.SelectedInputPluginIndex < 0 || Model.SelectedOutputPluginIndex < 0)
             {
                 return;
             }
+            else if (String.IsNullOrWhiteSpace(Model.ExportPath))
+            {
+                BrowseExportFolderButton_Click(sender, e);
+                if (String.IsNullOrWhiteSpace(Model.ExportPath))
+                {
+                    return;
+                }
+            }
             ExecuteTasks();
+        }
+
+        private void BrowseAndExportMenu_Click(object sender, RoutedEventArgs e)
+        {
+            BrowseExportFolderButton_Click(sender, e);
+            StartExecutionButton_Click(sender, e);
         }
 
         private void TreeViewHeader_Click(object sender, RoutedEventArgs e)
