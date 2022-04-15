@@ -85,7 +85,7 @@
                         materialDesign:ShadowAssist.ShadowDepth="Depth2"
                         Style="{StaticResource TaskStatusChip}">
                         <materialDesign:Chip.Icon>
-                            <materialDesign:PackIcon Kind="ExclamationThick"/>
+                            <materialDesign:PackIcon Kind="Exclamation"/>
                         </materialDesign:Chip.Icon>
                     </materialDesign:Chip>
                 </materialDesign:PopupBox.ToggleContent>

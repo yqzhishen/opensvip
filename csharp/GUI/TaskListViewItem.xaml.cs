@@ -35,7 +35,7 @@ namespace OpenSvip.GUI
         {
             var model = ElementsHelper.FindParent<Window>(this).DataContext as AppModel;
             var task = DataContext as TaskViewModel;
-            Process.Start("explorer.exe", $"/select,{Path.Combine(model.ExportPath, task.ExportTitle + model.ExportExtension)}");
+            Process.Start("explorer.exe", $"/select,{Path.Combine(task.ExportFolder, task.ExportTitle + model.ExportExtension)}");
         }
 
         private void CopyErrorMessageButton_Click(object sender, RoutedEventArgs e)

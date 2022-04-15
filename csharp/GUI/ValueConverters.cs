@@ -1,5 +1,6 @@
 ﻿using OpenSvip.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -10,6 +11,19 @@ using System.Windows.Data;
 
 namespace OpenSvip.GUI
 {
+    public class NotNullConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value != null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     public class IndexToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -20,6 +34,19 @@ namespace OpenSvip.GUI
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             return (Visibility)value == Visibility.Visible;
+        }
+    }
+
+    public class EnumerableIsNotEmptyConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return ((IEnumerable)value).Cast<object>().Any();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 
@@ -182,11 +209,11 @@ namespace OpenSvip.GUI
                 }
                 return val;
             }
-            if (!result.GetType().IsSubclassOf(targetType))
+            if (!result.GetType().Equals(targetType) && !result.GetType().IsSubclassOf(targetType))
             {
                 return DependencyProperty.UnsetValue;
             }
-            return result;
+            return string.Empty == result ? null : result;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

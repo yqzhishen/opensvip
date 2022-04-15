@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器"
@@ -30,54 +31,87 @@
                 <RowDefinition Height="25"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" Background="WhiteSmoke"/>
+            <Border Grid.Row="0" Background="WhiteSmoke">
+                <Border.Resources>
+                    <x:Array x:Key="DefaultExportEnumValues" Type="local:DefaultExport">
+                        <local:DefaultExport>None</local:DefaultExport>
+                        <local:DefaultExport>Source</local:DefaultExport>
+                        <local:DefaultExport>Desktop</local:DefaultExport>
+                        <local:DefaultExport>Custom</local:DefaultExport>
+                    </x:Array>
+                </Border.Resources>
+                <ComboBox
+                    x:Name="HiddenDefaultExportComboBox"
+                    Visibility="Hidden"
+                    Height="0"
+                    Width="0"
+                    ItemsSource="{StaticResource DefaultExportEnumValues}"
+                    SelectedIndex="{Binding DefaultExportPath, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type local:DefaultExport}}"/>
+            </Border>
             <DockPanel x:Name="MenuPanel" Grid.Row="0">
                 <Menu IsMainMenu="True" Margin="20 0 0 0" Height="25" FontFamily="Microsoft YaHei UI" FontSize="13" FontWeight="Normal">
-                    <MenuItem Header="_文件(F)" Padding="10 0">
+                    <Menu.Resources>
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
+                            <Setter Property="Height" Value="30"/>
+                        </Style>
+                    </Menu.Resources>
+                    <MenuItem Header="_文件(F)" Height="25" Padding="10 0">
                         <MenuItem
-                            Height="30"
                             Header="导入文件..."
                             InputGestureText="Ctrl+I"
                             Icon="{materialDesign:PackIcon Kind=Import, Size=17}"
-                            IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                            IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                             Click="FileMaskPanel_Click">
                         </MenuItem>
-                        <MenuItem Height="30" Header="导出文件" Icon="{materialDesign:PackIcon Kind=ExportVariant, Size=17}">
+                        <MenuItem Header="导出文件" Icon="{materialDesign:PackIcon Kind=ExportVariant, Size=17}">
                             <MenuItem
-                                Height="30"
                                 Header="立即开始转换"
                                 InputGestureText="Ctrl+E"
-                                IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                 Click="StartExecutionButton_Click"/>
                             <MenuItem
-                                Height="30"
                                 Header="选择输出路径..."
                                 InputGestureText="Ctrl+Shift+E"
                                 Click="BrowseAndExportMenu_Click"/>
                         </MenuItem>
-                        <MenuItem Height="30" Header="重置列表" Icon="{materialDesign:PackIcon Kind=Autorenew, Size=17}" InputGestureText="Ctrl+R"/>
+                        <MenuItem Header="重置列表" Icon="{materialDesign:PackIcon Kind=Autorenew, Size=17}" InputGestureText="Ctrl+R"/>
                     </MenuItem>
-                    <MenuItem Header="_设置(O)" Padding="10 0">
-                        <MenuItem Height="30" Header="{Binding Text, ElementName=AutoDetectText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
-                        <MenuItem Height="30" Header="{Binding Text, ElementName=AutoResetText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoResetToggle}"/>
-                        <MenuItem Height="30" Header="{Binding Text, ElementName=AutoExtensionText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoExtensionToggle}"/>
-                        <MenuItem Height="30" Header="{Binding Text, ElementName=OpenExportFolderText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
-                        <MenuItem Height="30" Header="{Binding Text, ElementName=OverwriteOptionText}" HorizontalContentAlignment="Stretch">
-                            <MenuItem Height="30" Header="覆盖" IsCheckable="True" Margin="-10 0 -5 0"
+                    <MenuItem Header="_设置(O)" Height="25" Padding="10 0">
+                        <MenuItem Header="{Binding Text, ElementName=AutoDetectText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
+                        <MenuItem Header="{Binding Text, ElementName=AutoResetText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoResetToggle}"/>
+                        <MenuItem Header="{Binding Text, ElementName=AutoExtensionText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoExtensionToggle}"/>
+                        <MenuItem Header="默认导出路径">
+                            <MenuItem Header="无" Margin="-10 0 -5 0" IsCheckable="True"
+                                      IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"
+                                      IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                            <MenuItem x:Name="ExportToSourceMenuItem" Header="源路径" Margin="-10 0 -5 0" IsCheckable="True"
+                                      IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"
+                                      IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                            <MenuItem Header="桌面" Margin="-10 0 -5 0" IsCheckable="True"
+                                      IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"
+                                      IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                            <MenuItem Header="自定义..." Margin="-10 0 -5 0" IsCheckable="True"
+                                      IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=3}"
+                                      IsEnabled="False"/>
+                                      <!--IsEnabled="{Binding CustomExportPaths, Converter={StaticResource EnumerableIsNotEmptyConverter}, Mode=OneWay}"-->
+                        </MenuItem>
+                        <MenuItem Header="{Binding Text, ElementName=OpenExportFolderText}" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
+                        <MenuItem Header="{Binding Text, ElementName=OverwriteOptionText}" HorizontalContentAlignment="Stretch">
+                            <MenuItem Header="覆盖" Margin="-10 0 -5 0" IsCheckable="True"
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"/>
-                            <MenuItem Height="30" Header="跳过" IsCheckable="True" Margin="-10 0 -5 0"
+                            <MenuItem Header="跳过" Margin="-10 0 -5 0" IsCheckable="True"
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"/>
-                            <MenuItem Height="30" Header="询问" IsCheckable="True" Margin="-10 0 -5 0"
+                            <MenuItem Header="询问" Margin="-10 0 -5 0" IsCheckable="True"
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
                         </MenuItem>
                         <Separator/>
                         <MenuItem Header="外观主题" IsEnabled="False">
-                            <MenuItem Height="30" Header="浅色" IsCheckable="True" IsChecked="True" Margin="-10 0 -5 0"/>
-                            <MenuItem Height="30" Header="深色" IsCheckable="True" IsChecked="False" Margin="-10 0 -5 0"/>
-                            <MenuItem Height="30" Header="系统" IsCheckable="True" IsChecked="False" Margin="-10 0 -5 0"/>
+                            <MenuItem Header="浅色" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="True"/>
+                            <MenuItem Header="深色" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="False"/>
+                            <MenuItem Header="系统" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="False"/>
                         </MenuItem>
                     </MenuItem>
-                    <MenuItem Header="帮助(H)" Padding="10 0">
+                    <MenuItem Header="帮助(H)" Height="25" Padding="10 0">
                         <MenuItem Header="_在线用户手册" Command="Cut" Icon="{materialDesign:PackIcon Kind=TextBoxSearchOutline}" InputGestureText="Ctrl+H"/>
                         <MenuItem Header="_关于 OpenSVIP..." Command="Copy" Icon="{materialDesign:PackIcon Kind=InformationOutline}" InputGestureText="Ctrl+A"/>
                     </MenuItem>
@@ -125,7 +159,7 @@
                                         Style="{StaticResource PluginComboBox}"
                                         materialDesign:HintAssist.Hint="导入工程格式"
                                         VerticalContentAlignment="Center"
-                                        IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                         SelectedIndex="{Binding SelectedInputPluginIndex}"
                                         SelectionChanged="ImportPluginComboBox_SelectionChanged">
                                     </ComboBox>
@@ -194,8 +228,9 @@
                                         Style="{StaticResource PluginComboBox}"
                                         materialDesign:HintAssist.Hint="导出工程格式"
                                         VerticalContentAlignment="Center"
-                                        IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
-                                        SelectedIndex="{Binding SelectedOutputPluginIndex}"/>
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
+                                        SelectedIndex="{Binding SelectedOutputPluginIndex}"
+                                        SelectionChanged="ExportPluginComboBox_SelectionChanged"/>
                                     <materialDesign:PopupBox
                                         Grid.Row="0"
                                         Grid.Column="1"
@@ -268,7 +303,7 @@
                                         <TextBlock
                                             x:Name="FileDropText"
                                             DockPanel.Dock="Bottom"
-                                            Text="拖拽或单击以导入文件"
+                                            Text="拖拽或单击导入文件"
                                             HorizontalAlignment="Center"
                                             FontSize="25"
                                             Opacity="{Binding Opacity, ElementName=FileDropIcon}"
@@ -310,7 +345,7 @@
                                             Margin="6 5 -5 5"
                                             ItemsSource="{Binding TaskList}"
                                             Visibility="{Binding HasItems, ElementName=TaskListView, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                            IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                            IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                             Grid.IsSharedSizeScope="True">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type local:TaskViewModel}">
@@ -331,7 +366,7 @@
                                         PlacementMode="RightAndAlignMiddles"
                                         UnfurlOrientation="Horizontal"
                                         ToolTip="操作"
-                                        IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}">
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}">
                                         <materialDesign:PopupBox.ToggleContent>
                                             <materialDesign:PackIcon Kind="Tools" Width="20" Height="20"/>
                                         </materialDesign:PopupBox.ToggleContent>
@@ -520,8 +555,8 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="2.8*"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="15 0" Text="输出设置" FontSize="20"/>
                             <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10 0 0 0">
@@ -535,7 +570,7 @@
                                     Style="{StaticResource MaterialDesignFlatLightBgButton}"
                                     materialDesign:ShadowAssist.ShadowDepth="Depth2"
                                     Content="{materialDesign:PackIcon Folder}"
-                                    IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                    IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     Click="BrowseExportFolderButton_Click"
                                     ToolTip="浏览文件夹"/>
                                 <StackPanel Orientation="Horizontal">
@@ -544,11 +579,12 @@
                                         Margin="10 0"
                                         d:Width="345"
                                         Width="{Binding ActualWidth, ElementName=TaskExecutionCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=220, Mode=OneWay}"
-                                        materialDesign:HintAssist.Hint="输出路径"
+                                        materialDesign:HintAssist.Hint="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（本次）;输出路径}"
                                         Text="{Binding ExportPath}"
                                         FontSize="16"
                                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                                        IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
+                                        ToolTip="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=当前已设置默认输出至源路径。修改此项将临时更换一次输出路径。;}"
                                         Cursor="Arrow">
                                     </TextBox>
                                 </StackPanel>
@@ -563,7 +599,7 @@
                                             Height="20"
                                             Cursor="Hand"
                                             IsChecked="{Binding OpenExportFolder}"/>
-                                    <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="转换完成后打开输出路径" FontSize="14" Opacity="0.8"/>
+                                    <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="完成后打开输出路径" FontSize="14" Opacity="0.8"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
                                     <TextBlock x:Name="OverwriteOptionText" VerticalAlignment="Center" Margin="5" Text="遇到同名文件时" FontSize="14" Opacity="0.8"/>
@@ -572,7 +608,7 @@
                                         Margin="2.5 3.5 2.5 2.5"
                                         FontSize="14"
                                         materialDesign:ComboBoxAssist.ShowSelectedItem="False"
-                                        IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}"
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                         SelectedIndex="{Binding OverWriteOption, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type local:OverwriteOptions}}">
                                         <ComboBoxItem IsSelected="True" Content="覆盖"/>
                                         <ComboBoxItem Content="跳过"/>
@@ -585,10 +621,11 @@
                                 Grid.Column="1"
                                 Grid.Row="1"
                                 Grid.RowSpan="2"
-                                Width="130"
+                                Width="Auto"
                                 Height="60"
-                                HorizontalAlignment="Center"
-                                Margin="-10 0 0 0"
+                                HorizontalAlignment="Stretch"
+                                Margin="5 0 15 0"
+                                Padding="0"
                                 materialDesign:ButtonAssist.CornerRadius="10"
                                 Style="{StaticResource MaterialDesignRaisedButton}"
                                 materialDesign:ButtonProgressAssist.Value="-1"
@@ -596,8 +633,16 @@
                                 materialDesign:ButtonProgressAssist.IsIndeterminate="{Binding ExecutionInProgress}"
                                 FontSize="20"
                                 Content="{Binding ExecutionInProgress, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=转换中;开始转换}"
-                                IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource BooleanNotOperationConverter}}"
-                                Click="StartExecutionButton_Click"/>
+                                Click="StartExecutionButton_Click">
+                                <Button.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanAllConverter}" Mode="OneWay">
+                                        <Binding Path="ExecutionInProgress" Converter="{StaticResource InvertBooleanConverter}" Mode="OneWay"/>
+                                        <Binding Path="SelectedInputPlugin" Converter="{StaticResource NotNullConverter}" Mode="OneWay"/>
+                                        <Binding Path="SelectedOutputPlugin" Converter="{StaticResource NotNullConverter}" Mode="OneWay"/>
+                                        <Binding  Path="HasItems" ElementName="TaskListView" Mode="OneWay"/>
+                                    </MultiBinding>
+                                </Button.IsEnabled>
+                            </Button>
                         </Grid>
                     </materialDesign:Card>
                 </Grid>

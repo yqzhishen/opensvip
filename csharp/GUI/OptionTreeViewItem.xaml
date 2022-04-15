@@ -84,7 +84,10 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <ComboBox ItemsSource="{Binding Path=OptionInfo.EnumChoices}" SelectedIndex="{Binding ChoiceIndex}">
+                <ComboBox
+                    ItemsSource="{Binding Path=OptionInfo.EnumChoices}"
+                    SelectedIndex="{Binding ChoiceIndex}"
+                    ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type framwork:Choice}">
                             <TextBlock Style="{StaticResource OptionTextBlock}" Opacity="1" TextAlignment="Center" Text="{Binding Name}" Padding="0" ToolTip="{Binding Label}"/>

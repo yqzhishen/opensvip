@@ -124,6 +124,34 @@ namespace OpenSvip.GUI
             }
         }
 
+        private DefaultExport _defaultExportPath = DefaultExport.None;
+
+        [JsonProperty]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DefaultExport DefaultExportPath
+        {
+            get => _defaultExportPath;
+            set {
+                _defaultExportPath = value;
+                switch (value)
+                {
+                    case DefaultExport.Source:
+                        ExportPath = "";
+                        break;
+                    case DefaultExport.Desktop:
+                        ExportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                        break;
+                    case DefaultExport.Custom:
+                        // TODO: implement this
+                        break;
+                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DefaultExport"));
+            }
+        }
+
+        [JsonProperty]
+        public ObservableCollection<string> CustomExportPaths { get; set; } = new AsyncObservableCollection<string>();
+
         private int _selectedInputPluginIndex = -1;
 
         public int SelectedInputPluginIndex
@@ -164,33 +192,7 @@ namespace OpenSvip.GUI
             get => SelectedOutputPluginIndex >= 0 ? Plugins[SelectedOutputPluginIndex] : null;
         }
 
-        public ObservableCollection<TaskViewModel> TaskList { get; set; } = new AsyncObservableCollection<TaskViewModel>();
-
         public List<ObservableCollection<OptionViewModel>> InputOptions { get; }
-
-        public ObservableCollection<OptionViewModel> SelectedInputOptions
-        {
-            get => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
-        }
-        
-        public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
-
-        public ObservableCollection<OptionViewModel> SelectedOutputOptions
-        {
-            get => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
-        }
-
-        private string _exportPath;
-
-        public string ExportPath
-        {
-            get => _exportPath;
-            set
-            {
-                _exportPath = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportPath"));
-            }
-        }
 
         private string _exportExtension;
 
@@ -221,6 +223,32 @@ namespace OpenSvip.GUI
             }
         }
 
+        public ObservableCollection<OptionViewModel> SelectedInputOptions
+        {
+            get => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
+        }
+        
+        public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
+
+        public ObservableCollection<OptionViewModel> SelectedOutputOptions
+        {
+            get => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
+        }
+
+        public ObservableCollection<TaskViewModel> TaskList { get; set; } = new AsyncObservableCollection<TaskViewModel>();
+
+        private string _exportPath;
+
+        public string ExportPath
+        {
+            get => _exportPath;
+            set
+            {
+                _exportPath = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportPath"));
+            }
+        }
+
         private bool _executionInProgress = false;
 
         public bool ExecutionInProgress
@@ -237,6 +265,13 @@ namespace OpenSvip.GUI
     public class TaskViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public void Initialize()
+        {
+            Status = TaskStates.Ready;
+            Warnings.Clear();
+            Error = null;
+        }
 
         public void PrepareForExecution()
         {
@@ -272,6 +307,8 @@ namespace OpenSvip.GUI
         }
 
         public string ImportPath { get; set; }
+
+        public string ExportFolder { get; set; }
 
         private TaskStates _status;
 
@@ -355,13 +392,18 @@ namespace OpenSvip.GUI
         }
     }
 
-    public enum OverwriteOptions
-    {
-        Overwrite, Skip, Ask
-    }
-
     public enum TaskStates
     {
         Ready, Queued, Success, Warning, Error, Skipped
+    }
+
+    public enum DefaultExport
+    {
+        None, Source, Desktop, Custom 
+    }
+
+    public enum OverwriteOptions
+    {
+        Overwrite, Skip, Ask
     }
 }

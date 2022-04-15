@@ -79,7 +79,7 @@ namespace OpenSvip.GUI
             var newFilenames = filenames
                 .Where(filename => Model.TaskList.All(task => task.ImportPath != filename))
                 .ToArray();
-            if (!Model.TaskList.Any() && filenames.Any())
+            if (Model.DefaultExportPath == DefaultExport.None && !Model.TaskList.Any() && filenames.Any())
             {
                 Model.ExportPath = Path.GetDirectoryName(filenames.First());
             }
@@ -136,6 +136,10 @@ namespace OpenSvip.GUI
 
         private void ExecuteTasks()
         {
+            if (!Model.TaskList.Any())
+            {
+                return;
+            }
             new Thread(() =>
             {
                 Model.ExecutionInProgress = true;
@@ -149,7 +153,8 @@ namespace OpenSvip.GUI
                 var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
                 foreach (var task in Model.TaskList)
                 {
-                    var exportPath = Path.Combine(Model.ExportPath, task.ExportTitle + Model.ExportExtension);
+                    var exportFolder = Model.DefaultExportPath == DefaultExport.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
+                    var exportPath = Path.Combine(exportFolder, task.ExportTitle + Model.ExportExtension);
                     if (File.Exists(exportPath))
                     {
                         if (askBeforeOverwrite)
@@ -190,6 +195,7 @@ namespace OpenSvip.GUI
                         task.Error = e.Message;
                         continue;
                     }
+                    task.ExportFolder = exportFolder;
                     var warnings = Warnings.GetWarnings();
                     if (warnings.Any())
                     {
@@ -208,7 +214,19 @@ namespace OpenSvip.GUI
                 Model.ExecutionInProgress = false;
                 if (Model.OpenExportFolder)
                 {
-                    Process.Start("explorer.exe", Model.ExportPath);
+                    var openFolder = Model.ExportPath;
+                    if (Model.DefaultExportPath == DefaultExport.Source)
+                    {
+                        openFolder = Model.TaskList[0].ImportDirectory;
+                        foreach (var task in Model.TaskList.Skip(1))
+                        {
+                            if (task.ImportDirectory != openFolder)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                    Process.Start("explorer.exe", openFolder);
                 }
             }).Start();
 
@@ -273,6 +291,18 @@ namespace OpenSvip.GUI
                 }
                 FilterTasks(task => Path.GetExtension(task.ImportFilename) == "." + plugin.Suffix);
             }
+            foreach (var task in Model.TaskList)
+            {
+                task.Initialize();
+            }
+        }
+
+        private void ExportPluginComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (var task in Model.TaskList)
+            {
+                task.Initialize();
+            }
         }
 
         private void ClearTasksButton_Click(object sender, RoutedEventArgs e)
@@ -296,43 +326,6 @@ namespace OpenSvip.GUI
                 return;
             }
             FilterTasks(task => Path.GetExtension(task.ImportFilename) == "." + plugin.Suffix);
-        }
-
-        private void BrowseExportFolderButton_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = new CommonOpenFileDialog
-            {
-                Title = "选择输出路径",
-                IsFolderPicker = true
-            };
-            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-            {
-                return;
-            }
-            Model.ExportPath = dialog.FileName;
-        }
-
-        private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!Model.TaskList.Any() || Model.SelectedInputPluginIndex < 0 || Model.SelectedOutputPluginIndex < 0)
-            {
-                return;
-            }
-            else if (String.IsNullOrWhiteSpace(Model.ExportPath))
-            {
-                BrowseExportFolderButton_Click(sender, e);
-                if (String.IsNullOrWhiteSpace(Model.ExportPath))
-                {
-                    return;
-                }
-            }
-            ExecuteTasks();
-        }
-
-        private void BrowseAndExportMenu_Click(object sender, RoutedEventArgs e)
-        {
-            BrowseExportFolderButton_Click(sender, e);
-            StartExecutionButton_Click(sender, e);
         }
 
         private void TreeViewHeader_Click(object sender, RoutedEventArgs e)
@@ -377,6 +370,39 @@ namespace OpenSvip.GUI
             OptionScrollViewer_TouchMove(OptionScrollViewer, e);
         }
 
+        private void BrowseExportFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = "选择输出路径",
+                IsFolderPicker = true
+            };
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            Model.ExportPath = dialog.FileName;
+        }
+
+        private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(Model.ExportPath) && Model.DefaultExportPath != DefaultExport.Source)
+            {
+                BrowseExportFolderButton_Click(sender, e);
+                if (String.IsNullOrWhiteSpace(Model.ExportPath))
+                {
+                    return;
+                }
+            }
+            ExecuteTasks();
+        }
+
+        private void BrowseAndExportMenu_Click(object sender, RoutedEventArgs e)
+        {
+            BrowseExportFolderButton_Click(sender, e);
+            StartExecutionButton_Click(sender, e);
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             try
@@ -386,7 +412,7 @@ namespace OpenSvip.GUI
                     FileMode.Create,
                     FileAccess.Write);
                 StreamWriter writer = new StreamWriter(stream);
-                writer.Write(JsonConvert.SerializeObject(Model));
+                writer.Write(JsonConvert.SerializeObject(Model, Formatting.Indented));
                 writer.Flush();
                 stream.Flush();
                 writer.Close();

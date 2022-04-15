@@ -13,7 +13,9 @@
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.chip.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/primary/materialdesigncolor.indigo.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <local:NotNullConverter x:Key="NotNullConverter"/>
             <local:IndexToBooleanConverter x:Key="IndexToBooleanConverter"/>
+            <local:EnumerableIsNotEmptyConverter x:Key="EnumerableIsNotEmptyConverter"/>
             <local:CollectionToVisibilityConverter x:Key="CollectionToVisibilityConverter"/>
             <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
             <local:ReversedVisibilityConverter x:Key="ReversedVisibilityConverter"/>
