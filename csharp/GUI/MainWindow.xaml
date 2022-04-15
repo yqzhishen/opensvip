@@ -20,6 +20,7 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="materialDesign:HintAssist.HintOpacity" Value="0.8"/>
         </Style>
+        
     </Window.Resources>
     <materialDesign:DialogHost Identifier="RootDialogHost">
         <Grid>
@@ -68,7 +69,7 @@
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
                         </MenuItem>
                         <Separator/>
-                        <MenuItem Header="外观主题">
+                        <MenuItem Header="外观主题" IsEnabled="False">
                             <MenuItem Height="30" Header="浅色" IsCheckable="True" IsChecked="True" Margin="-10 0 -5 0"/>
                             <MenuItem Height="30" Header="深色" IsCheckable="True" IsChecked="False" Margin="-10 0 -5 0"/>
                             <MenuItem Height="30" Header="系统" IsCheckable="True" IsChecked="False" Margin="-10 0 -5 0"/>
@@ -391,10 +392,11 @@
                             <ScrollViewer
                                 x:Name="OptionScrollViewer"
                                 Grid.Row="1"
-                                Margin="5 10 15 20"
+                                Margin="5 10 12 20"
                                 PanningMode="VerticalOnly"
                                 VerticalScrollBarVisibility="Auto"
-                                PreviewMouseWheel="OptionScrollViewer_MouseWheel">
+                                PreviewMouseWheel="OptionScrollViewer_MouseWheel"
+                                PreviewTouchMove="OptionScrollViewer_TouchMove">
                                 <StackPanel x:Name="OptionsPanel" CanVerticallyScroll="True">
                                     <StackPanel.Visibility>
                                         <MultiBinding Converter="{StaticResource AnyTrueAsVisibleConverter}">
@@ -404,7 +406,11 @@
                                     </StackPanel.Visibility>
                                     <StackPanel.Resources>
                                         <Style TargetType="TreeView" BasedOn="{StaticResource MaterialDesignTreeView}">
+                                            <Setter Property="ScrollViewer.PanningMode" Value="None"/>
+                                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
+                                            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
                                             <EventSetter Event="PreviewMouseWheel" Handler="OptionTreeView_MouseWheel"/>
+                                            <EventSetter Event="PreviewTouchMove" Handler="OptionTreeView_TouchMove"/>
                                         </Style>
                                         <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
                                             <Setter Property="IsExpanded" Value="True"/>
@@ -435,8 +441,6 @@
                                         </DataTemplate>
                                     </StackPanel.Resources>
                                     <TreeView
-                                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                        ScrollViewer.VerticalScrollBarVisibility="Disabled"
                                         Height="{Binding HasItems, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=Auto;0}"
                                         Visibility="{Binding HasItems, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanToVisibilityConverter}}">
                                         <TreeViewItem

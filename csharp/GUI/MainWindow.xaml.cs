@@ -343,18 +343,38 @@ namespace OpenSvip.GUI
 
         private void OptionScrollViewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta);
-            eventArg.RoutedEvent = UIElement.MouseWheelEvent;
-            eventArg.Source = e.Source;
+            var eventArgs = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                RoutedEvent = UIElement.MouseWheelEvent,
+                Source = e.Source
+            };
 
             ScrollViewer scv = (ScrollViewer)sender;
-            scv.RaiseEvent(eventArg);
+            scv.RaiseEvent(eventArgs);
+            e.Handled = true;
+        }
+
+        private void OptionScrollViewer_TouchMove(object sender, TouchEventArgs e)
+        {
+            var eventArgs = new TouchEventArgs(e.TouchDevice, e.Timestamp)
+            {
+                RoutedEvent = UIElement.TouchMoveEvent,
+                Source = e.Source
+            };
+
+            ScrollViewer scv = (ScrollViewer)sender;
+            scv.RaiseEvent(eventArgs);
             e.Handled = true;
         }
 
         private void OptionTreeView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             OptionScrollViewer_MouseWheel(OptionScrollViewer, e);
+        }
+
+        private void OptionTreeView_TouchMove(object sender, TouchEventArgs e)
+        {
+            OptionScrollViewer_TouchMove(OptionScrollViewer, e);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
