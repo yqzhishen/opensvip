@@ -5,14 +5,13 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:OpenSvip.GUI"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器（预览版本）"
     Height="800"
     Width="1200"
-    MinHeight="510"
-    MinWidth="985"
+    MinHeight="525"
+    MinWidth="700"
     Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
@@ -119,7 +118,7 @@
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
-                    <ColumnDefinition MinWidth="550"/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
@@ -147,7 +146,7 @@
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition/>
-                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <ComboBox
                                         x:Name="ImportPluginComboBox"
@@ -180,7 +179,7 @@
                                         </materialDesign:PopupBox.ToggleContent>
                                         <local:PluginDetailsBoard DataContext="{Binding SelectedInputPlugin, Mode=OneWay}"/>
                                     </materialDesign:PopupBox>
-                                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="7 -8 0 0" Orientation="Horizontal">
+                                    <WrapPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="7 -5 0 0" Orientation="Horizontal">
                                         <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
                                             <ToggleButton
                                                 x:Name="AutoDetectToggle"
@@ -203,7 +202,7 @@
                                                 IsChecked="{Binding AutoResetTasks}"/>
                                             <TextBlock x:Name="AutoResetText" VerticalAlignment="Center" Margin="5" Text="切换格式时重置列表" FontSize="14" Opacity="0.8"/>
                                         </StackPanel>
-                                    </StackPanel>
+                                    </WrapPanel>
                                 </Grid>
                             </StackPanel>
 
@@ -215,7 +214,7 @@
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition/>
-                                        <RowDefinition Height="25"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
                                     <ComboBox
                                         x:Name="ExportPluginComboBox"
@@ -248,7 +247,7 @@
                                         </materialDesign:PopupBox.ToggleContent>
                                         <local:PluginDetailsBoard DataContext="{Binding SelectedOutputPlugin, Mode=OneWay}"/>
                                     </materialDesign:PopupBox>
-                                    <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="7 -8 0 0" Orientation="Horizontal">
+                                    <WrapPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="7 -5 0 0" Orientation="Horizontal">
                                         <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
                                             <ToggleButton
                                                 x:Name="AutoExtensionToggle"
@@ -261,7 +260,7 @@
                                             <TextBlock x:Name="AutoExtensionText" VerticalAlignment="Center" Margin="5" Text="自动设置后缀名" FontSize="14" Foreground="DimGray"/>
                                         </StackPanel>
 
-                                    </StackPanel>
+                                    </WrapPanel>
                                 </Grid>
                             </StackPanel>
 
@@ -467,12 +466,12 @@
                                                     Margin="0 0 0 10"
                                                     Opacity="0.8"/>
                                                 <Separator Grid.Row="0" Margin="20 0 0 10" VerticalAlignment="Center" Opacity="0.6"/>
-                                                <StackPanel
+                                                <WrapPanel
                                                     Grid.Row="1"
                                                     Orientation="Horizontal"
-                                                    Width="{Binding ActualWidth, ElementName=ConverterOptionsCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=80}">
+                                                    Width="{Binding ActualWidth, ElementName=ConverterOptionsCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=70}">
                                                     <local:OptionTreeViewItem DataContext="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
-                                                </StackPanel>
+                                                </WrapPanel>
                                             </Grid>
                                         </DataTemplate>
                                     </StackPanel.Resources>
@@ -550,12 +549,12 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
-                                <RowDefinition Height="1.5*"/>
-                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2.8*"/>
-                                <ColumnDefinition Width="*" MaxWidth="150"/>
+                                <ColumnDefinition Width="1*" MinWidth="120" MaxWidth="150"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="15 0" Text="输出设置" FontSize="20"/>
                             <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" Margin="10 0 0 0">
@@ -572,24 +571,26 @@
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     Click="BrowseExportFolderButton_Click"
                                     ToolTip="浏览文件夹"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBox
-                                        VerticalAlignment="Center"
-                                        Margin="10 0"
-                                        d:Width="345"
-                                        Width="{Binding ActualWidth, ElementName=TaskExecutionCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=220, Mode=OneWay}"
-                                        materialDesign:HintAssist.Hint="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（本次）;输出路径}"
-                                        Text="{Binding ExportPath}"
-                                        FontSize="16"
-                                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
-                                        ToolTip="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=当前已设置默认输出至源路径。修改此项将临时更换一次输出路径。;}"
-                                        Cursor="Arrow">
-                                    </TextBox>
-                                </StackPanel>
+                                <TextBox
+                                    VerticalAlignment="Center"
+                                    Margin="10 0"
+                                    materialDesign:HintAssist.Hint="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（本次）;输出路径}"
+                                    Text="{Binding ExportPath}"
+                                    FontSize="16"
+                                    Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                    IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
+                                    ToolTip="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=当前已设置默认输出至源路径。修改此项将临时更换一次输出路径。;}"
+                                    Cursor="Arrow">
+                                    <TextBox.Width>
+                                        <MultiBinding Converter="{StaticResource DoubleSubConverter}" Mode="OneWay">
+                                            <Binding ElementName="TaskExecutionCard" Path="ActualWidth"/>
+                                            <Binding ElementName="StartExecutionButton" Path="ActualWidth" Converter="{StaticResource DoubleConstantSubConverter}" ConverterParameter="-90"/>
+                                        </MultiBinding>
+                                    </TextBox.Width>
+                                </TextBox>
                             </StackPanel>
-                            <StackPanel Grid.Row="2" Margin="7 0 10 5" Orientation="Horizontal" MinWidth="420">
-                                <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
+                            <WrapPanel Grid.Row="2" Margin="7 0 0 7" Orientation="Horizontal" VerticalAlignment="Stretch">
+                                <StackPanel Grid.Row="1" Margin="10 0 10 0" Height="26" Orientation="Horizontal" VerticalAlignment="Center">
                                     <ToggleButton
                                         x:Name="OpenExportFolderToggle"
                                         VerticalAlignment="Center"
@@ -598,13 +599,16 @@
                                         Height="20"
                                         Cursor="Hand"
                                         IsChecked="{Binding OpenExportFolder}"/>
-                                    <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="5" Text="完成后打开输出路径" FontSize="14" Opacity="0.8"/>
+                                    <TextBlock x:Name="OpenExportFolderText" VerticalAlignment="Center" Margin="0" Text="完成后打开输出路径" FontSize="14" Opacity="0.8"/>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Margin="10 0 10 0" Orientation="Horizontal">
-                                    <TextBlock x:Name="OverwriteOptionText" VerticalAlignment="Center" Margin="5" Text="遇到同名文件时" FontSize="14" Opacity="0.8"/>
+                                <StackPanel Grid.Row="1" Margin="10 0 10 0" Height="26" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock x:Name="OverwriteOptionText" VerticalAlignment="Center" Margin="2 0 2 0" Text="遇到同名文件时" FontSize="14" Opacity="0.8"/>
                                     <ComboBox
                                         x:Name="OverwriteOptionComboBox"
-                                        Margin="2.5 3.5 2.5 2.5"
+                                        Margin="2.5 4 2.5 0"
+                                        VerticalAlignment="Bottom"
+                                        Height="22"
+                                        Padding="0 0 0 3"
                                         FontSize="14"
                                         materialDesign:ComboBoxAssist.ShowSelectedItem="False"
                                         IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
@@ -614,7 +618,7 @@
                                         <ComboBoxItem Content="询问"/>
                                     </ComboBox>
                                 </StackPanel>
-                            </StackPanel>
+                            </WrapPanel>
                             <Button
                                 x:Name="StartExecutionButton"
                                 Grid.Column="1"
@@ -623,7 +627,8 @@
                                 Width="Auto"
                                 Height="60"
                                 HorizontalAlignment="Stretch"
-                                Margin="5 0 15 0"
+                                VerticalAlignment="Bottom"
+                                Margin="5 0 15 15"
                                 Padding="0"
                                 materialDesign:ButtonAssist.CornerRadius="10"
                                 Style="{StaticResource MaterialDesignRaisedButton}"

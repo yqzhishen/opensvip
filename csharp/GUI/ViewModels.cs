@@ -45,7 +45,7 @@ namespace OpenSvip.GUI
             });
         }
 
-        public string Version { get; set; } = "1.0.0 (Preview)";
+        public string Version { get; set; } = "1.0.1 (Preview)";
 
         public string FrameworkVersion { get; set; } = "1.2.0";
 
