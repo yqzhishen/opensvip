@@ -18,15 +18,16 @@
 
 - X Studio 工程文件 (*.svip)
 - OpenSVIP 文件 (*.json)
-- Synthesizer V 工程文件 (*.svp)（测试中）
-- 歌叽歌叽工程文件 (*.gj)（测试中）
+- Synthesizer V 工程文件 (*.svp)
+- 歌叽歌叽工程文件 (*.gj)
+- Project Vogen 工程文件 (*.json)（开发中）
 - MIDI 文件 (*.mid)（计划中）
 
 ## 使用方法
 
 ### GUI 桌面应用程序
 
-TODO
+1.0.0 (Preview) 版本已发布——详见 Releases 页面。
 
 ### C# 命令行工具
 
