@@ -125,6 +125,7 @@
     <Compile Include="PluginDetailsBoard.xaml.cs">
       <DependentUpon>PluginDetailsBoard.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RelayCommand.cs" />
     <Compile Include="TaskListViewItem.xaml.cs">
       <DependentUpon>TaskListViewItem.xaml</DependentUpon>
     </Compile>

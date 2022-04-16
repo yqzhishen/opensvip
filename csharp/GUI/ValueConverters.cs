@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace OpenSvip.GUI
@@ -45,6 +46,19 @@ namespace OpenSvip.GUI
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    public class ValueEqualsConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            return values[0].Equals(values[1]);
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
@@ -117,6 +131,23 @@ namespace OpenSvip.GUI
             if ((int)value[1] < 0)
                 return null;
             return ((IList<Plugin>)value[0])[(int)value[1]];
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+    public class MenuItemIsCheckedConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var selectedIndex = (int)values[0];
+            var myself = (MenuItem)values[1];
+            var parent = (MenuItem)values[2];
+            var items = parent.Items.Cast<object>().ToArray();
+            return selectedIndex == Array.IndexOf(items, myself);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

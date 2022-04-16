@@ -25,7 +25,9 @@
             <local:BooleanNotOperationConverter x:Key="BooleanNotOperationConverter"/>
             <local:BooleanOrOperationConverter x:Key="BooleanOrOperationConverter"/>
             <local:BooleanSwitchOperationConverter x:Key="BooleanSwitchOperationConverter"/>
+            <local:ValueEqualsConverter x:Key="ValueEqualsConverter"/>
             <local:PluginToFormatConverter x:Key="PluginToFormatConverter"/>
+            <local:MenuItemIsCheckedConverter x:Key="MenuItemIsCheckedConverter"/>
             <local:DoubleConstantSubConverter x:Key="DoubleConstantSubConverter"/>
             <local:IntegerConstantEqualsConverter x:Key="IntegerConstantEqualsConverter"/>
             <local:DoubleSubConverter x:Key="DoubleSubConverter"/>

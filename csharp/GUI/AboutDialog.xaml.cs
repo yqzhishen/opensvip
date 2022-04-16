@@ -45,21 +45,13 @@ namespace OpenSvip.GUI
         {
             Dispatcher.Invoke(() =>
             {
-                Monitor.Enter(_lock);
                 DialogHost.Show(this, "RootDialogHost");
             });
-            Monitor.Enter(_lock);
-            Monitor.Exit(_lock);
         }
 
         public void OpenLinkButton_Click(object sender, RoutedEventArgs e)
         {
             Process.Start(((Button)sender).ToolTip.ToString());
-        }
-
-        public void DialogButton_Click(object sender, RoutedEventArgs e)
-        {
-            Monitor.Exit(_lock);
         }
     }
 }

@@ -16,6 +16,9 @@
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
     </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="Esc" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+    </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -84,8 +87,7 @@
             Height="40"
             Width="90"
             Content="确定"
-            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-            Click="DialogButton_Click">
+            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
         </Button>
     </Grid>
 </UserControl>

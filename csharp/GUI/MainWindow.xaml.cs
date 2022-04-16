@@ -43,7 +43,8 @@ namespace OpenSvip.GUI
                 Model = new AppModel();
             }
             DataContext = Model;
-            foreach (var str in Model.Formats)
+            var formats = Model.Formats;
+            foreach (var str in formats)
             {
                 ImportPluginComboBox.Items.Add(new ComboBoxItem
                 {
@@ -55,6 +56,23 @@ namespace OpenSvip.GUI
                     HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center,
                     Content = str
                 });
+            }
+            for (var i = 0; i < formats.Count; ++i)
+            {
+                var importMenuItem = new System.Windows.Controls.MenuItem
+                {
+                    Header = $"_{(i + 1) % 10}  {formats[i]}"
+                };
+                importMenuItem.CommandParameter = importMenuItem;
+                importMenuItem.Command = ImportPluginMenuItemCommand;
+                ImportPluginMenuItem.Items.Add(importMenuItem);
+                var exportMenuItem = new System.Windows.Controls.MenuItem
+                {
+                    Header = $"_{(i + 1) % 10}  {formats[i]}"
+                };
+                exportMenuItem.CommandParameter = exportMenuItem;
+                exportMenuItem.Command = ExportPluginMenuItemCommand;
+                ExportPluginMenuItem.Items.Add(exportMenuItem);
             }
             TaskListView.ItemsSource = Model.TaskList;
         }
@@ -71,7 +89,7 @@ namespace OpenSvip.GUI
                     EasingMode = EasingMode.EaseInOut
                 }
             };
-            FileDropIcon.BeginAnimation(PackIcon.OpacityProperty, animation);
+            FileDropIcon.BeginAnimation(OpacityProperty, animation);
         }
 
         private void AddConverterTasks(IEnumerable<string> filenames)
@@ -229,6 +247,54 @@ namespace OpenSvip.GUI
                 }
             }).Start();
         }
+
+        public static RelayCommand<MainWindow> ImportCommand = new RelayCommand<MainWindow>(
+            p => !p.Model.ExecutionInProgress,
+            p => p.FileMaskPanel_Click(null, null));
+
+        public static RelayCommand<MainWindow> ExportCommand = new RelayCommand<MainWindow>(
+            p => p.StartExecutionButton.IsEnabled,
+            p => p.StartExecutionButton_Click(null, null));
+
+        public static RelayCommand<MainWindow> BrowseAndExportCommand = new RelayCommand<MainWindow>(
+            p => p.StartExecutionButton.IsEnabled,
+            p => p.BrowseAndExportMenu_Click(null, null));
+
+        public static RelayCommand<AppModel> ResetCommand = new RelayCommand<AppModel>(
+            p => !p.ExecutionInProgress,
+            p => p.TaskList.Clear());
+
+        public static RelayCommand<MainWindow> AboutCommand = new RelayCommand<MainWindow>(
+            p => true,
+            p => p.AboutMenuItem_Click(null, null));
+
+        public static RelayCommand<System.Windows.Controls.MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+            p => true,
+            p =>
+            {
+                if (!p.IsChecked)
+                {
+                    // Cancelling the choice of plugin is not allowed
+                    return;
+                }
+                var parent = p.Parent;
+                var index = ((ItemsControl)parent).Items.IndexOf(p);
+                ((MainWindow)App.Current.MainWindow).Model.SelectedInputPluginIndex = index;
+            });
+
+        public static RelayCommand<System.Windows.Controls.MenuItem> ExportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+            p => true,
+            p =>
+            {
+                if (!p.IsChecked)
+                {
+                    // Cancelling the choice of plugin is not allowed
+                    return;
+                }
+                var parent = p.Parent;
+                var index = ((ItemsControl)parent).Items.IndexOf(p);
+                ((MainWindow)App.Current.MainWindow).Model.SelectedOutputPluginIndex = index;
+            });
 
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -404,7 +470,16 @@ namespace OpenSvip.GUI
 
         private void BrowseAndExportMenu_Click(object sender, RoutedEventArgs e)
         {
-            BrowseExportFolderButton_Click(sender, e);
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = "选择输出路径",
+                IsFolderPicker = true
+            };
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+            {
+                return;
+            }
+            Model.ExportPath = dialog.FileName;
             if (StartExecutionButton.IsEnabled)
             {
                 StartExecutionButton_Click(sender, e);
