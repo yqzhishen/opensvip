@@ -153,8 +153,8 @@ namespace OpenSvip.GUI
                 var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
                 foreach (var task in Model.TaskList)
                 {
-                    var exportFolder = Model.DefaultExportPath == DefaultExport.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
-                    var exportPath = Path.Combine(exportFolder, task.ExportTitle + Model.ExportExtension);
+                    task.ExportFolder = Model.DefaultExportPath == DefaultExport.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
+                    var exportPath = Path.Combine(task.ExportFolder, task.ExportTitle + Model.ExportExtension);
                     if (File.Exists(exportPath))
                     {
                         if (askBeforeOverwrite)
@@ -195,7 +195,6 @@ namespace OpenSvip.GUI
                         task.Error = e.Message;
                         continue;
                     }
-                    task.ExportFolder = exportFolder;
                     var warnings = Warnings.GetWarnings();
                     if (warnings.Any())
                     {
