@@ -245,7 +245,7 @@
                 d:Text=".json"
                 Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Margin="0 2 5 0">
+        <StackPanel Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" Margin="0 2 5 0">
             <ContentControl x:Name="TaskStatusContentControl" Content="{Binding Status}">
                 <ContentControl.ContentTemplateSelector>
                     <local:TaskListViewItemTemplateSelector
@@ -259,6 +259,6 @@
                 </ContentControl.ContentTemplateSelector>
             </ContentControl>
         </StackPanel>
-        <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0 2 7 0" VerticalAlignment="Center"/>
+        <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="0 2 7 0" VerticalAlignment="Center"/>
     </Grid>
 </UserControl>
