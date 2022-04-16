@@ -11,7 +11,7 @@
     Height="800"
     Width="1200"
     MinHeight="525"
-    MinWidth="700"
+    MinWidth="655"
     Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
@@ -118,7 +118,7 @@
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition MinWidth="350"/>
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">

@@ -201,8 +201,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40"/>
-            <ColumnDefinition/>
-            <ColumnDefinition Width="140"/>
+            <ColumnDefinition Width="1.5*"/>
+            <ColumnDefinition Width="1*" MinWidth="90" MaxWidth="170"/>
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -222,29 +222,32 @@
             Content="{materialDesign:PackIcon DeleteOutline}"
             ToolTip="移除"
             Click="RemoveTaskButton_Click"/>
-        <StackPanel Grid.Column="1">
+        <StackPanel Grid.Column="1" Margin="0 3 0 0">
             <TextBlock d:Text="黏黏黏黏.svip" Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis"/>
             <TextBlock HorizontalAlignment="Left" d:Text="C:\Users\YQ之神\Desktop\LongLongDirectory" Text="{Binding ImportDirectory}" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
-        <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Margin="5 5 5 0">
+        <DockPanel Grid.Row="0" Grid.Column="2" Grid.IsSharedSizeScope="True" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5 5 5 0">
             <materialDesign:PackIcon
+                DockPanel.Dock="Left"
                 VerticalAlignment="Center"
                 Margin="0 4 5 4"
                 Width="20"
                 Height="20"
                 Kind="Export"
                 Opacity="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=1;0.5, Mode=OneWay}"/>
-            <TextBox
-                Width="100"
-                VerticalAlignment="Center"
-                materialDesign:HintAssist.Hint="输出文件名"
-                Text="{Binding ExportTitle}"/>
             <TextBlock
+                DockPanel.Dock="Right"
                 VerticalAlignment="Center"
                 Margin="5 4 0 5"
                 d:Text=".json"
                 Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>
-        </StackPanel>
+            <TextBox
+                DockPanel.Dock="Right"
+                VerticalAlignment="Center"
+                HorizontalContentAlignment="Center"
+                materialDesign:HintAssist.Hint="输出文件名"
+                Text="{Binding ExportTitle}"/>
+        </DockPanel>
         <StackPanel Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" Margin="0 2 5 0">
             <ContentControl x:Name="TaskStatusContentControl" Content="{Binding Status}">
                 <ContentControl.ContentTemplateSelector>
