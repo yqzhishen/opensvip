@@ -34,6 +34,7 @@
                     <Binding Path="Version" StringFormat="{}应用程序版本：{0}"/>
                 </TextBlock.Text>
             </TextBlock>
+            <TextBlock Text="预览版本 暂勿传播" Foreground="#f44336"/>
             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="10 5">
                 <StackPanel.Resources>
                     <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatDarkButton}">
