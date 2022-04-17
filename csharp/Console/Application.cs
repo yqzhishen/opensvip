@@ -86,9 +86,9 @@ namespace OpenSvip.Console
             var ty = typeof(ErrorTypes);
             var situation = ty.GetField(ty.GetEnumName(type)).GetCustomAttribute<DescriptionAttribute>().Description;
 #if RELEASE
-            System.Console.WriteLine($"{situation}发生错误：" + exception.Message);
+            System.Console.WriteLine($"{situation}发生错误：{exception.Message}");
 #else
-            System.Console.WriteLine($"{situation}发生错误。\n{exception.StackTrace}");
+            System.Console.WriteLine($"{situation}发生错误。{exception.Message}\n{exception.StackTrace}");
 #endif
         }
 
