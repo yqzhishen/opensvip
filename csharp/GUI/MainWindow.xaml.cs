@@ -269,7 +269,11 @@ namespace OpenSvip.GUI
             p => p.AboutMenuItem_Click(null, null));
 
         public static RelayCommand<System.Windows.Controls.MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
-            p => true,
+            p =>
+            {
+                var model = (AppModel)p.DataContext;
+                return model != null && !model.ExecutionInProgress;
+            },
             p =>
             {
                 if (!p.IsChecked)
