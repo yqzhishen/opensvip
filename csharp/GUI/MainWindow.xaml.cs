@@ -300,6 +300,94 @@ namespace OpenSvip.GUI
                 ((MainWindow)App.Current.MainWindow).Model.SelectedOutputPluginIndex = index;
             });
 
+        public static RelayCommand<AppModel> InstallPluginCommand = new RelayCommand<AppModel>(
+            p => !p.ExecutionInProgress,
+            p =>
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Multiselect = true,
+                    Title = "安装插件",
+                    Filter = "插件压缩包 (*.zip)|*.zip"
+                };
+                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                {
+                    return;
+                }
+                new Thread(() =>
+                {
+                    var success = 0;
+                    foreach (var path in dialog.FileNames)
+                    {
+                        try
+                        {
+                            var plugin = PluginManager.ExtractPlugin(path, out var folder);
+                            YesNoDialog confirmDialog;
+                            if (!PluginManager.HasPlugin(plugin.Identifier))
+                            {
+                                confirmDialog = YesNoDialog.CreateDialog(
+                                    "安装新的插件",
+                                    $"将要安装由 {plugin.Author} 开发，适用于 {plugin.Format} (*.{plugin.Suffix}) 的插件“{plugin.Name}”。确认继续？",
+                                    "安装");
+                                if (confirmDialog.ShowDialog())
+                                {
+                                    PluginManager.InstallPlugin(plugin, folder);
+                                    ++success;
+                                }
+                                continue;
+                            }
+                            var oldPlugin = PluginManager.GetPlugin(plugin.Identifier);
+                            Version oldVersion = new Version(oldPlugin.Version);
+                            Version version = new Version(plugin.Version);
+                            if (version > oldVersion)
+                            {
+                                confirmDialog = YesNoDialog.CreateDialog(
+                                    "更新已有插件",
+                                    $"插件“{plugin.Name}”将由 {oldVersion} 更新至 {version}。确认继续？",
+                                    "更新");
+                            }
+                            else
+                            {
+                                confirmDialog = YesNoDialog.CreateDialog(
+                                    "此插件不是新的版本",
+                                    $"当前已安装插件“{plugin.Name}”的相同或更新版本 ({oldVersion} ≥ {version})。确认要覆盖安装吗？",
+                                    "覆盖");
+                            }
+                            if (confirmDialog.ShowDialog())
+                            {
+                                PluginManager.InstallPlugin(plugin, folder);
+                                ++success;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageDialog.CreateDialog("插件安装失败", e.Message).ShowDialog();
+                        }
+                    }
+                    if (success > 0)
+                    {
+                        var restartDialog = YesNoDialog.CreateDialog(
+                            "插件安装完成。重启本应用？",
+                            $"已成功安装 {success} 个插件。需要重启本应用以使新的功能生效。",
+                            "重启",
+                            "稍后");
+                        if (restartDialog.ShowDialog())
+                        {
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+                                App.Current.MainWindow.Close();
+                                System.Windows.Application.Current.Shutdown();
+                            });
+                            System.Windows.Forms.Application.Restart();
+                        }
+                    }
+                    if (Directory.Exists(PluginManager.TempPath))
+                    {
+                        new DirectoryInfo(PluginManager.TempPath).Delete(true);
+                    }
+                }).Start();
+            });
+
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var dialog = AboutDialog.CreateDialog();

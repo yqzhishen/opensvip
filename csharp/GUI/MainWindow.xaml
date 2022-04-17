@@ -117,6 +117,8 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
+                        <Separator/>
+                        <MenuItem Header="安装插件(_P)..." Icon="{materialDesign:PackIcon Kind=PuzzlePlusOutline}" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
                     </MenuItem>
                     <MenuItem Header="设置(_O)" Height="25" Padding="10 0">
                         <MenuItem Header="自动检测导入格式(_D)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
@@ -147,7 +149,7 @@
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
                         </MenuItem>
                         <Separator/>
-                        <MenuItem Header="外观主题(_T)" IsEnabled="False">
+                        <MenuItem Header="外观主题(_T)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=PaletteOutline}">
                             <MenuItem Header="浅色(_L)" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="True"/>
                             <MenuItem Header="深色(_D)" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="False"/>
                             <MenuItem Header="系统(_S)" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="False"/>
