@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -10,9 +11,13 @@ namespace OpenSvip.Framework
 {
     public static class PluginManager
     {
-        private static readonly string PluginPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"Plugins\");
+        public static readonly string PluginPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+
+        public static readonly string TempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp");
 
         private static readonly Dictionary<string, Plugin> Plugins = new Dictionary<string, Plugin>();
+
+        private static readonly Dictionary<string, string> Folders = new Dictionary<string, string>();
 
         static PluginManager()
         {
@@ -32,10 +37,7 @@ namespace OpenSvip.Framework
                     {
                         var plugin = (Plugin) new XmlSerializer(typeof(Plugin)).Deserialize(reader);
                         Plugins[plugin.Identifier] = plugin;
-                    }
-                    catch (Exception)
-                    {
-                        // ignored
+                        Folders[plugin.Identifier] = pluginDir;
                     }
                     finally
                     {
@@ -58,6 +60,11 @@ namespace OpenSvip.Framework
             return (IProjectConverter) Activator.CreateInstance(type);
         }
 
+        public static bool HasPlugin(string identifier)
+        {
+            return Plugins.ContainsKey(identifier);
+        }
+
         public static Plugin GetPlugin(string identifier)
         {
             if (!Plugins.ContainsKey(identifier))
@@ -70,6 +77,57 @@ namespace OpenSvip.Framework
         public static Plugin[] GetAllPlugins()
         {
             return Array.ConvertAll(Plugins.ToArray(), kv => kv.Value);
+        }
+
+        public static Plugin ExtractPlugin(string path, out string folder)
+        {
+            if (Directory.Exists(TempPath))
+            {
+                new DirectoryInfo(TempPath).Delete(true);
+            }
+            Directory.CreateDirectory(TempPath);
+            ZipFile.ExtractToDirectory(path, TempPath);
+            folder = Directory.EnumerateDirectories(TempPath).First();
+            var propertiesPath = Path.Combine(folder, "Properties.xml");
+            try
+            {
+                var stream = new FileStream(propertiesPath, FileMode.Open, FileAccess.Read);
+                var reader = new StreamReader(stream, new UTF8Encoding(false));
+                try
+                {
+                    return (Plugin)new XmlSerializer(typeof(Plugin)).Deserialize(reader);
+                }
+                finally
+                {
+                    stream.Close();
+                    reader.Close();
+                }
+            }
+            catch (IOException)
+            {
+                new DirectoryInfo(folder).Delete(true);
+                throw new IOException($"压缩包“{path}”已损坏，或未包含正确的插件信息。");
+            }
+        }
+
+        public static void InstallPlugin(Plugin plugin, string folder)
+        {
+            var folderName = Path.GetFileName(folder);
+            if (Plugins.ContainsKey(plugin.Identifier)) // plugin already exists
+            {
+                new DirectoryInfo(Folders[plugin.Identifier]).Delete(true);
+                Directory.Move(folder, Path.Combine(PluginPath, folderName));
+            }
+            else // a new plugin
+            {
+                if (Directory.Exists(Path.Combine(PluginPath, folderName)))
+                {
+                    throw new IOException($"试图安装一个新的插件，但其目录名“{folderName}”与已有插件冲突。请联系插件的发布者。");
+                }
+                Directory.Move(folder, Path.Combine(PluginPath, folderName));
+            }
+            Plugins[plugin.Identifier] = plugin;
+            Folders[plugin.Identifier] = folder;
         }
     }
 }
