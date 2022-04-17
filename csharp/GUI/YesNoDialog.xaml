@@ -23,7 +23,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="20 16 20 5">
             <TextBlock HorizontalAlignment="Left" d:Text="插件已安装。立即重启本应用？" Text="{Binding Title}" FontSize="16" FontWeight="Bold"/>
