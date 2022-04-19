@@ -75,6 +75,7 @@ namespace OpenSvip.GUI
                 ExportPluginMenuItem.Items.Add(exportMenuItem);
             }
             TaskListView.ItemsSource = Model.TaskList;
+            AddConverterTasks(Environment.GetCommandLineArgs().Skip(1).Where(arg => File.Exists(arg)));
         }
 
         private void FileDropColorOpacityChange(double from, double to)

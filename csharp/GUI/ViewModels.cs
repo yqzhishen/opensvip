@@ -45,9 +45,9 @@ namespace OpenSvip.GUI
             });
         }
 
-        public string Version { get; set; } = "1.0.3 (Preview)";
+        public string Version { get; set; } = "1.0.4 (Preview)";
 
-        public string FrameworkVersion { get; set; } = "1.2.0";
+        public string FrameworkVersion { get; set; } = "1.2.1";
 
         public string Author { get; set; } = "YQ之神";
 
