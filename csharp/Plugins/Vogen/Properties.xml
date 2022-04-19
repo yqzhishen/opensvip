@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>Vogen</Name>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>Vogen 工程格式转换插件。</Descriptions>
