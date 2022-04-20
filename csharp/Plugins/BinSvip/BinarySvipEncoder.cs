@@ -109,9 +109,14 @@ namespace OpenSvip.Stream
             switch (track)
             {
                 case SingingTrack singingTrack:
+                    var singerId = Singers.GetId(singingTrack.AISingerName);
+                    if (singerId == "")
+                    {
+                        singerId = Singers.GetId(DefaultSinger);
+                    }
                     var sTrack = new SingingTool.Model.SingingTrack
                     {
-                        AISingerId = Singers.GetId(singingTrack.AISingerName, DefaultSinger),
+                        AISingerId = singerId,
                         ReverbPreset = ReverbPresets.GetIndex(singingTrack.ReverbPreset)
                     };
                     foreach (var note in singingTrack.NoteList)
@@ -156,7 +161,7 @@ namespace OpenSvip.Stream
                 KeyIndex = note.KeyNumber + 12,
                 Lyric = note.Lyric,
                 HeadTag = NoteHeadTags.GetIndex(note.HeadTag),
-                Pronouncing = note.Pronunciation
+                Pronouncing = note.Pronunciation?.ToLower()
             };
             resultNote.WidthPos = (int) Math.Round(
                     Synchronizer.GetActualTicksFromTicks(note.StartPos + note.Length)) - resultNote.ActualStartPos;

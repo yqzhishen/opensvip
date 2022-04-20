@@ -32,17 +32,13 @@ namespace OpenSvip.Const
             return Regex.IsMatch(id, "[FM]\\d+") ? $"$({id})" : "";
         }
 
-        public static string GetId(string name, string defaultName = null)
+        public static string GetId(string name)
         {
             foreach (var singer in SingerNames.Where(singer => singer.Value.Equals(name)))
             {
                 return singer.Key;
             }
-            if (Regex.IsMatch(name, "\\$\\([FM]\\d+\\)"))
-            {
-                return name.Substring(2, name.Length - 3);
-            }
-            return defaultName ?? "";
+            return Regex.IsMatch(name, "\\$\\([FM]\\d+\\)") ? name.Substring(2, name.Length - 3) : "";
         }
     }
 
