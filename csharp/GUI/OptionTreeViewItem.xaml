@@ -28,6 +28,31 @@
         <Style x:Key="OptionDoubleBox" TargetType="{x:Type local:DoubleNumericBox}" BasedOn="{StaticResource OptionTextBox}">
             <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
         </Style>
+        <Style x:Key="OptionInformationIcon" TargetType="materialDesign:PackIcon">
+            <Setter Property="Kind" Value="Information"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Width">
+                <Setter.Value>
+                    <Binding Path="OptionInfo.Tips" Mode="OneWay">
+                        <Binding.Converter>
+                            <local:ValueConverterGroup>
+                                <local:NotNullConverter/>
+                                <local:BooleanSwitchOperationConverter/>
+                            </local:ValueConverterGroup>
+                        </Binding.Converter>
+                        <Binding.ConverterParameter>19;0</Binding.ConverterParameter>
+                    </Binding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Height" Value="{Binding Height, RelativeSource={RelativeSource Mode=Self}}"/>
+            <Setter Property="Opacity" Value="0.8"/>
+            <Setter Property="ToolTip">
+                <Setter.Value>
+                    <TextBlock FontSize="13" Text="{Binding OptionInfo.Tips}" MaxWidth="320" TextWrapping="Wrap"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <DataTemplate x:Key="String" d:DataType="{x:Type local:OptionViewModel}">
             <WrapPanel
                 Grid.Row="0"
@@ -35,7 +60,10 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock x:Name="TextBlockNearTextBox" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Text="{Binding Path=OptionValue}" Margin="0 1 0 0" MinWidth="80"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Text="{Binding Path=OptionValue}" Margin="0 1 0 0" MinWidth="80"/>
+                    <materialDesign:PackIcon Style="{StaticResource OptionInformationIcon}"/>
+                </StackPanel>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Integer">
@@ -45,7 +73,10 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Margin="0 2 0 0" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
+                <StackPanel Orientation="Horizontal">
+                    <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Margin="0 2 0 0" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
+                    <materialDesign:PackIcon Style="{StaticResource OptionInformationIcon}"/>
+                </StackPanel>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Double">
@@ -55,7 +86,10 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:DoubleNumericBox Style="{StaticResource OptionDoubleTextBox}" VerticalAlignment="Center" Margin="0 2 0 0" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
+                <StackPanel Orientation="Horizontal">
+                    <local:DoubleNumericBox Style="{StaticResource OptionDoubleTextBox}" VerticalAlignment="Center" Margin="0 2 0 0" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
+                    <materialDesign:PackIcon Style="{StaticResource OptionInformationIcon}"/>
+                </StackPanel>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Boolean">
@@ -68,7 +102,10 @@
                     Margin="-2 0 0 0"
                     Cursor="Hand"
                     IsChecked="{Binding Path=OptionValue}"/>
-                <TextBlock x:Name="AutoDetectText" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Margin="5 0" Text="{Binding Path=OptionInfo.Notes}"/>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="AutoDetectText" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Margin="5 0" Text="{Binding Path=OptionInfo.Notes}"/>
+                    <materialDesign:PackIcon Style="{StaticResource OptionInformationIcon}"/>
+                </StackPanel>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Enum">
@@ -78,16 +115,21 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <ComboBox
-                    ItemsSource="{Binding Path=OptionInfo.EnumChoices}"
-                    SelectedIndex="{Binding ChoiceIndex}"
-                    ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type framwork:Choice}">
-                            <TextBlock Style="{StaticResource OptionTextBlock}" Opacity="1" TextAlignment="Center" Text="{Binding Name}" Padding="0" ToolTip="{Binding Label}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <StackPanel Orientation="Horizontal">
+                    <ComboBox
+                        Margin="0 5 0 0"
+                        Padding="0 0 0 4"
+                        ItemsSource="{Binding Path=OptionInfo.EnumChoices}"
+                        SelectedIndex="{Binding ChoiceIndex}"
+                        ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type framwork:Choice}">
+                                <TextBlock Style="{StaticResource OptionTextBlock}" Opacity="1" TextAlignment="Center" Text="{Binding Name}" Padding="0" ToolTip="{Binding Label}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <materialDesign:PackIcon Style="{StaticResource OptionInformationIcon}"/>
+                </StackPanel>
             </WrapPanel>
         </DataTemplate>
     </UserControl.Resources>

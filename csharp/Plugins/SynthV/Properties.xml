@@ -13,7 +13,8 @@
     <Converter>SynthV.Stream.SynthVConverter</Converter>
     <InputOptions>
         <Option Name="pitch" Type="enum" Default="plain">
-            <Notes>音高参数属性输入模式</Notes>
+            <Notes>音高信息输入模式</Notes>
+			<Tips>本选项控制音高曲线被导入的范围和判定条件。其中“经过编辑”的定义为：参数面板中的音高偏差、颤音包络和音符属性中的音高转变、颤音中的任意一项经过编辑。</Tips>
             <EnumChoices>
                 <Choice Name="输入完整音高曲线" Tag="full">
                     <Label>不论是否经过编辑，均输入整条音高曲线</Label>
@@ -28,6 +29,7 @@
         </Option>
         <Option Name="instant" Type="boolean" Default="true">
             <Notes>遵循即时音高模式设置</Notes>
+			<Tips>关闭此选项时，无论工程文件是否开启了即时音高模式，都只会考虑原始的默认音高。若您基于即时音高模式进行了调校，建议打开此选项。</Tips>
         </Option>
         <Option Name="breath" Type="enum" Default="ignore">
             <Notes>换气音符处理方式</Notes>
@@ -39,6 +41,7 @@
         </Option>
         <Option Name="group" Type="enum" Default="split">
             <Notes>音符组导入方式</Notes>
+			<Tips>注意：若音符组较多，请尽量选择“保留原始位置”以防止轨道数量暴增。但若音符组之间、音符组与主组之间存在时间轴上紧挨（但不重叠）的音符，则建议选择“拆分为轨道”以确保段落划分不被破坏。</Tips>
             <EnumChoices>
                 <Choice Name="全部拆分为轨道" Tag="split">
                     <Label>为每个音符组引用生成一个单独的音轨</Label>
@@ -66,6 +69,7 @@
         </Option>
         <Option Name="desample" Type="integer" Default="40">
             <Notes>设置参数点的平均采样间隔以改善性能（0 为无限制）</Notes>
+			<Tips>减小采样间隔可提高参数曲线的精准度，但可能造成渲染卡顿（例如 Synthesizer V Studio Pro + AI 声库）。请根据电脑配置与实际体验酌情设置此值。</Tips>
         </Option>
     </OutputOptions>
 </Plugin>

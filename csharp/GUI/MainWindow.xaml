@@ -493,6 +493,22 @@
                                             <EventSetter Event="PreviewMouseWheel" Handler="OptionTreeView_MouseWheel"/>
                                             <EventSetter Event="PreviewTouchMove" Handler="OptionTreeView_TouchMove"/>
                                         </Style>
+                                        <Style x:Key="TreeViewHeaderComment" TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="10 2 0 0"/>
+                                            <Setter Property="Opacity" Value="0.8"/>
+                                            <Setter Property="FontSize" Value="13"/>
+                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                            <Setter Property="MaxWidth">
+                                                <Setter.Value>
+                                                    <Binding
+                                                        RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}"
+                                                        Path="ActualWidth"
+                                                        Converter="{StaticResource DoubleConstantSubConverter}"
+                                                        ConverterParameter="160"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
                                         <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItem}">
                                             <Setter Property="IsExpanded" Value="True"/>
                                             <Setter Property="materialDesign:TreeViewAssist.ShowSelection" Value="False"/>
@@ -528,12 +544,25 @@
                                             x:Name="InputOptionsTreeView"
                                             ItemsSource="{Binding SelectedInputOptions}">
                                             <TreeViewItem.Header>
-                                                <TextBlock
-                                                    Margin="-8 0 0 0"
-                                                    Text="输入选项"
-                                                    FontSize="16"
-                                                    ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
-                                                    MouseDown="TreeViewHeader_Click"/>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Margin="-8 0 0 0"
+                                                        Text="输入选项"
+                                                        FontSize="16"
+                                                        ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
+                                                        MouseDown="TreeViewHeader_Click"/>
+                                                    <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
+                                                    <TextBlock VerticalAlignment="Center" Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}导入自 {0}">
+                                                                <Binding Path="SelectedInputPlugin.Format"/>
+                                                                <Binding Path="SelectedInputPlugin.Suffix"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                    <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="]" Margin="7 2 0 0"/>
+                                                </StackPanel>
                                             </TreeViewItem.Header>
                                             <TreeViewItem.ItemTemplate>
                                                 <StaticResource ResourceKey="OptionsTreeViewItemTemplate"/>
@@ -547,12 +576,25 @@
                                             x:Name="OutputOptionsTreeView"
                                             ItemsSource="{Binding SelectedOutputOptions}">
                                             <TreeViewItem.Header>
-                                                <TextBlock
-                                                    Margin="-8 0 0 0"
-                                                    Text="输出选项"
-                                                    FontSize="16"
-                                                    ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
-                                                    MouseDown="TreeViewHeader_Click"/>
+                                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        Margin="-8 0 0 0"
+                                                        Text="输出选项"
+                                                        FontSize="16"
+                                                        ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
+                                                        MouseDown="TreeViewHeader_Click"/>
+                                                    <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
+                                                    <TextBlock VerticalAlignment="Center" Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="{}导出为 {0}">
+                                                                <Binding Path="SelectedOutputPlugin.Format"/>
+                                                                <Binding Path="SelectedOutputPlugin.Suffix"/>
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                    <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="]" Margin="7 2 0 0"/>
+                                                </StackPanel>
                                             </TreeViewItem.Header>
                                             <TreeViewItem.ItemTemplate>
                                                 <StaticResource ResourceKey="OptionsTreeViewItemTemplate"/>

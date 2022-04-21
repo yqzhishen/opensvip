@@ -114,6 +114,7 @@
     <Compile Include="TaskListViewItem.xaml.cs">
       <DependentUpon>TaskListViewItem.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ValueConverterGroup.cs" />
     <Compile Include="ValueConverters.cs" />
     <Compile Include="YesNoDialog.xaml.cs">
       <DependentUpon>YesNoDialog.xaml</DependentUpon>
