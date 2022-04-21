@@ -9,7 +9,7 @@ using SynthV.Options;
 
 namespace SynthV.Stream
 {
-    internal class SynthVConverter : IProjectConverter
+    public class SynthVConverter : IProjectConverter
     {
         public Project Load(string path, ConverterOptions options)
         {
@@ -31,7 +31,7 @@ namespace SynthV.Stream
         {
             var svProject = new SynthVEncoder
             {
-                VibratoOption = options.GetValueAsEnum("vibrato", VibratoOptions.Hybrid),
+                VibratoOption = options.GetValueAsEnum("vibrato", VibratoOptions.None),
                 ParamSampleInterval = options.GetValueAsInteger("desample", 40)
             }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
