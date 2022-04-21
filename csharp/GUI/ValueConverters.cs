@@ -271,7 +271,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Math.Max(0, (double)value - double.Parse(parameter.ToString()));
+             return Math.Max(0, (double)value - double.Parse(parameter.ToString()));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

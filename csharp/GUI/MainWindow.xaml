@@ -505,7 +505,7 @@
                                                         RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}"
                                                         Path="ActualWidth"
                                                         Converter="{StaticResource DoubleConstantSubConverter}"
-                                                        ConverterParameter="160"/>
+                                                        ConverterParameter="180"/>
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
@@ -555,10 +555,7 @@
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
                                                     <TextBlock VerticalAlignment="Center" Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
                                                         <TextBlock.Text>
-                                                            <MultiBinding StringFormat="{}导入自 {0}">
-                                                                <Binding Path="SelectedInputPlugin.Format"/>
-                                                                <Binding Path="SelectedInputPlugin.Suffix"/>
-                                                            </MultiBinding>
+                                                            <Binding Path="SelectedInputPlugin.Format" StringFormat="{}导入自 {0}"/>
                                                         </TextBlock.Text>
                                                     </TextBlock>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="]" Margin="7 2 0 0"/>
@@ -587,10 +584,7 @@
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
                                                     <TextBlock VerticalAlignment="Center" Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
                                                         <TextBlock.Text>
-                                                            <MultiBinding StringFormat="{}导出为 {0}">
-                                                                <Binding Path="SelectedOutputPlugin.Format"/>
-                                                                <Binding Path="SelectedOutputPlugin.Suffix"/>
-                                                            </MultiBinding>
+                                                            <Binding Path="SelectedOutputPlugin.Format" StringFormat="{}导出为 {0}"/>
                                                         </TextBlock.Text>
                                                     </TextBlock>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="]" Margin="7 2 0 0"/>
