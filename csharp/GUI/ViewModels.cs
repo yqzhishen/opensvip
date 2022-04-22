@@ -57,10 +57,7 @@ namespace OpenSvip.GUI
 
         public List<Plugin> Plugins { get; } = PluginManager.GetAllPlugins().ToList();
 
-        public List<string> Formats
-        {
-            get => Plugins.ConvertAll(plugin => $"{plugin.Format} (*.{plugin.Suffix})");
-        }
+        public List<string> Formats => Plugins.ConvertAll(plugin => $"{plugin.Format} (*.{plugin.Suffix})");
 
         private bool _autoDetectFormat = true;
 
@@ -107,7 +104,7 @@ namespace OpenSvip.GUI
             }
         }
 
-        private bool _openExportFolder = false;
+        private bool _openExportFolder;
 
         [JsonProperty]
         public bool OpenExportFolder
@@ -154,6 +151,9 @@ namespace OpenSvip.GUI
                     case DefaultExport.Custom:
                         // TODO: implement this
                         break;
+                    case DefaultExport.None:
+                    default:
+                        break;
                 }
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DefaultExport"));
             }
@@ -177,9 +177,7 @@ namespace OpenSvip.GUI
         }
 
         public Plugin SelectedInputPlugin
-        {
-            get => SelectedInputPluginIndex >= 0 ? Plugins[SelectedInputPluginIndex] : null;
-        }
+            => SelectedInputPluginIndex >= 0 ? Plugins[SelectedInputPluginIndex] : null;
 
         private int _selectedOutputPluginIndex = -1;
 
@@ -198,9 +196,7 @@ namespace OpenSvip.GUI
         }
 
         public Plugin SelectedOutputPlugin
-        {
-            get => SelectedOutputPluginIndex >= 0 ? Plugins[SelectedOutputPluginIndex] : null;
-        }
+            => SelectedOutputPluginIndex >= 0 ? Plugins[SelectedOutputPluginIndex] : null;
 
         public List<ObservableCollection<OptionViewModel>> InputOptions { get; }
 
@@ -234,16 +230,12 @@ namespace OpenSvip.GUI
         }
 
         public ObservableCollection<OptionViewModel> SelectedInputOptions
-        {
-            get => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
-        }
-        
+            => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
+
         public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
 
         public ObservableCollection<OptionViewModel> SelectedOutputOptions
-        {
-            get => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
-        }
+            => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
 
         public ObservableCollection<TaskViewModel> TaskList { get; set; } = new AsyncObservableCollection<TaskViewModel>();
 
@@ -259,7 +251,7 @@ namespace OpenSvip.GUI
             }
         }
 
-        private bool _executionInProgress = false;
+        private bool _executionInProgress;
 
         public bool ExecutionInProgress
         {
@@ -294,15 +286,9 @@ namespace OpenSvip.GUI
         
         public Plugin OutputPlugin { get; set; }
 
-        public string ImportFilename
-        {
-            get => Path.GetFileName(ImportPath);
-        }
+        public string ImportFilename => Path.GetFileName(ImportPath);
 
-        public string ImportDirectory
-        {
-            get => Path.GetDirectoryName(ImportPath);
-        }
+        public string ImportDirectory => Path.GetDirectoryName(ImportPath);
 
         private string _exportTitle;
 

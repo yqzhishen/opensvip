@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:OpenSvip.GUI"
     xmlns:Framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
@@ -31,7 +30,7 @@
             <materialDesign:PackIcon
                 Grid.Column="0"
                 Grid.Row="0"
-                Grid.RowSpan="3"
+                Grid.RowSpan="2"
                 Kind="Puzzle"
                 Opacity="0.8"
                 VerticalAlignment="Center"

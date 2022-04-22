@@ -33,20 +33,20 @@
             <Setter Property="Kind" Value="HelpCircle"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin" Value="8 0 0 0"/>
-            <Setter Property="Width">
+            <Setter Property="Width" Value="19"/>
+            <Setter Property="Height" Value="{Binding Width, RelativeSource={RelativeSource Mode=Self}}"/>
+            <Setter Property="Visibility">
                 <Setter.Value>
                     <Binding Path="OptionInfo.Tips" Mode="OneWay">
                         <Binding.Converter>
                             <local:ValueConverterGroup>
                                 <local:NotNullConverter/>
-                                <local:BooleanSwitchOperationConverter/>
+                                <local:BooleanToVisibilityConverter/>
                             </local:ValueConverterGroup>
                         </Binding.Converter>
-                        <Binding.ConverterParameter>19;0</Binding.ConverterParameter>
                     </Binding>
                 </Setter.Value>
             </Setter>
-            <Setter Property="Height" Value="{Binding Height, RelativeSource={RelativeSource Mode=Self}}"/>
             <Setter Property="Opacity" Value="0.8"/>
             <Setter Property="ToolTip">
                 <Setter.Value>
@@ -57,7 +57,6 @@
         </Style>
         <DataTemplate x:Key="String" d:DataType="{x:Type local:OptionViewModel}">
             <WrapPanel
-                Grid.Row="0"
                 Orientation="Horizontal"
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
@@ -67,7 +66,6 @@
         </DataTemplate>
         <DataTemplate x:Key="Integer">
             <WrapPanel
-                Grid.Row="0"
                 Orientation="Horizontal"
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
@@ -77,12 +75,11 @@
         </DataTemplate>
         <DataTemplate x:Key="Double">
             <WrapPanel
-                Grid.Row="0"
                 Orientation="Horizontal"
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:DoubleNumericBox Style="{StaticResource OptionDoubleTextBox}" VerticalAlignment="Center" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
+                <local:DoubleNumericBox Style="{StaticResource OptionDoubleBox}" VerticalAlignment="Center" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Boolean">
@@ -100,7 +97,6 @@
         </DataTemplate>
         <DataTemplate x:Key="Enum">
             <WrapPanel
-                Grid.Row="0"
                 Orientation="Horizontal"
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">

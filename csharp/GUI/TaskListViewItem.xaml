@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:OpenSvip.GUI"
-    xmlns:framwork="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    xmlns:framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=local:TaskViewModel}"
@@ -105,7 +105,7 @@
                                 x:Name="WarningMessageItemsControl"
                                 ItemsSource="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TaskListViewItem}, Path=DataContext.Warnings, Mode=OneWay}">
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type framwork:Warning}">
+                                    <DataTemplate DataType="{x:Type framework:Warning}">
                                         <StackPanel>
                                             <Grid>
                                                 <Grid.RowDefinitions>
@@ -116,7 +116,6 @@
                                                 <StackPanel Grid.Row="1" Orientation="Horizontal">
                                                     <materialDesign:PackIcon Kind="AlertOutline" VerticalAlignment="Center"/>
                                                     <TextBlock
-                                                        Grid.Row="1"
                                                         Margin="5 0 10 0"
                                                         MaxWidth="{Binding ActualWidth, ElementName=WarningMessageItemsControl, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=20}"
                                                         HorizontalAlignment="Left"
@@ -211,8 +210,8 @@
         </Grid.RowDefinitions>
         <Button
             x:Name="RemoveTaskButton"
-            Grid.Column="0"
             Grid.Row="0"
+            Grid.Column="0"
             VerticalAlignment="Center"
             Margin="0 1 0 0"
             Padding="0"
@@ -222,7 +221,7 @@
             Content="{materialDesign:PackIcon DeleteOutline}"
             ToolTip="移除"
             Click="RemoveTaskButton_Click"/>
-        <StackPanel Grid.Column="1" Margin="0 3 0 0">
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0 3 0 0">
             <TextBlock d:Text="黏黏黏黏.svip" Text="{Binding ImportFilename}" FontWeight="Bold" FontSize="14" TextTrimming="CharacterEllipsis"/>
             <TextBlock HorizontalAlignment="Left" d:Text="C:\Users\YQ之神\Desktop\LongLongDirectory" Text="{Binding ImportDirectory}" TextTrimming="CharacterEllipsis"/>
         </StackPanel>

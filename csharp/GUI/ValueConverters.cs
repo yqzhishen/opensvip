@@ -29,12 +29,12 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (int)value >= 0;
+            return value != null && (int)value >= 0;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (Visibility)value == Visibility.Visible;
+            return value != null && (Visibility)value == Visibility.Visible;
         }
     }
 
@@ -42,7 +42,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((IEnumerable)value).Cast<object>().Any();
+            return (((IEnumerable)value) ?? throw new InvalidOperationException()).Cast<object>().Any();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -68,8 +68,12 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+            {
+                throw new InvalidOperationException();
+            }
             var integer = ((IList<TaskViewModel>) value).Count;
-            return integer > 0 ? Visibility.Visible : Visibility.Hidden;
+            return integer > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -82,12 +86,12 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value ? Visibility.Visible : Visibility.Hidden;
+            return value != null && (bool)value ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (Visibility)value == Visibility.Visible;
+            return value != null && (Visibility)value == Visibility.Visible;
         }
     }
 
@@ -95,14 +99,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            foreach (var v in values)
-            {
-                if ((bool)v)
-                {
-                    return Visibility.Visible;
-                }
-            }
-            return Visibility.Hidden;
+            return values.Any(v => (bool)v) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -115,7 +112,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value.Equals(Visibility.Visible) ? Visibility.Hidden : Visibility.Visible;
+            return value != null && value.Equals(Visibility.Visible) ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -160,13 +157,17 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var enumValues = ((Type)parameter).GetEnumValues().OfType<object>().ToArray();
-            return Array.IndexOf(enumValues, value);
+            var enumValues = ((Type)parameter)?.GetEnumValues().OfType<object>().ToArray();
+            return enumValues != null ? Array.IndexOf(enumValues, value) : -1;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((Type)parameter).GetEnumValues().OfType<object>().ElementAt((int)value);
+            if (value != null)
+            {
+                return ((Type) parameter)?.GetEnumValues().OfType<object>().ElementAt((int) value);
+            }
+            throw new InvalidOperationException();
         }
     }
 
@@ -174,6 +175,10 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+            {
+                throw new InvalidOperationException();
+            }
             var fields = value.GetType().GetFields().Skip(1).ToArray();
             var enumValues = value.GetType().GetEnumValues().OfType<object>().ToArray();
             return fields[Array.IndexOf(enumValues, value)].GetCustomAttribute<DescriptionAttribute>().Description;
@@ -189,7 +194,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return !(bool)value;
+            return value != null && !(bool)value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -202,14 +207,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
-            foreach (var item in value)
-            {
-                if ((bool)item)
-                {
-                    return true;
-                }
-            }
-            return false;
+            return value.Any(item => (bool) item);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
@@ -222,25 +220,21 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var choices = ((string)parameter).Split(';');
-            var result = (bool)value ? choices[0] : choices[1];
-            if (targetType.Equals(typeof(int)))
+            var choices = ((string)parameter)?.Split(';');
+            if (choices == null)
             {
-                if (!int.TryParse(result.ToString(), out int val))
-                {
-                    return DependencyProperty.UnsetValue;
-                }
-                return val;
+                throw new InvalidOperationException();
             }
-            else if (targetType.Equals(typeof(double)))
+            var result = value != null && (bool)value ? choices[0] : choices[1];
+            if (targetType == typeof(int))
             {
-                if (!double.TryParse(result.ToString(), out double val))
-                {
-                    return DependencyProperty.UnsetValue;
-                }
-                return val;
+                return !int.TryParse(result, out var val) ? DependencyProperty.UnsetValue : val;
             }
-            if (!result.GetType().Equals(targetType) && !result.GetType().IsSubclassOf(targetType))
+            if (targetType == typeof(double))
+            {
+                return !double.TryParse(result, out var val) ? DependencyProperty.UnsetValue : val;
+            }
+            if (result.GetType() != targetType && !result.GetType().IsSubclassOf(targetType))
             {
                 return DependencyProperty.UnsetValue;
             }
@@ -258,7 +252,11 @@ namespace OpenSvip.GUI
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var plugin = (Plugin)value;
-            return $"{plugin.Format} (*.{plugin.Suffix})";
+            if (plugin != null)
+            {
+                return $"{plugin.Format} (*.{plugin.Suffix})";
+            }
+            throw new InvalidOperationException();
         }
 
         public object ConvertBack(object value, Type targetTypes, object parameter, CultureInfo culture)
@@ -271,7 +269,11 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-             return Math.Max(0, (double)value - double.Parse(parameter.ToString()));
+            if (value == null || parameter == null)
+            {
+                throw new InvalidOperationException();
+            }
+            return Math.Max(0, (double) value - double.Parse(parameter.ToString()));
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -284,7 +286,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (int)value == int.Parse(parameter.ToString());
+            return value != null && parameter != null && (int)value == int.Parse(parameter.ToString());
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
