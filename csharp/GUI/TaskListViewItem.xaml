@@ -200,8 +200,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40"/>
-            <ColumnDefinition Width="1.5*"/>
-            <ColumnDefinition Width="1*" MinWidth="90" MaxWidth="170"/>
+            <ColumnDefinition Width="1.75*"/>
+            <ColumnDefinition Width="1*" MinWidth="90" MaxWidth="210"/>
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>

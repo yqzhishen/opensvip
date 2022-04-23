@@ -187,7 +187,7 @@ namespace OpenSvip.GUI
             set
             {
                 _selectedOutputPluginIndex = value;
-                ExportExtension = value >= 0 ? "." + SelectedOutputPlugin.Suffix : null;
+                ExportExtension = AutoExtension && value >= 0 ? "." + SelectedOutputPlugin.Suffix : null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputPluginIndex"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputPlugin"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputOptions"));
@@ -211,7 +211,7 @@ namespace OpenSvip.GUI
                 {
                     foreach (var task in TaskList)
                     {
-                        task.ExportTitle = Path.GetFileNameWithoutExtension(task.ExportTitle);
+                        task.ExportTitle = Path.GetFileNameWithoutExtension(task.ImportFilename);
                     }
                 }
                 else if (_exportExtension != null && value == null)
@@ -281,10 +281,6 @@ namespace OpenSvip.GUI
             Warnings.Clear();
             Error = null;
         }
-
-        public Plugin InputPlugin { get; set; }
-        
-        public Plugin OutputPlugin { get; set; }
 
         public string ImportFilename => Path.GetFileName(ImportPath);
 
