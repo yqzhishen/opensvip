@@ -4,7 +4,7 @@
     <Version>1.7.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
-    <Descriptions>Synthesizer V 工程格式转换插件。</Descriptions>
+    <Descriptions>Synthesizer V 工程格式转换插件，支持包括曲谱、歌词、参数曲线、音符属性、音符组、即时音高模式等所有数据的读取与写入。&#x000A;请注意：输入带有重叠音符的工程文件是未定义的行为，可能导致无法预料的异常。</Descriptions>
     <Requirements>无</Requirements>
     <Format>Synthesizer V 工程文件</Format>
     <Suffix>svp</Suffix>
