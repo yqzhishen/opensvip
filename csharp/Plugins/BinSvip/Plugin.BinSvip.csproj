@@ -38,14 +38,17 @@
           <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
           <Private>True</Private>
         </Reference>
+        <Reference Include="SingingTool.Const">
+          <HintPath>..\..\.tmp\SingingTool.Const.dll</HintPath>
+        </Reference>
         <Reference Include="SingingTool.Const, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\..\.tmp\SingingTool.Const.dll</HintPath>
         </Reference>
-        <Reference Include="SingingTool.Library, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\.tmp\SingingTool.Library.dll</HintPath>
+        <Reference Include="SingingTool.Library">
+          <HintPath>..\..\.tmp\SingingTool.Library.dll</HintPath>
         </Reference>
-        <Reference Include="SingingTool.Model, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\.tmp\SingingTool.Model.dll</HintPath>
+        <Reference Include="SingingTool.Model">
+          <HintPath>..\..\.tmp\SingingTool.Model.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
