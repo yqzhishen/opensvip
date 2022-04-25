@@ -127,12 +127,13 @@ namespace OpenSvip.GUI
                 {
                     for (var i = 0; i < Model.Plugins.Count; ++i)
                     {
-                        if (extension == "." + Model.Plugins[i].Suffix)
+                        if (extension != "." + Model.Plugins[i].Suffix)
                         {
-                            matchingExtensions.Add(extension);
-                            index = i;
-                            break;
+                            continue;
                         }
+                        matchingExtensions.Add(extension);
+                        index = i;
+                        break;
                     }
                 }
                 if (matchingExtensions.Count == 1)
@@ -185,6 +186,10 @@ namespace OpenSvip.GUI
                 }
                 var skipSameFilename = Model.OverWriteOption == OverwriteOptions.Skip;
                 var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
+                if (!string.IsNullOrWhiteSpace(Model.ExportPath))
+                {
+                    Directory.CreateDirectory(Model.ExportPath);
+                }
                 foreach (var task in Model.TaskList)
                 {
                     task.ExportFolder = Model.DefaultExportPath == ExportPaths.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
@@ -245,22 +250,20 @@ namespace OpenSvip.GUI
                     }
                 }
                 Model.ExecutionInProgress = false;
-                if (Model.OpenExportFolder)
+                if (!Model.OpenExportFolder)
                 {
-                    var openFolder = Model.ExportPath;
-                    if (Model.DefaultExportPath == ExportPaths.Source)
-                    {
-                        openFolder = Model.TaskList[0].ImportDirectory;
-                        foreach (var task in Model.TaskList.Skip(1))
-                        {
-                            if (task.ImportDirectory != openFolder)
-                            {
-                                return;
-                            }
-                        }
-                    }
-                    Process.Start("explorer.exe", openFolder);
+                    return;
                 }
+                var openFolder = Model.ExportPath;
+                if (Model.DefaultExportPath == ExportPaths.Source)
+                {
+                    openFolder = Model.TaskList[0].ImportDirectory;
+                    if (Model.TaskList.Skip(1).Any(task => task.ImportDirectory != openFolder))
+                    {
+                        return;
+                    }
+                }
+                Process.Start("explorer.exe", openFolder);
             }).Start();
         }
 
@@ -389,9 +392,9 @@ namespace OpenSvip.GUI
                             "稍后");
                         if (restartDialog.ShowDialog())
                         {
-                            App.Current.Dispatcher.Invoke(() =>
+                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
                             {
-                                App.Current.MainWindow.Close();
+                                System.Windows.Application.Current.MainWindow?.Close();
                                 System.Windows.Application.Current.Shutdown();
                             });
                             System.Windows.Forms.Application.Restart();
