@@ -5,8 +5,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:OpenSvip.GUI"
-    xmlns:config="clr-namespace:OpenSvip.GUI.Config"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:config="clr-namespace:OpenSvip.GUI.Config"
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器（预览版本）"
     Height="800"
@@ -579,7 +579,7 @@
                                                         Margin="-8 0 0 0"
                                                         Text="输出选项"
                                                         FontSize="16"
-                                                        ToolTip="{Binding IsExpanded, ElementName=InputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
+                                                        ToolTip="{Binding IsExpanded, ElementName=OutputOptionsTreeView, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=点击收起;点击展开}"
                                                         MouseDown="TreeViewHeader_Click"/>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
@@ -657,12 +657,13 @@
                                     VerticalAlignment="Center"
                                     Margin="10 0"
                                     Padding="0 2"
-                                    materialDesign:HintAssist.Hint="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（本次）;输出路径}"
-                                    Text="{Binding ExportPath}"
+                                    materialDesign:HintAssist.Hint="{Binding ExportPath.IsRelative, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（相对）;输出路径}"
+                                    Text="{Binding ExportPath.PathValue}"
                                     FontSize="16"
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
-                                    ToolTip="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=当前已设置默认输出至源路径。修改此项将临时更换一次输出路径。;}" Cursor="Arrow"/>
+                                    ToolTip="使用“${src}”可指代源路径"
+                                    Cursor="Arrow"/>
                             </DockPanel>
                             <WrapPanel Grid.Row="2" Grid.Column="0" Margin="7 0 0 7" Orientation="Horizontal" VerticalAlignment="Stretch">
                                 <StackPanel Margin="10 0 10 0" Height="26" Orientation="Horizontal" VerticalAlignment="Center">

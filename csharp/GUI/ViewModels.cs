@@ -125,10 +125,10 @@ namespace OpenSvip.GUI
                 switch (value)
                 {
                     case ExportPaths.Source:
-                        ExportPath = "";
+                        ExportPath.PathValue = "${src}";
                         break;
                     case ExportPaths.Desktop:
-                        ExportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                        ExportPath.PathValue = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                         break;
                     case ExportPaths.Custom:
                         // TODO: implement this
@@ -137,11 +137,28 @@ namespace OpenSvip.GUI
                     default:
                         break;
                 }
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DefaultExport"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DefaultExportPath"));
             }
         }
 
-        public ObservableCollection<string> CustomExportPaths { get; set; } = new AsyncObservableCollection<string>();
+        public ObservableCollection<CustomPath> CustomExportPaths { get; set; } = new AsyncObservableCollection<CustomPath>();
+
+        private int _selectedCustomExportPathIndex = -1;
+
+        public int SelectedCustomExportPathIndex
+        {
+            get => _selectedCustomExportPathIndex;
+            set
+            {
+                _selectedCustomExportPathIndex = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedCustomExportPathIndex"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedCustomExportPath"));
+            }
+        }
+
+        public CustomPath SelectedCustomExportPath => SelectedCustomExportPathIndex >= 0
+            ? CustomExportPaths[SelectedCustomExportPathIndex]
+            : null;
 
         private int _selectedInputPluginIndex = -1;
 
@@ -228,17 +245,7 @@ namespace OpenSvip.GUI
 
         public ObservableCollection<TaskViewModel> TaskList { get; set; } = new AsyncObservableCollection<TaskViewModel>();
 
-        private string _exportPath;
-
-        public string ExportPath
-        {
-            get => _exportPath;
-            set
-            {
-                _exportPath = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportPath"));
-            }
-        }
+        public CustomPath ExportPath { get; set; } = new CustomPath();
 
         private bool _executionInProgress;
 
@@ -291,6 +298,8 @@ namespace OpenSvip.GUI
 
         public string ExportFolder { get; set; }
 
+        public string ExportPath { get; set; }
+
         private TaskStates _status;
 
         public TaskStates Status
@@ -313,9 +322,14 @@ namespace OpenSvip.GUI
             set
             {
                 _error = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Status"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Error"));
             }
         }
+    }
+
+    public enum TaskStates
+    {
+        Ready, Queued, Success, Warning, Error, Skipped
     }
 
     public class OptionViewModel : INotifyPropertyChanged
@@ -330,11 +344,12 @@ namespace OpenSvip.GUI
             {
                 for (var i = 0; i < OptionInfo.EnumChoices.Length; ++i)
                 {
-                    if (OptionInfo.EnumChoices[i].Tag == option.Default)
+                    if (OptionInfo.EnumChoices[i].Tag != option.Default)
                     {
-                        _choiceIndex = i;
-                        break;
+                        continue;
                     }
+                    _choiceIndex = i;
+                    break;
                 }
             }
         }
@@ -373,8 +388,27 @@ namespace OpenSvip.GUI
         }
     }
 
-    public enum TaskStates
+    public class CustomPath : INotifyPropertyChanged
     {
-        Ready, Queued, Success, Warning, Error, Skipped
+        private const string SOURCE_TAG = "${src}";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        private string _pathValue = "";
+
+        public string PathValue
+        {
+            get => _pathValue;
+            set
+            {
+                _pathValue = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("PathValue"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsRelative"));
+            }
+        }
+
+        public bool IsRelative => _pathValue == SOURCE_TAG || _pathValue.StartsWith(SOURCE_TAG + Path.PathSeparator) || _pathValue.StartsWith(SOURCE_TAG + '/');
+
+        public string ActualValue => IsRelative ? _pathValue.Substring(7) : _pathValue;
     }
 }

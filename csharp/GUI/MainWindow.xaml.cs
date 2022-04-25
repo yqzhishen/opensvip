@@ -54,7 +54,17 @@ namespace OpenSvip.GUI
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
             foreach (var path in settings.CustomExportPaths)
             {
-                Model.CustomExportPaths.Add(path);
+                Model.CustomExportPaths.Add(new CustomPath
+                {
+                    PathValue = path.Path
+                });
+            }
+            Model.SelectedCustomExportPathIndex = settings.DefaultExportPath == ExportPaths.Custom
+                ? Array.FindIndex(settings.CustomExportPaths, path => path.IsSelected)
+                : -1;
+            if (settings.DefaultExportPath == ExportPaths.Custom && Model.SelectedCustomExportPathIndex == -1)
+            {
+                Model.DefaultExportPath = ExportPaths.Unset;
             }
             DataContext = Model;
             
@@ -115,7 +125,7 @@ namespace OpenSvip.GUI
                 .ToArray();
             if (Model.DefaultExportPath == ExportPaths.Unset && !Model.TaskList.Any() && filenames.Any())
             {
-                Model.ExportPath = Path.GetDirectoryName(filenames.First());
+                Model.ExportPath.PathValue = Path.GetDirectoryName(filenames.First());
             }
 
             if (Model.AutoDetectFormat)
@@ -186,31 +196,29 @@ namespace OpenSvip.GUI
                 }
                 var skipSameFilename = Model.OverWriteOption == OverwriteOptions.Skip;
                 var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
-                if (!string.IsNullOrWhiteSpace(Model.ExportPath))
-                {
-                    Directory.CreateDirectory(Model.ExportPath);
-                }
                 foreach (var task in Model.TaskList)
                 {
-                    task.ExportFolder = Model.DefaultExportPath == ExportPaths.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
-                    var exportPath = Path.Combine(task.ExportFolder, task.ExportTitle + Model.ExportExtension);
-                    if (File.Exists(exportPath))
-                    {
-                        if (askBeforeOverwrite)
-                        {
-                            var dialog = FileOverwriteDialog.CreateDialog(exportPath);
-                            dialog.ShowDialog();
-                            skipSameFilename = !dialog.Overwrite;
-                            askBeforeOverwrite = !dialog.KeepChoice;
-                        }
-                        if (skipSameFilename)
-                        {
-                            task.Status = TaskStates.Skipped;
-                            continue;
-                        }
-                    }
                     try
                     {
+                        task.ExportFolder = Model.ExportPath.IsRelative ? Path.Combine(task.ImportDirectory, Model.ExportPath.ActualValue) : Model.ExportPath.PathValue;
+                        Directory.CreateDirectory(task.ExportFolder);
+                        task.ExportPath = Path.Combine(task.ExportFolder, task.ExportTitle + Model.ExportExtension);
+                        if (File.Exists(task.ExportPath))
+                        {
+                            if (askBeforeOverwrite)
+                            {
+                                var dialog = FileOverwriteDialog.CreateDialog(task.ExportPath);
+                                dialog.ShowDialog();
+                                skipSameFilename = !dialog.Overwrite;
+                                askBeforeOverwrite = !dialog.KeepChoice;
+                            }
+                            if (skipSameFilename)
+                            {
+                                task.Status = TaskStates.Skipped;
+                                continue;
+                            }
+                        }
+
                         var inputOptionDictionary = new Dictionary<string, string>();
                         foreach (var option in Model.SelectedInputOptions)
                         {
@@ -222,7 +230,7 @@ namespace OpenSvip.GUI
                             outputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
                         }
                         outputConverter.Save(
-                            exportPath,
+                            task.ExportPath,
                             inputConverter.Load(
                                 task.ImportPath,
                                 new ConverterOptions(inputOptionDictionary)),
@@ -254,7 +262,7 @@ namespace OpenSvip.GUI
                 {
                     return;
                 }
-                var openFolder = Model.ExportPath;
+                var openFolder = Model.ExportPath.PathValue;
                 if (Model.DefaultExportPath == ExportPaths.Source)
                 {
                     openFolder = Model.TaskList[0].ImportDirectory;
@@ -356,8 +364,8 @@ namespace OpenSvip.GUI
                                 continue;
                             }
                             var oldPlugin = PluginManager.GetPlugin(plugin.Identifier);
-                            Version oldVersion = new Version(oldPlugin.Version);
-                            Version version = new Version(plugin.Version);
+                            var oldVersion = new Version(oldPlugin.Version);
+                            var version = new Version(plugin.Version);
                             if (version > oldVersion)
                             {
                                 confirmDialog = YesNoDialog.CreateDialog(
@@ -563,15 +571,15 @@ namespace OpenSvip.GUI
             {
                 return;
             }
-            Model.ExportPath = dialog.FileName;
+            Model.ExportPath.PathValue = dialog.FileName;
         }
 
         private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(Model.ExportPath) && Model.DefaultExportPath != ExportPaths.Source)
+            if (string.IsNullOrWhiteSpace(Model.ExportPath.PathValue) && Model.DefaultExportPath != ExportPaths.Source)
             {
                 BrowseExportFolderButton_Click(sender, e);
-                if (String.IsNullOrWhiteSpace(Model.ExportPath))
+                if (string.IsNullOrWhiteSpace(Model.ExportPath.PathValue))
                 {
                     return;
                 }
@@ -590,7 +598,7 @@ namespace OpenSvip.GUI
             {
                 return;
             }
-            Model.ExportPath = dialog.FileName;
+            Model.ExportPath.PathValue = dialog.FileName;
             if (StartExecutionButton.IsEnabled)
             {
                 StartExecutionButton_Click(sender, e);
@@ -616,7 +624,10 @@ namespace OpenSvip.GUI
                     OpenExportFolder = Model.OpenExportFolder,
                     OverwriteOption = Model.OverWriteOption,
                     DefaultExportPath = Model.DefaultExportPath,
-                    CustomExportPaths = Model.CustomExportPaths.ToArray()
+                    CustomExportPaths = Model.CustomExportPaths.Select(path => new PathConfig
+                    {
+                        Path = path.PathValue
+                    }).ToArray()
                 }
             }.SaveToFile();
         }

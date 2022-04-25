@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,7 +10,7 @@ namespace OpenSvip.GUI
     /// <summary>
     /// TaskListViewItem.xaml 的交互逻辑
     /// </summary>
-    public partial class TaskListViewItem : UserControl
+    public partial class TaskListViewItem
     {
         public TaskListViewItem()
         {
@@ -26,21 +25,18 @@ namespace OpenSvip.GUI
 
         private void OpenProjectFileButton_Click(object sender, RoutedEventArgs e)
         {
-            var model = ElementsHelper.FindParent<Window>(this).DataContext as AppModel;
-            var task = DataContext as TaskViewModel;
-            Process.Start(Path.Combine(model.ExportPath, task.ExportTitle + model.ExportExtension));
+            Process.Start(((TaskViewModel)DataContext).ExportPath);
         }
 
         private void OpenTargetFolderButton_Click(object sender, RoutedEventArgs e)
         {
-            var model = ElementsHelper.FindParent<Window>(this).DataContext as AppModel;
-            var task = DataContext as TaskViewModel;
-            Process.Start("explorer.exe", $"/select,{Path.Combine(task.ExportFolder, task.ExportTitle + model.ExportExtension)}");
+            var task = (TaskViewModel)DataContext;
+            Process.Start("explorer.exe", $"/select,{task.ExportPath}");
         }
 
         private void CopyErrorMessageButton_Click(object sender, RoutedEventArgs e)
         {
-            var task = DataContext as TaskViewModel;
+            var task = (TaskViewModel)DataContext;
             Clipboard.SetText(task.Error);
             var button = sender as Button;
             button.Content = "已复制";

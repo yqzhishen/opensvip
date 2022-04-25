@@ -15,7 +15,7 @@ namespace OpenSvip.GUI.Config
 
         private const string CONFIG_FILENAME = "Configurations.toml";
 
-        private static readonly string ActualConfigFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), CONFIG_FOLDER);
+        private static readonly string ActualConfigFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, CONFIG_FOLDER);
 
         private static readonly string ActualConfigFile = Path.Combine(ActualConfigFolder, CONFIG_FILENAME);
 
@@ -90,8 +90,6 @@ namespace OpenSvip.GUI.Config
 
         public string FrameworkVersion { get; set; } = "1.2.2";
 
-        public string Author { get; set; } = "YQ之神";
-
         public string AuthorHomePage { get; set; } = "https://space.bilibili.com/102844209";
 
         public string GitHubRepository { get; set; } = "https://github.com/yqzhishen/opensvip";
@@ -123,7 +121,14 @@ namespace OpenSvip.GUI.Config
 
         public ExportPaths DefaultExportPath { get; set; } = ExportPaths.Unset;
 
-        public string[] CustomExportPaths { get; set; } = Array.Empty<string>();
+        public PathConfig[] CustomExportPaths { get; set; } = Array.Empty<PathConfig>();
+    }
+
+    public class PathConfig
+    {
+        public string Path { get; set; }
+
+        public bool IsSelected { get; set; }
     }
 
     public enum OverwriteOptions
