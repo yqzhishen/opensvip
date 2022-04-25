@@ -200,8 +200,8 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="40"/>
-            <ColumnDefinition Width="1.75*"/>
-            <ColumnDefinition Width="1*" MinWidth="90" MaxWidth="210"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1.5*" MinWidth="100" MaxWidth="210"/>
             <ColumnDefinition Width="40"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -229,7 +229,7 @@
             <materialDesign:PackIcon
                 DockPanel.Dock="Left"
                 VerticalAlignment="Center"
-                Margin="0 4 5 4"
+                Margin="0 4 2 4"
                 Width="20"
                 Height="20"
                 Kind="Export"
@@ -238,12 +238,16 @@
                 DockPanel.Dock="Right"
                 VerticalAlignment="Center"
                 Margin="5 4 0 5"
+                FontSize="13"
                 d:Text=".json"
                 Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>
             <TextBox
                 DockPanel.Dock="Right"
                 VerticalAlignment="Center"
                 HorizontalContentAlignment="Center"
+                Padding="1 2"
+                d:Padding="2 4 2 0"
+                FontSize="13"
                 materialDesign:HintAssist.Hint="输出文件名"
                 Text="{Binding ExportTitle}"/>
         </DockPanel>

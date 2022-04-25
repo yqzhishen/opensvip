@@ -61,7 +61,7 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock x:Name="TextBlockNearTextBox" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Text="{Binding Path=OptionValue}" Margin="0 0 0 1" MinWidth="80"/>
+                <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Margin="0 0 0 2" Padding="2" Text="{Binding Path=OptionValue}" MinWidth="80"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Integer">
@@ -70,7 +70,7 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
+                <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Padding="2 1" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Double">
@@ -79,7 +79,7 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:DoubleNumericBox Style="{StaticResource OptionDoubleBox}" VerticalAlignment="Center" Padding="4 2" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
+                <local:DoubleNumericBox Style="{StaticResource OptionDoubleBox}" VerticalAlignment="Center" Padding="2 1" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Boolean">
@@ -102,8 +102,8 @@
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
                 <ComboBox
-                    Margin="0 5 0 0"
-                    Padding="0 0 0 4"
+                    Margin="0 5 0 2"
+                    Padding="2 0 0 2"
                     ItemsSource="{Binding Path=OptionInfo.EnumChoices}"
                     SelectedIndex="{Binding ChoiceIndex}"
                     ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}">

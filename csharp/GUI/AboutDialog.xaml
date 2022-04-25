@@ -29,12 +29,12 @@
             <TextBlock Text="OpenSVIP" FontSize="40" FontWeight="Bold"/>
             <TextBlock d:Text="框架版本：1.2.0" FontSize="16">
                 <TextBlock.Text>
-                    <Binding Path="FrameworkVersion" StringFormat="{}框架版本：{0}"/>
+                    <Binding Path="Information.FrameworkVersion" StringFormat="{}框架版本：{0}"/>
                 </TextBlock.Text>
             </TextBlock>
             <TextBlock d:Text="应用程序版本：1.0.0 (Preview)" FontSize="16">
                 <TextBlock.Text>
-                    <Binding Path="Version" StringFormat="{}应用程序版本：{0}"/>
+                    <Binding Path="Information.Version" StringFormat="{}应用程序版本：{0}"/>
                 </TextBlock.Text>
             </TextBlock>
             <TextBlock Text="预览版本 暂勿传播" Foreground="#f44336"/>
@@ -48,13 +48,13 @@
                         <EventSetter Event="Click" Handler="OpenLinkButton_Click"/>
                     </Style>
                 </StackPanel.Resources>
-                <Button ToolTip="{Binding AuthorHomePage}">
+                <Button ToolTip="{Binding Information.AuthorHomePage}">
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="User" VerticalAlignment="Center" Margin="-3 0 2 0"/>
                         <TextBlock Text="作者主页" FontSize="14" Margin="2 0 2 0"/>
                     </StackPanel>
                 </Button>
-                <Button ToolTip="{Binding GitHubRepository}">
+                <Button ToolTip="{Binding Information.GitHubRepository}">
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Github" VerticalAlignment="Center" Margin="-3 0 2 0"/>
                         <TextBlock Text="项目仓库" FontSize="14" Margin="2 0 2 0"/>

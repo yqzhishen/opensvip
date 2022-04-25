@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:config="clr-namespace:OpenSvip.GUI.Config"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     Title="OpenSVIP - 歌声合成工程文件转换器（预览版本）"
@@ -38,11 +39,11 @@
             </Grid.RowDefinitions>
             <Border Grid.Row="0" Background="WhiteSmoke">
                 <Border.Resources>
-                    <x:Array x:Key="DefaultExportEnumValues" Type="local:DefaultExport">
-                        <local:DefaultExport>None</local:DefaultExport>
-                        <local:DefaultExport>Source</local:DefaultExport>
-                        <local:DefaultExport>Desktop</local:DefaultExport>
-                        <local:DefaultExport>Custom</local:DefaultExport>
+                    <x:Array x:Key="DefaultExportEnumValues" Type="config:ExportPaths">
+                        <config:ExportPaths>Unset</config:ExportPaths>
+                        <config:ExportPaths>Source</config:ExportPaths>
+                        <config:ExportPaths>Desktop</config:ExportPaths>
+                        <config:ExportPaths>Custom</config:ExportPaths>
                     </x:Array>
                 </Border.Resources>
                 <ComboBox
@@ -51,7 +52,7 @@
                     Height="0"
                     Width="0"
                     ItemsSource="{StaticResource DefaultExportEnumValues}"
-                    SelectedIndex="{Binding DefaultExportPath, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type local:DefaultExport}}"/>
+                    SelectedIndex="{Binding DefaultExportPath, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:ExportPaths}}"/>
             </Border>
             <DockPanel x:Name="MenuPanel" Grid.Row="0">
                 <Menu IsMainMenu="True" Margin="20 0 0 0" Height="25" FontFamily="Microsoft YaHei UI" FontSize="13" FontWeight="Normal">
@@ -386,7 +387,7 @@
                                         DragLeave="FileMaskPanel_UnFocus">
                                         <ItemsControl
                                             x:Name="TaskListView"
-                                            Margin="6 5 -5 5"
+                                            Margin="6 5 10 5"
                                             ItemsSource="{Binding TaskList}"
                                             Visibility="{Binding HasItems, ElementName=TaskListView, Converter={StaticResource BooleanToVisibilityConverter}}"
                                             IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
@@ -486,6 +487,7 @@
                                         </MultiBinding>
                                     </StackPanel.Visibility>
                                     <StackPanel.Resources>
+                                        <Style TargetType="ScrollViewer" BasedOn="{StaticResource MaterialDesignScrollViewer}"/>
                                         <Style TargetType="TreeView" BasedOn="{StaticResource MaterialDesignTreeView}">
                                             <Setter Property="ScrollViewer.PanningMode" Value="None"/>
                                             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
@@ -502,10 +504,10 @@
                                             <Setter Property="MaxWidth">
                                                 <Setter.Value>
                                                     <Binding
-                                                        RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=TreeView}"
+                                                        RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=materialDesign:Card}"
                                                         Path="ActualWidth"
                                                         Converter="{StaticResource DoubleConstantSubConverter}"
-                                                        ConverterParameter="140"/>
+                                                        ConverterParameter="160"/>
                                                 </Setter.Value>
                                             </Setter>
                                         </Style>
@@ -531,7 +533,7 @@
                                                 <WrapPanel
                                                     Grid.Row="1"
                                                     Orientation="Horizontal"
-                                                    Width="{Binding ActualWidth, ElementName=ConverterOptionsCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=70}">
+                                                    Width="{Binding ActualWidth, ElementName=ConverterOptionsCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=64}">
                                                     <local:OptionTreeViewItem DataContext="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
                                                 </WrapPanel>
                                             </Grid>
@@ -554,7 +556,7 @@
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
                                                         <TextBlock.Text>
-                                                            <Binding Path="SelectedInputPlugin.Format" StringFormat="{}导入自 {0}"/>
+                                                            <Binding Path="SelectedInputFormat" StringFormat="{}导入自 {0}" Mode="OneWay"/>
                                                         </TextBlock.Text>
                                                     </TextBlock>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="]" Margin="7 2 0 0"/>
@@ -582,7 +584,7 @@
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="["/>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Margin="7 2 0 0">
                                                         <TextBlock.Text>
-                                                            <Binding Path="SelectedOutputPlugin.Format" StringFormat="{}导出为 {0}"/>
+                                                            <Binding Path="SelectedOutputFormat" StringFormat="{}导出为 {0}" Mode="OneWay"/>
                                                         </TextBlock.Text>
                                                     </TextBlock>
                                                     <TextBlock Style="{StaticResource TreeViewHeaderComment}" Text="]" Margin="7 2 0 0"/>
@@ -654,6 +656,7 @@
                                 <TextBox
                                     VerticalAlignment="Center"
                                     Margin="10 0"
+                                    Padding="0 2"
                                     materialDesign:HintAssist.Hint="{Binding IsChecked, ElementName=ExportToSourceMenuItem, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（本次）;输出路径}"
                                     Text="{Binding ExportPath}"
                                     FontSize="16"
@@ -684,7 +687,7 @@
                                         FontSize="14"
                                         materialDesign:ComboBoxAssist.ShowSelectedItem="False"
                                         IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
-                                        SelectedIndex="{Binding OverWriteOption, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type local:OverwriteOptions}}">
+                                        SelectedIndex="{Binding OverWriteOption, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:OverwriteOptions}}">
                                         <ComboBoxItem IsSelected="True" Content="覆盖"/>
                                         <ComboBoxItem Content="跳过"/>
                                         <ComboBoxItem Content="询问"/>

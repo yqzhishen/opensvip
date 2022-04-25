@@ -5,12 +5,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using OpenSvip.Framework;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using OpenSvip.GUI.Config;
 
 namespace OpenSvip.GUI
 {
-    [JsonObject(MemberSerialization = MemberSerialization.OptIn)]
     public class AppModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -45,23 +43,14 @@ namespace OpenSvip.GUI
             });
         }
 
-        public string Version { get; set; } = "1.0.5 (Preview)";
+        public Information Information { get; set; } = new Information();
 
-        public string FrameworkVersion { get; set; } = "1.2.2";
-
-        public string Author { get; set; } = "YQ之神";
-
-        public string AuthorHomePage { get; set; } = "https://space.bilibili.com/102844209";
-
-        public string GitHubRepository { get; set; } = "https://github.com/yqzhishen/opensvip";
-
-        public List<Plugin> Plugins { get; } = PluginManager.GetAllPlugins().ToList();
+        public List<Plugin> Plugins { get; set; } = PluginManager.GetAllPlugins().ToList();
 
         public List<string> Formats => Plugins.ConvertAll(plugin => $"{plugin.Format} (*.{plugin.Suffix})");
 
-        private bool _autoDetectFormat = true;
+        private bool _autoDetectFormat;
 
-        [JsonProperty]
         public bool AutoDetectFormat
         {
             get => _autoDetectFormat;
@@ -72,9 +61,8 @@ namespace OpenSvip.GUI
             }
         }
 
-        private bool _autoResetTasks = true;
+        private bool _autoResetTasks;
 
-        [JsonProperty]
         public bool AutoResetTasks
         {
             get => _autoResetTasks;
@@ -84,9 +72,8 @@ namespace OpenSvip.GUI
             }
         }
 
-        private bool _autoExtension = true;
+        private bool _autoExtension;
 
-        [JsonProperty]
         public bool AutoExtension
         {
             get => _autoExtension;
@@ -106,7 +93,6 @@ namespace OpenSvip.GUI
 
         private bool _openExportFolder;
 
-        [JsonProperty]
         public bool OpenExportFolder
         {
             get => _openExportFolder;
@@ -119,8 +105,6 @@ namespace OpenSvip.GUI
 
         private OverwriteOptions _overwriteOption = OverwriteOptions.Overwrite;
 
-        [JsonProperty]
-        [JsonConverter(typeof(StringEnumConverter))]
         public OverwriteOptions OverWriteOption
         {
             get => _overwriteOption;
@@ -131,27 +115,25 @@ namespace OpenSvip.GUI
             }
         }
 
-        private DefaultExport _defaultExportPath = DefaultExport.None;
+        private ExportPaths _defaultExportPath;
 
-        [JsonProperty]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public DefaultExport DefaultExportPath
+        public ExportPaths DefaultExportPath
         {
             get => _defaultExportPath;
             set {
                 _defaultExportPath = value;
                 switch (value)
                 {
-                    case DefaultExport.Source:
+                    case ExportPaths.Source:
                         ExportPath = "";
                         break;
-                    case DefaultExport.Desktop:
+                    case ExportPaths.Desktop:
                         ExportPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                         break;
-                    case DefaultExport.Custom:
+                    case ExportPaths.Custom:
                         // TODO: implement this
                         break;
-                    case DefaultExport.None:
+                    case ExportPaths.Unset:
                     default:
                         break;
                 }
@@ -159,7 +141,6 @@ namespace OpenSvip.GUI
             }
         }
 
-        [JsonProperty]
         public ObservableCollection<string> CustomExportPaths { get; set; } = new AsyncObservableCollection<string>();
 
         private int _selectedInputPluginIndex = -1;
@@ -172,12 +153,21 @@ namespace OpenSvip.GUI
                 _selectedInputPluginIndex = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputPluginIndex"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputPlugin"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputFormat"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputOptions"));
             }
         }
 
         public Plugin SelectedInputPlugin
             => SelectedInputPluginIndex >= 0 ? Plugins[SelectedInputPluginIndex] : null;
+
+        public string SelectedInputFormat =>
+            SelectedInputPluginIndex >= 0 ? Plugins[SelectedInputPluginIndex].Format : null;
+
+        public ObservableCollection<OptionViewModel> SelectedInputOptions
+            => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
+
+        public List<ObservableCollection<OptionViewModel>> InputOptions { get; }
 
         private int _selectedOutputPluginIndex = -1;
 
@@ -190,6 +180,7 @@ namespace OpenSvip.GUI
                 ExportExtension = AutoExtension && value >= 0 ? "." + SelectedOutputPlugin.Suffix : null;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputPluginIndex"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputPlugin"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputFormat"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputOptions"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportExtension"));
             }
@@ -198,7 +189,13 @@ namespace OpenSvip.GUI
         public Plugin SelectedOutputPlugin
             => SelectedOutputPluginIndex >= 0 ? Plugins[SelectedOutputPluginIndex] : null;
 
-        public List<ObservableCollection<OptionViewModel>> InputOptions { get; }
+        public string SelectedOutputFormat =>
+            SelectedOutputPluginIndex >= 0 ? Plugins[SelectedOutputPluginIndex].Format : null;
+
+        public ObservableCollection<OptionViewModel> SelectedOutputOptions
+            => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
+
+        public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
 
         private string _exportExtension;
 
@@ -228,14 +225,6 @@ namespace OpenSvip.GUI
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExportExtension"));
             }
         }
-
-        public ObservableCollection<OptionViewModel> SelectedInputOptions
-            => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
-
-        public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
-
-        public ObservableCollection<OptionViewModel> SelectedOutputOptions
-            => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
 
         public ObservableCollection<TaskViewModel> TaskList { get; set; } = new AsyncObservableCollection<TaskViewModel>();
 
@@ -387,15 +376,5 @@ namespace OpenSvip.GUI
     public enum TaskStates
     {
         Ready, Queued, Success, Warning, Error, Skipped
-    }
-
-    public enum DefaultExport
-    {
-        None, Source, Desktop, Custom 
-    }
-
-    public enum OverwriteOptions
-    {
-        Overwrite, Skip, Ask
     }
 }

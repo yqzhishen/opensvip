@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System;
-using MaterialDesignThemes.Wpf;
 using System.Windows;
 using System.Linq;
 using System.Collections.Generic;
@@ -12,8 +11,7 @@ using System.Threading;
 using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Input;
-using System.Reflection;
-using Newtonsoft.Json;
+using OpenSvip.GUI.Config;
 
 namespace OpenSvip.GUI
 {
@@ -27,22 +25,39 @@ namespace OpenSvip.GUI
         public MainWindow()
         {
             InitializeComponent();
-            try
+
+            var config = AppConfig.LoadFromFile();
+
+            var properties = config.Properties;
+            var bounds = properties.MainRestoreBounds;
+            if (bounds.Width > 0 && bounds.Height > 0)
             {
-                FileStream stream = new FileStream(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Configurations.json"),
-                    FileMode.Open,
-                    FileAccess.Read);
-                StreamReader reader = new StreamReader(stream);
-                Model = JsonConvert.DeserializeObject<AppModel>(reader.ReadToEnd());
-                reader.Close();
-                stream.Close();
+                WindowState = WindowState.Normal;
+                Left = bounds.Left;
+                Top = bounds.Top;
+                Width = bounds.Width;
+                Height = bounds.Height;
             }
-            catch (Exception)
+            WindowState = properties.MainWindowState;
+
+            var settings = config.Settings;
+            Model = new AppModel
             {
-                Model = new AppModel();
+                AutoDetectFormat = settings.AutoDetectFormat,
+                AutoResetTasks = settings.AutoResetTasks,
+                AutoExtension = settings.AutoExtension,
+                OpenExportFolder = settings.OpenExportFolder,
+                OverWriteOption = settings.OverwriteOption,
+                DefaultExportPath = settings.DefaultExportPath
+            };
+            Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
+            Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
+            foreach (var path in settings.CustomExportPaths)
+            {
+                Model.CustomExportPaths.Add(path);
             }
             DataContext = Model;
+            
             var formats = Model.Formats;
             foreach (var str in formats)
             {
@@ -98,7 +113,7 @@ namespace OpenSvip.GUI
             var newFilenames = filenames
                 .Where(filename => Model.TaskList.All(task => task.ImportPath != filename))
                 .ToArray();
-            if (Model.DefaultExportPath == DefaultExport.None && !Model.TaskList.Any() && filenames.Any())
+            if (Model.DefaultExportPath == ExportPaths.Unset && !Model.TaskList.Any() && filenames.Any())
             {
                 Model.ExportPath = Path.GetDirectoryName(filenames.First());
             }
@@ -172,7 +187,7 @@ namespace OpenSvip.GUI
                 var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
                 foreach (var task in Model.TaskList)
                 {
-                    task.ExportFolder = Model.DefaultExportPath == DefaultExport.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
+                    task.ExportFolder = Model.DefaultExportPath == ExportPaths.Source && string.IsNullOrWhiteSpace(Model.ExportPath) ? task.ImportDirectory : Model.ExportPath;
                     var exportPath = Path.Combine(task.ExportFolder, task.ExportTitle + Model.ExportExtension);
                     if (File.Exists(exportPath))
                     {
@@ -233,7 +248,7 @@ namespace OpenSvip.GUI
                 if (Model.OpenExportFolder)
                 {
                     var openFolder = Model.ExportPath;
-                    if (Model.DefaultExportPath == DefaultExport.Source)
+                    if (Model.DefaultExportPath == ExportPaths.Source)
                     {
                         openFolder = Model.TaskList[0].ImportDirectory;
                         foreach (var task in Model.TaskList.Skip(1))
@@ -550,7 +565,7 @@ namespace OpenSvip.GUI
 
         private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(Model.ExportPath) && Model.DefaultExportPath != DefaultExport.Source)
+            if (String.IsNullOrWhiteSpace(Model.ExportPath) && Model.DefaultExportPath != ExportPaths.Source)
             {
                 BrowseExportFolderButton_Click(sender, e);
                 if (String.IsNullOrWhiteSpace(Model.ExportPath))
@@ -581,23 +596,26 @@ namespace OpenSvip.GUI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            try
+            new AppConfig
             {
-                FileStream stream = new FileStream(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Configurations.json"),
-                    FileMode.Create,
-                    FileAccess.Write);
-                StreamWriter writer = new StreamWriter(stream);
-                writer.Write(JsonConvert.SerializeObject(Model, Formatting.Indented));
-                writer.Flush();
-                stream.Flush();
-                writer.Close();
-                stream.Close();
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
+                Properties =
+                {
+                    MainRestoreBounds = RestoreBounds,
+                    MainWindowState = WindowState
+                },
+                Settings =
+                {
+                    ImportPluginId = Model.SelectedInputPlugin?.Identifier,
+                    ExportPluginId = Model.SelectedOutputPlugin?.Identifier,
+                    AutoDetectFormat = Model.AutoDetectFormat,
+                    AutoResetTasks = Model.AutoResetTasks,
+                    AutoExtension = Model.AutoExtension,
+                    OpenExportFolder = Model.OpenExportFolder,
+                    OverwriteOption = Model.OverWriteOption,
+                    DefaultExportPath = Model.DefaultExportPath,
+                    CustomExportPaths = Model.CustomExportPaths.ToArray()
+                }
+            }.SaveToFile();
         }
     }
 }
