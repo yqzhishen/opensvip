@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
-    <Name>Gjgj</Name>
-    <Version>1.5.0</Version>
+    <Name>歌叽歌叽工程转换插件</Name>
+    <Version>1.5.1</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>歌叽歌叽工程格式转换插件。</Descriptions>
+    <Descriptions>适用于 OpenSvip 的歌叽歌叽工程格式转换插件。</Descriptions>
     <Requirements>无</Requirements>
     <Format>歌叽歌叽工程文件</Format>
     <Suffix>gj</Suffix>
@@ -14,10 +14,12 @@
     <InputOptions/>
 	<OutputOptions>
 		<Option Name="desample" Type="integer" Default="32">
-			<Notes>指定音量参数点的平均采样间隔以缓解编辑器卡顿</Notes>
+			<Notes>音量参数平均采样间隔</Notes>
+			<Tips>单位为梯。数值越大，编辑器越流畅；数值越小，音量参数越精确。</Tips>
 		</Option>
 		<Option Name="singer" Type="string" Default="扇宝">
-			<Notes>指定默认歌手</Notes>
+			<Notes>默认歌手</Notes>
+			<Tips>歌叽歌叽官方歌手有：扇宝、SING-林嘉慧和Rocky。</Tips>
 		</Option>
 	</OutputOptions>
 </Plugin>

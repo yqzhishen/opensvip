@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
-    <Name>Vogen</Name>
-    <Version>0.2.0</Version>
+    <Name>Vogen 工程转换插件</Name>
+    <Version>0.2.1</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>Vogen 工程格式转换插件。</Descriptions>
+    <Descriptions>适用于 OpenSvip 的 Vogen 工程格式转换插件。</Descriptions>
     <Requirements>无</Requirements>
     <Format>Vogen 工程文件</Format>
-    <Suffix>json</Suffix>
+    <Suffix>vog</Suffix>
     <Identifier>vog</Identifier>
     <LibraryPath>Vogen\Plugin.Vogen.dll</LibraryPath>
     <Converter>Vogen.Stream.VogenConverter</Converter>

@@ -20,7 +20,7 @@
 - OpenSVIP 文件 (*.json)
 - Synthesizer V 工程文件 (*.svp)
 - 歌叽歌叽工程文件 (*.gj)
-- Project Vogen 工程文件 (*.json)（开发中）
+- Project Vogen 工程文件 (*.vog)（开发中）
 - MIDI 文件 (*.mid)（计划中）
 
 ## 使用方法
