@@ -122,6 +122,8 @@ namespace OpenSvip.GUI.Config
         public ExportPaths DefaultExportPath { get; set; } = ExportPaths.Unset;
 
         public PathConfig[] CustomExportPaths { get; set; } = Array.Empty<PathConfig>();
+
+        public string LastExportPath { get; set; }
     }
 
     public class PathConfig

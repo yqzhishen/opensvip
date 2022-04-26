@@ -662,7 +662,7 @@
                                     FontSize="16"
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
-                                    ToolTip="使用“${src}”可指代源路径"
+                                    ToolTip="在开头插入“${src}”可指代源路径，例如“${src}/custom/relative/path”"
                                     Cursor="Arrow"/>
                             </DockPanel>
                             <WrapPanel Grid.Row="2" Grid.Column="0" Margin="7 0 0 7" Orientation="Horizontal" VerticalAlignment="Stretch">

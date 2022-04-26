@@ -66,6 +66,10 @@ namespace OpenSvip.GUI
             {
                 Model.DefaultExportPath = ExportPaths.Unset;
             }
+            if (Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(settings.LastExportPath))
+            {
+                Model.ExportPath.PathValue = settings.LastExportPath;
+            }
             DataContext = Model;
             
             var formats = Model.Formats;
@@ -120,12 +124,13 @@ namespace OpenSvip.GUI
 
         private void AddConverterTasks(IEnumerable<string> filenames)
         {
-            var newFilenames = filenames
+            var filenameArray = filenames.ToArray();
+            var newFilenames = filenameArray
                 .Where(filename => Model.TaskList.All(task => task.ImportPath != filename))
                 .ToArray();
-            if (Model.DefaultExportPath == ExportPaths.Unset && !Model.TaskList.Any() && filenames.Any())
+            if (string.IsNullOrWhiteSpace(Model.ExportPath.PathValue) && !Model.TaskList.Any() && filenameArray.Any())
             {
-                Model.ExportPath.PathValue = Path.GetDirectoryName(filenames.First());
+                Model.ExportPath.PathValue = Path.GetDirectoryName(filenameArray.First());
             }
 
             if (Model.AutoDetectFormat)
@@ -200,9 +205,9 @@ namespace OpenSvip.GUI
                 {
                     try
                     {
-                        task.ExportFolder = Model.ExportPath.IsRelative ? Path.Combine(task.ImportDirectory, Model.ExportPath.ActualValue) : Model.ExportPath.PathValue;
-                        Directory.CreateDirectory(task.ExportFolder);
-                        task.ExportPath = Path.Combine(task.ExportFolder, task.ExportTitle + Model.ExportExtension);
+                        task.ExportDirectory = Model.ExportPath.IsRelative ? Path.Combine(task.ImportDirectory, Model.ExportPath.ActualValue) : Model.ExportPath.PathValue;
+                        Directory.CreateDirectory(task.ExportDirectory);
+                        task.ExportPath = Path.Combine(task.ExportDirectory, task.ExportTitle + Model.ExportExtension);
                         if (File.Exists(task.ExportPath))
                         {
                             if (askBeforeOverwrite)
@@ -262,16 +267,10 @@ namespace OpenSvip.GUI
                 {
                     return;
                 }
-                var openFolder = Model.ExportPath.PathValue;
-                if (Model.DefaultExportPath == ExportPaths.Source)
+                foreach (var folder in Model.TaskList.Select(task => task.ExportDirectory).ToHashSet())
                 {
-                    openFolder = Model.TaskList[0].ImportDirectory;
-                    if (Model.TaskList.Skip(1).Any(task => task.ImportDirectory != openFolder))
-                    {
-                        return;
-                    }
+                    Process.Start("explorer.exe", folder);
                 }
-                Process.Start("explorer.exe", openFolder);
             }).Start();
         }
 
@@ -627,7 +626,10 @@ namespace OpenSvip.GUI
                     CustomExportPaths = Model.CustomExportPaths.Select(path => new PathConfig
                     {
                         Path = path.PathValue
-                    }).ToArray()
+                    }).ToArray(),
+                    LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
+                        ? Model.ExportPath.PathValue
+                        : null
                 }
             }.SaveToFile();
         }

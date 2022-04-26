@@ -296,7 +296,7 @@ namespace OpenSvip.GUI
 
         public string ImportPath { get; set; }
 
-        public string ExportFolder { get; set; }
+        public string ExportDirectory { get; set; }
 
         public string ExportPath { get; set; }
 
@@ -409,6 +409,6 @@ namespace OpenSvip.GUI
 
         public bool IsRelative => _pathValue == SOURCE_TAG || _pathValue.StartsWith(SOURCE_TAG + Path.PathSeparator) || _pathValue.StartsWith(SOURCE_TAG + '/');
 
-        public string ActualValue => IsRelative ? _pathValue.Substring(7) : _pathValue;
+        public string ActualValue => IsRelative ? _pathValue.Substring(SOURCE_TAG.Length).TrimStart(Path.PathSeparator, '/') : _pathValue;
     }
 }
