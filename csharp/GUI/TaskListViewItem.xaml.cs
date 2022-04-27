@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace OpenSvip.GUI
 {
@@ -17,10 +18,18 @@ namespace OpenSvip.GUI
             InitializeComponent();
         }
 
+        private void ExportTitleTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Keyboard.ClearFocus();
+            }
+        }
+
         private void RemoveTaskButton_Click(object sender, RoutedEventArgs e)
         {
             var itemsControl = ElementsHelper.FindParent<ItemsControl>(this);
-            (itemsControl.ItemsSource as Collection<TaskViewModel>).Remove(DataContext as TaskViewModel);
+            (itemsControl.ItemsSource as Collection<TaskViewModel>)?.Remove(DataContext as TaskViewModel);
         }
 
         private void OpenProjectFileButton_Click(object sender, RoutedEventArgs e)
@@ -73,7 +82,7 @@ namespace OpenSvip.GUI
                 {
                     return ReadyTemplate;
                 }
-                var task = ElementsHelper.FindParent<TaskListViewItem>(container).DataContext as TaskViewModel;
+                var task = (TaskViewModel)ElementsHelper.FindParent<TaskListViewItem>(container).DataContext;
                 switch (task.Status)
                 {
                     case TaskStates.Ready:

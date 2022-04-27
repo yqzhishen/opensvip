@@ -131,7 +131,7 @@ namespace OpenSvip.GUI
                         ExportPath.PathValue = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                         break;
                     case ExportPaths.Custom:
-                        // TODO: implement this
+                        ExportPath.PathValue = SelectedCustomExportPath?.PathValue;
                         break;
                     case ExportPaths.Unset:
                     default:
@@ -151,6 +151,10 @@ namespace OpenSvip.GUI
             set
             {
                 _selectedCustomExportPathIndex = value;
+                if (value < 0)
+                {
+                    DefaultExportPath = ExportPaths.Unset;
+                }
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedCustomExportPathIndex"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedCustomExportPath"));
             }
@@ -395,6 +399,11 @@ namespace OpenSvip.GUI
         public event PropertyChangedEventHandler PropertyChanged;
         
         private string _pathValue = "";
+
+        public override string ToString()
+        {
+            return PathValue;
+        }
 
         public string PathValue
         {

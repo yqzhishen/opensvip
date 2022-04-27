@@ -1,15 +1,14 @@
-﻿using MaterialDesignThemes.Wpf;
-using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using MaterialDesignThemes.Wpf;
 
-namespace OpenSvip.GUI
+namespace OpenSvip.GUI.Dialog
 {
     /// <summary>
-    /// MessageDialog.xaml 的交互逻辑
+    /// YesNoDialog.xaml 的交互逻辑
     /// </summary>
-    public partial class MessageDialog : UserControl
+    public partial class YesNoDialog
     {
         private readonly object _lock = new object();
 
@@ -17,30 +16,35 @@ namespace OpenSvip.GUI
 
         public string Message { get; set; }
 
-        public string ButtonText { get; set; } = "确定";
+        public string YesText { get; set; } = "确定";
 
-        public MessageDialog()
+        public string NoText { get; set; } = "取消";
+
+        private bool _yes;
+
+        public YesNoDialog()
         {
             InitializeComponent();
             DataContext = this;
         }
 
-        public static MessageDialog CreateDialog(string title, string message, string buttonText = "确定")
+        public static YesNoDialog CreateDialog(string title, string message, string yesText = "确定", string noText = "取消")
         {
-            MessageDialog dialog = null;
+            YesNoDialog dialog = null;
             App.Current.Dispatcher.Invoke(() =>
             {
-                dialog = new MessageDialog
+                dialog = new YesNoDialog
                 {
                     Title = title,
                     Message = message,
-                    ButtonText = buttonText
+                    YesText = yesText,
+                    NoText = noText
                 };
             });
             return dialog;
         }
 
-        public void ShowDialog()
+        public bool ShowDialog()
         {
             Dispatcher.Invoke(() =>
             {
@@ -49,10 +53,12 @@ namespace OpenSvip.GUI
             });
             Monitor.Enter(_lock);
             Monitor.Exit(_lock);
+            return _yes;
         }
 
         public void Button_Click(object sender, RoutedEventArgs e)
         {
+            _yes = (bool)((Button)sender).CommandParameter;
             Monitor.Exit(_lock);
         }
     }

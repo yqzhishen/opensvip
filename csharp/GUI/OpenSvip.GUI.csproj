@@ -90,17 +90,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AboutDialog.xaml.cs">
+    <Compile Include="CancellableRadioButton.cs" />
+    <Compile Include="Dialog\AboutDialog.xaml.cs">
       <DependentUpon>AboutDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="AsyncObservableCollection.cs" />
     <Compile Include="Config\Configurations.cs" />
-    <Compile Include="FileOverwriteDialog.xaml.cs">
+    <Compile Include="Dialog\FileOverwriteDialog.xaml.cs">
       <DependentUpon>FileOverwriteDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\PathManagerDialog.xaml.cs">
+      <DependentUpon>PathManagerDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="DoubleNumericBox.cs" />
     <Compile Include="IntegerNumericBox.cs" />
-    <Compile Include="MessageDialog.xaml.cs">
+    <Compile Include="Dialog\MessageDialog.xaml.cs">
       <DependentUpon>MessageDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="NumericBox.cs" />
@@ -116,14 +120,18 @@
     </Compile>
     <Compile Include="ValueConverterGroup.cs" />
     <Compile Include="ValueConverters.cs" />
-    <Compile Include="YesNoDialog.xaml.cs">
+    <Compile Include="Dialog\YesNoDialog.xaml.cs">
       <DependentUpon>YesNoDialog.xaml</DependentUpon>
     </Compile>
-    <Page Include="AboutDialog.xaml">
+    <Page Include="Dialog\AboutDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="FileOverwriteDialog.xaml">
+    <Page Include="Dialog\FileOverwriteDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\PathManagerDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -141,7 +149,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MessageDialog.xaml">
+    <Page Include="Dialog\MessageDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -161,7 +169,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="YesNoDialog.xaml">
+    <Page Include="Dialog\YesNoDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

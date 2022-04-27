@@ -48,9 +48,7 @@
                 </Border.Resources>
                 <ComboBox
                     x:Name="HiddenDefaultExportComboBox"
-                    Visibility="Hidden"
-                    Height="0"
-                    Width="0"
+                    Visibility="Collapsed"
                     ItemsSource="{StaticResource DefaultExportEnumValues}"
                     SelectedIndex="{Binding DefaultExportPath, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:ExportPaths}}"/>
             </Border>
@@ -93,10 +91,10 @@
                                 <Style TargetType="MenuItem" BasedOn="{StaticResource NarrowCheckableMenuItem}">
                                     <Setter Property="IsChecked">
                                         <Setter.Value>
-                                            <MultiBinding Converter="{StaticResource MenuItemIsCheckedConverter}" Mode="OneWay">
+                                            <MultiBinding Converter="{StaticResource ItemIsCheckedConverter}" Mode="OneWay">
                                                 <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}" Path="DataContext.SelectedInputPluginIndex" Mode="OneWay"/>
                                                 <Binding RelativeSource="{RelativeSource Mode=Self}"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}"/>
+                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}" Path="Items"/>
                                             </MultiBinding>
                                         </Setter.Value>
                                     </Setter>
@@ -108,10 +106,10 @@
                                 <Style TargetType="MenuItem" BasedOn="{StaticResource NarrowCheckableMenuItem}">
                                     <Setter Property="IsChecked">
                                         <Setter.Value>
-                                            <MultiBinding Converter="{StaticResource MenuItemIsCheckedConverter}" Mode="OneWay">
+                                            <MultiBinding Converter="{StaticResource ItemIsCheckedConverter}" Mode="OneWay">
                                                 <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}" Path="DataContext.SelectedOutputPluginIndex" Mode="OneWay"/>
                                                 <Binding RelativeSource="{RelativeSource Mode=Self}"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}"/>
+                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}" Path="Items"/>
                                             </MultiBinding>
                                         </Setter.Value>
                                     </Setter>
@@ -129,15 +127,28 @@
                             <MenuItem Header="无(_N)"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"
                                       IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
-                            <MenuItem x:Name="ExportToSourceMenuItem" Header="源路径(_S)"
+                            <MenuItem Header="源路径(_S)"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"
                                       IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
                             <MenuItem Header="桌面(_D)"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"
                                       IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
-                            <MenuItem Header="自定义(_C)..."
+                            <MenuItem Header="自定义(_C)"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=3}"
-                                      IsEnabled="False"/>
+                                      ToolTip="{Binding SelectedCustomExportPath}">
+                                <MenuItem.IsEnabled>
+                                    <MultiBinding Converter="{StaticResource BooleanAllConverter}" Mode="OneWay">
+                                        <Binding Path="ExecutionInProgress" Converter="{StaticResource InvertBooleanConverter}"/>
+                                        <Binding Path="SelectedCustomExportPath" Converter="{StaticResource NotNullConverter}"/>
+                                    </MultiBinding>
+                                </MenuItem.IsEnabled>
+                            </MenuItem>
+                            <Separator/>
+                            <MenuItem
+                                Header="管理自定义路径(M)..."
+                                IsCheckable="False"
+                                Command="{x:Static local:MainWindow.ManagePathsCommand}"
+                                CommandParameter="{Binding}"/>
                                       <!--IsEnabled="{Binding CustomExportPaths, Converter={StaticResource EnumerableIsNotEmptyConverter}, Mode=OneWay}"-->
                         </MenuItem>
                         <MenuItem Header="完成后打开输出路径(_O)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
@@ -663,7 +674,8 @@
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     ToolTip="在开头插入“${src}”可指代源路径，例如“${src}/custom/relative/path”"
-                                    Cursor="Arrow"/>
+                                    Cursor="Arrow"
+                                    KeyDown="ExportPathTextBox_KeyDown"/>
                             </DockPanel>
                             <WrapPanel Grid.Row="2" Grid.Column="0" Margin="7 0 0 7" Orientation="Horizontal" VerticalAlignment="Stretch">
                                 <StackPanel Margin="10 0 10 0" Height="26" Orientation="Horizontal" VerticalAlignment="Center">

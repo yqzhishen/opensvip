@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Input;
 using OpenSvip.GUI.Config;
+using OpenSvip.GUI.Dialog;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace OpenSvip.GUI
 {
@@ -47,8 +49,7 @@ namespace OpenSvip.GUI
                 AutoResetTasks = settings.AutoResetTasks,
                 AutoExtension = settings.AutoExtension,
                 OpenExportFolder = settings.OpenExportFolder,
-                OverWriteOption = settings.OverwriteOption,
-                DefaultExportPath = settings.DefaultExportPath
+                OverWriteOption = settings.OverwriteOption
             };
             Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
@@ -65,6 +66,10 @@ namespace OpenSvip.GUI
             if (settings.DefaultExportPath == ExportPaths.Custom && Model.SelectedCustomExportPathIndex == -1)
             {
                 Model.DefaultExportPath = ExportPaths.Unset;
+            }
+            else
+            {
+                Model.DefaultExportPath = settings.DefaultExportPath;
             }
             if (Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(settings.LastExportPath))
             {
@@ -414,6 +419,10 @@ namespace OpenSvip.GUI
                 }).Start();
             });
 
+        public static RelayCommand<AppModel> ManagePathsCommand = new RelayCommand<AppModel>(
+            p => !p.ExecutionInProgress,
+            p => PathManagerDialog.CreateDialog(p).ShowDialog());
+
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var dialog = AboutDialog.CreateDialog();
@@ -531,7 +540,7 @@ namespace OpenSvip.GUI
                 Source = e.Source
             };
 
-            ScrollViewer scv = (ScrollViewer)sender;
+            var scv = (ScrollViewer)sender;
             scv.RaiseEvent(eventArgs);
             e.Handled = true;
         }
@@ -544,7 +553,7 @@ namespace OpenSvip.GUI
                 Source = e.Source
             };
 
-            ScrollViewer scv = (ScrollViewer)sender;
+            var scv = (ScrollViewer)sender;
             scv.RaiseEvent(eventArgs);
             e.Handled = true;
         }
@@ -571,6 +580,14 @@ namespace OpenSvip.GUI
                 return;
             }
             Model.ExportPath.PathValue = dialog.FileName;
+        }
+
+        private void ExportPathTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Keyboard.ClearFocus();
+            }
         }
 
         private void StartExecutionButton_Click(object sender, RoutedEventArgs e)

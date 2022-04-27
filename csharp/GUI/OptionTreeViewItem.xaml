@@ -22,6 +22,7 @@
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
+            <EventSetter Event="KeyDown" Handler="OptionValueTextBox_KeyDown"/>
         </Style>
         <Style x:Key="OptionIntegerBox" TargetType="{x:Type local:IntegerNumericBox}" BasedOn="{StaticResource OptionTextBox}">
             <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
@@ -61,7 +62,7 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock x:Name="TextBlockNearTextBox" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Margin="0 0 0 2" Padding="2" Text="{Binding Path=OptionValue}" MinWidth="80"/>
+                <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Padding="2 4" Text="{Binding Path=OptionValue}" MinWidth="80"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Integer">
@@ -70,7 +71,7 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Padding="2 1" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
+                <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Padding="2 3" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Double">
@@ -79,7 +80,7 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:DoubleNumericBox Style="{StaticResource OptionDoubleBox}" VerticalAlignment="Center" Padding="2 1" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
+                <local:DoubleNumericBox Style="{StaticResource OptionDoubleBox}" VerticalAlignment="Center" Padding="2 3" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Boolean">
