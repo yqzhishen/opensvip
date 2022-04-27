@@ -96,6 +96,10 @@ namespace OpenSvip.GUI.Dialog
                 return;
             }
             customPath.PathValue = dialog.FileName;
+            if (customPath == Model.SelectedCustomExportPath)
+            {
+                Model.ExportPath.PathValue = dialog.FileName;
+            }
         }
 
         private void RemovePathButton_Click(object sender, RoutedEventArgs e)
@@ -130,6 +134,24 @@ namespace OpenSvip.GUI.Dialog
             if (e.Key == Key.Enter)
             {
                 Keyboard.ClearFocus();
+            }
+        }
+
+        private void PathValueTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            if ((CustomPath)(textBox).DataContext == Model.SelectedCustomExportPath)
+            {
+                Model.ExportPath.PathValue = textBox.Text;
+            }
+        }
+
+        private void PathValueTextBox_TextCleared(object sender, RoutedEventArgs e)
+        {
+            var textBox = (TextBox)sender;
+            if (string.IsNullOrEmpty(textBox.Text) && (CustomPath)(textBox).DataContext == Model.SelectedCustomExportPath)
+            {
+                Model.ExportPath.PathValue = "";
             }
         }
     }

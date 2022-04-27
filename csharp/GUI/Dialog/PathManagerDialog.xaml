@@ -129,6 +129,7 @@
                                                     VerticalAlignment="Center"
                                                     Style="{StaticResource MaterialDesignRadioButton}"
                                                     Cursor="Hand"
+                                                    ToolTip="{Binding IsChecked, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=取消选中;选中}"
                                                     GroupName="PathRadioButtonGroup"
                                                     Checked="SelectPathRadioButton_Checked"
                                                     Unchecked="SelectPathRadioButton_Unchecked">
@@ -156,8 +157,11 @@
                                                     VerticalAlignment="Center"
                                                     Padding="1 2.5"
                                                     FontSize="15"
+                                                    Text="{Binding PathValue}"
+                                                    materialDesign:TextFieldAssist.HasClearButton="True"
                                                     KeyDown="PathValueTextBox_KeyDown"
-                                                    Text="{Binding PathValue}">
+                                                    LostKeyboardFocus="PathValueTextBox_LostFocus"
+                                                    TextChanged="PathValueTextBox_TextCleared">
                                                     <materialDesign:HintAssist.Hint>
                                                         <TextBlock Text="自定义路径" VerticalAlignment="Bottom" Margin="1 2.7 1 0"/>
                                                     </materialDesign:HintAssist.Hint>

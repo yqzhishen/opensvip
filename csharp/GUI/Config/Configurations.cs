@@ -130,7 +130,7 @@ namespace OpenSvip.GUI.Config
     {
         public string Path { get; set; }
 
-        public bool IsSelected { get; set; }
+        public bool Selected { get; set; }
     }
 
     public enum OverwriteOptions

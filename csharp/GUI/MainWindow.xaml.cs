@@ -61,7 +61,7 @@ namespace OpenSvip.GUI
                 });
             }
             Model.SelectedCustomExportPathIndex = settings.DefaultExportPath == ExportPaths.Custom
-                ? Array.FindIndex(settings.CustomExportPaths, path => path.IsSelected)
+                ? Array.FindIndex(settings.CustomExportPaths, path => path.Selected)
                 : -1;
             if (settings.DefaultExportPath == ExportPaths.Custom && Model.SelectedCustomExportPathIndex == -1)
             {
@@ -642,7 +642,8 @@ namespace OpenSvip.GUI
                     DefaultExportPath = Model.DefaultExportPath,
                     CustomExportPaths = Model.CustomExportPaths.Select(path => new PathConfig
                     {
-                        Path = path.PathValue
+                        Path = path.PathValue,
+                        Selected = path == Model.SelectedCustomExportPath
                     }).ToArray(),
                     LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
                         ? Model.ExportPath.PathValue
