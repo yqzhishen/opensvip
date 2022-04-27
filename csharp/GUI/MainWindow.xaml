@@ -67,12 +67,12 @@
                         <MenuItem
                             Header="导入文件(_I)..."
                             InputGestureText="Ctrl+I"
-                            Icon="{materialDesign:PackIcon Kind=TrayArrowDown, Size=17}"
+                            Icon="{materialDesign:PackIcon Kind=TrayArrowDown}"
                             IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                             Click="FileMaskPanel_Click"/>
                         <MenuItem
                             Header="导出文件(_E)"
-                            Icon="{materialDesign:PackIcon Kind=TrayArrowUp, Size=17}"
+                            Icon="{materialDesign:PackIcon Kind=ShareAllOutline}"
                             IsEnabled="{Binding IsEnabled, ElementName=StartExecutionButton}">
                             <MenuItem
                                 Header="立即开始转换(_N)"
@@ -83,7 +83,7 @@
                                 InputGestureText="Ctrl+Shift+E"
                                 Click="BrowseAndExportMenu_Click"/>
                         </MenuItem>
-                        <MenuItem Header="重置列表(_R)" Icon="{materialDesign:PackIcon Kind=Autorenew, Size=17}" InputGestureText="Ctrl+R"/>
+                        <MenuItem Header="重置列表(_R)" Icon="{materialDesign:PackIcon Kind=Autorenew}" InputGestureText="Ctrl+R"/>
                     </MenuItem>
                     <MenuItem Header="转换(_C)" Height="25" Padding="10 0">
                         <MenuItem x:Name="ImportPluginMenuItem" Header="导入格式(_F)">
@@ -118,11 +118,21 @@
                         </MenuItem>
                         <Separator/>
                         <MenuItem Header="安装插件(_P)..." Icon="{materialDesign:PackIcon Kind=PuzzlePlusOutline}" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="插件市场(_M)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=CloudSearchOutline}"/>
                     </MenuItem>
                     <MenuItem Header="设置(_O)" Height="25" Padding="10 0">
                         <MenuItem Header="自动检测导入格式(_D)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
                         <MenuItem Header="切换格式时重置列表(_R)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoResetToggle}"/>
                         <MenuItem Header="自动设置后缀名(_E)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoExtensionToggle}"/>
+                        <MenuItem Header="完成后打开输出路径(_O)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
+                        <MenuItem Header="遇到同名文件时(_H)" HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
+                            <MenuItem Header="覆盖(_C)"
+                                      IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"/>
+                            <MenuItem Header="跳过(_S)"
+                                      IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"/>
+                            <MenuItem Header="询问(_A)"
+                                      IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
+                        </MenuItem>
                         <MenuItem Header="默认输出路径(_P)" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
                             <MenuItem Header="无(_N)"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"
@@ -146,19 +156,10 @@
                             <Separator/>
                             <MenuItem
                                 Header="管理自定义路径(M)..."
+                                Icon="{materialDesign:PackIcon Kind=FormatListBulleted}"
                                 IsCheckable="False"
                                 Command="{x:Static local:MainWindow.ManagePathsCommand}"
                                 CommandParameter="{Binding}"/>
-                                      <!--IsEnabled="{Binding CustomExportPaths, Converter={StaticResource EnumerableIsNotEmptyConverter}, Mode=OneWay}"-->
-                        </MenuItem>
-                        <MenuItem Header="完成后打开输出路径(_O)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
-                        <MenuItem Header="遇到同名文件时(_H)" HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
-                            <MenuItem Header="覆盖(_C)"
-                                      IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"/>
-                            <MenuItem Header="跳过(_S)"
-                                      IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"/>
-                            <MenuItem Header="询问(_A)"
-                                      IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
                         </MenuItem>
                         <Separator/>
                         <MenuItem Header="外观主题(_T)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=PaletteOutline}">
@@ -168,7 +169,8 @@
                         </MenuItem>
                     </MenuItem>
                     <MenuItem Header="帮助(_H)" Height="25" Padding="10 0">
-                        <MenuItem Header="在线用户手册(_M)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=TextBoxSearchOutline}" InputGestureText="Ctrl+H"/>
+                        <MenuItem Header="在线手册(_M)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=TextBoxSearchOutline}" InputGestureText="Ctrl+H"/>
+                        <MenuItem Header="检查更新(_U)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=UploadMultiple}" InputGestureText="Ctrl+U"/>
                         <MenuItem Header="关于 OpenSVIP(_A)" Icon="{materialDesign:PackIcon Kind=InformationOutline}" InputGestureText="Ctrl+A" Click="AboutMenuItem_Click"/>
                     </MenuItem>
                 </Menu>
