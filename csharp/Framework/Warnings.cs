@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -27,6 +28,7 @@ namespace OpenSvip.Framework
         [Description("未知")] Others
     }
     
+    [Serializable]
     public class Warning
     {
         public WarningTypes Type;

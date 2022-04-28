@@ -46,6 +46,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="IProjectConverter.cs" />
     <Compile Include="PluginManager.cs" />
+    <Compile Include="TaskContainer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Warnings.cs" />
   </ItemGroup>
