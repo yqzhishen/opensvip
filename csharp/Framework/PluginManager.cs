@@ -113,21 +113,25 @@ namespace OpenSvip.Framework
         public static void InstallPlugin(Plugin plugin, string folder)
         {
             var folderName = Path.GetFileName(folder);
+            var targetFolder = Path.Combine(PluginPath, folderName);
             if (Plugins.ContainsKey(plugin.Identifier)) // plugin already exists
             {
                 new DirectoryInfo(Folders[plugin.Identifier]).Delete(true);
-                Directory.Move(folder, Path.Combine(PluginPath, folderName));
             }
             else // a new plugin
             {
-                if (Directory.Exists(Path.Combine(PluginPath, folderName)))
+                if (Directory.Exists(targetFolder))
                 {
-                    throw new IOException($"试图安装一个新的插件，但其目录名“{folderName}”与已有插件冲突。请联系插件的发布者。");
+                    if (Folders.ContainsValue(targetFolder))
+                    {
+                        throw new IOException($"试图安装一个新的插件，但其目录名“{folderName}”与已有插件冲突。请联系插件的发布者。");
+                    }
+                    new DirectoryInfo(targetFolder).Delete(true);
                 }
-                Directory.Move(folder, Path.Combine(PluginPath, folderName));
             }
+            Directory.Move(folder, targetFolder);
             Plugins[plugin.Identifier] = plugin;
-            Folders[plugin.Identifier] = folder;
+            Folders[plugin.Identifier] = targetFolder;
         }
     }
 }
