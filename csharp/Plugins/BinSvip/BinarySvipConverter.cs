@@ -16,9 +16,9 @@ namespace OpenSvip.Stream
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new BinaryReader(stream);
             var version = reader.ReadString() + reader.ReadString();
-            var model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(stream);
             stream.Close();
             reader.Close();
+            var model = SingingTool.Model.ProjectModelFileMgr.ReadModelFile(path, out _, out _);
             return new BinarySvipDecoder().DecodeProject(version, model);
         }
 
@@ -68,14 +68,14 @@ namespace OpenSvip.Stream
                 throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。");
             }
             var value = key.GetValue("").ToString().Split('"')[1];
-            return value.Substring(0, value.Length - 18);
+            return Path.GetDirectoryName(value);
         }
 
         private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)
         {
             var path = FindLibrary();
             var filename = args.Name.Split(',')[0];
-            return Assembly.LoadFile($@"{path}\{filename}.dll");
+            return Assembly.LoadFile(Path.Combine(path, filename + ".dll"));
         }
     }
 }
