@@ -9,9 +9,12 @@ using System.IO;
 using OpenSvip.Framework;
 using System.Threading;
 using System.Diagnostics;
+using System.Reflection;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Input;
 using OpenSvip.GUI.Config;
+using OpenSvip.GUI.Dialog;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace OpenSvip.GUI
 {
@@ -47,8 +50,7 @@ namespace OpenSvip.GUI
                 AutoResetTasks = settings.AutoResetTasks,
                 AutoExtension = settings.AutoExtension,
                 OpenExportFolder = settings.OpenExportFolder,
-                OverWriteOption = settings.OverwriteOption,
-                DefaultExportPath = settings.DefaultExportPath
+                OverWriteOption = settings.OverwriteOption
             };
             Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
@@ -60,11 +62,15 @@ namespace OpenSvip.GUI
                 });
             }
             Model.SelectedCustomExportPathIndex = settings.DefaultExportPath == ExportPaths.Custom
-                ? Array.FindIndex(settings.CustomExportPaths, path => path.IsSelected)
+                ? Array.FindIndex(settings.CustomExportPaths, path => path.Selected)
                 : -1;
             if (settings.DefaultExportPath == ExportPaths.Custom && Model.SelectedCustomExportPathIndex == -1)
             {
                 Model.DefaultExportPath = ExportPaths.Unset;
+            }
+            else
+            {
+                Model.DefaultExportPath = settings.DefaultExportPath;
             }
             if (Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(settings.LastExportPath))
             {
@@ -192,13 +198,38 @@ namespace OpenSvip.GUI
             }
             new Thread(() =>
             {
+                // Prepare for execution
                 Model.ExecutionInProgress = true;
-                var inputConverter = PluginManager.GetConverter(Model.SelectedInputPlugin.Identifier);
-                var outputConverter = PluginManager.GetConverter(Model.SelectedOutputPlugin.Identifier);
                 foreach (var task in Model.TaskList)
                 {
                     task.PrepareForExecution();
                 }
+                
+                // Construct options
+                var inputOptionDictionary = new Dictionary<string, string>();
+                foreach (var option in Model.SelectedInputOptions)
+                {
+                    inputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
+                }
+                var outputOptionDictionary = new Dictionary<string, string>();
+                foreach (var option in Model.SelectedOutputOptions)
+                {
+                    outputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
+                }
+                var inputOptions = new ConverterOptions(inputOptionDictionary);
+                var outputOptions = new ConverterOptions(outputOptionDictionary);
+                
+                // Create sandbox for tasks
+                var domain = AppDomain.CreateDomain("TaskExecution");
+                var container = (TaskContainer)domain.CreateInstanceAndUnwrap(
+                    Assembly.GetAssembly(typeof(TaskContainer)).FullName,
+                    typeof(TaskContainer).ToString());
+                container.Init(
+                    Model.SelectedInputPlugin,
+                    Model.SelectedOutputPlugin,
+                    inputOptions,
+                    outputOptions);
+                
                 var skipSameFilename = Model.OverWriteOption == OverwriteOptions.Skip;
                 var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
                 foreach (var task in Model.TaskList)
@@ -223,23 +254,8 @@ namespace OpenSvip.GUI
                                 continue;
                             }
                         }
-
-                        var inputOptionDictionary = new Dictionary<string, string>();
-                        foreach (var option in Model.SelectedInputOptions)
-                        {
-                            inputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
-                        }
-                        var outputOptionDictionary = new Dictionary<string, string>();
-                        foreach (var option in Model.SelectedOutputOptions)
-                        {
-                            outputOptionDictionary[option.OptionInfo.Name] = option.OptionValue;
-                        }
-                        outputConverter.Save(
-                            task.ExportPath,
-                            inputConverter.Load(
-                                task.ImportPath,
-                                new ConverterOptions(inputOptionDictionary)),
-                            new ConverterOptions(outputOptionDictionary));
+                        // Run the container
+                        container.Run(task.ImportPath, task.ExportPath);
                     }
                     catch (Exception e)
                     {
@@ -247,7 +263,7 @@ namespace OpenSvip.GUI
                         task.Error = e.Message;
                         continue;
                     }
-                    var warnings = Warnings.GetWarnings();
+                    var warnings = container.GetWarnings();
                     if (warnings.Any())
                     {
                         task.Status = TaskStates.Warning;
@@ -255,13 +271,17 @@ namespace OpenSvip.GUI
                         {
                             task.Warnings.Add(warning);
                         }
-                        Warnings.ClearWarnings();
+                        container.ClearWarnings();
                     }
                     else
                     {
                         task.Status = TaskStates.Success;
                     }
                 }
+                // Unload the domain to release assembly files
+                AppDomain.Unload(domain);
+                
+                // Things after execution
                 Model.ExecutionInProgress = false;
                 if (!Model.OpenExportFolder)
                 {
@@ -274,27 +294,27 @@ namespace OpenSvip.GUI
             }).Start();
         }
 
-        public static RelayCommand<MainWindow> ImportCommand = new RelayCommand<MainWindow>(
+        public static readonly RelayCommand<MainWindow> ImportCommand = new RelayCommand<MainWindow>(
             p => !p.Model.ExecutionInProgress,
             p => p.FileMaskPanel_Click(null, null));
 
-        public static RelayCommand<MainWindow> ExportCommand = new RelayCommand<MainWindow>(
+        public static readonly RelayCommand<MainWindow> ExportCommand = new RelayCommand<MainWindow>(
             p => p.StartExecutionButton.IsEnabled,
             p => p.StartExecutionButton_Click(null, null));
 
-        public static RelayCommand<MainWindow> BrowseAndExportCommand = new RelayCommand<MainWindow>(
+        public static readonly RelayCommand<MainWindow> BrowseAndExportCommand = new RelayCommand<MainWindow>(
             p => p.StartExecutionButton.IsEnabled,
             p => p.BrowseAndExportMenu_Click(null, null));
 
-        public static RelayCommand<AppModel> ResetCommand = new RelayCommand<AppModel>(
+        public static readonly RelayCommand<AppModel> ResetCommand = new RelayCommand<AppModel>(
             p => !p.ExecutionInProgress,
             p => p.TaskList.Clear());
 
-        public static RelayCommand<MainWindow> AboutCommand = new RelayCommand<MainWindow>(
+        public static readonly RelayCommand<MainWindow> AboutCommand = new RelayCommand<MainWindow>(
             p => true,
             p => p.AboutMenuItem_Click(null, null));
 
-        public static RelayCommand<System.Windows.Controls.MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+        public static readonly RelayCommand<System.Windows.Controls.MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
             p =>
             {
                 var model = (AppModel)p.DataContext;
@@ -312,7 +332,7 @@ namespace OpenSvip.GUI
                 ((MainWindow)App.Current.MainWindow).Model.SelectedInputPluginIndex = index;
             });
 
-        public static RelayCommand<System.Windows.Controls.MenuItem> ExportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+        public static readonly RelayCommand<System.Windows.Controls.MenuItem> ExportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
             p => true,
             p =>
             {
@@ -326,7 +346,7 @@ namespace OpenSvip.GUI
                 ((MainWindow)App.Current.MainWindow).Model.SelectedOutputPluginIndex = index;
             });
 
-        public static RelayCommand<AppModel> InstallPluginCommand = new RelayCommand<AppModel>(
+        public static readonly RelayCommand<AppModel> InstallPluginCommand = new RelayCommand<AppModel>(
             p => !p.ExecutionInProgress,
             p =>
             {
@@ -413,6 +433,10 @@ namespace OpenSvip.GUI
                     }
                 }).Start();
             });
+
+        public static readonly RelayCommand<AppModel> ManagePathsCommand = new RelayCommand<AppModel>(
+            p => !p.ExecutionInProgress,
+            p => PathManagerDialog.CreateDialog(p).ShowDialog());
 
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -531,7 +555,7 @@ namespace OpenSvip.GUI
                 Source = e.Source
             };
 
-            ScrollViewer scv = (ScrollViewer)sender;
+            var scv = (ScrollViewer)sender;
             scv.RaiseEvent(eventArgs);
             e.Handled = true;
         }
@@ -544,7 +568,7 @@ namespace OpenSvip.GUI
                 Source = e.Source
             };
 
-            ScrollViewer scv = (ScrollViewer)sender;
+            var scv = (ScrollViewer)sender;
             scv.RaiseEvent(eventArgs);
             e.Handled = true;
         }
@@ -571,6 +595,14 @@ namespace OpenSvip.GUI
                 return;
             }
             Model.ExportPath.PathValue = dialog.FileName;
+        }
+
+        private void ExportPathTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Keyboard.ClearFocus();
+            }
         }
 
         private void StartExecutionButton_Click(object sender, RoutedEventArgs e)
@@ -625,7 +657,8 @@ namespace OpenSvip.GUI
                     DefaultExportPath = Model.DefaultExportPath,
                     CustomExportPaths = Model.CustomExportPaths.Select(path => new PathConfig
                     {
-                        Path = path.PathValue
+                        Path = path.PathValue,
+                        Selected = path == Model.SelectedCustomExportPath
                     }).ToArray(),
                     LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
                         ? Model.ExportPath.PathValue

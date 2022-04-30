@@ -86,7 +86,7 @@ namespace OpenSvip.GUI.Config
 
     public class Information
     {
-        public string Version { get; set; } = "1.0.6 (Preview)";
+        public string Version { get; set; } = "1.1.0 (Preview)";
 
         public string FrameworkVersion { get; set; } = "1.2.2";
 
@@ -130,7 +130,7 @@ namespace OpenSvip.GUI.Config
     {
         public string Path { get; set; }
 
-        public bool IsSelected { get; set; }
+        public bool Selected { get; set; }
     }
 
     public enum OverwriteOptions

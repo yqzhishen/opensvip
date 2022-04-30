@@ -4,7 +4,7 @@
     <Version>1.7.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
-    <Descriptions>Synthesizer V 工程格式转换插件，支持包括曲谱、歌词、参数曲线、音符属性、音符组、即时音高模式等所有数据的读取与写入。&#x000A;请注意：输入带有重叠音符的工程文件是未定义的行为，可能导致无法预料的异常。</Descriptions>
+    <Descriptions>Synthesizer V 工程格式转换插件，支持包括曲谱、歌词、参数曲线、音符属性、音符组、即时音高模式在内所有数据的读取与写入。&#x000A;请注意：输入带有重叠音符的工程文件是未定义的行为，可能导致无法预料的异常。</Descriptions>
     <Requirements>无</Requirements>
     <Format>Synthesizer V 工程文件</Format>
     <Suffix>svp</Suffix>
@@ -69,7 +69,7 @@
         </Option>
         <Option Name="desample" Type="integer" Default="40">
             <Notes>设置参数点的平均采样间隔以改善性能（0 为无限制）</Notes>
-			<Tips>减小采样间隔可提高参数曲线的精准度，但可能造成渲染卡顿（例如 Synthesizer V Studio Pro + AI 声库）。请根据电脑配置与实际体验酌情设置此值。</Tips>
+			<Tips>减小采样间隔可提高参数曲线的精准度，但可能造成渲染卡顿（例如 Synthesizer V Studio Pro + AI 声库）。请根据硬件配置与实际体验酌情设置此值。</Tips>
         </Option>
     </OutputOptions>
 </Plugin>

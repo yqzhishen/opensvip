@@ -42,7 +42,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (((IEnumerable)value) ?? throw new InvalidOperationException()).Cast<object>().Any();
+            return ((IEnumerable)value ?? throw new InvalidOperationException()).Cast<object>().Any();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -136,14 +136,14 @@ namespace OpenSvip.GUI
         }
     }
 
-    public class MenuItemIsCheckedConverter : IMultiValueConverter
+    public class ItemIsCheckedConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             var selectedIndex = (int)values[0];
-            var myself = (MenuItem)values[1];
-            var parent = (MenuItem)values[2];
-            var items = parent.Items.Cast<object>().ToArray();
+            var myself = values[1];
+            var parent = (IEnumerable)values[2];
+            var items = parent.Cast<object>().ToArray();
             return selectedIndex == Array.IndexOf(items, myself);
         }
 

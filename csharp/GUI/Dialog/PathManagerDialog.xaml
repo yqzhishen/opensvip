@@ -1,0 +1,217 @@
+﻿<UserControl
+    x:Class="OpenSvip.GUI.Dialog.PathManagerDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:dialog="clr-namespace:OpenSvip.GUI.Dialog"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=150, Mode=OneWay}"
+    Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=150, Mode=OneWay}"
+    MaxHeight="600"
+    MaxWidth="900"
+    d:DesignHeight="400"
+    d:DesignWidth="600"
+    d:DataContext="{d:DesignInstance Type=local:AppModel}">
+    <Grid d:Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" Margin="20 15 15 5">
+            <TextBlock VerticalAlignment="Center" FontSize="24" FontWeight="Bold" Text="管理自定义路径"/>
+            <Button
+                x:Name="CloseButton"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Right"
+                Style="{StaticResource MaterialDesignIconButton}"
+                Width="40"
+                Height="40"
+                Padding="0"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                <materialDesign:PackIcon Kind="Close" Width="30" Height="30"/>
+            </Button>
+        </DockPanel>
+        <Separator Grid.Row="1" Margin="15 0"/>
+        <Grid Grid.Row="2">
+            <DockPanel
+                x:Name="FileDropPanel"
+                VerticalAlignment="Center"
+                Width="250"
+                Height="150"
+                d:Visibility="Collapsed"
+                Visibility="{Binding HasItems, ElementName=PathListView, Converter={StaticResource InverseBoolToVisConverter}}">
+                <Grid>
+                    <StackPanel
+                        x:Name="AddPathMaskPanel"
+                        Background="Black"
+                        Opacity="0"
+                        Panel.ZIndex="16"
+                        Cursor="Hand"
+                        MouseEnter="AddPathMaskPanel_Focus"
+                        MouseLeave="AddPathMaskPanel_UnFocus"
+                        MouseDown="AddPathMaskPanel_Click"/>
+                    <DockPanel Height="240" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <materialDesign:PackIcon
+                            x:Name="AddPathIcon"
+                            DockPanel.Dock="Top"
+                            Kind="FolderPlusOutline"
+                            Margin="0 50 0 0"
+                            HorizontalAlignment="Center"
+                            Width="100"
+                            Height="100"
+                            Opacity="0.4"
+                            Foreground="#01579b"/>
+                        <TextBlock
+                            x:Name="FileDropText"
+                            DockPanel.Dock="Bottom"
+                            Text="单击添加自定义路径"
+                            HorizontalAlignment="Center"
+                            FontSize="25"
+                            Opacity="{Binding Opacity, ElementName=AddPathIcon}"
+                            Foreground="#01579b"/>
+                    </DockPanel>
+                </Grid>
+            </DockPanel>
+            <StackPanel
+                Margin="22 0 22 10"
+                HorizontalAlignment="Stretch"
+                d:Visibility="Visible"
+                Visibility="{Binding Visibility, ElementName=PathListView}">
+                <TextBlock Margin="0 10 0 5" TextWrapping="Wrap" Text="在开头插入“${src}”可指代源路径，例如“${src}/custom/relative/path”。"/>
+                <Border
+                    Visibility="{Binding Visibility, ElementName=PathListView}"
+                    CornerRadius="5"
+                    Background="#f5f5f5"
+                    d:Height="287"
+                    Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dialog:PathManagerDialog}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=105, Mode=OneWay}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <ComboBox
+                            Grid.Row="0"
+                            x:Name="HiddenPathComboBox"
+                            Visibility="Collapsed"
+                            ItemsSource="{Binding CustomExportPaths}"
+                            SelectedIndex="{Binding SelectedCustomExportPathIndex}"/>
+                        <ScrollViewer
+                            x:Name="PathScrollViewer"
+                            Grid.Row="0"
+                            Margin="0 5"
+                            Visibility="{Binding Visibility, ElementName=PathListView}"
+                            VerticalScrollBarVisibility="Auto"
+                            PanningMode="VerticalOnly"
+                            MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=60}">
+                            <ItemsControl
+                                x:Name="PathListView"
+                                ItemsSource="{Binding CustomExportPaths}"
+                                d:Visibility="Visible"
+                                Visibility="{Binding HasItems, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border x:Name="ItemBorder" Margin="5 0 5 0" Padding="8 4" CornerRadius="5">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="20"/>
+                                                    <ColumnDefinition Width="40"/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <local:CancellableRadioButton
+                                                    x:Name="ItemRadioButton"
+                                                    Grid.Column="0"
+                                                    Padding="0"
+                                                    VerticalAlignment="Center"
+                                                    Style="{StaticResource MaterialDesignRadioButton}"
+                                                    Cursor="Hand"
+                                                    ToolTip="{Binding IsChecked, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=取消选中;选中}"
+                                                    GroupName="PathRadioButtonGroup"
+                                                    Checked="SelectPathRadioButton_Checked"
+                                                    Unchecked="SelectPathRadioButton_Unchecked">
+                                                    <local:CancellableRadioButton.IsChecked>
+                                                        <MultiBinding Converter="{StaticResource ItemIsCheckedConverter}" Mode="OneWay">
+                                                            <Binding ElementName="HiddenPathComboBox" Path="SelectedIndex"/>
+                                                            <Binding/>
+                                                            <Binding ElementName="PathListView" Path="ItemsSource"/>
+                                                        </MultiBinding>
+                                                    </local:CancellableRadioButton.IsChecked>
+                                                </local:CancellableRadioButton>
+                                                <Button
+                                                    x:Name="BrowsePathButton"
+                                                    Grid.Column="1"
+                                                    VerticalAlignment="Center"
+                                                    Padding="0"
+                                                    Height="36"
+                                                    Width="36"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Content="{materialDesign:PackIcon Kind=Folder, Size=25}"
+                                                    ToolTip="浏览文件夹"
+                                                    Click="BrowsePathButton_Click"/>
+                                                <TextBox
+                                                    Grid.Column="2"
+                                                    VerticalAlignment="Center"
+                                                    Padding="1 2.5"
+                                                    FontSize="15"
+                                                    Text="{Binding PathValue}"
+                                                    materialDesign:TextFieldAssist.HasClearButton="True"
+                                                    KeyDown="PathValueTextBox_KeyDown"
+                                                    LostKeyboardFocus="PathValueTextBox_LostFocus"
+                                                    TextChanged="PathValueTextBox_TextCleared">
+                                                    <materialDesign:HintAssist.Hint>
+                                                        <TextBlock Text="自定义路径" VerticalAlignment="Bottom" Margin="1 2.7 1 0"/>
+                                                    </materialDesign:HintAssist.Hint>
+                                                </TextBox>
+                                                <Button
+                                                    x:Name="RemovePathButton"
+                                                    Grid.Column="3"
+                                                    VerticalAlignment="Center"
+                                                    Margin="2"
+                                                    Padding="0"
+                                                    Height="36"
+                                                    Width="36"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Content="{materialDesign:PackIcon Kind=Delete, Size=27}"
+                                                    ToolTip="移除"
+                                                    Click="RemovePathButton_Click"/>
+                                            </Grid>
+                                        </Border>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger
+                                                Binding="{Binding IsChecked, ElementName=ItemRadioButton}"
+                                                Value="True">
+                                                <Setter
+                                                    TargetName="ItemBorder"
+                                                    Property="Background"
+                                                    Value="{DynamicResource MaterialDesignSelection}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                        <Button
+                            x:Name="AddPathButton"
+                            Grid.Row="1"
+                            Margin="5 0 5 5"
+                            Height="45"
+                            Width="300"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            materialDesign:ButtonAssist.CornerRadius="5"
+                            Click="AddPathMaskPanel_Click">
+                            <materialDesign:PackIcon
+                                Kind="AddThick"
+                                VerticalAlignment="Center"
+                                Width="30"
+                                Height="30"/>
+                        </Button>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

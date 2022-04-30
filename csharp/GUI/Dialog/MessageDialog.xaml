@@ -1,17 +1,16 @@
 ﻿<UserControl
-    x:Class="OpenSvip.GUI.YesNoDialog"
+    x:Class="OpenSvip.GUI.Dialog.MessageDialog"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:OpenSvip.GUI"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:OpenSvip.GUI.Dialog"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     d:Background="White"
     Width="320"
     Height="Auto"
-    d:DataContext="{d:DesignInstance Type=local:YesNoDialog}">
+    d:DataContext="{d:DesignInstance Type=local:MessageDialog}">
     <UserControl.Resources>
         <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
             <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -26,12 +25,12 @@
             <RowDefinition Height="60"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Margin="20 16 20 5">
-            <TextBlock HorizontalAlignment="Left" d:Text="插件已安装。立即重启本应用？" Text="{Binding Title}" FontSize="16" FontWeight="Bold"/>
+            <TextBlock HorizontalAlignment="Left" d:Text="插件安装失败" Text="{Binding Title}" FontSize="16" FontWeight="Bold"/>
             <TextBlock
                 Margin="0 8 0 0"
                 HorizontalAlignment="Stretch"
                 TextWrapping="Wrap"
-                d:Text="部分功能更改需要重启本应用才可正常使用。"
+                d:Text="试图安装一个新的插件，但其目录名“BinSvip”与已有插件冲突。请联系插件的发布者。"
                 Text="{Binding Message}"/>
         </StackPanel>
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
@@ -46,16 +45,7 @@
                     <EventSetter Event="Click" Handler="Button_Click"/>
                 </Style>
             </StackPanel.Resources>
-            <Button d:Content="重启" Content="{Binding YesText}">
-                <Button.CommandParameter>
-                    <sys:Boolean>true</sys:Boolean>
-                </Button.CommandParameter>
-            </Button>
-            <Button d:Content="稍后" Content="{Binding NoText}">
-                <Button.CommandParameter>
-                    <sys:Boolean>false</sys:Boolean>
-                </Button.CommandParameter>
-            </Button>
+            <Button d:Content="确定" Content="{Binding ButtonText}"/>
         </StackPanel>
     </Grid>
 </UserControl>

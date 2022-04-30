@@ -1,9 +1,9 @@
-﻿using MaterialDesignThemes.Wpf;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using MaterialDesignThemes.Wpf;
 
-namespace OpenSvip.GUI
+namespace OpenSvip.GUI.Dialog
 {
     /// <summary>
     /// FileOverwriteDialog.xaml 的交互逻辑

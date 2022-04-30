@@ -37,29 +37,38 @@
                 HorizontalAlignment="Center"
                 Width="80"
                 Height="80"/>
-            <StackPanel
+            <DockPanel
                 Grid.Row="0"
                 Grid.Column="1"
-                Margin="0 0 20 0"
-                Orientation="Horizontal">
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Margin="10 10 10 0"
-                    FontSize="32"
-                    FontWeight="Bold"
-                    d:Text="BinSvip"
-                    Text="{Binding Name}"/>
-                <TextBlock
-                    VerticalAlignment="Center"
-                    Margin="0 25 0 0"
-                    d:Text="1.1.0"
-                    Text="{Binding Version}"
-                    FontSize="16"/>
-            </StackPanel>
+                HorizontalAlignment="Left">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Margin="5 10 10 0"
+                        FontSize="32"
+                        FontWeight="Bold"
+                        TextTrimming="WordEllipsis"
+                        d:Text="BinSvip"
+                        Text="{Binding Name}"
+                        ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Bottom"
+                        Margin="0 0 5 8"
+                        d:Text="1.1.0"
+                        Text="{Binding Version}"
+                        FontSize="16"/>
+                </Grid>
+            </DockPanel>
             <StackPanel
                 Grid.Row="1"
                 Grid.Column="1"
-                Margin="10 0 20 15"
+                Margin="5 0 20 15"
                 Orientation="Horizontal">
                 <materialDesign:PackIcon
                     VerticalAlignment="Center"

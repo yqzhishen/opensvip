@@ -9,6 +9,7 @@ namespace OpenSvip.Framework
     /// <summary>
     /// 由 OpenSVIP Framework 提供给工程转换器的转换选项。
     /// </summary>
+    [Serializable]
     public class ConverterOptions
     {
         private readonly Dictionary<string, string> OptionDictionary;

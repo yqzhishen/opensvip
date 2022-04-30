@@ -1,14 +1,14 @@
-﻿using MaterialDesignThemes.Wpf;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using MaterialDesignThemes.Wpf;
 
-namespace OpenSvip.GUI
+namespace OpenSvip.GUI.Dialog
 {
     /// <summary>
     /// AboutDialog.xaml 的交互逻辑
     /// </summary>
-    public partial class AboutDialog : UserControl
+    public partial class AboutDialog
     {
         public AboutDialog()
         {
@@ -18,7 +18,7 @@ namespace OpenSvip.GUI
         public static AboutDialog CreateDialog()
         {
             AboutDialog dialog = null;
-            App.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 dialog = new AboutDialog();
             });
