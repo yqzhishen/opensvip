@@ -218,6 +218,8 @@
             Height="32"
             Width="32"
             Style="{StaticResource MaterialDesignRaisedLightButton}"
+            Background="#FF9FA8DA"
+            BorderBrush="#FF9FA8DA"
             Content="{materialDesign:PackIcon DeleteOutline}"
             ToolTip="移除"
             Click="RemoveTaskButton_Click"/>

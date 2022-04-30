@@ -4,6 +4,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
+using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.GUI.Config;
 
@@ -262,6 +265,52 @@ namespace OpenSvip.GUI
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("ExecutionInProgress"));
             }
         }
+
+        private AppearanceThemes _appearanceTheme;
+
+        public AppearanceThemes AppearanceThemes
+        {
+            get => _appearanceTheme;
+            set
+            {
+                _appearanceTheme = value;
+                if (value == AppearanceThemes.System)
+                {
+                    AppUsesLightMode = SystemAppsUseLightMode();
+                }
+                else
+                {
+                    AppUsesLightMode = value == AppearanceThemes.Light;
+                }
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AppearanceThemes"));
+            }
+        }
+
+        private bool _appUsesLightMode;
+
+        public bool AppUsesLightMode
+        {
+            get => _appUsesLightMode;
+            set
+            {
+                _appUsesLightMode = value;
+                var theme = (BundledTheme)Application.Current.Resources.MergedDictionaries
+                    .First(rd => rd.GetType() == typeof(BundledTheme));
+                theme.BaseTheme = value ? BaseTheme.Light : BaseTheme.Dark;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AppUsesLightMode"));
+            }
+        }
+
+        private static bool SystemAppsUseLightMode()
+        {
+            var key = Registry.CurrentUser.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+            var rawValue = key?.GetValue("AppsUseLightTheme");
+            if (rawValue == null || !int.TryParse(rawValue.ToString(), out var value))
+            {
+                return true;
+            }
+            return value == 1;
+        }
     }
 
     public class TaskViewModel : INotifyPropertyChanged
@@ -410,7 +459,7 @@ namespace OpenSvip.GUI
             get => _pathValue;
             set
             {
-                _pathValue = value;
+                _pathValue = value ?? "";
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("PathValue"));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsRelative"));
             }

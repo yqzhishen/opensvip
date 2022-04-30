@@ -13,6 +13,8 @@
     Width="1200"
     MinHeight="525"
     MinWidth="655"
+    Style="{DynamicResource MaterialDesignWindow}"
+    FontFamily="Microsoft Yahei UI"
     Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
@@ -37,7 +39,7 @@
                 <RowDefinition Height="25"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Border Grid.Row="0" Background="WhiteSmoke">
+            <Border Grid.Row="0">
                 <Border.Resources>
                     <x:Array x:Key="DefaultExportEnumValues" Type="config:ExportPaths">
                         <config:ExportPaths>Unset</config:ExportPaths>
@@ -45,15 +47,29 @@
                         <config:ExportPaths>Desktop</config:ExportPaths>
                         <config:ExportPaths>Custom</config:ExportPaths>
                     </x:Array>
+                    <x:Array x:Key="AppearanceThemeEnumValues" Type="config:AppearanceThemes">
+                        <config:AppearanceThemes>Light</config:AppearanceThemes>
+                        <config:AppearanceThemes>Dark</config:AppearanceThemes>
+                        <config:AppearanceThemes>System</config:AppearanceThemes>
+                    </x:Array>
                 </Border.Resources>
-                <ComboBox
-                    x:Name="HiddenDefaultExportComboBox"
-                    Visibility="Collapsed"
-                    ItemsSource="{StaticResource DefaultExportEnumValues}"
-                    SelectedIndex="{Binding DefaultExportPath, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:ExportPaths}}"/>
+                <Grid>
+                    <ComboBox
+                        x:Name="HiddenDefaultExportComboBox"
+                        Visibility="Collapsed"
+                        ItemsSource="{StaticResource DefaultExportEnumValues}"
+                        SelectedIndex="{Binding DefaultExportPath, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:ExportPaths}}"/>
+                    <ComboBox
+                        x:Name="HiddenAppearanceThemeComboBox"
+                        Visibility="Collapsed"
+                        ItemsSource="{StaticResource AppearanceThemeEnumValues}"
+                        SelectedIndex="{Binding AppearanceThemes, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:AppearanceThemes}}">
+                    </ComboBox>
+                </Grid>
+
             </Border>
             <DockPanel x:Name="MenuPanel" Grid.Row="0">
-                <Menu IsMainMenu="True" Margin="20 0 0 0" Height="25" FontFamily="Microsoft YaHei UI" FontSize="13" FontWeight="Normal">
+                <Menu IsMainMenu="True" Margin="20 0 20 0" Height="25" FontFamily="Microsoft YaHei UI" FontSize="13" FontWeight="Normal">
                     <Menu.Resources>
                         <Style TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
                             <Setter Property="Height" Value="30"/>
@@ -162,10 +178,16 @@
                                 CommandParameter="{Binding}"/>
                         </MenuItem>
                         <Separator/>
-                        <MenuItem Header="外观主题(_T)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=PaletteOutline}">
-                            <MenuItem Header="浅色(_L)" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="True"/>
-                            <MenuItem Header="深色(_D)" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="False"/>
-                            <MenuItem Header="系统(_S)" Margin="-10 0 -5 0" IsCheckable="True" IsChecked="False"/>
+                        <MenuItem Header="外观主题(_T)" Icon="{materialDesign:PackIcon Kind=PaletteOutline}" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
+                            <MenuItem
+                                Header="浅色(_L)"
+                                IsChecked="{Binding SelectedIndex, ElementName=HiddenAppearanceThemeComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"/>
+                            <MenuItem
+                                Header="深色(_D)"
+                                IsChecked="{Binding SelectedIndex, ElementName=HiddenAppearanceThemeComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=1}"/>
+                            <MenuItem
+                                Header="系统(_S)"
+                                IsChecked="{Binding SelectedIndex, ElementName=HiddenAppearanceThemeComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
                         </MenuItem>
                     </MenuItem>
                     <MenuItem Header="帮助(_H)" Height="25" Padding="10 0">
@@ -189,7 +211,7 @@
                     <materialDesign:Card
                         x:Name="PluginSelectionCard"
                         Grid.Row="0"
-                        Margin="20 20 10 10"
+                        Margin="20 10 10 10"
                         Padding="0 0 0 5">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -244,7 +266,7 @@
                                             <ToggleButton
                                                 x:Name="AutoDetectToggle"
                                                 VerticalAlignment="Center"
-                                                Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                                Style="{DynamicResource MaterialDesignSwitchToggleButton}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -317,7 +339,7 @@
                                                 Height="20"
                                                 Cursor="Hand"
                                                 IsChecked="{Binding AutoExtension}"/>
-                                            <TextBlock x:Name="AutoExtensionText" VerticalAlignment="Center" Margin="5" Text="自动设置后缀名" FontSize="14" Foreground="DimGray"/>
+                                            <TextBlock x:Name="AutoExtensionText" VerticalAlignment="Center" Margin="5" Text="自动设置后缀名" FontSize="14"/>
                                         </StackPanel>
 
                                     </WrapPanel>
@@ -429,34 +451,33 @@
                                             <materialDesign:PackIcon Kind="Tools" Width="20" Height="20"/>
                                         </materialDesign:PopupBox.ToggleContent>
                                         <StackPanel Orientation="Horizontal">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
+                                                    <Setter Property="Margin" Value="5 0"/>
+                                                    <Setter Property="Background" Value="#FF9FA8DA"/>
+                                                    <Setter Property="BorderBrush" Value="#FF9FA8DA"/>
+                                                </Style>
+                                            </StackPanel.Resources>
                                             <Button
                                                 x:Name="AppendTasksButton"
-                                                Margin="5 0"
-                                                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
                                                 ToolTip="继续添加文件"
                                                 Click="FileMaskPanel_Click">
                                                 <materialDesign:PackIcon Kind="Add"/>
                                             </Button>
                                             <Button
                                                 x:Name="ClearTasksButton"
-                                                Margin="5 0"
-                                                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
                                                 ToolTip="清空所有导入"
                                                 Click="ClearTasksButton_Click">
                                                 <materialDesign:PackIcon Kind="Refresh"/>
                                             </Button>
                                             <Button
                                                 x:Name="RestoreTasksButton"
-                                                Margin="5 0"
-                                                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
                                                 ToolTip="恢复默认命名"
                                                 Click="RestoreTasksButton_Click">
                                                 <materialDesign:PackIcon Kind="FormTextbox"/>
                                             </Button>
                                             <Button
                                                 x:Name="FilterTasksButton"
-                                                Margin="5 0"
-                                                Style="{StaticResource MaterialDesignFloatingActionMiniLightButton}"
                                                 ToolTip="过滤多余项目"
                                                 Click="FilterTasksButton_Click">
                                                 <materialDesign:PackIcon Kind="FilterMinusOutline"/>
@@ -477,7 +498,7 @@
                     <materialDesign:Card
                         x:Name="ConverterOptionsCard"
                         Grid.Row="0"
-                        Margin="10 20 20 10">
+                        Margin="10 10 20 10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
@@ -660,6 +681,8 @@
                                     Margin="5 12 0 7"
                                     Height="40"
                                     Width="40"
+                                    Background="#FF9FA8DA"
+                                    BorderBrush="#FF9FA8DA"
                                     Style="{StaticResource MaterialDesignFlatLightBgButton}"
                                     materialDesign:ShadowAssist.ShadowDepth="Depth2"
                                     Content="{materialDesign:PackIcon Folder}"

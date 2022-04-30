@@ -51,11 +51,15 @@ namespace OpenSvip.GUI
             button.Content = "已复制";
             new Thread(() =>
             {
-                Thread.Sleep(5000);
-                Dispatcher.Invoke(() =>
+                Thread.Sleep(2000);
+                try
                 {
-                    button.Content = "复制错误信息";
-                });
+                    Dispatcher.Invoke(() => { button.Content = "复制错误信息"; });
+                }
+                catch
+                {
+                    // ignored
+                }
             }).Start();
         }
     }

@@ -93,7 +93,7 @@
                     Margin="-2 0 0 0"
                     Cursor="Hand"
                     IsChecked="{Binding Path=OptionValue}"/>
-                <TextBlock x:Name="AutoDetectText" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Margin="5 2 5 0" Text="{Binding Path=OptionInfo.Notes}"/>
+                <TextBlock x:Name="AutoDetectText" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Margin="5 2 0 0" Text="{Binding Path=OptionInfo.Notes}"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Enum">

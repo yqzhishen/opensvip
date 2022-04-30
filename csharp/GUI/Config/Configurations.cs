@@ -124,6 +124,8 @@ namespace OpenSvip.GUI.Config
         public PathConfig[] CustomExportPaths { get; set; } = Array.Empty<PathConfig>();
 
         public string LastExportPath { get; set; }
+
+        public AppearanceThemes AppearanceTheme { get; set; } = AppearanceThemes.System;
     }
 
     public class PathConfig
@@ -141,5 +143,10 @@ namespace OpenSvip.GUI.Config
     public enum ExportPaths
     {
         Unset, Source, Desktop, Custom
+    }
+
+    public enum AppearanceThemes
+    {
+        Light, Dark, System
     }
 }

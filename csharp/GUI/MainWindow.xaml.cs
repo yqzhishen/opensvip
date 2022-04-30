@@ -1,10 +1,10 @@
-﻿using System.Windows.Forms;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System;
 using System.Windows;
 using System.Linq;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using OpenSvip.Framework;
 using System.Threading;
@@ -12,9 +12,11 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Input;
+using Microsoft.Win32;
 using OpenSvip.GUI.Config;
 using OpenSvip.GUI.Dialog;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
 namespace OpenSvip.GUI
 {
@@ -28,6 +30,7 @@ namespace OpenSvip.GUI
         public MainWindow()
         {
             InitializeComponent();
+            SystemEvents.UserPreferenceChanged += UserPreference_ThemeChanged;
 
             var config = AppConfig.LoadFromFile();
 
@@ -50,7 +53,8 @@ namespace OpenSvip.GUI
                 AutoResetTasks = settings.AutoResetTasks,
                 AutoExtension = settings.AutoExtension,
                 OpenExportFolder = settings.OpenExportFolder,
-                OverWriteOption = settings.OverwriteOption
+                OverWriteOption = settings.OverwriteOption,
+                AppearanceThemes = settings.AppearanceTheme
             };
             Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
@@ -110,7 +114,7 @@ namespace OpenSvip.GUI
                 ExportPluginMenuItem.Items.Add(exportMenuItem);
             }
             TaskListView.ItemsSource = Model.TaskList;
-            AddConverterTasks(Environment.GetCommandLineArgs().Skip(1).Where(arg => File.Exists(arg)));
+            AddConverterTasks(Environment.GetCommandLineArgs().Skip(1).Where(File.Exists));
         }
 
         private void FileDropColorOpacityChange(double from, double to)
@@ -636,7 +640,16 @@ namespace OpenSvip.GUI
             }
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void UserPreference_ThemeChanged(object sender, UserPreferenceChangedEventArgs e)
+        {
+            if (Model.AppearanceThemes != AppearanceThemes.System || e.Category != UserPreferenceCategory.General)
+            {
+                return;
+            }
+            Model.AppearanceThemes = AppearanceThemes.System;
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             new AppConfig
             {
@@ -662,7 +675,8 @@ namespace OpenSvip.GUI
                     }).ToArray(),
                     LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
                         ? Model.ExportPath.PathValue
-                        : null
+                        : null,
+                    AppearanceTheme = Model.AppearanceThemes
                 }
             }.SaveToFile();
         }
