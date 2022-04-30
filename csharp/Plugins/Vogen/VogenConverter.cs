@@ -14,15 +14,16 @@ namespace Vogen.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            ZipHelper.DecompressFile(path, Path.GetDirectoryName(path));
             string chartJsonPath = Path.GetDirectoryName(path) + "\\" + "chart.json";
+            File.Delete(chartJsonPath);
+            ZipHelper.UnZip(path, Path.GetDirectoryName(path));
             var stream = new FileStream(chartJsonPath, FileMode.Open, FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
             var vogenProject = JsonConvert.DeserializeObject<VogenProject>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
+            File.Delete(chartJsonPath);
             return new VogenDecoder().DecodeProject(vogenProject);
-            //return new Project();
         }
 
         public void Save(string path, Project project, ConverterOptions options)
@@ -40,8 +41,10 @@ namespace Vogen.Stream
             writer.Close();
             stream.Close();
             string chartJsonPath = Path.GetDirectoryName(path) + "\\" + "chart.json";
+            File.Delete(chartJsonPath);
             FileInfo fi = new FileInfo(path);
-            fi.MoveTo(chartJsonPath);
+            fi.CopyTo(chartJsonPath);
+            fi.Delete();
             ZipHelper.CompressFile(chartJsonPath, Path.GetDirectoryName(path) + "\\" +  Path.GetFileNameWithoutExtension(path) + ".vog");
             File.Delete(chartJsonPath);
         }

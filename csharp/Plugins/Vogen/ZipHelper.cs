@@ -30,46 +30,68 @@ namespace Plugin.Vogen
             }
         }
 
-        //解压文件
-        public static void DecompressFile(string sourceFile, string targetPath)
+        /// <summary>
+        /// ZIP:解压一个zip文件
+        /// add yuangang by 2016-06-13
+        /// </summary>
+        /// <param name="ZipFile">需要解压的Zip文件（绝对路径）</param>
+        /// <param name="TargetDirectory">解压到的目录</param>
+        /// <param name="Password">解压密码</param>
+        /// <param name="OverWrite">是否覆盖已存在的文件</param>
+        public static void UnZip(string ZipFile, string TargetDirectory, bool OverWrite = true)
         {
-            if (!File.Exists(sourceFile))
+            //如果解压到的目录不存在，则报错
+            if (!System.IO.Directory.Exists(TargetDirectory))
             {
-                throw new FileNotFoundException(string.Format("未能找到文件 '{0}' ", sourceFile));
+                throw new System.IO.FileNotFoundException("指定的目录: " + TargetDirectory + " 不存在!");
             }
-            if (!Directory.Exists(targetPath))
+            //目录结尾
+            if (!TargetDirectory.EndsWith("\\")) 
             {
-                Directory.CreateDirectory(targetPath);
+                TargetDirectory = TargetDirectory + "\\"; 
             }
-            using (var s = new ZipInputStream(File.OpenRead(sourceFile)))
+
+            using (ZipInputStream zipfiles = new ZipInputStream(File.OpenRead(ZipFile)))
             {
+                //zipfiles.Password = Password;
                 ZipEntry theEntry;
-                while ((theEntry = s.GetNextEntry()) != null)
+
+                while ((theEntry = zipfiles.GetNextEntry()) != null)
                 {
-                    if (theEntry.IsDirectory)
+                    string directoryName = "";
+                    string pathToZip = "";
+                    pathToZip = theEntry.Name;
+
+                    if (pathToZip != "")
+                        directoryName = Path.GetDirectoryName(pathToZip) + "\\";
+
+                    string fileName = Path.GetFileName(pathToZip);
+
+                    Directory.CreateDirectory(TargetDirectory + directoryName);
+
+                    if (fileName != "")
                     {
-                        continue;
-                    }
-                    string directorName = Path.Combine(targetPath, Path.GetDirectoryName(theEntry.Name));
-                    string fileName = Path.Combine(directorName, Path.GetFileName(theEntry.Name));
-                    if (!Directory.Exists(directorName))
-                    {
-                        Directory.CreateDirectory(directorName);
-                    }
-                    if (!String.IsNullOrEmpty(fileName))
-                    {
-                        using (FileStream streamWriter = File.Create(fileName))
+                        if ((File.Exists(TargetDirectory + directoryName + fileName) && OverWrite) || (!File.Exists(TargetDirectory + directoryName + fileName)))
                         {
-                            int size = 4096;
-                            byte[] data = new byte[size];
-                            while (size > 0)
+                            using (FileStream streamWriter = File.Create(TargetDirectory + directoryName + fileName))
                             {
-                                streamWriter.Write(data, 0, size);
-                                size = s.Read(data, 0, data.Length);
+                                int size = 2048;
+                                byte[] data = new byte[2048];
+                                while (true)
+                                {
+                                    size = zipfiles.Read(data, 0, data.Length);
+
+                                    if (size > 0)
+                                        streamWriter.Write(data, 0, size);
+                                    else
+                                        break;
+                                }
+                                streamWriter.Close();
                             }
                         }
                     }
                 }
+                zipfiles.Close();
             }
         }
     }
