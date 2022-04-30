@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>MIDI 转换插件</Name>
+    <Version>0.1.0</Version>
+    <Author>笛鹿FlutyDeer</Author>
+    <HomePage>https://space.bilibili.com/386270936</HomePage>
+    <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>MIDI 文件</Format>
+    <Suffix>mid</Suffix>
+    <Identifier>mid</Identifier>
+    <LibraryPath>Midi\Plugin.Midi.dll</LibraryPath>
+    <Converter>Midi.Stream.MidiConverter</Converter>
+    <InputOptions/>
+	<OutputOptions/>
+</Plugin>
