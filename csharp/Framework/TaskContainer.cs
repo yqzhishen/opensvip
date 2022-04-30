@@ -35,7 +35,6 @@ namespace OpenSvip.Framework
 
         public void Run(string importPath, string exportPath)
         {
-            Warnings.AddWarning("Hello!");
             _outputConverter.Save(exportPath, _inputConverter.Load(importPath, _inputOptions), _outputOptions);
         }
 
