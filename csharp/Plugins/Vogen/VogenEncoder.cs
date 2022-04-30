@@ -5,22 +5,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Vogen.Model;
+using NPinyin;
 
 namespace Plugin.Vogen
 {
     public class VogenEncoder
     {
-        private Project xsProject;
+        private Project osProject;
 
         private VogenProject vogenProject;
 
         public VogenProject EncodeProject(Project project)
         {
-            xsProject = project;
+            osProject = project;
             vogenProject = new VogenProject
             {
-                BPM = xsProject.SongTempoList[0].BPM,
-                TimeSignature = GetTimeSignature(xsProject.TimeSignatureList[0]),
+                BPM = osProject.SongTempoList[0].BPM,
+                TimeSignature = GetTimeSignature(osProject.TimeSignatureList[0]),
                 InstrumentalOffset = 0,
                 TrackList = EncodeTrackList()
             };
@@ -36,7 +37,7 @@ namespace Plugin.Vogen
         {
             List<VogTrack> vogTrackList = new List<VogTrack>();
             int trackID = 0;
-            foreach (var track in xsProject.TrackList)
+            foreach (var track in osProject.TrackList)
             {
                 switch (track)
                 {
@@ -94,7 +95,7 @@ namespace Plugin.Vogen
             }
             else if (note.Pronunciation == null)
             {
-                return "";
+                return Pinyin.GetPinyin(note.Lyric);
             }
             else
             {
