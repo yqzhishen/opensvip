@@ -4,7 +4,10 @@ namespace Plugin.Gjgj
 {
 	public class GjgjSupportedPinyin
 	{
-        
+        /// <summary>
+		/// 歌叽歌叽支持的拼音列表。
+		/// </summary>
+		/// <returns></returns>
 		private SortedList<string, int> SupportedPinyinList()
 		{
 			return new SortedList<string, int>
@@ -1676,6 +1679,11 @@ namespace Plugin.Gjgj
 			};
 		}
 
+		/// <summary>
+		/// 确定当前发音是否在歌叽歌叽支持的拼音列表中。
+		/// </summary>
+		/// <param name="pinyin"></param>
+		/// <returns>如果歌叽歌叽支持，则返回true，否则为false。</returns>
 		public bool IsGjSupportedPinyin(string pinyin)
 		{
 			return SupportedPinyinList().ContainsKey(pinyin.ToLower());

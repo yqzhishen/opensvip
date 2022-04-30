@@ -12,7 +12,12 @@ namespace Gjgj.Stream
 {
     internal class GjgjConverter : IProjectConverter
     {
-
+        /// <summary>
+        /// 将歌叽歌叽工程转换为OpenSvip工程。
+        /// </summary>
+        /// <param name="path">输入路径。</param>
+        /// <param name="options">输入选项。</param>
+        /// <returns></returns>
         public Project Load(string path, ConverterOptions options)
         {
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
@@ -23,6 +28,12 @@ namespace Gjgj.Stream
             return new GjgjDecoder().DecodeProject(gjProject);
         }
 
+        /// <summary>
+        /// 将OpenSvip工程转换为歌叽歌叽工程。
+        /// </summary>
+        /// <param name="path">输出路径。</param>
+        /// <param name="project">OpenSvip工程。</param>
+        /// <param name="options">输出选项。</param>
         public void Save(string path, Project project, ConverterOptions options)
         {
             var gjProject = new GjgjEncoder

@@ -9,26 +9,37 @@ namespace Plugin.Gjgj
 {
     public class GjgjEncoder
     {
+        /// <summary>
+        /// 指定的参数平均采样间隔。
+        /// </summary>
         public int ParamSampleInterval { get; set; }
 
+        /// <summary>
+        /// 指定的歌手名称。
+        /// </summary>
         public string SingerName { get; set; }
 
-        private Project xsProject;
+        private Project osProject;
         
         private GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
         
         private GjProject gjProject;
         
-        private TimeSynchronizer timeSynchronizer;
+        private TimeSynchronizer timeSync;
 
         private bool isUnsupportedPinyinExist = false;
 
         private List<string> unsupportedPinyinList = new List<string>();
 
+        /// <summary>
+        /// 转换为歌叽歌叽工程。
+        /// </summary>
+        /// <param name="project">原始的OpenSvip工程。</param>
+        /// <returns>转换后的歌叽歌叽工程。</returns>
         public GjProject EncodeProject(Project project)
         {
-            xsProject = project;
-            timeSynchronizer = new TimeSynchronizer(xsProject.SongTempoList);
+            osProject = project;
+            timeSync = new TimeSynchronizer(osProject.SongTempoList);
             gjProject = new GjProject
             {
                 gjgjVersion = 2,
@@ -39,14 +50,17 @@ namespace Plugin.Gjgj
             return gjProject;
         }
 
+        /// <summary>
+        /// 转换演唱轨和伴奏轨。
+        /// </summary>
         private void EncodeTracks()
         {
             int noteID = 1;
             int trackID = 1;
-            gjProject.SingingTrackList = new List<GjSingingTrack>(xsProject.TrackList.Count);
+            gjProject.SingingTrackList = new List<GjSingingTrack>(osProject.TrackList.Count);
             gjProject.InstrumentalTrackList = new List<GjInstrumentalTrack>();
             int trackIndex = 0;
-            foreach (var track in xsProject.TrackList)
+            foreach (var track in osProject.TrackList)
             {
                 switch (track)
                 {
@@ -71,6 +85,12 @@ namespace Plugin.Gjgj
             gjProject.MIDITrackList = EncodeMIDITrackList();
         }
 
+        /// <summary>
+        /// 转换伴奏轨。
+        /// </summary>
+        /// <param name="trackID">轨道ID。</param>
+        /// <param name="instrumentalTrack">原始伴奏轨。</param>
+        /// <returns>转换后的伴奏轨。</returns>
         private GjInstrumentalTrack EncodeInstrumentalTrack(int trackID, InstrumentalTrack instrumentalTrack)
         {
             GjTrackVolume gjTrackVolume = new GjTrackVolume
@@ -80,7 +100,7 @@ namespace Plugin.Gjgj
                 RightVolume = 1.0f,
                 Mute = instrumentalTrack.Mute
             };
-            GjInstrumentalTrack gjInstrumentalTracksItem = new GjInstrumentalTrack
+            GjInstrumentalTrack gjInstrumentalTrack = new GjInstrumentalTrack
             {
                 TrackID = Convert.ToString(trackID),
                 Path = instrumentalTrack.AudioFilePath,
@@ -89,12 +109,19 @@ namespace Plugin.Gjgj
                 SortIndex = 0,
                 TrackVolume = gjTrackVolume
             };
-            return gjInstrumentalTracksItem;
+            return gjInstrumentalTrack;
         }
 
+        /// <summary>
+        /// 转换演唱轨。
+        /// </summary>
+        /// <param name="noteID">音符ID。</param>
+        /// <param name="trackID">轨道ID。</param>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns>转换后的演唱轨。</returns>
         private GjSingingTrack EncodeSingingTrack(ref int noteID, int trackID, SingingTrack singingTrack)
         {
-            GjSingingTrack gjSingingTracksItem = new GjSingingTrack
+            GjSingingTrack gjSingingTrack = new GjSingingTrack
             {
                 TrackID = Convert.ToString(trackID),
                 Type = 0,
@@ -108,9 +135,12 @@ namespace Plugin.Gjgj
                 TrackVolume = EncodeTrackVolume(singingTrack),
                 EQProgram = "无"
             };
-            return gjSingingTracksItem;
+            return gjSingingTrack;
         }
 
+        /// <summary>
+        /// 根据歌手名称返回歌手代号。
+        /// </summary>
         private string GetSingerCode()
         {
             switch (SingerName)
@@ -126,25 +156,39 @@ namespace Plugin.Gjgj
             }
         }
 
+        /// <summary>
+        /// 生成MIDI轨道列表。
+        /// </summary>
+        /// <returns>空的MIDI轨道列表。</returns>
         private List<GjMIDITrack> EncodeMIDITrackList()
         {
             return new List<GjMIDITrack>();
         }
 
+        /// <summary>
+        /// 返回转换后的音符列表。
+        /// </summary>
+        /// <param name="noteID">音符ID。</param>
+        /// <param name="singingTrack">原始演唱轨。</param>
         private List<GjNote> EncodeNoteList(int noteID, SingingTrack singingTrack)
         {
-            List<GjNote> gjNoteListItems = new List<GjNote>();
+            List<GjNote> gjNoteList = new List<GjNote>();
             foreach (var note in singingTrack.NoteList)
             {
-                gjNoteListItems.Add(EncodeNote(noteID, note));
+                gjNoteList.Add(EncodeNote(noteID, note));
                 noteID++;
             }
-            return gjNoteListItems;
+            return gjNoteList;
         }
 
+        /// <summary>
+        /// 返回转换后的音符。
+        /// </summary>
+        /// <param name="noteID">音符ID。</param>
+        /// <param name="note">原始音符。</param>
         private GjNote EncodeNote(int noteID, Note note)
         {
-            GjNote gjNoteListItem = new GjNote
+            GjNote gjNote = new GjNote
             {
                 NoteID = noteID,
                 Lyric = note.Lyric,
@@ -157,9 +201,12 @@ namespace Plugin.Gjgj
                 Style = GetNoteStyle(note.HeadTag),
                 Velocity = 127
             };
-            return gjNoteListItem;
+            return gjNote;
         }
 
+        /// <summary>
+        /// 返回轨道的Keyboard属性。
+        /// </summary>
         private GjKeyboard EncodeKeyboard()
         {
             GjKeyboard gjKeyboard = new GjKeyboard
@@ -169,7 +216,12 @@ namespace Plugin.Gjgj
             };
             return gjKeyboard;
         }
-        
+
+        /// <summary>
+        /// 返回演唱轨的音量属性。
+        /// </summary>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns></returns>
         private GjTrackVolume EncodeTrackVolume(SingingTrack singingTrack)
         {
             GjTrackVolume gjTrackVolume = new GjTrackVolume
@@ -182,6 +234,11 @@ namespace Plugin.Gjgj
             return gjTrackVolume;
         }
 
+        /// <summary>
+        /// 返回演唱轨的音量参数曲线。
+        /// </summary>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns></returns>
         private List<GjVolumeParamPoint> EncodeVolumeParam(SingingTrack singingTrack)
         {
             List<GjVolumeParamPoint> gjVolumeParam = new List<GjVolumeParamPoint>();
@@ -236,16 +293,34 @@ namespace Plugin.Gjgj
             return gjVolumeParam;
         }
 
+        /// <summary>
+        /// 返回转换后的音量参数点的时间。
+        /// </summary>
+        /// <param name="index">参数点的索引。</param>
+        /// <param name="paramCurve">原始参数曲线。</param>
+        /// <returns></returns>
         private int GetVolumeParamPointTime(int index, ParamCurve paramCurve)
         {
             return paramCurve.PointList[index].Item1;
         }
 
+        /// <summary>
+        /// 返回原始音量参数点的值。
+        /// </summary>
+        /// <param name="index">参数点的索引。</param>
+        /// <param name="paramCurve">原始参数曲线。</param>
+        /// <returns></returns>
         private double GetOriginalVolumeParamPointValue(int index, ParamCurve paramCurve)
         {
             return paramCurve.PointList[index].Item2;
         }
 
+        /// <summary>
+        /// 根据时间和值返回音量参数点。
+        /// </summary>
+        /// <param name="time">时间。</param>
+        /// <param name="value">值。</param>
+        /// <returns></returns>
         private GjVolumeParamPoint EncodeVolumeParamPoint(double time, double value)
         {
             GjVolumeParamPoint gjVolumeParamPoint = new GjVolumeParamPoint
@@ -256,11 +331,21 @@ namespace Plugin.Gjgj
             return gjVolumeParamPoint;
         }
 
+        /// <summary>
+        /// 返回转换后的音量参数点的值。
+        /// </summary>
+        /// <param name="volume">原始参数点的值</param>
+        /// <returns></returns>
         private double GetVolumeParamPointValue(double volume)
         {
             return (volume + 1000.0) / 1000.0;
         }
 
+        /// <summary>
+        /// 返回演唱轨的音高参数曲线。
+        /// </summary>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns></returns>
         private GjPitchParam EncodePitchParam(SingingTrack singingTrack)
         {
             try
@@ -317,16 +402,34 @@ namespace Plugin.Gjgj
             }
         }
 
+        /// <summary>
+        /// 返回原始音高参数点的时间。
+        /// </summary>
+        /// <param name="index">参数点的索引。</param>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns></returns>
         private int GetOriginalPitchParamPointTime(int index, SingingTrack singingTrack)
         {
             return singingTrack.EditedParams.Pitch.PointList[index].Item1;
         }
 
+        /// <summary>
+        /// 返回原始音高参数点的值。
+        /// </summary>
+        /// <param name="index">参数点的索引。</param>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns></returns>
         private int GetOriginalPitchParamPointValue(int index, SingingTrack singingTrack)
         {
             return singingTrack.EditedParams.Pitch.PointList[index].Item2;
         }
 
+        /// <summary>
+        /// 根据时间和值返回音高参数点。
+        /// </summary>
+        /// <param name="time">时间。</param>
+        /// <param name="value">值。</param>
+        /// <returns></returns>
         private GjPitchParamPoint EncodePitchParamPoint(double time, double value)
         {
             GjPitchParamPoint gjPitchParamPoint = new GjPitchParamPoint
@@ -337,6 +440,12 @@ namespace Plugin.Gjgj
             return gjPitchParamPoint;
         }
 
+        /// <summary>
+        /// 根据改动区间的端点返回一个改动区间（ModifyRange）。
+        /// </summary>
+        /// <param name="left">左端点。</param>
+        /// <param name="right">右端点。</param>
+        /// <returns></returns>
         private GjModifyRange EncodeModifyRange(double left, double right)
         {
             GjModifyRange gjModifyRange = new GjModifyRange
@@ -347,16 +456,30 @@ namespace Plugin.Gjgj
             return gjModifyRange;
         }
 
+        /// <summary>
+        /// 返回转换后的音高参数点的时间。
+        /// </summary>
+        /// <param name="origin">原始时间。</param>
+        /// <returns></returns>
         private double GetPitchParamPointTime(double origin)
         {
             return origin / 5.0;
         }
 
+        /// <summary>
+        /// 返回转换后的音高参数点的值。
+        /// </summary>
+        /// <param name="origin">原始值。</param>
+        /// <returns></returns>
         private double GetPitchParamPointValue(double origin)
         {
             return ToneToY((double)((origin) / 100.0));
         }
 
+        /// <summary>
+        /// 返回谱面的曲速和拍号信息。
+        /// </summary>
+        /// <returns></returns>
         private GjTempoMap EncodeTempoMap()
         {
             GjTempoMap gjTempoMap = new GjTempoMap
@@ -368,31 +491,44 @@ namespace Plugin.Gjgj
             return gjTempoMap;
         }
 
+        /// <summary>
+        /// 返回转换后的曲速列表。
+        /// </summary>
+        /// <returns></returns>
         private List<GjTempo> EncodeTempoList()
         {
             List<GjTempo> gjTempoList = new List<GjTempo>();
-            for (int index = 0; index < xsProject.SongTempoList.Count; index++)
+            for (int index = 0; index < osProject.SongTempoList.Count; index++)
             {
                 gjTempoList.Add(EncodeTempo(index));
             }
             return gjTempoList;
         }
 
+        /// <summary>
+        /// 返回转换后的曲速标记。
+        /// </summary>
+        /// <param name="index">曲速标记的索引。</param>
+        /// <returns></returns>
         private GjTempo EncodeTempo(int index)
         {
             GjTempo gjTempo = new GjTempo
             {
-                Time = xsProject.SongTempoList[index].Position,
+                Time = osProject.SongTempoList[index].Position,
                 MicrosecondsPerQuarterNote = GetMicrosecondsPerQuarterNote(index)
             };
             return gjTempo;
         }
 
+        /// <summary>
+        /// 返回转换后的拍号列表。
+        /// </summary>
+        /// <returns></returns>
         private List<GjTimeSignature> EncodeTimeSignatureList()
         {
-            List<GjTimeSignature> gjTimeSignatureList = new List<GjTimeSignature>(xsProject.TimeSignatureList.Count);
+            List<GjTimeSignature> gjTimeSignatureList = new List<GjTimeSignature>(osProject.TimeSignatureList.Count);
             int sumOfTime = 0;
-            for (int index = 0; index < xsProject.TimeSignatureList.Count; index++)
+            for (int index = 0; index < osProject.TimeSignatureList.Count; index++)
             {
 
                 gjTimeSignatureList.Add(EncodeTimeSignature(sumOfTime, index));
@@ -400,17 +536,29 @@ namespace Plugin.Gjgj
             return gjTimeSignatureList;
         }
 
+        /// <summary>
+        /// 返回转换后的拍号。
+        /// </summary>
+        /// <param name="sumOfTime">从谱面开始到当前拍号的累计时间。</param>
+        /// <param name="index">原始拍号的索引。</param>
+        /// <returns></returns>
         private GjTimeSignature EncodeTimeSignature(int sumOfTime, int index)
         {
-            GjTimeSignature gjTimeSignatureItem = new GjTimeSignature
+            GjTimeSignature gjTimeSignature = new GjTimeSignature
             {
                 Time = GetTimeSignatureTime(sumOfTime, index),
                 Numerator = GetNumerator(index),
                 Denominator = GetDenominator(index)
             };
-            return gjTimeSignatureItem;
+            return gjTimeSignature;
         }
-        
+
+        /// <summary>
+        /// 返回转换后的拍号的时间。
+        /// </summary>
+        /// <param name="sumOfTime">从谱面开始到当前拍号的累计时间。</param>
+        /// <param name="index">原始拍号的索引。</param>
+        /// <returns></returns>
         private int GetTimeSignatureTime(int sumOfTime, int index)
         {
             int time;
@@ -425,27 +573,51 @@ namespace Plugin.Gjgj
             }
             return time;
         }
-        
+
+        /// <summary>
+        /// 返回拍号所在的小节。
+        /// </summary>
+        /// <param name="index">原始拍号的索引。</param>
+        /// <returns></returns>
         private int GetBarIndex(int index)
         {
-            return xsProject.TimeSignatureList[index].BarIndex;
+            return osProject.TimeSignatureList[index].BarIndex;
         }
 
+        /// <summary>
+        /// 返回拍号的分子。
+        /// </summary>
+        /// <param name="index">原始拍号的索引。</param>
+        /// <returns></returns>
         private int GetNumerator(int index)
         {
-            return xsProject.TimeSignatureList[index].Numerator;
+            return osProject.TimeSignatureList[index].Numerator;
         }
 
+        /// <summary>
+        /// 返回拍号的分母。
+        /// </summary>
+        /// <param name="index">原始拍号的索引。</param>
+        /// <returns></returns>
         private int GetDenominator(int index)
         {
-            return xsProject.TimeSignatureList[index].Denominator;
+            return osProject.TimeSignatureList[index].Denominator;
         }
 
+        /// <summary>
+        /// 返回每四分音符的微秒数。
+        /// </summary>
+        /// <param name="index">原始曲速的索引。</param>
+        /// <returns></returns>
         private int GetMicrosecondsPerQuarterNote(int index)
         {
-            return (int)(60.0 / xsProject.SongTempoList[index].BPM * 1000000.0);
+            return (int)(60.0 / osProject.SongTempoList[index].BPM * 1000000.0);
         }
 
+        /// <summary>
+        /// 设置工程的基本属性。
+        /// </summary>
+        /// <returns>工程的基本属性。</returns>
         private GjProjectSetting EncodeProjectSetting()
         {
             GjProjectSetting gjProjectSetting = new GjProjectSetting
@@ -459,11 +631,21 @@ namespace Plugin.Gjgj
             return gjProjectSetting;
         }
 
+        /// <summary>
+        /// 将音高转换为Y值。
+        /// </summary>
+        /// <param name="tone"></param>
+        /// <returns></returns>
         private double ToneToY(double tone)
         {
             return (127 - tone + 0.5) * 18.0;
         }
 
+        /// <summary>
+        /// 返回音符标记（无、换气和停顿）。
+        /// </summary>
+        /// <param name="origin">原始音符标记。</param>
+        /// <returns></returns>
         private int GetNoteStyle(string origin)
         {
             switch (origin)
@@ -479,11 +661,21 @@ namespace Plugin.Gjgj
             }
         }
 
+        /// <summary>
+        /// 返回转换后的音符起始时间。
+        /// </summary>
+        /// <param name="origin">原始时间。</param>
+        /// <returns></returns>
         private int GetNoteStartTick(int origin)
         {
             return origin + 1920 * GetNumerator(0) / GetDenominator(0);
         }
 
+        /// <summary>
+        /// 转换音符的拼音。
+        /// </summary>
+        /// <param name="origin">原始发音。</param>
+        /// <returns>如果原始发音为空值或者歌叽歌叽不支持，返回空字符串，否则返回原始的发音。</returns>
         private string GetNotePinyin(string origin)
         {
             if (origin == null)
@@ -505,7 +697,12 @@ namespace Plugin.Gjgj
                 return pinyin;
             }
         }
-        
+
+        /// <summary>
+        /// 转换音素的第一根杆子。
+        /// </summary>
+        /// <param name="note">原始音符。</param>
+        /// <returns>转换后的音素的第一根杆子。</returns>
         private double GetNotePhonePreTime(Note note)
         {
             double phonePreTime = 0.0;
@@ -514,9 +711,9 @@ namespace Plugin.Gjgj
                 if (note.EditedPhones.HeadLengthInSecs != -1.0)
                 {
                     int noteStartPositionInTicks = note.StartPos + (1920 * GetNumerator(0) / GetDenominator(0));
-                    double noteStartPositionInSeconds = timeSynchronizer.GetActualSecsFromTicks(noteStartPositionInTicks);
+                    double noteStartPositionInSeconds = timeSync.GetActualSecsFromTicks(noteStartPositionInTicks);
                     double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
-                    double phoneHeadPositionInTicks = timeSynchronizer.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
+                    double phoneHeadPositionInTicks = timeSync.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
                     double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
                     phonePreTime = -difference * (2000.0 / 3.0) / 480.0;
                 }
@@ -527,7 +724,12 @@ namespace Plugin.Gjgj
             }
             return phonePreTime; 
         }
-        
+
+        /// <summary>
+        /// 转换音素的第二根杆子。
+        /// </summary>
+        /// <param name="note">原始音符。</param>
+        /// <returns>转换后的音素的第二根杆子。</returns>
         private double GetNotePhonePostTime(Note note)
         {
             double phonePostTime = 0.0;
