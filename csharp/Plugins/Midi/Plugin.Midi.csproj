@@ -59,6 +59,7 @@
     <Compile Include="MidiDecoder.cs" />
     <Compile Include="MidiEncoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SymbolList.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
