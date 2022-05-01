@@ -29,6 +29,7 @@
                 Width="23"
                 Padding="0"
                 Style="{StaticResource MaterialDesignCircularProgressBar}"
+                Foreground="{StaticResource ThemedButtonForegroundBrush}"
                 Value="0"
                 IsIndeterminate="True"/>
         </materialDesign:Card>
@@ -59,13 +60,13 @@
                         x:Name="OpenProjectFileButton"
                         Width="100"
                         Margin="0 0 0 5"
-                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Style="{StaticResource MaterialDesignFlatMidBgButton}"
                         Content="打开文件"
                         Click="OpenProjectFileButton_Click"/>
                     <Button
                         x:Name="OpenProjectFileFolderButton"
                         Width="100"
-                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Style="{StaticResource MaterialDesignFlatMidBgButton}"
                         Content="打开目录"
                         Click="OpenTargetFolderButton_Click"/>
                 </StackPanel>
@@ -164,7 +165,7 @@
                         Margin="15 0 15 8"
                         Width="140"
                         Content="复制错误信息"
-                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Style="{StaticResource MaterialDesignFlatMidBgButton}"
                         Click="CopyErrorMessageButton_Click"/>
                 </StackPanel>
             </materialDesign:PopupBox>
@@ -191,7 +192,7 @@
                         Margin="15 0 15 8"
                         Width="140"
                         Content="打开所在目录"
-                        Style="{StaticResource MaterialDesignFlatSecondaryLightBgButton}"
+                        Style="{StaticResource MaterialDesignFlatMidBgButton}"
                         Click="OpenTargetFolderButton_Click"/>
                 </StackPanel>
             </materialDesign:PopupBox>
@@ -218,8 +219,9 @@
             Height="32"
             Width="32"
             Style="{StaticResource MaterialDesignRaisedLightButton}"
-            Background="#FF9FA8DA"
-            BorderBrush="#FF9FA8DA"
+            Background="{StaticResource ThemedLowContrastButtonForegroundBrush}"
+            BorderBrush="{StaticResource ThemedLowContrastButtonForegroundBrush}"
+            materialDesign:ShadowAssist.ShadowDepth="Depth1"
             Content="{materialDesign:PackIcon DeleteOutline}"
             ToolTip="移除"
             Click="RemoveTaskButton_Click"/>
@@ -251,6 +253,7 @@
                 d:Padding="2 4 2 0"
                 FontSize="13"
                 Text="{Binding ExportTitle}"
+                CaretBrush="{StaticResource ThemedCaretBrush}"
                 KeyDown="ExportTitleTextBox_KeyDown">
                 <materialDesign:HintAssist.Hint>
                     <TextBlock Text="输出文件名" VerticalAlignment="Bottom" Margin="0 1.7 0 0"/>

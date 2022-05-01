@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:OpenSvip.GUI.Dialog"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    xmlns:app="clr-namespace:OpenSvip.GUI"
     mc:Ignorable="d"
     d:Background="White"
     Width="320"
@@ -34,18 +35,12 @@
                 Text="{Binding Message}"/>
         </StackPanel>
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
-            <StackPanel.Resources>
-                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
-                    <Setter Property="VerticalAlignment" Value="Center"/>
-                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                    <Setter Property="Margin" Value="10 8 10 10"/>
-                    <Setter Property="Height" Value="40"/>
-                    <Setter Property="Padding" Value="30 0"/>
-                    <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
-                    <EventSetter Event="Click" Handler="Button_Click"/>
-                </Style>
-            </StackPanel.Resources>
-            <Button d:Content="确定" Content="{Binding ButtonText}"/>
+            <Button
+                Style="{StaticResource MaterialDesignFlatButton}"
+                Foreground="{StaticResource ThemedButtonForegroundBrush}"
+                d:Content="确定"
+                Content="{Binding ButtonText}">
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

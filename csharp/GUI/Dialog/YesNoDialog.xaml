@@ -5,6 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:OpenSvip.GUI.Dialog"
+    xmlns:app="clr-namespace:OpenSvip.GUI"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
@@ -46,12 +47,18 @@
                     <EventSetter Event="Click" Handler="Button_Click"/>
                 </Style>
             </StackPanel.Resources>
-            <Button d:Content="重启" Content="{Binding YesText}">
+            <Button
+                Foreground="{StaticResource ThemedButtonForegroundBrush}"
+                d:Content="重启"
+                Content="{Binding YesText}">
                 <Button.CommandParameter>
                     <sys:Boolean>true</sys:Boolean>
                 </Button.CommandParameter>
             </Button>
-            <Button d:Content="稍后" Content="{Binding NoText}">
+            <Button
+                Foreground="{StaticResource ThemedButtonForegroundBrush}"
+                d:Content="稍后"
+                Content="{Binding NoText}">
                 <Button.CommandParameter>
                     <sys:Boolean>false</sys:Boolean>
                 </Button.CommandParameter>

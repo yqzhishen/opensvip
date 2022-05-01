@@ -86,7 +86,7 @@ namespace OpenSvip.GUI.Config
 
     public class Information
     {
-        public string Version { get; set; } = "1.1.0 (Preview)";
+        public string Version { get; set; } = "1.1.2 (Preview)";
 
         public string FrameworkVersion { get; set; } = "1.2.2";
 

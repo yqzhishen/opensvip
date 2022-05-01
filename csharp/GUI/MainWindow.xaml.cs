@@ -224,7 +224,7 @@ namespace OpenSvip.GUI
                 var outputOptions = new ConverterOptions(outputOptionDictionary);
                 
                 // Create sandbox for tasks
-                var domain = AppDomain.CreateDomain("TaskExecution");
+                var domain = AppDomain.CreateDomain("TaskExecution" + new Random().Next());
                 var container = (TaskContainer)domain.CreateInstanceAndUnwrap(
                     Assembly.GetAssembly(typeof(TaskContainer)).FullName,
                     typeof(TaskContainer).ToString());
@@ -282,19 +282,19 @@ namespace OpenSvip.GUI
                         task.Status = TaskStates.Success;
                     }
                 }
-                // Unload the domain to release assembly files
-                AppDomain.Unload(domain);
-                
+
                 // Things after execution
                 Model.ExecutionInProgress = false;
-                if (!Model.OpenExportFolder)
+                if (Model.OpenExportFolder)
                 {
-                    return;
+                    foreach (var folder in Model.TaskList.Select(task => task.ExportDirectory).ToHashSet())
+                    {
+                        Process.Start("explorer.exe", folder);
+                    }
                 }
-                foreach (var folder in Model.TaskList.Select(task => task.ExportDirectory).ToHashSet())
-                {
-                    Process.Start("explorer.exe", folder);
-                }
+
+                // Unload the domain to release assembly files
+                AppDomain.Unload(domain);
             }).Start();
         }
 
@@ -318,7 +318,7 @@ namespace OpenSvip.GUI
             p => true,
             p => p.AboutMenuItem_Click(null, null));
 
-        public static readonly RelayCommand<System.Windows.Controls.MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+        public static readonly RelayCommand<MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
             p =>
             {
                 var model = (AppModel)p.DataContext;
@@ -336,7 +336,7 @@ namespace OpenSvip.GUI
                 ((MainWindow)App.Current.MainWindow).Model.SelectedInputPluginIndex = index;
             });
 
-        public static readonly RelayCommand<System.Windows.Controls.MenuItem> ExportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+        public static readonly RelayCommand<MenuItem> ExportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
             p => true,
             p =>
             {

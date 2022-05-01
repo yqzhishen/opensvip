@@ -79,7 +79,7 @@
                 <TextBlock VerticalAlignment="Center" Margin="5 0">
                     <Hyperlink
                         FontSize="16"
-                        Foreground="#01579b"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"
                         TextDecorations="Underline"
                         NavigateUri="{Binding HomePage}"
                         ToolTip="{Binding HomePage}"

@@ -7,7 +7,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace OpenSvip.GUI
@@ -220,7 +219,7 @@ namespace OpenSvip.GUI
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var choices = ((string)parameter)?.Split(';');
+            var choices = parameter is string str ? str?.Split(';') : ((Array)parameter).Cast<object>().ToArray();
             if (choices == null)
             {
                 throw new InvalidOperationException();
@@ -228,17 +227,17 @@ namespace OpenSvip.GUI
             var result = value != null && (bool)value ? choices[0] : choices[1];
             if (targetType == typeof(int))
             {
-                return !int.TryParse(result, out var val) ? DependencyProperty.UnsetValue : val;
+                return !int.TryParse(result.ToString(), out var val) ? DependencyProperty.UnsetValue : val;
             }
             if (targetType == typeof(double))
             {
-                return !double.TryParse(result, out var val) ? DependencyProperty.UnsetValue : val;
+                return !double.TryParse(result.ToString(), out var val) ? DependencyProperty.UnsetValue : val;
             }
             if (result.GetType() != targetType && !result.GetType().IsSubclassOf(targetType))
             {
                 return DependencyProperty.UnsetValue;
             }
-            return string.Empty == result ? null : result;
+            return string.Empty == result.ToString() ? null : result;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

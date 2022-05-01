@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:OpenSvip.GUI"
-    xmlns:framwork="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    xmlns:framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     d:DesignHeight="100"
@@ -62,7 +62,13 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock x:Name="TextBlockNearTextBox" Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <TextBox Style="{StaticResource OptionTextBox}" VerticalAlignment="Center" Padding="2 4" Text="{Binding Path=OptionValue}" MinWidth="80"/>
+                <TextBox
+                    Style="{StaticResource OptionTextBox}"
+                    CaretBrush="{StaticResource ThemedHighContrastButtonForegroundBrush}"
+                    VerticalAlignment="Center"
+                    Padding="2 4"
+                    Text="{Binding Path=OptionValue}"
+                    MinWidth="80"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Integer">
@@ -71,7 +77,14 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:IntegerNumericBox Style="{StaticResource OptionIntegerBox}" VerticalAlignment="Center" Padding="2 3" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="35"/>
+                <local:IntegerNumericBox
+                    Style="{StaticResource OptionIntegerBox}"
+                    CaretBrush="{StaticResource ThemedHighContrastButtonForegroundBrush}"
+                    VerticalAlignment="Center"
+                    Padding="2 3"
+                    d:Text="60"
+                    Text="{Binding Path=OptionValue}"
+                    MinWidth="35"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Double">
@@ -80,7 +93,15 @@
                 d:DataContext="{d:DesignInstance Type=local:OptionViewModel}"
                 DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TreeViewItem}, Path=DataContext}">
                 <TextBlock Style="{StaticResource OptionTextBlock}" VerticalAlignment="Center" Text="{Binding Path=OptionInfo.Notes, StringFormat={}{0}：}"/>
-                <local:DoubleNumericBox Style="{StaticResource OptionDoubleBox}" VerticalAlignment="Center" Padding="2 3" d:Text="60" Text="{Binding Path=OptionValue}" MinWidth="50" Digits="3"/>
+                <local:DoubleNumericBox
+                    Style="{StaticResource OptionDoubleBox}"
+                    CaretBrush="{StaticResource ThemedHighContrastButtonForegroundBrush}"
+                    VerticalAlignment="Center"
+                    Padding="2 3"
+                    d:Text="60"
+                    Text="{Binding Path=OptionValue}"
+                    MinWidth="50"
+                    Digits="3"/>
             </WrapPanel>
         </DataTemplate>
         <DataTemplate x:Key="Boolean">
@@ -88,6 +109,7 @@
                 <ToggleButton
                     VerticalAlignment="Center"
                     Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                    Background="{StaticResource ThemedButtonForegroundBrush}"
                     Width="40"
                     Height="20"
                     Margin="-2 0 0 0"
@@ -109,7 +131,7 @@
                     SelectedIndex="{Binding ChoiceIndex}"
                     ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}">
                     <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type framwork:Choice}">
+                        <DataTemplate DataType="{x:Type framework:Choice}">
                             <TextBlock Style="{StaticResource OptionTextBlock}" TextAlignment="Center" Text="{Binding Name}" Padding="0" ToolTip="{Binding Label}"/>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>

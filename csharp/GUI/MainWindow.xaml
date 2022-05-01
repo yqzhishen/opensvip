@@ -13,8 +13,8 @@
     Width="1200"
     MinHeight="525"
     MinWidth="655"
-    Style="{DynamicResource MaterialDesignWindow}"
-    FontFamily="Microsoft Yahei UI"
+    Style="{StaticResource MaterialDesignWindow}"
+    FontFamily="Microsoft YaHei UI"
     Closing="Window_Closing">
     <Window.DataContext>
         <local:AppModel/>
@@ -99,7 +99,7 @@
                                 InputGestureText="Ctrl+Shift+E"
                                 Click="BrowseAndExportMenu_Click"/>
                         </MenuItem>
-                        <MenuItem Header="重置列表(_R)" Icon="{materialDesign:PackIcon Kind=Autorenew}" InputGestureText="Ctrl+R"/>
+                        <MenuItem Header="重置列表(_R)" Icon="{materialDesign:PackIcon Kind=Autorenew}" InputGestureText="Ctrl+R" Click="ClearTasksButton_Click"/>
                     </MenuItem>
                     <MenuItem Header="转换(_C)" Height="25" Padding="10 0">
                         <MenuItem x:Name="ImportPluginMenuItem" Header="导入格式(_F)">
@@ -238,6 +238,7 @@
                                         Margin="15 0 0 0"
                                         Style="{StaticResource PluginComboBox}"
                                         materialDesign:HintAssist.Hint="导入工程格式"
+                                        materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastButtonForegroundBrush}"
                                         VerticalContentAlignment="Center"
                                         IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                         SelectedIndex="{Binding SelectedInputPluginIndex}"
@@ -255,8 +256,8 @@
                                         Cursor="Hand">
                                         <materialDesign:PopupBox.ToggleContent>
                                             <Grid>
-                                                <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="#424242"/>
-                                                <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="#424242"/>
+                                                <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="{StaticResource HighContrastBrush}"/>
+                                                <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="{StaticResource HighContrastBrush}"/>
                                             </Grid>
                                         </materialDesign:PopupBox.ToggleContent>
                                         <local:PluginDetailsBoard DataContext="{Binding SelectedInputPlugin, Mode=OneWay}"/>
@@ -266,7 +267,8 @@
                                             <ToggleButton
                                                 x:Name="AutoDetectToggle"
                                                 VerticalAlignment="Center"
-                                                Style="{DynamicResource MaterialDesignSwitchToggleButton}"
+                                                Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                                Background="{StaticResource ThemedButtonForegroundBrush}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -278,6 +280,7 @@
                                                 x:Name="AutoResetToggle"
                                                 VerticalAlignment="Center"
                                                 Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                                Background="{StaticResource ThemedButtonForegroundBrush}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -306,6 +309,7 @@
                                         Margin="15 0 0 0"
                                         Padding="16 5"
                                         Style="{StaticResource PluginComboBox}"
+                                        materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastButtonForegroundBrush}"
                                         materialDesign:HintAssist.Hint="导出工程格式"
                                         VerticalContentAlignment="Center"
                                         IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
@@ -323,8 +327,8 @@
                                         Cursor="Hand">
                                         <materialDesign:PopupBox.ToggleContent>
                                             <Grid>
-                                                <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="#424242"/>
-                                                <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="#424242"/>
+                                                <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="{StaticResource HighContrastBrush}"/>
+                                                <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="{StaticResource HighContrastBrush}"/>
                                             </Grid>
                                         </materialDesign:PopupBox.ToggleContent>
                                         <local:PluginDetailsBoard DataContext="{Binding SelectedOutputPlugin, Mode=OneWay}"/>
@@ -335,6 +339,7 @@
                                                 x:Name="AutoExtensionToggle"
                                                 VerticalAlignment="Center"
                                                 Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                                Background="{StaticResource ThemedButtonForegroundBrush}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -379,7 +384,7 @@
                                             Width="100"
                                             Height="100"
                                             Opacity="0.4"
-                                            Foreground="#01579b"/>
+                                            Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                                         <TextBlock
                                             x:Name="FileDropText"
                                             DockPanel.Dock="Bottom"
@@ -387,12 +392,12 @@
                                             HorizontalAlignment="Center"
                                             FontSize="25"
                                             Opacity="{Binding Opacity, ElementName=FileDropIcon}"
-                                            Foreground="#01579b"/>
+                                            Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                                     </DockPanel>
                                     <Rectangle
                                         x:Name="FileDropRectangle"
                                         Margin="10 10 10 10"
-                                        Stroke="#01579b"
+                                        Stroke="{StaticResource FunctionalAreaIconBrush}"
                                         Opacity="{Binding Opacity, ElementName=FileDropIcon}"
                                         StrokeThickness="3"
                                         StrokeLineJoin="Round"
@@ -454,8 +459,8 @@
                                             <StackPanel.Resources>
                                                 <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
                                                     <Setter Property="Margin" Value="5 0"/>
-                                                    <Setter Property="Background" Value="#FF9FA8DA"/>
-                                                    <Setter Property="BorderBrush" Value="#FF9FA8DA"/>
+                                                    <Setter Property="Background" Value="{StaticResource ThemedLowContrastButtonForegroundBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{StaticResource ThemedLowContrastButtonForegroundBrush}"/>
                                                 </Style>
                                             </StackPanel.Resources>
                                             <Button
@@ -568,7 +573,11 @@
                                                     Grid.Row="1"
                                                     Orientation="Horizontal"
                                                     Width="{Binding ActualWidth, ElementName=ConverterOptionsCard, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=64}">
-                                                    <local:OptionTreeViewItem DataContext="{Binding}" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+                                                    <local:OptionTreeViewItem
+                                                        DataContext="{Binding}"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Stretch"
+                                                        IsEnabled="{Binding DataContext.ExecutionInProgress, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource InvertBooleanConverter}}"/>
                                                 </WrapPanel>
                                             </Grid>
                                         </DataTemplate>
@@ -646,14 +655,14 @@
                                     Width="100"
                                     Height="100"
                                     Opacity="0.4"
-                                    Foreground="{Binding Foreground, ElementName=FileDropIcon}"/>
+                                    Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                                 <TextBlock
                                     DockPanel.Dock="Bottom"
                                     Text="当前没有可用的选项"
                                     HorizontalAlignment="Center"
                                     FontSize="25"
                                     Opacity="{Binding Opacity, ElementName=NoOptionsAvailableIcon}"
-                                    Foreground="{Binding Foreground, ElementName=FileDropIcon}"/>
+                                    Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                             </DockPanel>
                         </Grid>
                     </materialDesign:Card>
@@ -681,10 +690,10 @@
                                     Margin="5 12 0 7"
                                     Height="40"
                                     Width="40"
-                                    Background="#FF9FA8DA"
-                                    BorderBrush="#FF9FA8DA"
                                     Style="{StaticResource MaterialDesignFlatLightBgButton}"
-                                    materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                    Background="{StaticResource ThemedLowContrastButtonForegroundBrush}"
+                                    BorderBrush="{StaticResource ThemedLowContrastButtonForegroundBrush}"
+                                    materialDesign:ShadowAssist.ShadowDepth="Depth1"
                                     Content="{materialDesign:PackIcon Folder}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     Click="BrowseExportFolderButton_Click"
@@ -694,9 +703,11 @@
                                     Margin="10 0"
                                     Padding="0 2"
                                     materialDesign:HintAssist.Hint="{Binding ExportPath.IsRelative, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（相对）;输出路径}"
+                                    materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastButtonForegroundBrush}"
                                     Text="{Binding ExportPath.PathValue}"
                                     FontSize="16"
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                    CaretBrush="{StaticResource ThemedCaretBrush}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     ToolTip="在开头插入“${src}”可指代源路径，例如“${src}/custom/relative/path”"
                                     Cursor="Arrow"
@@ -708,6 +719,7 @@
                                         x:Name="OpenExportFolderToggle"
                                         VerticalAlignment="Center"
                                         Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                                        Background="{StaticResource ThemedButtonForegroundBrush}"
                                         Width="40"
                                         Height="20"
                                         Cursor="Hand"

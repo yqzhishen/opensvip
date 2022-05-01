@@ -274,30 +274,10 @@ namespace OpenSvip.GUI
             set
             {
                 _appearanceTheme = value;
-                if (value == AppearanceThemes.System)
-                {
-                    AppUsesLightMode = SystemAppsUseLightMode();
-                }
-                else
-                {
-                    AppUsesLightMode = value == AppearanceThemes.Light;
-                }
+                ((App)Application.Current).AppUsesLightMode = value == AppearanceThemes.System
+                    ? SystemAppsUseLightMode()
+                    : value == AppearanceThemes.Light;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AppearanceThemes"));
-            }
-        }
-
-        private bool _appUsesLightMode;
-
-        public bool AppUsesLightMode
-        {
-            get => _appUsesLightMode;
-            set
-            {
-                _appUsesLightMode = value;
-                var theme = (BundledTheme)Application.Current.Resources.MergedDictionaries
-                    .First(rd => rd.GetType() == typeof(BundledTheme));
-                theme.BaseTheme = value ? BaseTheme.Light : BaseTheme.Dark;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("AppUsesLightMode"));
             }
         }
 

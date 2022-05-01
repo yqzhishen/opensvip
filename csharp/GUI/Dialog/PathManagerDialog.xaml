@@ -28,6 +28,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
                 Style="{StaticResource MaterialDesignIconButton}"
+                Foreground="{StaticResource ThemedButtonForegroundBrush}"
                 Width="40"
                 Height="40"
                 Padding="0"
@@ -64,7 +65,7 @@
                             Width="100"
                             Height="100"
                             Opacity="0.4"
-                            Foreground="#01579b"/>
+                            Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                         <TextBlock
                             x:Name="FileDropText"
                             DockPanel.Dock="Bottom"
@@ -72,7 +73,7 @@
                             HorizontalAlignment="Center"
                             FontSize="25"
                             Opacity="{Binding Opacity, ElementName=AddPathIcon}"
-                            Foreground="#01579b"/>
+                            Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                     </DockPanel>
                 </Grid>
             </DockPanel>
@@ -85,9 +86,15 @@
                 <Border
                     Visibility="{Binding Visibility, ElementName=PathListView}"
                     CornerRadius="5"
-                    Background="#f5f5f5"
+                    Background="{StaticResource ItemContainerBackgroundBrush}"
                     d:Height="287"
                     Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dialog:PathManagerDialog}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=105, Mode=OneWay}">
+                    <Border.Resources>
+                        <x:Array x:Key="FlatButtonStyles" Type="Style">
+                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}"/>
+                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatLightButton}"/>
+                        </x:Array>
+                    </Border.Resources>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -128,6 +135,7 @@
                                                     Padding="0"
                                                     VerticalAlignment="Center"
                                                     Style="{StaticResource MaterialDesignRadioButton}"
+                                                    Background="{StaticResource ThemedButtonForegroundBrush}"
                                                     Cursor="Hand"
                                                     ToolTip="{Binding IsChecked, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=取消选中;选中}"
                                                     GroupName="PathRadioButtonGroup"
@@ -149,6 +157,7 @@
                                                     Height="36"
                                                     Width="36"
                                                     Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Foreground="{StaticResource ThemedButtonForegroundBrush}"
                                                     Content="{materialDesign:PackIcon Kind=Folder, Size=25}"
                                                     ToolTip="浏览文件夹"
                                                     Click="BrowsePathButton_Click"/>
@@ -158,6 +167,7 @@
                                                     Padding="1 2.5"
                                                     FontSize="15"
                                                     Text="{Binding PathValue}"
+                                                    CaretBrush="{StaticResource ThemedCaretBrush}"
                                                     materialDesign:TextFieldAssist.HasClearButton="True"
                                                     KeyDown="PathValueTextBox_KeyDown"
                                                     LostKeyboardFocus="PathValueTextBox_LostFocus"
@@ -175,6 +185,7 @@
                                                     Height="36"
                                                     Width="36"
                                                     Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Foreground="{StaticResource ThemedButtonForegroundBrush}"
                                                     Content="{materialDesign:PackIcon Kind=Delete, Size=27}"
                                                     ToolTip="移除"
                                                     Click="RemovePathButton_Click"/>
@@ -201,6 +212,7 @@
                             Height="45"
                             Width="300"
                             Style="{StaticResource MaterialDesignFlatButton}"
+                            Foreground="{StaticResource ThemedButtonForegroundBrush}"
                             materialDesign:ButtonAssist.CornerRadius="5"
                             Click="AddPathMaskPanel_Click">
                             <materialDesign:PackIcon
