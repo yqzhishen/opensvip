@@ -19,6 +19,7 @@
                 -->
                 <ResourceDictionary Source="ScrollBarDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
             <local:NotNullConverter x:Key="NotNullConverter"/>
             <local:IndexToBooleanConverter x:Key="IndexToBooleanConverter"/>
             <local:EnumerableIsNotEmptyConverter x:Key="EnumerableIsNotEmptyConverter"/>
@@ -38,89 +39,102 @@
             <local:IntegerConstantEqualsConverter x:Key="IntegerConstantEqualsConverter"/>
             <local:DoubleSubConverter x:Key="DoubleSubConverter"/>
             <local:AnyTrueAsVisibleConverter x:Key="AnyTrueAsVisibleConverter"/>
-            <x:Array x:Key="FunctionalAreaIconColors" Type="Color">
-                <Color>#01579b</Color>
-                <Color>#b3e5fc</Color>
-            </x:Array>
+
             <SolidColorBrush
                 x:Key="FunctionalAreaIconBrush">
                 <SolidColorBrush.Color>
                     <Binding
                         Source="{x:Static local:App.Current}"
                         Path="AppUsesLightMode"
-                        Converter="{StaticResource BooleanSwitchOperationConverter}"
-                        ConverterParameter="{StaticResource FunctionalAreaIconColors}"/>
+                        Converter="{StaticResource BooleanSwitchOperationConverter}">
+                        <Binding.ConverterParameter>
+                            <x:Array Type="Color">
+                                <Color>#01579b</Color>
+                                <Color>#bbdefb</Color>
+                            </x:Array>
+                        </Binding.ConverterParameter>
+                    </Binding>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
-            <x:Array x:Key="ItemContainerBackgroundColors" Type="Color">
-                <Color>#f5f5f5</Color>
-                <Color>#424242</Color>
-            </x:Array>
             <SolidColorBrush
-                x:Key="ItemContainerBackgroundBrush">
+                x:Key="ThemedHighContrastGreyscaleBrush">
                 <SolidColorBrush.Color>
                     <Binding
                         Source="{x:Static local:App.Current}"
                         Path="AppUsesLightMode"
-                        Converter="{StaticResource BooleanSwitchOperationConverter}"
-                        ConverterParameter="{StaticResource ItemContainerBackgroundColors}"/>
+                        Converter="{StaticResource BooleanSwitchOperationConverter}">
+                        <Binding.ConverterParameter>
+                            <x:Array Type="Color">
+                                <Color>#424242</Color>
+                                <Color>#e0e0e0</Color>
+                            </x:Array>
+                        </Binding.ConverterParameter>
+                    </Binding>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
-            <x:Array x:Key="HighContrastColors" Type="Color">
-                <Color>#424242</Color>
-                <Color>#e0e0e0</Color>
-            </x:Array>
-            <SolidColorBrush
-                x:Key="HighContrastBrush">
+             <SolidColorBrush
+                x:Key="ThemedLowContrastGreyscaleBrush">
                 <SolidColorBrush.Color>
                     <Binding
                         Source="{x:Static local:App.Current}"
                         Path="AppUsesLightMode"
-                        Converter="{StaticResource BooleanSwitchOperationConverter}"
-                        ConverterParameter="{StaticResource HighContrastColors}"/>
+                        Converter="{StaticResource BooleanSwitchOperationConverter}">
+                        <Binding.ConverterParameter>
+                            <x:Array Type="Color">
+                                <Color>#f5f5f5</Color>
+                                <Color>#424242</Color>
+                            </x:Array>
+                        </Binding.ConverterParameter>
+                    </Binding>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
-            <x:Array x:Key="ThemedButtonForegroundColors" Type="Color">
-                <Color>#3F51B5</Color>
-                <Color>#82b1ff</Color>
-            </x:Array>
-            <SolidColorBrush
-                x:Key="ThemedButtonForegroundBrush">
+           <SolidColorBrush
+                x:Key="ThemedIndigoBrush">
                 <SolidColorBrush.Color>
                     <Binding
                         Source="{x:Static local:App.Current}"
                         Path="AppUsesLightMode"
-                        Converter="{StaticResource BooleanSwitchOperationConverter}"
-                        ConverterParameter="{StaticResource ThemedButtonForegroundColors}"/>
+                        Converter="{StaticResource BooleanSwitchOperationConverter}">
+                        <Binding.ConverterParameter>
+                            <x:Array Type="Color">
+                                <Color>#3F51B5</Color>
+                                <Color>#82b1ff</Color>
+                            </x:Array>
+                        </Binding.ConverterParameter>
+                    </Binding>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
-            <x:Array x:Key="ThemedHighContrastButtonForegroundColors" Type="Color">
-                <Color>#002984</Color>
-                <Color>#aacaf1</Color>
-            </x:Array>
             <SolidColorBrush
-                x:Key="ThemedHighContrastButtonForegroundBrush">
+                x:Key="ThemedHighContrastIndigoBrush">
                 <SolidColorBrush.Color>
                     <Binding
                         Source="{x:Static local:App.Current}"
                         Path="AppUsesLightMode"
-                        Converter="{StaticResource BooleanSwitchOperationConverter}"
-                        ConverterParameter="{StaticResource ThemedHighContrastButtonForegroundColors}"/>
+                        Converter="{StaticResource BooleanSwitchOperationConverter}">
+                        <Binding.ConverterParameter>
+                            <x:Array Type="Color">
+                                <Color>#002984</Color>
+                                <Color>#aacaf1</Color>
+                            </x:Array>
+                        </Binding.ConverterParameter>
+                    </Binding>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
-            <SolidColorBrush x:Key="ThemedLowContrastButtonForegroundBrush" Color="#91bef8"/>
-            <x:Array x:Key="ThemedCaretColors" Type="Color">
-                <Color>Black</Color>
-                <Color>White</Color>
-            </x:Array>
+            <SolidColorBrush x:Key="ThemedLowContrastIndigoBrush" Color="#91bef8"/>
             <SolidColorBrush
-                x:Key="ThemedCaretBrush">
+                x:Key="ThemedMaxContrastBrush">
                 <SolidColorBrush.Color>
                     <Binding
                         Source="{x:Static local:App.Current}"
                         Path="AppUsesLightMode"
-                        Converter="{StaticResource BooleanSwitchOperationConverter}"
-                        ConverterParameter="{StaticResource ThemedCaretColors}"/>
+                        Converter="{StaticResource BooleanSwitchOperationConverter}">
+                        <Binding.ConverterParameter>
+                            <x:Array Type="Color">
+                                <Color>Black</Color>
+                                <Color>White</Color>
+                            </x:Array>
+                        </Binding.ConverterParameter>
+                    </Binding>
                 </SolidColorBrush.Color>
             </SolidColorBrush>
         </ResourceDictionary>

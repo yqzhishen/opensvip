@@ -45,13 +45,16 @@
             VerticalAlignment="Center"
             HorizontalAlignment="Right"
             Margin="0 0 10 10">
+            <StackPanel.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="0 8 8 0"/>
+                    <Setter Property="Foreground" Value="{StaticResource ThemedIndigoBrush}"/>
+                    <Setter Property="Width" Value="70"/>
+                </Style>
+            </StackPanel.Resources>
             <Button
                 x:Name="YesButton"
-                VerticalAlignment="Center"
-                Margin="0 8 8 0"
-                Style="{StaticResource MaterialDesignFlatButton}"
-                Foreground="{StaticResource ThemedButtonForegroundBrush}"
-                Width="70"
                 Content="是"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 Click="DialogButton_Click">
@@ -61,11 +64,6 @@
             </Button>
             <Button
                 x:Name="NoButton"
-                VerticalAlignment="Center"
-                Margin="0 8 8 0"
-                Style="{StaticResource MaterialDesignFlatButton}"
-                Foreground="{StaticResource ThemedButtonForegroundBrush}"
-                Width="70"
                 Content="否"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                 Click="DialogButton_Click">

@@ -20,17 +20,14 @@
         <local:AppModel/>
     </Window.DataContext>
     <Window.Resources>
-        <Style x:Key="PluginComboBox" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
-            <Setter Property="Height" Value="45"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="materialDesign:HintAssist.HintOpacity" Value="0.8"/>
-        </Style>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Gesture="Ctrl+I" Command="{x:Static local:MainWindow.ImportCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"/>
         <KeyBinding Gesture="Ctrl+E" Command="{x:Static local:MainWindow.ExportCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"/>
         <KeyBinding Gesture="Ctrl+Shift+E" Command="{x:Static local:MainWindow.BrowseAndExportCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"/>
         <KeyBinding Gesture="Ctrl+R" Command="{x:Static local:MainWindow.ResetCommand}" CommandParameter="{Binding}"/>
+        <KeyBinding Gesture="Ctrl+W" Command="{x:Static local:MainWindow.SwapPluginCommand}" CommandParameter="{Binding}"/>
+        <KeyBinding Gesture="Ctrl+P" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
         <KeyBinding Gesture="Ctrl+A" Command="{x:Static local:MainWindow.AboutCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"/>
     </Window.InputBindings>
     <materialDesign:DialogHost Identifier="RootDialogHost">
@@ -132,8 +129,9 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
+                        <MenuItem Header="上下交换(_W)" InputGestureText="Ctrl+W" Icon="{materialDesign:PackIcon Kind=SwapVertical, Size=18}" Command="{x:Static local:MainWindow.SwapPluginCommand}" CommandParameter="{Binding}"/>
                         <Separator/>
-                        <MenuItem Header="安装插件(_P)..." Icon="{materialDesign:PackIcon Kind=PuzzlePlusOutline}" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="安装插件(_P)..." InputGestureText="Ctrl+P" Icon="{materialDesign:PackIcon Kind=PuzzlePlusOutline}" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
                         <MenuItem Header="插件市场(_M)" IsEnabled="False" Icon="{materialDesign:PackIcon Kind=CloudSearchOutline}"/>
                     </MenuItem>
                     <MenuItem Header="设置(_O)" Height="25" Padding="10 0">
@@ -211,8 +209,48 @@
                     <materialDesign:Card
                         x:Name="PluginSelectionCard"
                         Grid.Row="0"
-                        Margin="20 10 10 10"
+                        Margin="20 5 10 10"
                         Padding="0 0 0 5">
+                        <materialDesign:Card.Resources>
+                            <Style x:Key="PluginComboBox" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="15 0 0 0"/>
+                                <Setter Property="Padding" Value="16 5"/>
+                                <Setter Property="Height" Value="45"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="materialDesign:HintAssist.HintOpacity" Value="0.8"/>
+                                <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ThemedHighContrastIndigoBrush}"/>
+                                <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThemedIndigoBrush}"/>
+                                <Setter Property="IsEnabled" Value="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                            </Style>
+                            <Style x:Key="PluginDetailsPopupBox" TargetType="materialDesign:PopupBox" BasedOn="{StaticResource MaterialDesignPopupBox}">
+                                <Setter Property="Margin" Value="10 10 0 8"/>
+                                <Setter Property="PlacementMode" Value="BottomAndAlignCentres"/>
+                                <Setter Property="StaysOpen" Value="True"/>
+                                <Setter Property="ToolTip" Value="查看详细信息"/>
+                                <Setter Property="UnfurlOrientation" Value="Horizontal"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                            </Style>
+                            <Style x:Key="PluginDetailsPopupBoxRectangle" TargetType="Rectangle">
+                                <Setter Property="Margin" Value="0 -1 0 1"/>
+                                <Setter Property="Width" Value="45"/>
+                                <Setter Property="Height" Value="45"/>
+                                <Setter Property="RadiusX" Value="4"/>
+                                <Setter Property="RadiusY" Value="4"/>
+                                <Setter Property="StrokeThickness" Value="1"/>
+                                <Setter Property="Stroke" Value="{StaticResource ThemedHighContrastGreyscaleBrush}"/>
+                            </Style>
+                            <Style x:Key="PluginDetailsPopupBoxIcon" TargetType="materialDesign:PackIcon">
+                                <Setter Property="Kind" Value="InformationOutline"/>
+                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Width" Value="20"/>
+                                <Setter Property="Height" Value="20"/>
+                                <Setter Property="Foreground" Value="{StaticResource ThemedHighContrastGreyscaleBrush}"/>
+                            </Style>
+                        </materialDesign:Card.Resources>
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
@@ -232,32 +270,22 @@
                                     </Grid.RowDefinitions>
                                     <ComboBox
                                         x:Name="ImportPluginComboBox"
+                                        Grid.Row="0"
                                         Grid.Column="0"
-                                        HorizontalAlignment="Stretch"
-                                        Padding="16 5"
-                                        Margin="15 0 0 0"
                                         Style="{StaticResource PluginComboBox}"
                                         materialDesign:HintAssist.Hint="导入工程格式"
-                                        materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastButtonForegroundBrush}"
-                                        VerticalContentAlignment="Center"
-                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                         SelectedIndex="{Binding SelectedInputPluginIndex}"
                                         SelectionChanged="ImportPluginComboBox_SelectionChanged">
                                     </ComboBox>
                                     <materialDesign:PopupBox
-                                        Grid.Column="1"
-                                        Margin="10 10 0 8"
                                         Grid.Row="0"
-                                        PlacementMode="BottomAndAlignCentres"
-                                        StaysOpen="True"
-                                        ToolTip="查看详细信息"
-                                        IsEnabled="{Binding SelectedIndex, ElementName=ImportPluginComboBox, Converter={StaticResource IndexToBooleanConverter}}"
-                                        UnfurlOrientation="Horizontal"
-                                        Cursor="Hand">
+                                        Grid.Column="1"
+                                        Style="{StaticResource PluginDetailsPopupBox}"
+                                        IsEnabled="{Binding SelectedIndex, ElementName=ImportPluginComboBox, Converter={StaticResource IndexToBooleanConverter}}">
                                         <materialDesign:PopupBox.ToggleContent>
                                             <Grid>
-                                                <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="{StaticResource HighContrastBrush}"/>
-                                                <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="{StaticResource HighContrastBrush}"/>
+                                                <Rectangle Style="{StaticResource PluginDetailsPopupBoxRectangle}"/>
+                                                <materialDesign:PackIcon Style="{StaticResource PluginDetailsPopupBoxIcon}"/>
                                             </Grid>
                                         </materialDesign:PopupBox.ToggleContent>
                                         <local:PluginDetailsBoard DataContext="{Binding SelectedInputPlugin, Mode=OneWay}"/>
@@ -268,7 +296,7 @@
                                                 x:Name="AutoDetectToggle"
                                                 VerticalAlignment="Center"
                                                 Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                                Background="{StaticResource ThemedButtonForegroundBrush}"
+                                                Background="{StaticResource ThemedIndigoBrush}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -280,7 +308,7 @@
                                                 x:Name="AutoResetToggle"
                                                 VerticalAlignment="Center"
                                                 Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                                Background="{StaticResource ThemedButtonForegroundBrush}"
+                                                Background="{StaticResource ThemedIndigoBrush}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -305,30 +333,19 @@
                                         x:Name="ExportPluginComboBox"
                                         Grid.Row="0"
                                         Grid.Column="0"
-                                        HorizontalAlignment="Stretch"
-                                        Margin="15 0 0 0"
-                                        Padding="16 5"
                                         Style="{StaticResource PluginComboBox}"
-                                        materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastButtonForegroundBrush}"
                                         materialDesign:HintAssist.Hint="导出工程格式"
-                                        VerticalContentAlignment="Center"
-                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                         SelectedIndex="{Binding SelectedOutputPluginIndex}"
                                         SelectionChanged="ExportPluginComboBox_SelectionChanged"/>
                                     <materialDesign:PopupBox
                                         Grid.Row="0"
                                         Grid.Column="1"
-                                        Margin="10 10 0 8"
-                                        PlacementMode="BottomAndAlignCentres"
-                                        StaysOpen="True"
-                                        ToolTip="查看详细信息"
-                                        IsEnabled="{Binding SelectedIndex, ElementName=ExportPluginComboBox, Converter={StaticResource IndexToBooleanConverter}}"
-                                        UnfurlOrientation="Horizontal"
-                                        Cursor="Hand">
+                                        Style="{StaticResource PluginDetailsPopupBox}"
+                                        IsEnabled="{Binding SelectedIndex, ElementName=ExportPluginComboBox, Converter={StaticResource IndexToBooleanConverter}}">
                                         <materialDesign:PopupBox.ToggleContent>
                                             <Grid>
-                                                <Rectangle Margin="0 -1 0 1" Width="45" Height="45" StrokeThickness="1" RadiusX="4" RadiusY="4" Stroke="{StaticResource HighContrastBrush}"/>
-                                                <materialDesign:PackIcon Kind="InformationOutline" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Foreground="{StaticResource HighContrastBrush}"/>
+                                                <Rectangle Style="{StaticResource PluginDetailsPopupBoxRectangle}"/>
+                                                <materialDesign:PackIcon Style="{StaticResource PluginDetailsPopupBoxIcon}"/>
                                             </Grid>
                                         </materialDesign:PopupBox.ToggleContent>
                                         <local:PluginDetailsBoard DataContext="{Binding SelectedOutputPlugin, Mode=OneWay}"/>
@@ -339,7 +356,7 @@
                                                 x:Name="AutoExtensionToggle"
                                                 VerticalAlignment="Center"
                                                 Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                                Background="{StaticResource ThemedButtonForegroundBrush}"
+                                                Background="{StaticResource ThemedIndigoBrush}"
                                                 Width="40"
                                                 Height="20"
                                                 Cursor="Hand"
@@ -351,6 +368,20 @@
                                 </Grid>
                             </StackPanel>
 
+                            <Button
+                                Grid.Row="1"
+                                Grid.RowSpan="2"
+                                HorizontalAlignment="Right"
+                                Margin="20 0 14 23"
+                                Width="45"
+                                Padding="0"
+                                Style="{StaticResource MaterialDesignFlatButton}"
+                                Foreground="{StaticResource ThemedIndigoBrush}"
+                                materialDesign:ButtonAssist.CornerRadius="4"
+                                Content="{materialDesign:PackIcon Kind=SwapVerticalCircle, Size=22}"
+                                ToolTip="上下交换"
+                                Command="{x:Static local:MainWindow.SwapPluginCommand}"
+                                CommandParameter="{Binding}"/>
                         </Grid>
                     </materialDesign:Card>
 
@@ -459,8 +490,8 @@
                                             <StackPanel.Resources>
                                                 <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFloatingActionMiniLightButton}">
                                                     <Setter Property="Margin" Value="5 0"/>
-                                                    <Setter Property="Background" Value="{StaticResource ThemedLowContrastButtonForegroundBrush}"/>
-                                                    <Setter Property="BorderBrush" Value="{StaticResource ThemedLowContrastButtonForegroundBrush}"/>
+                                                    <Setter Property="Background" Value="{StaticResource ThemedLowContrastIndigoBrush}"/>
+                                                    <Setter Property="BorderBrush" Value="{StaticResource ThemedLowContrastIndigoBrush}"/>
                                                 </Style>
                                             </StackPanel.Resources>
                                             <Button
@@ -503,7 +534,7 @@
                     <materialDesign:Card
                         x:Name="ConverterOptionsCard"
                         Grid.Row="0"
-                        Margin="10 10 20 10">
+                        Margin="10 5 20 10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
@@ -526,7 +557,6 @@
                                         </MultiBinding>
                                     </StackPanel.Visibility>
                                     <StackPanel.Resources>
-                                        <Style TargetType="ScrollViewer" BasedOn="{StaticResource MaterialDesignScrollViewer}"/>
                                         <Style TargetType="TreeView" BasedOn="{StaticResource MaterialDesignTreeView}">
                                             <Setter Property="ScrollViewer.PanningMode" Value="None"/>
                                             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
@@ -691,9 +721,11 @@
                                     Height="40"
                                     Width="40"
                                     Style="{StaticResource MaterialDesignFlatLightBgButton}"
-                                    Background="{StaticResource ThemedLowContrastButtonForegroundBrush}"
-                                    BorderBrush="{StaticResource ThemedLowContrastButtonForegroundBrush}"
+                                    Background="{StaticResource ThemedLowContrastIndigoBrush}"
+                                    BorderBrush="{StaticResource ThemedLowContrastIndigoBrush}"
+                                    BorderThickness="0.5"
                                     materialDesign:ShadowAssist.ShadowDepth="Depth1"
+                                    materialDesign:ButtonAssist.CornerRadius="5"
                                     Content="{materialDesign:PackIcon Folder}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     Click="BrowseExportFolderButton_Click"
@@ -703,11 +735,12 @@
                                     Margin="10 0"
                                     Padding="0 2"
                                     materialDesign:HintAssist.Hint="{Binding ExportPath.IsRelative, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（相对）;输出路径}"
-                                    materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastButtonForegroundBrush}"
+                                    materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastIndigoBrush}"
+                                    materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThemedIndigoBrush}"
                                     Text="{Binding ExportPath.PathValue}"
                                     FontSize="16"
                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                                    CaretBrush="{StaticResource ThemedCaretBrush}"
+                                    CaretBrush="{StaticResource ThemedMaxContrastBrush}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     ToolTip="在开头插入“${src}”可指代源路径，例如“${src}/custom/relative/path”"
                                     Cursor="Arrow"
@@ -719,7 +752,7 @@
                                         x:Name="OpenExportFolderToggle"
                                         VerticalAlignment="Center"
                                         Style="{StaticResource MaterialDesignSwitchToggleButton}"
-                                        Background="{StaticResource ThemedButtonForegroundBrush}"
+                                        Background="{StaticResource ThemedIndigoBrush}"
                                         Width="40"
                                         Height="20"
                                         Cursor="Hand"
@@ -735,6 +768,7 @@
                                         Height="22"
                                         Padding="0 0 0 3"
                                         FontSize="14"
+                                        materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThemedIndigoBrush}"
                                         materialDesign:ComboBoxAssist.ShowSelectedItem="False"
                                         IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                         SelectedIndex="{Binding OverWriteOption, Converter={StaticResource IndexToEnumValueConverter}, ConverterParameter={x:Type config:OverwriteOptions}}">

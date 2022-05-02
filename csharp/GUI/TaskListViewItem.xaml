@@ -29,7 +29,7 @@
                 Width="23"
                 Padding="0"
                 Style="{StaticResource MaterialDesignCircularProgressBar}"
-                Foreground="{StaticResource ThemedButtonForegroundBrush}"
+                Foreground="{StaticResource ThemedIndigoBrush}"
                 Value="0"
                 IsIndeterminate="True"/>
         </materialDesign:Card>
@@ -219,9 +219,9 @@
             Height="32"
             Width="32"
             Style="{StaticResource MaterialDesignRaisedLightButton}"
-            Background="{StaticResource ThemedLowContrastButtonForegroundBrush}"
-            BorderBrush="{StaticResource ThemedLowContrastButtonForegroundBrush}"
-            materialDesign:ShadowAssist.ShadowDepth="Depth1"
+            Background="{StaticResource ThemedLowContrastIndigoBrush}"
+            BorderThickness="0"
+            materialDesign:ButtonAssist.CornerRadius="4"
             Content="{materialDesign:PackIcon DeleteOutline}"
             ToolTip="移除"
             Click="RemoveTaskButton_Click"/>
@@ -249,11 +249,12 @@
                 DockPanel.Dock="Right"
                 VerticalAlignment="Center"
                 HorizontalContentAlignment="Center"
+                materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThemedIndigoBrush}"
                 Padding="1 2"
                 d:Padding="2 4 2 0"
                 FontSize="13"
                 Text="{Binding ExportTitle}"
-                CaretBrush="{StaticResource ThemedCaretBrush}"
+                CaretBrush="{StaticResource ThemedMaxContrastBrush}"
                 KeyDown="ExportTitleTextBox_KeyDown">
                 <materialDesign:HintAssist.Hint>
                     <TextBlock Text="输出文件名" VerticalAlignment="Bottom" Margin="0 1.7 0 0"/>

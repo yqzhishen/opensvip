@@ -5,7 +5,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:OpenSvip.GUI.Dialog"
-    xmlns:app="clr-namespace:OpenSvip.GUI"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
@@ -43,12 +42,12 @@
                     <Setter Property="Margin" Value="10 8 10 10"/>
                     <Setter Property="Height" Value="40"/>
                     <Setter Property="Padding" Value="30 0"/>
+                    <Setter Property="Foreground" Value="{StaticResource ThemedIndigoBrush}"/>
                     <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
                     <EventSetter Event="Click" Handler="Button_Click"/>
                 </Style>
             </StackPanel.Resources>
             <Button
-                Foreground="{StaticResource ThemedButtonForegroundBrush}"
                 d:Content="重启"
                 Content="{Binding YesText}">
                 <Button.CommandParameter>
@@ -56,7 +55,6 @@
                 </Button.CommandParameter>
             </Button>
             <Button
-                Foreground="{StaticResource ThemedButtonForegroundBrush}"
                 d:Content="稍后"
                 Content="{Binding NoText}">
                 <Button.CommandParameter>

@@ -45,7 +45,7 @@
                         <Setter Property="Width" Value="100"/>
                         <Setter Property="Margin" Value="10 0"/>
                         <Setter Property="Padding" Value="0"/>
-                        <Setter Property="Foreground" Value="{StaticResource ThemedHighContrastButtonForegroundBrush}"/>
+                        <Setter Property="Foreground" Value="{StaticResource ThemedHighContrastIndigoBrush}"/>
                         <EventSetter Event="Click" Handler="OpenLinkButton_Click"/>
                     </Style>
                 </StackPanel.Resources>
@@ -84,7 +84,7 @@
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             Style="{StaticResource MaterialDesignFlatButton}"
-            Foreground="{StaticResource ThemedButtonForegroundBrush}"
+            Foreground="{StaticResource ThemedIndigoBrush}"
             Margin="0 8 0 10"
             Height="40"
             Width="90"

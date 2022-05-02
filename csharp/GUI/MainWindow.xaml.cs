@@ -285,6 +285,7 @@ namespace OpenSvip.GUI
 
                 // Things after execution
                 Model.ExecutionInProgress = false;
+                Dispatcher.Invoke(CommandManager.InvalidateRequerySuggested);
                 if (Model.OpenExportFolder)
                 {
                     foreach (var folder in Model.TaskList.Select(task => task.ExportDirectory).ToHashSet())
@@ -318,7 +319,7 @@ namespace OpenSvip.GUI
             p => true,
             p => p.AboutMenuItem_Click(null, null));
 
-        public static readonly RelayCommand<MenuItem> ImportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+        public static readonly RelayCommand<MenuItem> ImportPluginMenuItemCommand = new RelayCommand<MenuItem>(
             p =>
             {
                 var model = (AppModel)p.DataContext;
@@ -336,7 +337,7 @@ namespace OpenSvip.GUI
                 ((MainWindow)App.Current.MainWindow).Model.SelectedInputPluginIndex = index;
             });
 
-        public static readonly RelayCommand<MenuItem> ExportPluginMenuItemCommand = new RelayCommand<System.Windows.Controls.MenuItem>(
+        public static readonly RelayCommand<MenuItem> ExportPluginMenuItemCommand = new RelayCommand<MenuItem>(
             p => true,
             p =>
             {
@@ -348,6 +349,13 @@ namespace OpenSvip.GUI
                 var parent = p.Parent;
                 var index = ((ItemsControl)parent).Items.IndexOf(p);
                 ((MainWindow)App.Current.MainWindow).Model.SelectedOutputPluginIndex = index;
+            });
+
+        public static readonly RelayCommand<AppModel> SwapPluginCommand = new RelayCommand<AppModel>(
+            p => p != null && !p.ExecutionInProgress && p.SelectedInputPluginIndex != p.SelectedOutputPluginIndex,
+            p =>
+            {
+                (p.SelectedInputPluginIndex, p.SelectedOutputPluginIndex) = (p.SelectedOutputPluginIndex, p.SelectedInputPluginIndex);
             });
 
         public static readonly RelayCommand<AppModel> InstallPluginCommand = new RelayCommand<AppModel>(
@@ -461,6 +469,10 @@ namespace OpenSvip.GUI
 
         private void FileMaskPanel_Click(object sender, RoutedEventArgs e)
         {
+            if (e is MouseButtonEventArgs mbe && mbe.LeftButton != MouseButtonState.Pressed)
+            {
+                return;
+            }
             string FilterOfPlugin(Plugin plugin)
             {
                 return $"{plugin.Format} (*.{plugin.Suffix})|*.{plugin.Suffix}";
@@ -492,9 +504,9 @@ namespace OpenSvip.GUI
             AddConverterTasks(dialog.FileNames);
         }
 
-        private void FileMaskPanel_Drop(object sender, System.Windows.DragEventArgs e)
+        private void FileMaskPanel_Drop(object sender, DragEventArgs e)
         {
-            AddConverterTasks((string[])e.Data.GetData(System.Windows.DataFormats.FileDrop));
+            AddConverterTasks((string[])e.Data.GetData(DataFormats.FileDrop));
         }
 
         private void ImportPluginComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

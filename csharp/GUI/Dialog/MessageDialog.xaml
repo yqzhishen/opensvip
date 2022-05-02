@@ -37,7 +37,7 @@
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
             <Button
                 Style="{StaticResource MaterialDesignFlatButton}"
-                Foreground="{StaticResource ThemedButtonForegroundBrush}"
+                Foreground="{StaticResource ThemedIndigoBrush}"
                 d:Content="确定"
                 Content="{Binding ButtonText}">
             </Button>
