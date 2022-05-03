@@ -5,6 +5,7 @@ using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.MusicTheory;
+using OpenSvip.Framework;
 using OpenSvip.Model;
 using MidiNote = Melanchall.DryWetMidi.Interaction.Note;
 using OsNote = OpenSvip.Model.Note;
@@ -20,6 +21,8 @@ namespace Plugin.Midi
         public void EncodeMidiFile(Project project, string path)
         {
             osProject = project;
+            TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision(480);
+            midiFile.TimeDivision = timeDivision;
             EncodeMidiChunks();
             WritingSettings settings = new WritingSettings
             {
@@ -39,7 +42,7 @@ namespace Plugin.Midi
         private List<TrackChunk> EncodeTrackChunkList()
         {
             List<TrackChunk> trackChunkList = new List<TrackChunk>();
-            trackChunkList.Add(new TrackChunk(new SetTempoEvent(GetMicrosecondsPerQuarterNote(0))));
+            trackChunkList.Add(EncodeTempoTrackChunk());
             foreach (var track in osProject.TrackList)
             {
                 switch (track)
@@ -54,32 +57,54 @@ namespace Plugin.Midi
             return trackChunkList;
         }
 
+        private TrackChunk EncodeTempoTrackChunk()
+        {
+            return new TrackChunk(new SetTempoEvent(GetMicrosecondsPerQuarterNote(0)));
+        }
+
         private TrackChunk EncodeTrackChunk(SingingTrack singingTrack)
         {
-            MidiEvent[] midiEvents = EncodeMidiEventList(singingTrack);
+            MidiEvent[] midiEvents = EncodeMidiEventArray(singingTrack);
 
             TrackChunk trackChunk = new TrackChunk(midiEvents);
 
             return trackChunk;
         }
 
-        private MidiEvent[] EncodeMidiEventList(SingingTrack singingTrack)
+        private MidiEvent[] EncodeMidiEventArray(SingingTrack singingTrack)
         {
             List<MidiEvent> midiEventList = new List<MidiEvent>();
+            int lastEventAbsoluteTime = 0;
             foreach (var note in singingTrack.NoteList)
             {
-                midiEventList.Add(EncodeLyricEvent(note));
+                midiEventList.Add(EncodeLyricEvent(note, lastEventAbsoluteTime));
                 midiEventList.Add(EncodeNoteOnEvent(note));
-                midiEventList.Add(EncodeNoteOffEvent(note));
+                midiEventList.Add(EncodeNoteOffEvent(note, ref lastEventAbsoluteTime));
             }
             return midiEventList.ToArray();
         }
         
-        private LyricEvent EncodeLyricEvent(OsNote note)
+        private LyricEvent EncodeLyricEvent(OsNote note, int lastEventAbsoluteTime)
         {
-            LyricEvent lyricEvent = new LyricEvent();
-            lyricEvent.Text = note.Lyric;
+            LyricEvent lyricEvent = new LyricEvent
+            {
+                Text = GetLyric(note),
+                DeltaTime = note.StartPos - lastEventAbsoluteTime
+            };
             return lyricEvent;
+        }
+
+        private string GetLyric(OsNote note)
+        {
+            string lyric = note.Lyric;
+            if (lyric.Length > 1)
+            {
+                foreach (var symbol in SymbolList.SymbolToRemoveList())
+                {
+                    lyric = lyric.Replace(symbol, "");
+                }
+            }
+            return lyric;
         }
 
         private NoteOnEvent EncodeNoteOnEvent(OsNote note)
@@ -93,7 +118,7 @@ namespace Plugin.Midi
             return noteOnEvent;
         }
 
-        private NoteOffEvent EncodeNoteOffEvent(OsNote note)
+        private NoteOffEvent EncodeNoteOffEvent(OsNote note, ref int lastEventAbsoluteTime)
         {
             NoteOffEvent noteOffEvent = new NoteOffEvent
             {
@@ -102,6 +127,7 @@ namespace Plugin.Midi
                 DeltaTime = note.Length,
                 Channel = (FourBitNumber)0
             };
+            lastEventAbsoluteTime = note.StartPos + note.Length;
             return noteOffEvent;
         }
 
