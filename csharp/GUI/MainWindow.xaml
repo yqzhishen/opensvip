@@ -13,8 +13,8 @@
     FontFamily="Microsoft YaHei UI"
     Height="800"
     Width="1200"
-    MinHeight="500"
-    MinWidth="655"
+    MinHeight="480"
+    MinWidth="640"
     Style="{StaticResource MaterialDesignWindow}"
     panuon:WindowXCaption.Height="32"
     WindowStartupLocation="CenterScreen"
@@ -521,7 +521,7 @@
                     <materialDesign:Card
                         x:Name="ConverterTaskCard"
                         Grid.Row="1"
-                        Margin="20 10 10 20">
+                        Margin="20 10 10 12">
                         <Grid>
                             <DockPanel x:Name="FileDropPanel" Visibility="{Binding Visibility, ElementName=TaskListView, Converter={StaticResource ReversedVisibilityConverter}}">
                                 <Grid>
@@ -835,7 +835,7 @@
                     <materialDesign:Card
                         x:Name="TaskExecutionCard"
                         Grid.Row="1"
-                        Margin="10 10 20 20">
+                        Margin="10 10 20 12">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
