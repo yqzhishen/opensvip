@@ -8,15 +8,13 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="Indigo" SecondaryColor="Blue"/>
-                <!--
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml"/>
-                -->
+                <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/styles/windowxstyle.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/styles/menu.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/styles/menuitem.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/Control.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.chip.xaml"/>
-                <!--
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/primary/materialdesigncolor.indigo.xaml"/>
-                -->
                 <ResourceDictionary Source="ScrollBarDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 

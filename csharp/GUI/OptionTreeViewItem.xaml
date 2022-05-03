@@ -19,17 +19,23 @@
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
         <Style x:Key="OptionTextBox" TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+            <Setter Property="Margin" Value="0 0 0 2"/>
+            <Setter Property="Padding" Value="2"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="TextAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
-            <Setter Property="CaretBrush" Value="{StaticResource ThemedMaxContrastBrush}"></Setter>
+            <Setter Property="CaretBrush" Value="{StaticResource ThemedMaxContrastBrush}"/>
             <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThemedIndigoBrush}"/>
             <EventSetter Event="KeyDown" Handler="OptionValueTextBox_KeyDown"/>
         </Style>
         <Style x:Key="OptionIntegerBox" TargetType="{x:Type local:IntegerNumericBox}" BasedOn="{StaticResource OptionTextBox}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="2 1"/>
             <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
         </Style>
         <Style x:Key="OptionDoubleBox" TargetType="{x:Type local:DoubleNumericBox}" BasedOn="{StaticResource OptionTextBox}">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="2 1"/>
             <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
         </Style>
         <Style x:Key="OptionTipsIcon" TargetType="materialDesign:PackIcon">
@@ -67,7 +73,6 @@
                 <TextBox
                     Style="{StaticResource OptionTextBox}"
                     VerticalAlignment="Center"
-                    Padding="2 4"
                     Text="{Binding Path=OptionValue}"
                     MinWidth="80"/>
             </WrapPanel>
@@ -81,7 +86,6 @@
                 <local:IntegerNumericBox
                     Style="{StaticResource OptionIntegerBox}"
                     VerticalAlignment="Center"
-                    Padding="2 3"
                     d:Text="60"
                     Text="{Binding Path=OptionValue}"
                     MinWidth="35"/>
@@ -96,7 +100,6 @@
                 <local:DoubleNumericBox
                     Style="{StaticResource OptionDoubleBox}"
                     VerticalAlignment="Center"
-                    Padding="2 3"
                     d:Text="60"
                     Text="{Binding Path=OptionValue}"
                     MinWidth="50"

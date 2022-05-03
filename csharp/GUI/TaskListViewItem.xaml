@@ -54,7 +54,7 @@
                 </materialDesign:PopupBox.ToggleContent>
                 <StackPanel Width="150" Height="110">
                     <TextBlock
-                        Margin="24.5 10 20 10"
+                        Margin="21 10 20 10"
                         Text="此文件已成功转换。"/>
                     <Button
                         x:Name="OpenProjectFileButton"
@@ -154,9 +154,10 @@
                 <StackPanel Margin="15 0" MaxWidth="250">
                     <TextBlock
                         HorizontalAlignment="Center"
-                        Margin="0 10"
+                        Margin="5 10 0 10"
                         Text="此文件转换失败，错误信息如下："/>
                     <TextBlock
+                        HorizontalAlignment="Center"
                         Margin="10 0 10 10"
                         TextWrapping="Wrap"
                         Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:TaskListViewItem}, Path=DataContext.Error, Mode=OneWay}"/>

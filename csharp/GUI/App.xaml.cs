@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Windows;
 using MaterialDesignThemes.Wpf;
-using Microsoft.Win32;
 
 namespace OpenSvip.GUI
 {

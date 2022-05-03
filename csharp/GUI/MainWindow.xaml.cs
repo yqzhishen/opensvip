@@ -15,6 +15,7 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using OpenSvip.GUI.Config;
 using OpenSvip.GUI.Dialog;
+using Panuon.UI.Silver;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
@@ -81,31 +82,31 @@ namespace OpenSvip.GUI
                 Model.ExportPath.PathValue = settings.LastExportPath;
             }
             DataContext = Model;
-            
+
             var formats = Model.Formats;
             foreach (var str in formats)
             {
                 ImportPluginComboBox.Items.Add(new ComboBoxItem
                 {
-                    HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center,
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
                     Content = str
                 });
                 ExportPluginComboBox.Items.Add(new ComboBoxItem
                 {
-                    HorizontalContentAlignment = System.Windows.HorizontalAlignment.Center,
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
                     Content = str
                 });
             }
             for (var i = 0; i < formats.Count; ++i)
             {
-                var importMenuItem = new System.Windows.Controls.MenuItem
+                var importMenuItem = new MenuItem
                 {
                     Header = $"_{(i + 1) % 10}  {formats[i]}"
                 };
                 importMenuItem.CommandParameter = importMenuItem;
                 importMenuItem.Command = ImportPluginMenuItemCommand;
                 ImportPluginMenuItem.Items.Add(importMenuItem);
-                var exportMenuItem = new System.Windows.Controls.MenuItem
+                var exportMenuItem = new MenuItem
                 {
                     Header = $"_{(i + 1) % 10}  {formats[i]}"
                 };
