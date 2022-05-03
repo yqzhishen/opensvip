@@ -110,6 +110,7 @@
                             x:Name="PathScrollViewer"
                             Grid.Row="0"
                             Margin="0 5"
+                            Style="{StaticResource OptimizedScrollViewer}"
                             Visibility="{Binding Visibility, ElementName=PathListView}"
                             VerticalScrollBarVisibility="Auto"
                             PanningMode="VerticalOnly"

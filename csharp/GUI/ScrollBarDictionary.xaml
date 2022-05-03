@@ -239,5 +239,5 @@
     <Style TargetType="ScrollBar" BasedOn="{StaticResource for_scrollbar}"/>
 
     <!--默认ScrollView-->
-    <Style TargetType="ScrollViewer" BasedOn="{StaticResource for_scrollviewer}"/>
+    <Style x:Key="OptimizedScrollViewer" TargetType="ScrollViewer" BasedOn="{StaticResource for_scrollviewer}"/>
 </ResourceDictionary>

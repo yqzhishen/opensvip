@@ -16,11 +16,10 @@
     MinHeight="500"
     MinWidth="655"
     Style="{StaticResource MaterialDesignWindow}"
-    WindowStyle="None"
     panuon:WindowXCaption.Height="32"
     Closing="Window_Closing">
     <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="5" CornerRadius="20"/>
+        <WindowChrome ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
     <panuon:WindowXCaption.MinimizeButtonStyle>
         <Style TargetType="Button" BasedOn="{StaticResource {ComponentResourceKey ResourceId=MinimizeButtonStyle, TypeInTargetAssembly={x:Type panuon:WindowXCaption}}}">
@@ -583,6 +582,7 @@
                                     <ScrollViewer
                                         Grid.Row="1"
                                         Margin="7 5 12 0"
+                                        Style="{StaticResource OptimizedScrollViewer}"
                                         VerticalScrollBarVisibility="Auto"
                                         PanningMode="VerticalOnly"
                                         AllowDrop="True"
@@ -678,6 +678,7 @@
                                 x:Name="OptionScrollViewer"
                                 Grid.Row="1"
                                 Margin="5 10 12 20"
+                                Style="{StaticResource OptimizedScrollViewer}"
                                 PanningMode="VerticalOnly"
                                 VerticalScrollBarVisibility="Auto"
                                 PreviewMouseWheel="OptionScrollViewer_MouseWheel"
