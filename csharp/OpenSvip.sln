@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1684
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Model", "Model\OpenSvip.Model.csproj", "{F0CF4E57-33F4-4A63-A45F-69727058C24A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{3779DA9F-186C-4529-9FF6-56D0186D571C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{3779DA9F-186C-4529-9FF6-56D0186D571C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.BinSvip", "Plugins\BinSvip\Plugin.BinSvip.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
 EndProject
@@ -22,6 +22,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Gjgj", "Plugins\Gjgj\Plugin.Gjgj.csproj", "{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Vogen", "Plugins\Vogen\Plugin.Vogen.csproj", "{2094D048-0F25-4052-A24E-B4783CB0E5E0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Y77", "Plugins\Y77\Plugin.Y77.csproj", "{3B5FB653-3637-47CE-B3FD-E184419A058E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Midi", "Plugins\Midi\Plugin.Midi.csproj", "{9959258B-F7D7-47EE-823F-54B60BB7935C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecodeMidi.Console", "DecodeMidi.Console\DecodeMidi.Console.csproj", "{B9A66731-A69A-4BF8-A602-AC049C71BD15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +75,18 @@ Global
 		{2094D048-0F25-4052-A24E-B4783CB0E5E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2094D048-0F25-4052-A24E-B4783CB0E5E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2094D048-0F25-4052-A24E-B4783CB0E5E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B5FB653-3637-47CE-B3FD-E184419A058E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B5FB653-3637-47CE-B3FD-E184419A058E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B5FB653-3637-47CE-B3FD-E184419A058E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B5FB653-3637-47CE-B3FD-E184419A058E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9959258B-F7D7-47EE-823F-54B60BB7935C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9959258B-F7D7-47EE-823F-54B60BB7935C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9959258B-F7D7-47EE-823F-54B60BB7935C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9959258B-F7D7-47EE-823F-54B60BB7935C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
