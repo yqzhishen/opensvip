@@ -11,9 +11,9 @@ namespace OpenSvip.Framework
 {
     public static class PluginManager
     {
-        public static readonly string PluginPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Plugins");
+        public static readonly string PluginPath = Path.Combine(ConstValues.CommonDataPath, "Plugins");
 
-        public static readonly string TempPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Temp");
+        public static readonly string TempPath = Path.Combine(ConstValues.CommonDataPath, "Temp");
 
         private static readonly Dictionary<string, Plugin> Plugins = new Dictionary<string, Plugin>();
 
@@ -23,6 +23,7 @@ namespace OpenSvip.Framework
         {
             try
             {
+                Directory.CreateDirectory(PluginPath);
                 foreach (var pluginDir in Directory.GetDirectories(PluginPath))
                 {
                     var propertiesPath = Path.Combine(pluginDir, "Properties.xml");

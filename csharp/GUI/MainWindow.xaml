@@ -17,6 +17,7 @@
     MinWidth="655"
     Style="{StaticResource MaterialDesignWindow}"
     panuon:WindowXCaption.Height="32"
+    WindowStartupLocation="CenterScreen"
     Closing="Window_Closing">
     <WindowChrome.WindowChrome>
         <WindowChrome ResizeBorderThickness="5"/>
@@ -867,7 +868,6 @@
                                 <TextBox
                                     VerticalAlignment="Center"
                                     Margin="10 0"
-                                    Padding="0 2"
                                     materialDesign:HintAssist.Hint="{Binding ExportPath.IsRelative, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（相对）;输出路径}"
                                     materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastIndigoBrush}"
                                     materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThemedIndigoBrush}"

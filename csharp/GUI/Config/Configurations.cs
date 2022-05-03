@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
+using OpenSvip.Framework;
 using Tomlet;
 using Tomlet.Attributes;
 using Tomlet.Models;
@@ -11,11 +11,11 @@ namespace OpenSvip.GUI.Config
 {
     public class AppConfig
     {
-        private const string CONFIG_FOLDER = "Config";
+        private const string CONFIG_FOLDER = "Converter";
 
         private const string CONFIG_FILENAME = "Configurations.toml";
 
-        private static readonly string ActualConfigFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty, CONFIG_FOLDER);
+        private static readonly string ActualConfigFolder = Path.Combine(ConstValues.CommonConfigPath, CONFIG_FOLDER);
 
         private static readonly string ActualConfigFile = Path.Combine(ActualConfigFolder, CONFIG_FILENAME);
 
@@ -86,9 +86,9 @@ namespace OpenSvip.GUI.Config
 
     public class Information
     {
-        public string Version { get; set; } = "1.1.2 (Preview)";
+        public string Version { get; set; } = "1.1.3 (Preview)";
 
-        public string FrameworkVersion { get; set; } = "1.2.2";
+        public string FrameworkVersion { get; set; } = ConstValues.FrameworkVersion;
 
         public string AuthorHomePage { get; set; } = "https://space.bilibili.com/102844209";
 
