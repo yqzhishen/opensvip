@@ -11,7 +11,6 @@
                 <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/styles/windowxstyle.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/styles/menu.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/styles/menuitem.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/Panuon.UI.Silver;component/Control.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.popupbox.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/themes/materialdesigntheme.chip.xaml"/>

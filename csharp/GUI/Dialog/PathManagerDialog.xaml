@@ -110,6 +110,7 @@
                             x:Name="PathScrollViewer"
                             Grid.Row="0"
                             Margin="0 5"
+                            Style="{StaticResource OptimizedScrollViewer}"
                             Visibility="{Binding Visibility, ElementName=PathListView}"
                             VerticalScrollBarVisibility="Auto"
                             PanningMode="VerticalOnly"
@@ -165,18 +166,17 @@
                                                 <TextBox
                                                     Grid.Column="2"
                                                     VerticalAlignment="Center"
-                                                    Padding="1 2.5"
+                                                    VerticalContentAlignment="Center"
+                                                    Padding="2 4"
                                                     FontSize="15"
-                                                    Text="{Binding PathValue}"
-                                                    CaretBrush="{StaticResource ThemedMaxContrastBrush}"
+                                                    materialDesign:HintAssist.Hint="自定义路径"
                                                     materialDesign:TextFieldAssist.HasClearButton="True"
                                                     materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThemedIndigoBrush}"
+                                                    CaretBrush="{StaticResource ThemedMaxContrastBrush}"
+                                                    Text="{Binding PathValue}"
                                                     KeyDown="PathValueTextBox_KeyDown"
                                                     LostKeyboardFocus="PathValueTextBox_LostFocus"
                                                     TextChanged="PathValueTextBox_TextCleared">
-                                                    <materialDesign:HintAssist.Hint>
-                                                        <TextBlock Text="自定义路径" VerticalAlignment="Bottom" Margin="1 2.7 1 0"/>
-                                                    </materialDesign:HintAssist.Hint>
                                                 </TextBox>
                                                 <Button
                                                     x:Name="RemovePathButton"

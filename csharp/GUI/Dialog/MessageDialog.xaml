@@ -39,7 +39,8 @@
                 Style="{StaticResource MaterialDesignFlatButton}"
                 Foreground="{StaticResource ThemedIndigoBrush}"
                 d:Content="确定"
-                Content="{Binding ButtonText}">
+                Content="{Binding ButtonText}"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
             </Button>
         </StackPanel>
     </Grid>

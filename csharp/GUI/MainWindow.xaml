@@ -13,14 +13,14 @@
     FontFamily="Microsoft YaHei UI"
     Height="800"
     Width="1200"
-    MinHeight="500"
-    MinWidth="655"
+    MinHeight="480"
+    MinWidth="640"
     Style="{StaticResource MaterialDesignWindow}"
-    WindowStyle="None"
     panuon:WindowXCaption.Height="32"
+    WindowStartupLocation="CenterScreen"
     Closing="Window_Closing">
     <WindowChrome.WindowChrome>
-        <WindowChrome ResizeBorderThickness="5" CornerRadius="20"/>
+        <WindowChrome ResizeBorderThickness="5"/>
     </WindowChrome.WindowChrome>
     <panuon:WindowXCaption.MinimizeButtonStyle>
         <Style TargetType="Button" BasedOn="{StaticResource {ComponentResourceKey ResourceId=MinimizeButtonStyle, TypeInTargetAssembly={x:Type panuon:WindowXCaption}}}">
@@ -521,7 +521,7 @@
                     <materialDesign:Card
                         x:Name="ConverterTaskCard"
                         Grid.Row="1"
-                        Margin="20 10 10 20">
+                        Margin="20 10 10 12">
                         <Grid>
                             <DockPanel x:Name="FileDropPanel" Visibility="{Binding Visibility, ElementName=TaskListView, Converter={StaticResource ReversedVisibilityConverter}}">
                                 <Grid>
@@ -583,6 +583,7 @@
                                     <ScrollViewer
                                         Grid.Row="1"
                                         Margin="7 5 12 0"
+                                        Style="{StaticResource OptimizedScrollViewer}"
                                         VerticalScrollBarVisibility="Auto"
                                         PanningMode="VerticalOnly"
                                         AllowDrop="True"
@@ -678,6 +679,7 @@
                                 x:Name="OptionScrollViewer"
                                 Grid.Row="1"
                                 Margin="5 10 12 20"
+                                Style="{StaticResource OptimizedScrollViewer}"
                                 PanningMode="VerticalOnly"
                                 VerticalScrollBarVisibility="Auto"
                                 PreviewMouseWheel="OptionScrollViewer_MouseWheel"
@@ -833,7 +835,7 @@
                     <materialDesign:Card
                         x:Name="TaskExecutionCard"
                         Grid.Row="1"
-                        Margin="10 10 20 20">
+                        Margin="10 10 20 12">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
@@ -866,7 +868,6 @@
                                 <TextBox
                                     VerticalAlignment="Center"
                                     Margin="10 0"
-                                    Padding="0 2"
                                     materialDesign:HintAssist.Hint="{Binding ExportPath.IsRelative, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=输出路径（相对）;输出路径}"
                                     materialDesign:HintAssist.Foreground="{StaticResource ThemedHighContrastIndigoBrush}"
                                     materialDesign:TextFieldAssist.UnderlineBrush="{StaticResource ThemedIndigoBrush}"

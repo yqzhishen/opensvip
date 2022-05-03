@@ -15,7 +15,6 @@ using System.Windows.Input;
 using Microsoft.Win32;
 using OpenSvip.GUI.Config;
 using OpenSvip.GUI.Dialog;
-using Panuon.UI.Silver;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
