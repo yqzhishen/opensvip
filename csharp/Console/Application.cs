@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using CommandLine;
+using NullLib.ConsoleTable;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 
@@ -112,14 +113,27 @@ namespace OpenSvip.Console
             {
                 System.Console.WriteLine("当前未安装任何插件。\n");
             }
+            var margin = new string(' ', 2);
+            var table = new ConsoleTable(
+                string.Empty,
+                "名称" + margin,
+                "版本" + margin,
+                "作者" + margin,
+                "标识符" + margin,
+                "适用格式" + margin);
             var num = 1;
-            System.Console.WriteLine("    名称\t版本\t作者\t标识符\t适用格式");
             foreach (var plugin in plugins)
             {
-                System.Console.WriteLine($"[{num}] {plugin.Name}\t{plugin.Version}\t{plugin.Author}\t{plugin.Identifier}\t{plugin.Format} (*.{plugin.Suffix})");
+                table.AddRow(
+                    $"[{num}] ",
+                    plugin.Name + margin,
+                    plugin.Version + margin,
+                    plugin.Author + margin,
+                    plugin.Identifier + margin,
+                    $"{plugin.Format} (*.{plugin.Suffix}){margin}");
                 ++num;
             }
-            System.Console.WriteLine();
+            System.Console.WriteLine(table.ToMinimalString());
         }
 
         private static void PrintPluginDetails(Plugin plugin)
@@ -132,7 +146,7 @@ namespace OpenSvip.Console
                 System.Console.WriteLine($"\n主页：{plugin.HomePage}");
             }
             System.Console.WriteLine($"\n此插件适用于 {plugin.Format} (*.{plugin.Suffix})。");
-            System.Console.WriteLine($"若要使用此插件，请在转换时指定 \"-i {plugin.Identifier}\" 或 \"-o {plugin.Identifier}\"。");
+            System.Console.WriteLine($"若要使用此插件，请在转换时指定 \"-i {plugin.Identifier}\"（输入）或 \"-o {plugin.Identifier}\"（输出）。");
             if (plugin.Descriptions != null)
             {
                 System.Console.WriteLine($"\n描述：\n{plugin.Descriptions}");
