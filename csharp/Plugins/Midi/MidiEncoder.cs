@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
@@ -9,11 +10,22 @@ using OpenSvip.Framework;
 using OpenSvip.Model;
 using MidiNote = Melanchall.DryWetMidi.Interaction.Note;
 using OsNote = OpenSvip.Model.Note;
+using NPinyin;
 
 namespace Plugin.Midi
 {
     public class MidiEncoder
     {
+        public int Transpose { get; set; }
+
+        public bool IsUseCompatibleLyric { get; set; }
+        
+        public bool IsRemoveSymbols { get; set; }
+
+        public LyricEncodings LyricEncoding { get; set; }
+
+        public int PPQ { get; set; }
+
         private Project osProject;
 
         private MidiFile midiFile = new MidiFile();
@@ -21,12 +33,12 @@ namespace Plugin.Midi
         public void EncodeMidiFile(Project project, string path)
         {
             osProject = project;
-            TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision(480);
+            TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision((short)PPQ);
             midiFile.TimeDivision = timeDivision;
             EncodeMidiChunks();
             WritingSettings settings = new WritingSettings
             {
-                TextEncoding = Encoding.UTF8
+                TextEncoding = GetEncoding()
             };
             midiFile.Write(path, true, settings: settings);
         }
@@ -36,6 +48,31 @@ namespace Plugin.Midi
             foreach (var trackChunk in EncodeTrackChunkList())
             {
                 midiFile.Chunks.Add(trackChunk);
+            }
+        }
+
+        private Encoding GetEncoding()
+        {
+            switch (LyricEncoding)
+            {
+                case LyricEncodings.ASCII:
+                    return Encoding.ASCII;
+                case LyricEncodings.BigEndianUnicode:
+                    return Encoding.BigEndianUnicode;
+                case LyricEncodings.Default:
+                    return Encoding.Default;
+                case LyricEncodings.Unicode:
+                    return Encoding.Unicode;
+                case LyricEncodings.UTF32:
+                    return Encoding.UTF32;
+                case LyricEncodings.UTF7:
+                    return Encoding.UTF7;
+                case LyricEncodings.UTF8BOM:
+                    return Encoding.UTF8;
+                case LyricEncodings.UTF8:
+                    return new UTF8Encoding(false);
+                default:
+                    return Encoding.UTF8;
             }
         }
 
@@ -59,19 +96,42 @@ namespace Plugin.Midi
 
         private TrackChunk EncodeTempoTrackChunk()
         {
-            return new TrackChunk(new SetTempoEvent(GetMicrosecondsPerQuarterNote(0)));
+            return new TrackChunk(EncodeSetTemopEventArray());
+        }
+
+        private MidiEvent[] EncodeSetTemopEventArray()
+        {
+            List<MidiEvent> midiEventList = new List<MidiEvent>();
+            int lastEventAbsoluteTime = 0;
+            foreach (var tempo in osProject.SongTempoList)
+            {
+                midiEventList.Add(EncodeSetTempoEvent(tempo, ref lastEventAbsoluteTime));
+                lastEventAbsoluteTime = tempo.Position;
+            }
+            return midiEventList.ToArray();
+        }
+
+        private SetTempoEvent EncodeSetTempoEvent(SongTempo tempo, ref int lastEventAbsoluteTime)
+        {
+            SetTempoEvent setTempoEvent = new SetTempoEvent
+            {
+                MicrosecondsPerQuarterNote = GetMicrosecondsPerQuarterNote((long)tempo.BPM),
+                DeltaTime = tempo.Position - lastEventAbsoluteTime
+            };
+            lastEventAbsoluteTime = tempo.Position;
+            return setTempoEvent;
         }
 
         private TrackChunk EncodeTrackChunk(SingingTrack singingTrack)
         {
-            MidiEvent[] midiEvents = EncodeMidiEventArray(singingTrack);
+            MidiEvent[] midiEvents = EncodeNoteEventArray(singingTrack);
 
             TrackChunk trackChunk = new TrackChunk(midiEvents);
 
             return trackChunk;
         }
 
-        private MidiEvent[] EncodeMidiEventArray(SingingTrack singingTrack)
+        private MidiEvent[] EncodeNoteEventArray(SingingTrack singingTrack)
         {
             List<MidiEvent> midiEventList = new List<MidiEvent>();
             int lastEventAbsoluteTime = 0;
@@ -96,12 +156,24 @@ namespace Plugin.Midi
 
         private string GetLyric(OsNote note)
         {
-            string lyric = note.Lyric;
-            if (lyric.Length > 1)
+            string lyric;
+            if (note.Pronunciation != null)
             {
-                foreach (var symbol in SymbolList.SymbolToRemoveList())
+                lyric = note.Pronunciation;
+            }
+            else
+            {
+                lyric = note.Lyric;
+                if (lyric.Length > 1 && IsRemoveSymbols)
                 {
-                    lyric = lyric.Replace(symbol, "");
+                    foreach (var symbol in SymbolList.SymbolToRemoveList())
+                    {
+                        lyric = lyric.Replace(symbol, "");
+                    }
+                }
+                if (IsUseCompatibleLyric)
+                {
+                    lyric = Pinyin.GetPinyin(lyric);
                 }
             }
             return lyric;
@@ -111,7 +183,7 @@ namespace Plugin.Midi
         {
             NoteOnEvent noteOnEvent = new NoteOnEvent
             {
-                NoteNumber = (SevenBitNumber)note.KeyNumber,
+                NoteNumber = (SevenBitNumber)(note.KeyNumber + Transpose),
                 Velocity = (SevenBitNumber)45,
                 Channel = (FourBitNumber)0
             };
@@ -122,7 +194,7 @@ namespace Plugin.Midi
         {
             NoteOffEvent noteOffEvent = new NoteOffEvent
             {
-                NoteNumber = (SevenBitNumber)note.KeyNumber,
+                NoteNumber = (SevenBitNumber)(note.KeyNumber + Transpose),
                 Velocity = (SevenBitNumber)0,
                 DeltaTime = note.Length,
                 Channel = (FourBitNumber)0
@@ -131,14 +203,10 @@ namespace Plugin.Midi
             return noteOffEvent;
         }
 
-        /// <summary>
-        /// 返回每四分音符的微秒数。
-        /// </summary>
-        /// <param name="index">原始曲速的索引。</param>
-        /// <returns></returns>
-        private long GetMicrosecondsPerQuarterNote(int index)
+        private long GetMicrosecondsPerQuarterNote(long BPM)
         {
-            return (long)(60.0 / osProject.SongTempoList[index].BPM * 1000000.0);
+            return (long)(60.0 / BPM * 1000000.0);
         }
+
     }
 }

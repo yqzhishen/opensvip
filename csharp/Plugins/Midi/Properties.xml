@@ -1,16 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.1.2</Version>
+    <Version>0.2.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
+    <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。暂不支持 MIDI 格式转换为 OpenSvip 格式。</Descriptions>
     <Requirements>无</Requirements>
     <Format>MIDI 文件</Format>
     <Suffix>mid</Suffix>
-    <Identifier>mid</Identifier>
+    <Identifier>midi</Identifier>
     <LibraryPath>Midi\Plugin.Midi.dll</LibraryPath>
     <Converter>Midi.Stream.MidiConverter</Converter>
-    <InputOptions/>
-	<OutputOptions/>
+	<InputOptions>
+	</InputOptions>
+	<OutputOptions>
+		<Option Name="transpose" Type="string" Default="0">
+			<Notes>移调</Notes>
+		</Option>
+		<Option Name="compatibleLyric" Type="boolean" Default="false">
+			<Notes>歌词兼容性模式</Notes>
+			<Tips>将所有中文歌词转换为拼音，防止不支持导入带有中文歌词MIDI文件的歌声合成软件出现乱码。</Tips>
+		</Option>
+		<Option Name="removeSymbols" Type="boolean" Default="true">
+			<Notes>移除歌词中的常见标点符号</Notes>
+			<Tips>移除{ ",", ".", "?", "!", "，", "。", "？", "！" }，防止不支持含标点符号歌词的歌声合成软件无法正常合成。</Tips>
+		</Option>
+		<Option Name="lyricEncoding" Type="enum" Default="UTF8BOM">
+			<Notes>歌词文本编码</Notes>
+			<Tips>除非打开歌词兼容性模式后仍然乱码，否则不应更改此设置。</Tips>
+			<EnumChoices>
+				<Choice Name="ASCII" Tag="ASCII" />
+				<Choice Name="BigEndianUnicode" Tag="BigEndianUnicode" />
+				<Choice Name="Default" Tag="Default">
+					<Label>操作系统的当前 ANSI 代码页的编码。</Label>
+				</Choice>
+				<Choice Name="Unicode" Tag="Unicode" />
+				<Choice Name="UTF32" Tag="UTF32" />
+				<Choice Name="UTF7" Tag="UTF7" />
+				<Choice Name="UTF8BOM" Tag="UTF8BOM" />
+				<Choice Name="UTF8" Tag="UTF8" />
+			</EnumChoices>
+		</Option>
+		<Option Name="ppq" Type="string" Default="480">
+			<Notes>时基(PPQ)</Notes>
+			<Tips>即 parts per quarter, 又名 ticks per quarter note，每四分音符的脉冲数。除非你知道这是什么，否则不应更改此设置。</Tips>
+		</Option>
+	</OutputOptions>
 </Plugin>

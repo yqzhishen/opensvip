@@ -14,7 +14,14 @@ namespace Midi.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            new MidiEncoder().EncodeMidiFile(project, path);
+            new MidiEncoder
+            {
+                Transpose = options.GetValueAsInteger("transpose", 0),
+                IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
+                IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
+                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
+                PPQ = options.GetValueAsInteger("ppq", 480)
+            }.EncodeMidiFile(project, path);
         }
     }
 }
