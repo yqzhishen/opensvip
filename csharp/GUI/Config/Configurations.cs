@@ -28,21 +28,21 @@ namespace OpenSvip.GUI.Config
         static AppConfig()
         {
             TomletMain.RegisterMapper(
-                rect => new TomlArray { rect.Left, rect.Top, rect.Width, rect.Height },
+                tuple => new TomlArray { tuple.Item1, tuple.Item2 },
                 tomlValue =>
                 {
                     if (!(tomlValue is TomlArray tomlArray))
                     {
-                        return new Rect();
+                        return new Tuple<double, double>(-1, -1);
                     }
                     try
                     {
                         var arr = tomlArray.Select(val => ((TomlDouble)val).Value).ToArray();
-                        return new Rect(arr[0], arr[1], arr[2], arr[3]);
+                        return new Tuple<double, double>(arr[0], arr[1]);
                     }
                     catch
                     {
-                        return new Rect();
+                        return new Tuple<double, double>(-1, -1);
                     }
                 });
         }
@@ -86,19 +86,19 @@ namespace OpenSvip.GUI.Config
 
     public class Information
     {
-        public string Version { get; set; } = "1.1.3 (Preview)";
+        public static readonly string ApplicationVersion = "1.1.4 (Preview)";
 
-        public string FrameworkVersion { get; set; } = ConstValues.FrameworkVersion;
+        public static readonly string OnlineDocuments = "https://openvpi.github.io/home";
 
-        public string AuthorHomePage { get; set; } = "https://space.bilibili.com/102844209";
+        public static readonly string GitHubRepository = "https://github.com/yqzhishen/opensvip";
 
-        public string GitHubRepository { get; set; } = "https://github.com/yqzhishen/opensvip";
+        public static readonly string UpdateLogUrl = "https://openvpi.github.io/home/updatelogs/converter.toml";
     }
 
     [TomlDoNotInlineObject]
     public class Properties
     {
-        public Rect MainRestoreBounds { get; set; } = new Rect();
+        public Tuple<double, double> MainWindowSize { get; set; } = new Tuple<double, double>(-1, -1);
 
         public WindowState MainWindowState { get; set; } = WindowState.Normal;
     }
@@ -133,6 +133,21 @@ namespace OpenSvip.GUI.Config
         public string Path { get; set; }
 
         public bool Selected { get; set; }
+    }
+
+    public class UpdateLog
+    {
+        public string Version { get; set; }
+
+        public string Date { get; set; }
+
+        public string DownloadLink { get; set; }
+
+        public string Prologue { get; set; }
+
+        public string[] Items { get; set; } = Array.Empty<string>();
+
+        public string Epilogue { get; set; }
     }
 
     public enum OverwriteOptions

@@ -35,14 +35,15 @@ namespace OpenSvip.GUI
             var config = AppConfig.LoadFromFile();
 
             var properties = config.Properties;
-            var bounds = properties.MainRestoreBounds;
-            if (bounds.Width > 0 && bounds.Height > 0)
+            var (width, height) = properties.MainWindowSize;
+            WindowState = WindowState.Normal;
+            if (width >= MinWidth)
             {
-                WindowState = WindowState.Normal;
-                Left = bounds.Left;
-                Top = bounds.Top;
-                Width = bounds.Width;
-                Height = bounds.Height;
+                Width = width;
+            }
+            if (height >= MinHeight)
+            {
+                Height = height;
             }
             WindowState = properties.MainWindowState;
 
@@ -315,9 +316,21 @@ namespace OpenSvip.GUI
             p => !p.ExecutionInProgress,
             p => p.TaskList.Clear());
 
-        public static readonly RelayCommand<MainWindow> AboutCommand = new RelayCommand<MainWindow>(
+        public static readonly RelayCommand<object> CheckUpdateCommand = new RelayCommand<object>(
             p => true,
-            p => p.AboutMenuItem_Click(null, null));
+            p =>
+            {
+                UpdateCheckDialog.CreateDialog().ShowDialog();
+            });
+
+        public static readonly RelayCommand<AppModel> AboutCommand = new RelayCommand<AppModel>(
+            p => true,
+            p =>
+            {
+                var dialog = AboutDialog.CreateDialog();
+                dialog.DataContext = p;
+                dialog.ShowDialog();
+            });
 
         public static readonly RelayCommand<MenuItem> ImportPluginMenuItemCommand = new RelayCommand<MenuItem>(
             p =>
@@ -449,13 +462,6 @@ namespace OpenSvip.GUI
         public static readonly RelayCommand<AppModel> ManagePathsCommand = new RelayCommand<AppModel>(
             p => !p.ExecutionInProgress,
             p => PathManagerDialog.CreateDialog(p).ShowDialog());
-
-        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var dialog = AboutDialog.CreateDialog();
-            dialog.DataContext = Model;
-            dialog.ShowDialog();
-        }
 
         private void FileMaskPanel_Focus(object sender, RoutedEventArgs e)
         {
@@ -667,7 +673,7 @@ namespace OpenSvip.GUI
             {
                 Properties =
                 {
-                    MainRestoreBounds = RestoreBounds,
+                    MainWindowSize = new Tuple<double, double>(Width, Height),
                     MainWindowState = WindowState
                 },
                 Settings =

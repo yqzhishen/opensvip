@@ -22,6 +22,7 @@
             <local:EnumerableIsNotEmptyConverter x:Key="EnumerableIsNotEmptyConverter"/>
             <local:CollectionToVisibilityConverter x:Key="CollectionToVisibilityConverter"/>
             <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <local:StringNotBlankToVisibilityConverter x:Key="StringNotBlankToVisibilityConverter"/>
             <local:ReversedVisibilityConverter x:Key="ReversedVisibilityConverter"/>
             <local:CollectionElementConverter x:Key="CollectionElementConverter"/>
             <local:IndexToEnumValueConverter x:Key="IndexToEnumValueConverter"/>

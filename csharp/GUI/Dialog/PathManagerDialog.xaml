@@ -28,13 +28,13 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Right"
                 Style="{StaticResource MaterialDesignIconButton}"
+                Content="{materialDesign:PackIcon Kind=Close, Size=30}"
                 Foreground="{StaticResource ThemedIndigoBrush}"
                 Width="40"
                 Height="40"
                 Padding="0"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
-                <materialDesign:PackIcon Kind="Close" Width="30" Height="30"/>
-            </Button>
+                IsCancel="True"
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
         </DockPanel>
         <Separator Grid.Row="1" Margin="15 0"/>
         <Grid Grid.Row="2">

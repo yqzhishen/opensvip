@@ -94,6 +94,9 @@
     <Compile Include="Dialog\PathManagerDialog.xaml.cs">
       <DependentUpon>PathManagerDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialog\UpdateCheckDialog.xaml.cs">
+      <DependentUpon>UpdateCheckDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DoubleNumericBox.cs" />
     <Compile Include="IntegerNumericBox.cs" />
     <Compile Include="Dialog\MessageDialog.xaml.cs">
@@ -107,6 +110,7 @@
       <DependentUpon>PluginDetailsBoard.xaml</DependentUpon>
     </Compile>
     <Compile Include="RelayCommand.cs" />
+    <Compile Include="RelayCommands.cs" />
     <Compile Include="TaskListViewItem.xaml.cs">
       <DependentUpon>TaskListViewItem.xaml</DependentUpon>
     </Compile>
@@ -124,6 +128,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialog\PathManagerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\UpdateCheckDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -43,20 +43,23 @@
                     <Setter Property="Height" Value="40"/>
                     <Setter Property="Padding" Value="30 0"/>
                     <Setter Property="Foreground" Value="{StaticResource ThemedIndigoBrush}"/>
+                    <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="5"/>
                     <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
                     <EventSetter Event="Click" Handler="Button_Click"/>
                 </Style>
             </StackPanel.Resources>
             <Button
                 d:Content="重启"
-                Content="{Binding YesText}">
+                Content="{Binding YesText}"
+                IsDefault="True">
                 <Button.CommandParameter>
                     <sys:Boolean>true</sys:Boolean>
                 </Button.CommandParameter>
             </Button>
             <Button
                 d:Content="稍后"
-                Content="{Binding NoText}">
+                Content="{Binding NoText}"
+                IsCancel="True">
                 <Button.CommandParameter>
                     <sys:Boolean>false</sys:Boolean>
                 </Button.CommandParameter>

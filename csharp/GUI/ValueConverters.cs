@@ -94,6 +94,21 @@ namespace OpenSvip.GUI
         }
     }
 
+    public class StringNotBlankToVisibilityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value != null && !string.IsNullOrWhiteSpace(value.ToString())
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     public class AnyTrueAsVisibleConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

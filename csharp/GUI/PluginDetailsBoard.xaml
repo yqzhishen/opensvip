@@ -4,12 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:Framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     mc:Ignorable="d"
     d:Background="White"
-    d:DataContext="{d:DesignInstance Type=Framework:Plugin}"
-    MaxWidth="400">
+    d:DataContext="{d:DesignInstance Type=framework:Plugin}"
+    MaxWidth="600">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
@@ -80,11 +81,16 @@
                     <Hyperlink
                         FontSize="16"
                         Foreground="{StaticResource FunctionalAreaIconBrush}"
-                        TextDecorations="Underline"
                         NavigateUri="{Binding HomePage}"
                         ToolTip="{Binding HomePage}"
                         Cursor="Hand"
-                        Click="AuthorHomePageLink_Click">
+                        Command="{x:Static local:RelayCommands.StartProcessCommand}"
+                        CommandParameter="{Binding HomePage}">
+                        <Hyperlink.TextDecorations>
+                            <TextDecorationCollection>
+                                <TextDecoration PenOffset="3"/>
+                            </TextDecorationCollection>
+                        </Hyperlink.TextDecorations>
                         <TextBlock
                             x:Name="AuthorName"
                             d:Text="YQ之神"

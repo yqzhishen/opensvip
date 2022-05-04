@@ -7,7 +7,6 @@
     xmlns:local="clr-namespace:OpenSvip.GUI.Dialog"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:app="clr-namespace:OpenSvip.GUI"
     mc:Ignorable="d"
     d:Background="White"
     MinHeight="120"
@@ -34,9 +33,9 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Center"
             VerticalContentAlignment="Center"
-            Margin="13.5 0 0 2"
+            Margin="18 0 0 2"
             Padding="4 0 0 0"
-            FontSize="14"
+            Background="{StaticResource ThemedIndigoBrush}"
             Content="记住选择"
             IsChecked="{Binding KeepChoice}"/>
         <StackPanel
@@ -50,6 +49,7 @@
                     <Setter Property="VerticalAlignment" Value="Center"/>
                     <Setter Property="Margin" Value="0 8 8 0"/>
                     <Setter Property="Foreground" Value="{StaticResource ThemedIndigoBrush}"/>
+                    <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="5"/>
                     <Setter Property="Width" Value="70"/>
                 </Style>
             </StackPanel.Resources>
@@ -57,6 +57,7 @@
                 x:Name="YesButton"
                 Content="是"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                IsDefault="True"
                 Click="DialogButton_Click">
                 <Button.CommandParameter>
                     <sys:Boolean>true</sys:Boolean>
@@ -66,6 +67,7 @@
                 x:Name="NoButton"
                 Content="否"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                IsCancel="True"
                 Click="DialogButton_Click">
                 <Button.CommandParameter>
                     <sys:Boolean>false</sys:Boolean>

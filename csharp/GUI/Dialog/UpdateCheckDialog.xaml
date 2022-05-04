@@ -1,0 +1,201 @@
+﻿<UserControl
+    x:Class="OpenSvip.GUI.Dialog.UpdateCheckDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:OpenSvip.GUI"
+    xmlns:dialog="clr-namespace:OpenSvip.GUI.Dialog"
+    xmlns:config="clr-namespace:OpenSvip.GUI.Config"
+    xmlns:framework="clr-namespace:OpenSvip.Framework;assembly=OpenSvip.Framework"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+    mc:Ignorable="d"
+    MaxWidth="400"
+    d:DesignHeight="200"
+    d:DesignWidth="300"
+    d:Background="White"
+    d:DataContext="{d:DesignInstance local:UpdateViewModel}">
+    <UserControl.Resources>
+        <Style x:Key="DialogButton" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+            <Setter Property="Margin" Value="5 0"/>
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="{StaticResource ThemedIndigoBrush}"/>
+            <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="5"/>
+        </Style>
+        <Style x:Key="DialogCloseButton" TargetType="Button" BasedOn="{StaticResource DialogButton}">
+            <Setter Property="IsCancel" Value="True"/>
+            <Setter Property="Command" Value="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+        </Style>
+        <Style x:Key="DialogRetryButton" TargetType="Button" BasedOn="{StaticResource DialogButton}">
+            <Setter Property="Content" Value="重试"/>
+            <EventSetter Event="Click" Handler="RetryButton_Click"/>
+        </Style>
+        <DataTemplate x:Key="Checking">
+            <StackPanel Initialized="UpdateCheckingTemplate_Initialized">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Margin="16 8"
+                    FontSize="14"
+                    Text="正在检查更新，请稍候……"/>
+                <ProgressBar
+                    Margin="16"
+                    Width="20"
+                    Height="20"
+                    Style="{StaticResource MaterialDesignCircularProgressBar}"
+                    Foreground="{StaticResource ThemedIndigoBrush}"
+                    Value="0"
+                    IsIndeterminate="True"/>
+                <Button
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource DialogCloseButton}"
+                    Content="取消"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="Latest">
+            <StackPanel>
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Margin="16"
+                    FontSize="14"
+                    Text="{Binding Source={x:Static config:Information.ApplicationVersion}, StringFormat=已经是最新版本：{0}}"/>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Style="{StaticResource DialogRetryButton}"/>
+                    <Button
+                        Style="{StaticResource DialogCloseButton}"
+                        Content="确定"
+                        IsDefault="True"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="Detected" DataType="{x:Type local:UpdateLogViewModel}">
+            <StackPanel DataContext="{Binding DataContext.UpdateLog, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dialog:UpdateCheckDialog}}">
+                <StackPanel Margin="16 10 16 5">
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        LineHeight="25"
+                        Text="{Binding NewVersion, StringFormat=检测到新版本：{0}}"/>
+                    <TextBlock
+                        HorizontalAlignment="Left"
+                        FontSize="14"
+                        LineHeight="25"
+                        Text="{Binding UpdateDate, StringFormat=更新日期：{0}}"/>
+                </StackPanel>
+                <ScrollViewer
+                    Margin="16 0 5 10"
+                    MaxHeight="400"
+                    Style="{StaticResource OptimizedScrollViewer}"
+                    PanningMode="VerticalOnly">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0 5 15 5"
+                            Visibility="{Binding Text, RelativeSource={RelativeSource Self}, Converter={StaticResource StringNotBlankToVisibilityConverter}, Mode=OneWay}"
+                            Text="{Binding Prologue}"
+                            LineHeight="18"
+                            TextWrapping="Wrap"/>
+                        <ItemsControl
+                            Margin="0 5 15 5"
+                            Visibility="{Binding HasItems, RelativeSource={RelativeSource Self}, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+                            ItemsSource="{Binding UpdateItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <materialDesign:PackIcon
+                                            DockPanel.Dock="Left"
+                                            VerticalAlignment="Center"
+                                            Margin="0 0 5 0"
+                                            Width="5"
+                                            Height="5"
+                                            Kind="Square"/>
+                                        <TextBlock
+                                            DockPanel.Dock="Left"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Center"
+                                            Margin="0 3"
+                                            Text="{Binding}"
+                                            LineHeight="18"
+                                            TextWrapping="Wrap">
+                                        </TextBlock>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                            <TextBlock
+                            Margin="0 5 15 5"
+                            Visibility="{Binding Text, RelativeSource={RelativeSource Self}, Converter={StaticResource StringNotBlankToVisibilityConverter}, Mode=OneWay}"
+                            Text="{Binding Epilogue}"
+                            LineHeight="18"
+                            TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button
+                        Style="{StaticResource DialogButton}"
+                        Content="下载"
+                        ToolTip="{Binding DownloadLink}"
+                        Command="{x:Static local:RelayCommands.StartProcessCommand}"
+                        CommandParameter="{Binding DownloadLink}"
+                        IsDefault="True"/>
+                    <Button
+                        Style="{StaticResource DialogCloseButton}"
+                        Content="取消"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="Failed">
+            <StackPanel>
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    Margin="16 16 16 8"
+                    Text="获取更新失败，请检查网络设置。"/>
+                <StackPanel HorizontalAlignment="Left" Margin="16 8 16 16" Orientation="Horizontal">
+                    <TextBlock Text="您可以手动查询最新版本："/>
+                    <TextBlock>
+                        <Hyperlink
+                            Foreground="{StaticResource FunctionalAreaIconBrush}"
+                            NavigateUri="{Binding Source={x:Static framework:ConstValues.BundleShareLink}}"
+                            ToolTip="{x:Static framework:ConstValues.BundleShareLink}"
+                            Cursor="Hand"
+                            Command="{x:Static local:RelayCommands.StartProcessCommand}"
+                            CommandParameter="{x:Static framework:ConstValues.BundleShareLink}">
+                            <Hyperlink.TextDecorations>
+                                <TextDecorationCollection>
+                                    <TextDecoration PenOffset="3"/>
+                                </TextDecorationCollection>
+                            </Hyperlink.TextDecorations>
+                            <TextBlock Text="访问版本仓库"/>
+                        </Hyperlink>
+                    </TextBlock>
+                    <materialDesign:PackIcon
+                        Margin="-2 -5 0 0"
+                        VerticalAlignment="Center"
+                        Kind="ArrowTopRightThick"
+                        Width="10"
+                        Height="10"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                </StackPanel>
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <Button Style="{StaticResource DialogRetryButton}"/>
+                    <Button
+                        Style="{StaticResource DialogCloseButton}"
+                        Content="取消"
+                        IsDefault="True"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel Margin="16">
+            <ContentControl Content="{Binding Status}">
+                <ContentControl.ContentTemplateSelector>
+                    <dialog:UpdateCheckDialogTemplateSelector
+                        CheckingTemplate="{StaticResource Checking}"
+                        LatestTemplate="{StaticResource Latest}"
+                        DetectedTemplate="{StaticResource Detected}"
+                        FailedTemplate="{StaticResource Failed}"/>
+                </ContentControl.ContentTemplateSelector>
+            </ContentControl>
+        </StackPanel>
+    </Grid>
+</UserControl>

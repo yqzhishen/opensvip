@@ -4,11 +4,15 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.GUI.Config;
+using Tomlet;
+using Tomlet.Attributes;
+using Tomlet.Models;
 
 namespace OpenSvip.GUI
 {
@@ -45,8 +49,6 @@ namespace OpenSvip.GUI
                 return collection;
             });
         }
-
-        public Information Information { get; set; } = new Information();
 
         public List<Plugin> Plugins { get; set; } = PluginManager.GetAllPlugins().ToList();
 
@@ -448,5 +450,116 @@ namespace OpenSvip.GUI
         public bool IsRelative => _pathValue == SOURCE_TAG || _pathValue.StartsWith(SOURCE_TAG + Path.PathSeparator) || _pathValue.StartsWith(SOURCE_TAG + '/');
 
         public string ActualValue => IsRelative ? _pathValue.Substring(SOURCE_TAG.Length).TrimStart(Path.PathSeparator, '/') : _pathValue;
+    }
+
+    public class UpdateViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private UpdateStates _status;
+
+        public UpdateStates Status
+        {
+            get => _status;
+            set
+            {
+                _status = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private UpdateLogViewModel _updateLog = new UpdateLogViewModel();
+
+        public UpdateLogViewModel UpdateLog
+        {
+            get => _updateLog;
+            set
+            {
+                _updateLog = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public class UpdateLogViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private string _newVersion;
+        
+        public string NewVersion
+        {
+            get => _newVersion;
+            set
+            {
+                _newVersion = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _updateDate;
+        
+        public string UpdateDate
+        {
+            get => _updateDate;
+            set
+            {
+                _updateDate = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _prologue;
+
+        public string Prologue
+        {
+            get => _prologue;
+            set
+            {
+                _prologue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public AsyncObservableCollection<string> UpdateItems { get; set; } = new AsyncObservableCollection<string>();
+
+        private string _epilogue;
+
+        public string Epilogue
+        {
+            get => _epilogue;
+            set
+            {
+                _epilogue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _downloadLink;
+
+        public string DownloadLink
+        {
+            get => _downloadLink;
+            set
+            {
+                _downloadLink = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public enum UpdateStates
+    {
+        Checking, Latest, Detected, Failed
     }
 }

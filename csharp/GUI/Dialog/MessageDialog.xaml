@@ -6,7 +6,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:OpenSvip.GUI.Dialog"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-    xmlns:app="clr-namespace:OpenSvip.GUI"
     mc:Ignorable="d"
     d:Background="White"
     Width="320"
@@ -38,8 +37,11 @@
             <Button
                 Style="{StaticResource MaterialDesignFlatButton}"
                 Foreground="{StaticResource ThemedIndigoBrush}"
+                materialDesign:ButtonAssist.CornerRadius="5"
                 d:Content="确定"
                 Content="{Binding ButtonText}"
+                IsDefault="True"
+                IsCancel="True"
                 Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
             </Button>
         </StackPanel>

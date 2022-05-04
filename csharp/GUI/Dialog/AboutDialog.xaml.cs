@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using MaterialDesignThemes.Wpf;
 
 namespace OpenSvip.GUI.Dialog
@@ -31,11 +29,6 @@ namespace OpenSvip.GUI.Dialog
             {
                 DialogHost.Show(this, "RootDialogHost");
             });
-        }
-
-        public void OpenLinkButton_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start(((Button)sender).ToolTip.ToString());
         }
     }
 }
