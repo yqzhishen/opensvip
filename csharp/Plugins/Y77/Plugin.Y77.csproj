@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SymbolList.cs" />
     <Compile Include="Y77Converter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Y77Decoder.cs" />

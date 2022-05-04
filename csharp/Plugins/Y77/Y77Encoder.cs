@@ -1,4 +1,5 @@
-﻿using OpenSvip.Model;
+﻿using NPinyin;
+using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +11,6 @@ namespace Plugin.Y77
 {
     public class Y77Encoder
     {
-        //public int singingTrackIndex = 0;
-
         private Project osProject;
 
         private int noteCount = 0;
@@ -76,7 +75,16 @@ namespace Plugin.Y77
             string origin = note.Pronunciation;
             if (origin == null)
             {
-                return NPinyin.Pinyin.GetPinyin(note.Lyric);
+                string lyric = note.Lyric;
+                if (lyric.Length > 1)
+                {
+                    foreach (var symbol in SymbolList.SymbolToRemoveList())
+                    {
+                        lyric = lyric.Replace(symbol, "");
+                    }
+                }
+                origin = Pinyin.GetPinyin(lyric);
+                return origin;
             }
             else
             {
