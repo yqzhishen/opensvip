@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.2.0</Version>
+    <Version>0.2.1</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。暂不支持 MIDI 格式转换为 OpenSvip 格式。</Descriptions>
@@ -14,7 +14,7 @@
 	<InputOptions>
 	</InputOptions>
 	<OutputOptions>
-		<Option Name="transpose" Type="string" Default="0">
+		<Option Name="transpose" Type="integer" Default="0">
 			<Notes>移调</Notes>
 		</Option>
 		<Option Name="compatibleLyric" Type="boolean" Default="false">
@@ -41,7 +41,7 @@
 				<Choice Name="UTF8" Tag="UTF8" />
 			</EnumChoices>
 		</Option>
-		<Option Name="ppq" Type="string" Default="480">
+		<Option Name="ppq" Type="integer" Default="480">
 			<Notes>时基(PPQ)</Notes>
 			<Tips>即 parts per quarter, 又名 ticks per quarter note，每四分音符的脉冲数。除非你知道这是什么，否则不应更改此设置。</Tips>
 		</Option>
