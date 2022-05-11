@@ -28,7 +28,7 @@
 
 ### GUI 桌面应用程序
 
-1.0.0 (Preview) 版本已发布——详见 Releases 页面。
+OpenSVIP 工程转换器已开启公测：详见 [OpenVPI 主页](https://openvpi.github.io/home/)
 
 ### C# 命令行工具
 
