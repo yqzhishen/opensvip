@@ -36,6 +36,11 @@ namespace Plugin.Midi
         public LyricEncodings LyricEncoding { get; set; }
 
         /// <summary>
+        /// 半元音前移量，单位为梯。
+        /// </summary>
+        public int SemivowelPreShift { get; set; }
+
+        /// <summary>
         /// 时基，默认为480。
         /// </summary>
         public int PPQ { get; set; }
@@ -165,7 +170,7 @@ namespace Plugin.Midi
             lastEventAbsoluteTime = tempo.Position;
             return setTempoEvent;
         }
-        
+
         /// <summary>
         /// 转换演唱轨。
         /// </summary>
@@ -186,8 +191,28 @@ namespace Plugin.Midi
         /// <returns>带词音符的 MIDI Event 数组。</returns>
         private MidiEvent[] EncodeNoteEventArray(SingingTrack singingTrack)
         {
+            if (SemivowelPreShift != 0)
+            {
+                for (int index = 0; index < singingTrack.NoteList.Count; index++)//这种方式不好，以后再改。
+                {
+                    if (IsSemivowelNote(singingTrack.NoteList[index]))//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
+                    {
+                        if (index > 0 && singingTrack.NoteList[index - 1].Length >= SemivowelPreShift)
+                        {
+                            singingTrack.NoteList[index - 1].Length -= SemivowelPreShift;
+                        }
+                        else
+                        {
+                            Warnings.AddWarning("半元音前移量过大，将导致音符长度小于或等于零，已忽略。", $"歌词：{singingTrack.NoteList[index - 1].Lyric}，长度：{singingTrack.NoteList[index - 1].Length}", WarningTypes.Notes);
+                        }
+                        singingTrack.NoteList[index].StartPos -= SemivowelPreShift;
+                        singingTrack.NoteList[index].Length += SemivowelPreShift;
+                    }
+                }
+            }
             List<MidiEvent> midiEventList = new List<MidiEvent>();
             int lastEventAbsoluteTime = 0;
+            //bool IsSemivowelShiftForwardHandled = false;
             //这里不能用 DryWetMidi 的音符管理器来转换音符，因为不能设置音符的歌词。需要手动生成歌词、音符按下和松开三个事件。
             foreach (var note in singingTrack.NoteList)
             {
@@ -197,7 +222,38 @@ namespace Plugin.Midi
             }
             return midiEventList.ToArray();
         }
-        
+
+        /// <summary>
+        /// 判断是否为半元音音符。
+        /// </summary>
+        private bool IsSemivowelNote(Note note)
+        {
+            string notePinyin = GetPinyin(note);
+            if (notePinyin.StartsWith("y") || notePinyin.StartsWith("w") || notePinyin == "er")
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 获取音符的拼音。
+        /// </summary>
+        private string GetPinyin(Note note)
+        {
+            if (note.Pronunciation != null)
+            {
+                return note.Pronunciation;
+            }
+            else
+            {
+                return Pinyin.GetPinyin(note.Lyric);
+            }
+        }
+
         /// <summary>
         /// 将歌词转换成 MIDI 事件。
         /// </summary>
@@ -206,12 +262,25 @@ namespace Plugin.Midi
         /// <returns>歌词事件。</returns>
         private LyricEvent EncodeLyricEvent(Note note, int lastEventAbsoluteTime)
         {
-            LyricEvent lyricEvent = new LyricEvent
+            try
             {
-                Text = GetLyric(note),
-                DeltaTime = note.StartPos - lastEventAbsoluteTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
-            };
-            return lyricEvent;
+                LyricEvent lyricEvent = new LyricEvent
+                {
+                    Text = GetLyric(note),
+                    DeltaTime = note.StartPos - lastEventAbsoluteTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
+                };
+                return lyricEvent;
+            }
+            catch (System.Exception)
+            {
+                //用于调试。
+                Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
+                + " StartPos = " + note.StartPos
+                + " Length = " + note.Length
+                + " lastEventAbsoluteTime = " + lastEventAbsoluteTime
+                + " DeltaTime = " + (note.StartPos - lastEventAbsoluteTime).ToString());
+            }
+            return new LyricEvent();
         }
 
         /// <summary>

@@ -11,11 +11,11 @@ namespace Plugin.Midi
     {
         public Project DecodeMidiFile(String path)
         {
-            var xsProject = new Project
+            var osProject = new Project
             {
 
             };
-            return xsProject;
+            return osProject;
         }
     }
 }
