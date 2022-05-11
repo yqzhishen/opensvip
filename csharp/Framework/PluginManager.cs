@@ -111,7 +111,7 @@ namespace OpenSvip.Framework
             }
         }
 
-        public static void InstallPlugin(Plugin plugin, string folder)
+        public static void InstallPlugin(Plugin plugin, string folder, bool force = false)
         {
             var folderName = Path.GetFileName(folder);
             var targetFolder = Path.Combine(PluginPath, folderName);
@@ -123,9 +123,9 @@ namespace OpenSvip.Framework
             {
                 if (Directory.Exists(targetFolder))
                 {
-                    if (Folders.ContainsValue(targetFolder))
+                    if (Folders.ContainsValue(targetFolder) && !force)
                     {
-                        throw new IOException($"试图安装一个新的插件，但其目录名“{folderName}”与已有插件冲突。请联系插件的发布者。");
+                        throw new PluginFolderConflictException(folderName);
                     }
                     new DirectoryInfo(targetFolder).Delete(true);
                 }
@@ -133,6 +133,16 @@ namespace OpenSvip.Framework
             Directory.Move(folder, targetFolder);
             Plugins[plugin.Identifier] = plugin;
             Folders[plugin.Identifier] = targetFolder;
+        }
+    }
+
+    public class PluginFolderConflictException : IOException
+    {
+        public string FolderName { get; set; }
+
+        public PluginFolderConflictException(string folderName)
+        {
+            FolderName = folderName;
         }
     }
 }
