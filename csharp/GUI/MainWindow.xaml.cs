@@ -55,7 +55,8 @@ namespace OpenSvip.GUI
                 AutoExtension = settings.AutoExtension,
                 OpenExportFolder = settings.OpenExportFolder,
                 OverWriteOption = settings.OverwriteOption,
-                AppearanceThemes = settings.AppearanceTheme
+                AppearanceThemes = settings.AppearanceTheme,
+                CheckForUpdates = settings.CheckForUpdates
             };
             Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
@@ -82,40 +83,28 @@ namespace OpenSvip.GUI
                 Model.ExportPath.PathValue = settings.LastExportPath;
             }
             DataContext = Model;
+        }
 
-            var formats = Model.Formats;
-            foreach (var str in formats)
-            {
-                ImportPluginComboBox.Items.Add(new ComboBoxItem
-                {
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    Content = str
-                });
-                ExportPluginComboBox.Items.Add(new ComboBoxItem
-                {
-                    HorizontalContentAlignment = HorizontalAlignment.Center,
-                    Content = str
-                });
-            }
-            for (var i = 0; i < formats.Count; ++i)
-            {
-                var importMenuItem = new MenuItem
-                {
-                    Header = $"_{(i + 1) % 10}  {formats[i]}"
-                };
-                importMenuItem.CommandParameter = importMenuItem;
-                importMenuItem.Command = ImportPluginMenuItemCommand;
-                ImportPluginMenuItem.Items.Add(importMenuItem);
-                var exportMenuItem = new MenuItem
-                {
-                    Header = $"_{(i + 1) % 10}  {formats[i]}"
-                };
-                exportMenuItem.CommandParameter = exportMenuItem;
-                exportMenuItem.Command = ExportPluginMenuItemCommand;
-                ExportPluginMenuItem.Items.Add(exportMenuItem);
-            }
-            TaskListView.ItemsSource = Model.TaskList;
+        private void MainWindow_SourceInitialized(object sender, EventArgs e)
+        {
             AddConverterTasks(Environment.GetCommandLineArgs().Skip(1).Where(File.Exists));
+            if (Model.CheckForUpdates)
+            {
+                new Thread(() =>
+                {
+                    try
+                    {
+                        if (new UpdateChecker().CheckForUpdate(out var updateLog) && !Model.ExecutionInProgress)
+                        {
+                            UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
+                        }
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                }).Start();
+            }
         }
 
         private void FileDropColorOpacityChange(double from, double to)
@@ -335,7 +324,7 @@ namespace OpenSvip.GUI
         public static readonly RelayCommand<MenuItem> ImportPluginMenuItemCommand = new RelayCommand<MenuItem>(
             p =>
             {
-                var model = (AppModel)p.DataContext;
+                var model = ((MainWindow)Application.Current.MainWindow)?.Model;
                 return model != null && !model.ExecutionInProgress;
             },
             p =>
@@ -345,13 +334,21 @@ namespace OpenSvip.GUI
                     // Cancelling the choice of plugin is not allowed
                     return;
                 }
-                var parent = p.Parent;
-                var index = ((ItemsControl)parent).Items.IndexOf(p);
-                ((MainWindow)App.Current.MainWindow).Model.SelectedInputPluginIndex = index;
+                var model = ((MainWindow)Application.Current.MainWindow)?.Model;
+                if (model == null)
+                {
+                    return;
+                }
+                var index = model.Plugins.IndexOf((Plugin)p.DataContext);
+                model.SelectedInputPluginIndex = index;
             });
 
         public static readonly RelayCommand<MenuItem> ExportPluginMenuItemCommand = new RelayCommand<MenuItem>(
-            p => true,
+            p =>
+            {
+                var model = ((MainWindow)Application.Current.MainWindow)?.Model;
+                return model != null && !model.ExecutionInProgress;
+            },
             p =>
             {
                 if (!p.IsChecked)
@@ -359,9 +356,13 @@ namespace OpenSvip.GUI
                     // Cancelling the choice of plugin is not allowed
                     return;
                 }
-                var parent = p.Parent;
-                var index = ((ItemsControl)parent).Items.IndexOf(p);
-                ((MainWindow)App.Current.MainWindow).Model.SelectedOutputPluginIndex = index;
+                var model = ((MainWindow)Application.Current.MainWindow)?.Model;
+                if (model == null)
+                {
+                    return;
+                }
+                var index = model.Plugins.IndexOf((Plugin)p.DataContext);
+                model.SelectedOutputPluginIndex = index;
             });
 
         public static readonly RelayCommand<AppModel> SwapPluginCommand = new RelayCommand<AppModel>(
@@ -398,13 +399,29 @@ namespace OpenSvip.GUI
                             {
                                 confirmDialog = YesNoDialog.CreateDialog(
                                     "安装新的插件",
-                                    $"将要安装由 {plugin.Author} 开发，适用于 {plugin.Format} (*.{plugin.Suffix}) 的插件“{plugin.Name}”。确认继续？",
+                                    $"将要安装由 {plugin.Author} 开发，适用于 {plugin.Format} (*.{plugin.Suffix}) 的插件“{plugin.Name}”。\n确认继续？",
                                     "安装");
-                                if (confirmDialog.ShowDialog())
+                                if (!confirmDialog.ShowDialog())
+                                {
+                                    continue;
+                                }
+                                try
                                 {
                                     PluginManager.InstallPlugin(plugin, folder);
-                                    ++success;
                                 }
+                                catch (PluginFolderConflictException e)
+                                {
+                                    confirmDialog = YesNoDialog.CreateDialog(
+                                        "插件文件夹冲突",
+                                        $"试图安装一个新的插件，但其文件夹“{e.FolderName}”与已有插件冲突。\n出现此问题可能是由于插件开发者修改了插件的标识符；若您无法确认上述情况，继续安装可能会导致丢失插件数据。\n确认要覆盖安装吗？",
+                                        "覆盖");
+                                    if (!confirmDialog.ShowDialog())
+                                    {
+                                        continue;
+                                    }
+                                    PluginManager.InstallPlugin(plugin, folder, true);
+                                }
+                                ++success;
                                 continue;
                             }
                             var oldPlugin = PluginManager.GetPlugin(plugin.Identifier);
@@ -414,29 +431,45 @@ namespace OpenSvip.GUI
                             {
                                 confirmDialog = YesNoDialog.CreateDialog(
                                     "更新已有插件",
-                                    $"插件“{plugin.Name}”将由 {oldVersion} 更新至 {version}。确认继续？",
+                                    $"插件“{plugin.Name}”将由 {oldVersion} 更新至 {version}。\n确认继续？",
                                     "更新");
                             }
                             else
                             {
                                 confirmDialog = YesNoDialog.CreateDialog(
                                     "此插件不是新的版本",
-                                    $"当前已安装插件“{plugin.Name}”的相同或更新版本 ({oldVersion} ≥ {version})。确认要覆盖安装吗？",
+                                    $"当前已安装插件“{plugin.Name}”的相同或更新版本 ({oldVersion} ≥ {version})。\n确认要覆盖安装吗？",
                                     "覆盖");
                             }
-                            if (confirmDialog.ShowDialog())
+                            if (!confirmDialog.ShowDialog())
                             {
-                                PluginManager.InstallPlugin(plugin, folder);
-                                ++success;
+                                continue;
                             }
+                            PluginManager.InstallPlugin(plugin, folder);
+                            ++success;
                         }
                         catch (Exception e)
                         {
                             MessageDialog.CreateDialog("插件安装失败", e.Message).ShowDialog();
                         }
                     }
-                    if (success > 0)
+                    if (Directory.Exists(PluginManager.TempPath))
                     {
+                        new DirectoryInfo(PluginManager.TempPath).Delete(true);
+                    }
+
+                    if (success <= 0)
+                    {
+                        return;
+                    }
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        ((MainWindow)Application.Current.MainWindow)?.Model.RefreshPluginsSource();
+                    });
+                    MessageDialog.CreateDialog(
+                        "插件安装完成",
+                        $"已成功安装 {success} 个插件。新的功能已准备就绪。").ShowDialog();
+                    /*
                         var restartDialog = YesNoDialog.CreateDialog(
                             "插件安装完成。重启本应用？",
                             $"已成功安装 {success} 个插件。需要重启本应用以使新的功能生效。",
@@ -444,18 +477,14 @@ namespace OpenSvip.GUI
                             "稍后");
                         if (restartDialog.ShowDialog())
                         {
-                            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                            Application.Current.Dispatcher.Invoke(() =>
                             {
-                                System.Windows.Application.Current.MainWindow?.Close();
-                                System.Windows.Application.Current.Shutdown();
+                                Application.Current.MainWindow?.Close();
+                                Application.Current.Shutdown();
                             });
                             System.Windows.Forms.Application.Restart();
                         }
-                    }
-                    if (Directory.Exists(PluginManager.TempPath))
-                    {
-                        new DirectoryInfo(PluginManager.TempPath).Delete(true);
-                    }
+                        */
                 }).Start();
             });
 
@@ -573,7 +602,7 @@ namespace OpenSvip.GUI
         {
             var eventArgs = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
             {
-                RoutedEvent = UIElement.MouseWheelEvent,
+                RoutedEvent = MouseWheelEvent,
                 Source = e.Source
             };
 
@@ -586,7 +615,7 @@ namespace OpenSvip.GUI
         {
             var eventArgs = new TouchEventArgs(e.TouchDevice, e.Timestamp)
             {
-                RoutedEvent = UIElement.TouchMoveEvent,
+                RoutedEvent = TouchMoveEvent,
                 Source = e.Source
             };
 
@@ -669,6 +698,17 @@ namespace OpenSvip.GUI
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            if (Model.ExecutionInProgress)
+            {
+                var confirmDialog = YesNoDialog.CreateDialog(
+                    "确认退出？",
+                    "转换任务仍在进行中。现在退出可能导致输出文件损坏。");
+                if (!confirmDialog.ShowDialog())
+                {
+                    e.Cancel = true;
+                    return;
+                }
+            }
             new AppConfig
             {
                 Properties =
@@ -694,9 +734,15 @@ namespace OpenSvip.GUI
                     LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
                         ? Model.ExportPath.PathValue
                         : null,
-                    AppearanceTheme = Model.AppearanceThemes
+                    AppearanceTheme = Model.AppearanceThemes,
+                    CheckForUpdates = Model.CheckForUpdates
                 }
             }.SaveToFile();
+            // Shutdown the application by force
+            new Thread(() =>
+            {
+                Environment.Exit(0);
+            }).Start();
         }
     }
 }

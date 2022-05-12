@@ -237,12 +237,12 @@
                 Margin="0 4 2 4"
                 Width="20"
                 Height="20"
-                Kind="Export"
+                Kind="TransferRight"
                 Opacity="{Binding IsEnabled, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ItemsControl}, Converter={StaticResource BooleanSwitchOperationConverter}, ConverterParameter=1;0.5, Mode=OneWay}"/>
             <TextBlock
                 DockPanel.Dock="Right"
                 VerticalAlignment="Center"
-                Margin="5 4 0 5"
+                Margin="5 4 0 4"
                 FontSize="13"
                 d:Text=".json"
                 Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext.ExportExtension, Mode=OneWay}"/>

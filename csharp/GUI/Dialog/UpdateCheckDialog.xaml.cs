@@ -1,23 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using MaterialDesignThemes.Wpf;
 using OpenSvip.GUI.Config;
 using Tomlet;
@@ -31,18 +18,27 @@ namespace OpenSvip.GUI.Dialog
     {
         public UpdateViewModel Model = new UpdateViewModel();
 
-        public UpdateCheckDialog()
+        private readonly bool _hasChecked;
+
+        public UpdateCheckDialog(bool hasChecked = false)
         {
             InitializeComponent();
             DataContext = Model;
+            _hasChecked = hasChecked;
         }
 
-        public static UpdateCheckDialog CreateDialog()
+        public static UpdateCheckDialog CreateDialog(UpdateLog updateLog = null)
         {
             UpdateCheckDialog dialog = null;
             Application.Current.Dispatcher.Invoke(() =>
             {
-                dialog = new UpdateCheckDialog();
+                dialog = new UpdateCheckDialog(updateLog != null);
+                if (updateLog == null)
+                {
+                    return;
+                }
+                dialog.Model.UpdateLog = ConvertFromUpdateLog(updateLog);
+                dialog.Model.Status = UpdateStates.Detected;
             });
             return dialog;
         }
@@ -55,54 +51,45 @@ namespace OpenSvip.GUI.Dialog
             });
         }
 
+        private static UpdateLogViewModel ConvertFromUpdateLog(UpdateLog updateLog)
+        {
+            var updateLogViewModel = new UpdateLogViewModel
+            {
+                NewVersion = updateLog.Version,
+                UpdateDate = updateLog.Date,
+                Prologue = updateLog.Prologue,
+                Epilogue = updateLog.Epilogue,
+                DownloadLink = updateLog.DownloadLink
+            };
+            foreach (var item in updateLog.Items)
+            {
+                updateLogViewModel.UpdateItems.Add(item);
+            }
+            return updateLogViewModel;
+        }
+
         private void UpdateCheckingTemplate_Initialized(object sender, EventArgs e)
         {
+            if (_hasChecked)
+            {
+                return;
+            }
             new Thread(() =>
             {
-                var timer = new Thread(() =>
-                {
-                    Thread.Sleep(1000);
-                });
                 try
                 {
-                    timer.Start();
-                    var request = (HttpWebRequest)WebRequest.Create(Information.UpdateLogUrl);
-                    request.Method = "GET";
-                    var response = (HttpWebResponse)request.GetResponse();
-                    if (response.StatusCode != HttpStatusCode.OK)
+                    if (new UpdateChecker().CheckForUpdate(out var updateLog))
                     {
-                        throw new HttpException($"Unexpected response code: {response.StatusCode}");
+                        Model.UpdateLog = ConvertFromUpdateLog(updateLog);
+                        Model.Status = UpdateStates.Detected;
                     }
-                    var stream = response.GetResponseStream();
-                    if (stream == null)
+                    else
                     {
-                        throw new HttpException("Response is null");
+                        Model.Status = UpdateStates.Latest;
                     }
-                    using (var reader = new StreamReader(stream))
-                    {
-                        var responseBody = reader.ReadToEnd();
-                        var updateLog = TomletMain.To<UpdateLog>(responseBody);
-                        Model.UpdateLog = new UpdateLogViewModel
-                        {
-                            NewVersion = updateLog.Version,
-                            UpdateDate = updateLog.Date,
-                            Prologue = updateLog.Prologue,
-                            Epilogue = updateLog.Epilogue,
-                            DownloadLink = updateLog.DownloadLink
-                        };
-                        foreach (var item in updateLog.Items)
-                        {
-                            Model.UpdateLog.UpdateItems.Add(item);
-                        }
-                    }
-                    var currentVersion = new Version(Information.ApplicationVersion.Split(' ')[0]);
-                    var newVersion = new Version(Model.UpdateLog.NewVersion.Split(' ')[0]);
-                    timer.Join();
-                    Model.Status = newVersion > currentVersion ? UpdateStates.Detected : UpdateStates.Latest;
                 }
                 catch
                 {
-                    timer.Join();
                     Model.Status = UpdateStates.Failed;
                 }
             }).Start();

@@ -25,6 +25,7 @@ namespace OpenSvip.Framework
         /// <param name="name">选项名称</param>
         public bool ContainsOption(string name)
         {
+            
             return OptionDictionary.ContainsKey(name);
         }
 

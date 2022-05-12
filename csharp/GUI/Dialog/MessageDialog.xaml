@@ -35,6 +35,8 @@
         </StackPanel>
         <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Horizontal">
             <Button
+                Height="40"
+                Width="75"
                 Style="{StaticResource MaterialDesignFlatButton}"
                 Foreground="{StaticResource ThemedIndigoBrush}"
                 materialDesign:ButtonAssist.CornerRadius="5"
