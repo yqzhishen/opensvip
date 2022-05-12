@@ -20,7 +20,8 @@ namespace Midi.Stream
                 IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
                 LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
-                PPQ = options.GetValueAsInteger("ppq", 480)
+                PPQ = options.GetValueAsInteger("ppq", 480),
+                SemivowelPreShift = options.GetValueAsInteger("semivowelPreShift", 0)
             }.EncodeMidiFile(project, path);
         }
     }

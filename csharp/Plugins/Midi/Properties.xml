@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.2.1</Version>
+    <Version>0.3.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。暂不支持 MIDI 格式转换为 OpenSvip 格式。</Descriptions>
@@ -17,13 +17,13 @@
 		<Option Name="transpose" Type="integer" Default="0">
 			<Notes>移调</Notes>
 		</Option>
-		<Option Name="compatibleLyric" Type="boolean" Default="false">
-			<Notes>歌词兼容性模式</Notes>
-			<Tips>将所有中文歌词转换为拼音，防止不支持导入带有中文歌词MIDI文件的歌声合成软件出现乱码。</Tips>
-		</Option>
 		<Option Name="removeSymbols" Type="boolean" Default="true">
 			<Notes>移除歌词中的常见标点符号</Notes>
 			<Tips>移除{ ",", ".", "?", "!", "，", "。", "？", "！" }，防止不支持含标点符号歌词的歌声合成软件无法正常合成。</Tips>
+		</Option>
+		<Option Name="compatibleLyric" Type="boolean" Default="false">
+			<Notes>歌词兼容性模式</Notes>
+			<Tips>将所有中文歌词转换为拼音，防止不支持导入带有中文歌词MIDI文件的歌声合成软件出现乱码。</Tips>
 		</Option>
 		<Option Name="lyricEncoding" Type="enum" Default="UTF8BOM">
 			<Notes>歌词文本编码</Notes>
@@ -35,15 +35,19 @@
 					<Label>操作系统的当前 ANSI 代码页的编码。</Label>
 				</Choice>
 				<Choice Name="Unicode" Tag="Unicode" />
-				<Choice Name="UTF32" Tag="UTF32" />
-				<Choice Name="UTF7" Tag="UTF7" />
-				<Choice Name="UTF8BOM" Tag="UTF8BOM" />
-				<Choice Name="UTF8" Tag="UTF8" />
+				<Choice Name="UTF-32" Tag="UTF32" />
+				<Choice Name="UTF-7" Tag="UTF7" />
+				<Choice Name="UTF-8 BOM" Tag="UTF8BOM" />
+				<Choice Name="UTF-8" Tag="UTF8" />
 			</EnumChoices>
 		</Option>
 		<Option Name="ppq" Type="integer" Default="480">
 			<Notes>时基(PPQ)</Notes>
 			<Tips>即 parts per quarter, 又名 ticks per quarter note，每四分音符的脉冲数。除非你知道这是什么，否则不应更改此设置。</Tips>
+		</Option>
+		<Option Name="semivowelPreShift" Type="integer" Default="0">
+			<Notes>半元音前移量</Notes>
+			<Tips>单位为梯。将发音为 y-、w- 和 er 的音符提前，以缓解某些歌声合成软件半元音音符出现迟滞的问题。推荐值：30~120。</Tips>
 		</Option>
 	</OutputOptions>
 </Plugin>

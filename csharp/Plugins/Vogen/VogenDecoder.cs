@@ -101,7 +101,7 @@ namespace Plugin.Vogen
         /// <returns></returns>
         private int DecodeNoteStartPosition(int singingTrackIndex, int noteIndex, Project project)
         {
-            return vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].StartPosition - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+            return vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].StartPosition;
         }
 
         /// <summary>
