@@ -67,7 +67,6 @@
                             Opacity="0.4"
                             Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                         <TextBlock
-                            x:Name="FileDropText"
                             DockPanel.Dock="Bottom"
                             Text="单击添加自定义路径"
                             HorizontalAlignment="Center"
@@ -89,12 +88,6 @@
                     Background="{StaticResource ThemedLowContrastGreyscaleBrush}"
                     d:Height="287"
                     Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=dialog:PathManagerDialog}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=105, Mode=OneWay}">
-                    <Border.Resources>
-                        <x:Array x:Key="FlatButtonStyles" Type="Style">
-                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}"/>
-                            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatLightButton}"/>
-                        </x:Array>
-                    </Border.Resources>
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
@@ -161,7 +154,7 @@
                                                     Foreground="{StaticResource ThemedIndigoBrush}"
                                                     materialDesign:ButtonAssist.CornerRadius="3"
                                                     Content="{materialDesign:PackIcon Kind=Folder, Size=25}"
-                                                    ToolTip="浏览文件夹"
+                                                    ToolTip="浏览"
                                                     Click="BrowsePathButton_Click"/>
                                                 <TextBox
                                                     Grid.Column="2"

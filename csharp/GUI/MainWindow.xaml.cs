@@ -107,7 +107,7 @@ namespace OpenSvip.GUI
             }
         }
 
-        private void FileDropColorOpacityChange(double from, double to)
+        private static void FileDropColorOpacityChange(IAnimatable element, double from, double to)
         {
             var animation = new DoubleAnimation
             {
@@ -119,7 +119,7 @@ namespace OpenSvip.GUI
                     EasingMode = EasingMode.EaseInOut
                 }
             };
-            FileDropIcon.BeginAnimation(OpacityProperty, animation);
+            element.BeginAnimation(OpacityProperty, animation);
         }
 
         private void AddConverterTasks(IEnumerable<string> filenames)
@@ -373,7 +373,7 @@ namespace OpenSvip.GUI
             });
 
         public static readonly RelayCommand<AppModel> InstallPluginCommand = new RelayCommand<AppModel>(
-            p => !p.ExecutionInProgress,
+            p => p != null && !p.ExecutionInProgress,
             p =>
             {
                 var dialog = new OpenFileDialog
@@ -494,12 +494,22 @@ namespace OpenSvip.GUI
 
         private void FileMaskPanel_Focus(object sender, RoutedEventArgs e)
         {
-            FileDropColorOpacityChange(0.4, 0.8);
+            FileDropColorOpacityChange(FileDropIcon, 0.4, 0.8);
         }
 
         private void FileMaskPanel_UnFocus(object sender, RoutedEventArgs e)
         {
-            FileDropColorOpacityChange(0.8, 0.4);
+            FileDropColorOpacityChange(FileDropIcon, 0.8, 0.4);
+        }
+
+        private void InstallPluginMaskPanel_Focus(object sender, RoutedEventArgs e)
+        {
+            FileDropColorOpacityChange(InstallPluginIcon, 0.4, 0.8);
+        }
+
+        private void InstallPluginMaskPanel_UnFocus(object sender, RoutedEventArgs e)
+        {
+            FileDropColorOpacityChange(InstallPluginIcon, 0.8, 0.4);
         }
 
         private void FileMaskPanel_Click(object sender, RoutedEventArgs e)

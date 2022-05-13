@@ -1,13 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Net;
 using System.Threading;
-using System.Web;
 using System.Windows;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
 using OpenSvip.GUI.Config;
-using Tomlet;
 
 namespace OpenSvip.GUI.Dialog
 {

@@ -46,6 +46,7 @@ namespace OpenSvip.GUI
                 var exportId = SelectedOutputPlugin?.Identifier;
                 _plugins = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Plugins"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HasAnyPlugin"));
                 SelectedInputPluginIndex = _plugins.FindIndex(plugin => plugin.Identifier == importId);
                 SelectedOutputPluginIndex = _plugins.FindIndex(plugin => plugin.Identifier == exportId);
                 InputOptions = Plugins.ConvertAll(plugin =>
@@ -68,6 +69,8 @@ namespace OpenSvip.GUI
                 });
             }
         }
+
+        public bool HasAnyPlugin => Plugins.Count > 0;
 
         private bool _autoDetectFormat;
 

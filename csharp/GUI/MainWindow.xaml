@@ -148,8 +148,14 @@
                             Header="导入文件(_I)..."
                             InputGestureText="Ctrl+I"
                             Icon="{materialDesign:PackIcon Kind=TrayArrowDown}"
-                            IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
-                            Click="FileMaskPanel_Click"/>
+                            Click="FileMaskPanel_Click">
+                            <MenuItem.IsEnabled>
+                                <MultiBinding Converter="{StaticResource BooleanAllConverter}" Mode="OneWay">
+                                    <Binding Path="HasAnyPlugin"/>
+                                    <Binding Path="ExecutionInProgress" Converter="{StaticResource InvertBooleanConverter}"/>
+                                </MultiBinding>
+                            </MenuItem.IsEnabled>
+                        </MenuItem>
                         <MenuItem
                             Header="导出文件(_E)"
                             Icon="{materialDesign:PackIcon Kind=ShareAllOutline}"
@@ -163,11 +169,17 @@
                                 InputGestureText="Ctrl+Shift+E"
                                 Click="BrowseAndExportMenu_Click"/>
                         </MenuItem>
-                        <MenuItem Header="重置列表(_R)" Icon="{materialDesign:PackIcon Kind=Autorenew}" InputGestureText="Ctrl+R" Click="ClearTasksButton_Click"/>
+                        <MenuItem
+                            Header="重置列表(_R)"
+                            Icon="{materialDesign:PackIcon Kind=Autorenew}"
+                            InputGestureText="Ctrl+R"
+                            IsEnabled="{Binding HasItems, ElementName=TaskListView}"
+                            Click="ClearTasksButton_Click"/>
                     </MenuItem>
                     <MenuItem Header="转换(_C)" Height="22" Padding="10 0">
                         <MenuItem.Resources>
                             <Style x:Key="PluginMenuItem" TargetType="MenuItem" BasedOn="{StaticResource NarrowCheckableMenuItem}">
+                                <Setter Property="IsEnabled" Value="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}, Mode=OneWay}"/>
                                 <Setter Property="Header">
                                     <Setter.Value>
                                         <MultiBinding Mode="OneWay">
@@ -179,10 +191,10 @@
                                         </MultiBinding>
                                     </Setter.Value>
                                 </Setter>
-                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}}"></Setter>
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}}"/>
                             </Style>
                         </MenuItem.Resources>
-                        <MenuItem Header="导入格式(_F)" ItemsSource="{Binding Plugins}">
+                        <MenuItem Header="导入格式(_F)" IsEnabled="{Binding HasAnyPlugin}" ItemsSource="{Binding Plugins}">
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="MenuItem" BasedOn="{StaticResource PluginMenuItem}">
                                     <Setter Property="IsChecked">
@@ -198,7 +210,7 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
-                        <MenuItem Header="导出格式(_T)" ItemsSource="{Binding Plugins}">
+                        <MenuItem Header="导出格式(_T)" IsEnabled="{Binding HasAnyPlugin}" ItemsSource="{Binding Plugins}">
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="MenuItem" BasedOn="{StaticResource PluginMenuItem}">
                                     <Setter Property="IsChecked">
@@ -358,7 +370,44 @@
                     </ComboBox>
                 </Grid>
             </Grid>
-            <Grid>
+            <Grid Visibility="{Binding HasAnyPlugin, Converter={StaticResource InverseBoolToVisConverter}}">
+                <Button
+                    x:Name="InstallPluginMaskPanel"
+                    Width="280"
+                    Height="180"
+                    Opacity="0"
+                    Panel.ZIndex="16"
+                    Cursor="Hand"
+                    MouseEnter="InstallPluginMaskPanel_Focus"
+                    MouseLeave="InstallPluginMaskPanel_UnFocus"
+                    Command="{x:Static local:MainWindow.InstallPluginCommand}"
+                    CommandParameter="{Binding}"/>
+                <DockPanel
+                    Height="240"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <materialDesign:PackIcon
+                        x:Name="InstallPluginIcon"
+                        DockPanel.Dock="Top"
+                        Kind="PuzzlePlusOutline"
+                        Margin="0 50 0 0"
+                        HorizontalAlignment="Center"
+                        Width="100"
+                        Height="100"
+                        Opacity="0.4"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                    <TextBlock
+                        DockPanel.Dock="Bottom"
+                        Text="单击安装第一个插件"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Margin="0 5 0 0"
+                        FontSize="25"
+                        Opacity="{Binding Opacity, ElementName=InstallPluginIcon}"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                </DockPanel>
+            </Grid>
+            <Grid d:Visibility="Visible" Visibility="{Binding HasAnyPlugin, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition MinWidth="350"/>
@@ -935,7 +984,7 @@
                                     Content="{materialDesign:PackIcon Folder}"
                                     IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"
                                     Click="BrowseExportFolderButton_Click"
-                                    ToolTip="浏览文件夹"/>
+                                    ToolTip="浏览"/>
                                 <TextBox
                                     VerticalAlignment="Center"
                                     Margin="10 0"
