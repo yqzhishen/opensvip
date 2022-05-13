@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>歌叽歌叽工程转换插件</Name>
-    <Version>1.5.1</Version>
+    <Version>1.6.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的歌叽歌叽工程格式转换插件。</Descriptions>
@@ -11,15 +11,35 @@
     <Identifier>gj</Identifier>
     <LibraryPath>Gjgj\Plugin.Gjgj.dll</LibraryPath>
     <Converter>Gjgj.Stream.GjgjConverter</Converter>
-    <InputOptions/>
-	<OutputOptions>
-		<Option Name="desample" Type="integer" Default="32">
-			<Notes>音量参数平均采样间隔</Notes>
-			<Tips>单位为梯。数值越大，编辑器越流畅；数值越小，音量参数越精确。</Tips>
-		</Option>
-		<Option Name="singer" Type="string" Default="扇宝">
-			<Notes>默认歌手</Notes>
-			<Tips>歌叽歌叽官方歌手有：扇宝、SING-林嘉慧和Rocky。</Tips>
-		</Option>
-	</OutputOptions>
+    <InputOptions />
+    <OutputOptions>
+        <Option Name="lyricsAndPinyinSettings" Type="enum" Default="sameAsSource">
+            <Notes>歌词和拼音处理方式</Notes>
+            <!--<Tips></Tips>-->
+            <EnumChoices>
+                <Choice Name="仅歌词" Tag="lyricsOnly">
+                    <Label>丢弃所有编辑过的拼音，仅保留中文歌词。</Label>
+                </Choice>
+                <Choice Name="与源文件相同" Tag="sameAsSource" />
+                <Choice Name="仅拼音" Tag="pinyinOnly">
+                    <Label>所有歌词在转换成拼音后丢弃，歌词恢复为默认的“啊”。</Label>
+                </Choice>
+                <Choice Name="歌词和拼音" Tag="lyricsAndPinyin">
+                    <Label>保留中文歌词和已编辑的拼音，未编辑拼音的音符将标上拼音。</Label>
+                </Choice>
+            </EnumChoices>
+        </Option>
+        <Option Name="desample" Type="integer" Default="32">
+            <Notes>音量参数平均采样间隔</Notes>
+            <Tips>单位为梯。数值越大，编辑器越流畅；数值越小，音量参数越精确。</Tips>
+        </Option>
+        <Option Name="singer" Type="enum" Default="扇宝">
+            <Notes>默认歌手</Notes>
+            <EnumChoices>
+                <Choice Name="扇宝" Tag="扇宝" />
+                <Choice Name="SING-林嘉慧" Tag="SING-林嘉慧" />
+                <Choice Name="Rocky" Tag="Rocky" />
+            </EnumChoices>
+        </Option>
+    </OutputOptions>
 </Plugin>

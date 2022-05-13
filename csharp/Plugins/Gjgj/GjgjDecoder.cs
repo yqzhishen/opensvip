@@ -132,7 +132,7 @@ namespace Plugin.Gjgj
             }
             catch
             {
-                
+
             }
             return singerName;
         }
@@ -239,7 +239,7 @@ namespace Plugin.Gjgj
             }
             return phones;
         }
-        
+
         /// <summary>
         /// 转换音素第一根杆子。
         /// </summary>

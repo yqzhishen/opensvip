@@ -38,6 +38,7 @@ namespace Gjgj.Stream
         {
             var gjProject = new GjgjEncoder
             {
+                lyricsAndPinyinSettings = options.GetValueAsEnum("lyricsAndPinyinSettings", LyricsAndPinyinSettings.SameAsSource),
                 ParamSampleInterval = options.GetValueAsInteger("desample", 32),
                 SingerName = options.GetValueAsString("singer", "扇宝"),
             }.EncodeProject(project);

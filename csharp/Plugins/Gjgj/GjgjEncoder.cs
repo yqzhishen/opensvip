@@ -4,11 +4,14 @@ using OpenSvip.Model;
 using Gjgj.Model;
 using OpenSvip.Library;
 using OpenSvip.Framework;
+using NPinyin;
 
 namespace Plugin.Gjgj
 {
     public class GjgjEncoder
     {
+        public LyricsAndPinyinSettings lyricsAndPinyinSettings { get; set; }
+
         /// <summary>
         /// 指定的参数平均采样间隔。
         /// </summary>
@@ -20,11 +23,9 @@ namespace Plugin.Gjgj
         public string SingerName { get; set; }
 
         private Project osProject;
-        
-        private GjgjSupportedPinyin gjgjSupportedPinyin = new GjgjSupportedPinyin();
-        
+
         private GjProject gjProject;
-        
+
         private TimeSynchronizer timeSync;
 
         private bool isUnsupportedPinyinExist = false;
@@ -80,7 +81,7 @@ namespace Plugin.Gjgj
             if (isUnsupportedPinyinExist)
             {
                 string unsupportedPinyin = string.Join("、", unsupportedPinyinList);
-                Warnings.AddWarning("当前工程文件有歌叽歌叽不支持的拼音，已忽略。不支持的拼音：" + unsupportedPinyin, type: WarningTypes.Lyrics);
+                Warnings.AddWarning($"当前工程文件有歌叽歌叽不支持的拼音，已忽略。不支持的拼音：{unsupportedPinyin}", type: WarningTypes.Lyrics);
             }
             gjProject.MIDITrackList = EncodeMIDITrackList();
         }
@@ -191,8 +192,8 @@ namespace Plugin.Gjgj
             GjNote gjNote = new GjNote
             {
                 NoteID = noteID,
-                Lyric = note.Lyric,
-                Pinyin = GetNotePinyin(note.Pronunciation),
+                Lyric = GetLyric(note),
+                Pinyin = GetNotePinyin(note),
                 StartTick = GetNoteStartTick(note.StartPos),
                 Duration = note.Length,
                 KeyNumber = note.KeyNumber,
@@ -202,6 +203,18 @@ namespace Plugin.Gjgj
                 Velocity = 127
             };
             return gjNote;
+        }
+
+        private string GetLyric(Note note)
+        {
+            if (lyricsAndPinyinSettings == LyricsAndPinyinSettings.PinyinOnly)
+            {
+                return "啊";
+            }
+            else
+            {
+                return note.Lyric;
+            }
         }
 
         /// <summary>
@@ -288,7 +301,7 @@ namespace Plugin.Gjgj
             }
             catch (Exception)
             {
-                
+
             }
             return gjVolumeParam;
         }
@@ -676,26 +689,41 @@ namespace Plugin.Gjgj
         /// </summary>
         /// <param name="origin">原始发音。</param>
         /// <returns>如果原始发音为空值或者歌叽歌叽不支持，返回空字符串，否则返回原始的发音。</returns>
-        private string GetNotePinyin(string origin)
+        private string GetNotePinyin(Note note)
         {
-            if (origin == null)
+            if ((lyricsAndPinyinSettings == LyricsAndPinyinSettings.lyricsOnly))//仅歌词
             {
-                return "";
+                return null;
             }
             else
             {
-                string pinyin = origin;
-                if (pinyin != "" && !gjgjSupportedPinyin.IsGjSupportedPinyin(pinyin))
+                if (note.Pronunciation == null)//没有拼音的音符
                 {
-                    isUnsupportedPinyinExist = true;
-                    if (!unsupportedPinyinList.Contains(pinyin))
+                    if (lyricsAndPinyinSettings == LyricsAndPinyinSettings.SameAsSource)//和源相同时
                     {
-                        unsupportedPinyinList.Add(pinyin);
+                        return "";
                     }
-                    pinyin = "";//过滤不支持的拼音
+                    else//仅拼音、歌词和拼音
+                    {
+                        return Pinyin.GetPinyin(note.Lyric);
+                    }
                 }
-                return pinyin;
+                else//有拼音的音符
+                {
+                    string pinyin = note.Pronunciation;
+                    if (pinyin != "" && !GjgjSupportedPinyin.SupportedPinyinList().Contains(pinyin.ToLower()))
+                    {
+                        isUnsupportedPinyinExist = true;
+                        if (!unsupportedPinyinList.Contains(pinyin))
+                        {
+                            unsupportedPinyinList.Add(pinyin);
+                        }
+                        pinyin = "";//过滤不支持的拼音
+                    }
+                    return pinyin;
+                }
             }
+
         }
 
         /// <summary>
@@ -708,21 +736,24 @@ namespace Plugin.Gjgj
             double phonePreTime = 0.0;
             try
             {
-                if (note.EditedPhones.HeadLengthInSecs != -1.0)
+                if (note.EditedPhones != null)
                 {
-                    int noteStartPositionInTicks = note.StartPos + (1920 * GetNumerator(0) / GetDenominator(0));
-                    double noteStartPositionInSeconds = timeSync.GetActualSecsFromTicks(noteStartPositionInTicks);
-                    double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
-                    double phoneHeadPositionInTicks = timeSync.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
-                    double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
-                    phonePreTime = -difference * (2000.0 / 3.0) / 480.0;
+                    if (note.EditedPhones.HeadLengthInSecs != -1.0)
+                    {
+                        int noteStartPositionInTicks = note.StartPos + (1920 * GetNumerator(0) / GetDenominator(0));
+                        double noteStartPositionInSeconds = timeSync.GetActualSecsFromTicks(noteStartPositionInTicks);
+                        double phoneHeadPositionInSeconds = noteStartPositionInSeconds - note.EditedPhones.HeadLengthInSecs;
+                        double phoneHeadPositionInTicks = timeSync.GetActualTicksFromSecs(phoneHeadPositionInSeconds);
+                        double difference = noteStartPositionInTicks - phoneHeadPositionInTicks;
+                        phonePreTime = -difference * (2000.0 / 3.0) / 480.0;
+                    }
                 }
             }
             catch (Exception)
             {
 
             }
-            return phonePreTime; 
+            return phonePreTime;
         }
 
         /// <summary>
@@ -735,16 +766,19 @@ namespace Plugin.Gjgj
             double phonePostTime = 0.0;
             try
             {
-                if (note.EditedPhones.MidRatioOverTail != -1.0)
+                if (note.EditedPhones != null)
                 {
-                    double noteLength = note.Length;
-                    double ratio = note.EditedPhones.MidRatioOverTail;
-                    phonePostTime = -(noteLength / (1.0 + ratio)) * (2000.0 / 3.0) / 480.0;
+                    if (note.EditedPhones.MidRatioOverTail != -1.0)
+                    {
+                        double noteLength = note.Length;
+                        double ratio = note.EditedPhones.MidRatioOverTail;
+                        phonePostTime = -(noteLength / (1.0 + ratio)) * (2000.0 / 3.0) / 480.0;
+                    }
                 }
             }
             catch (Exception)
             {
-                
+
             }
             return phonePostTime;
         }
