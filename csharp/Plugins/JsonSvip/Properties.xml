@@ -9,7 +9,7 @@
     <Format>OpenSVIP 文件</Format>
     <Suffix>json</Suffix>
     <Identifier>json</Identifier>
-    <LibraryPath>JsonSvip\Plugin.JsonSvip.dll</LibraryPath>
+    <LibraryPath>OpenSvip\Plugin.JsonSvip.dll</LibraryPath>
     <Converter>OpenSvip.Stream.JsonSvipConverter</Converter>
     <InputOptions/>
     <OutputOptions>

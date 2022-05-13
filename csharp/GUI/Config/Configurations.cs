@@ -86,7 +86,7 @@ namespace OpenSvip.GUI.Config
 
     public class Information
     {
-        public static readonly string ApplicationVersion = "1.1.4 (Preview)";
+        public static readonly string ApplicationVersion = "1.2.1";
 
         public static readonly string OnlineDocuments = "https://openvpi.github.io/home";
 
@@ -126,6 +126,8 @@ namespace OpenSvip.GUI.Config
         public string LastExportPath { get; set; }
 
         public AppearanceThemes AppearanceTheme { get; set; } = AppearanceThemes.System;
+
+        public bool CheckForUpdates { get; set; } = true;
     }
 
     public class PathConfig

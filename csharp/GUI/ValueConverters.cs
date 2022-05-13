@@ -150,6 +150,22 @@ namespace OpenSvip.GUI
         }
     }
 
+    public class PluginMenuItemHeaderConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var item = (Plugin)values[0];
+            var array = ((IEnumerable)values[1]).Cast<Plugin>().ToArray();
+            var gesture = (Array.IndexOf(array, item) + 1) % 10;
+            return $"_{gesture}  {item.Format} (*.{item.Suffix})";
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     public class ItemIsCheckedConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

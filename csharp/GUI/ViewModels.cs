@@ -6,13 +6,9 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
-using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.GUI.Config;
-using Tomlet;
-using Tomlet.Attributes;
-using Tomlet.Models;
 
 namespace OpenSvip.GUI
 {
@@ -28,31 +24,50 @@ namespace OpenSvip.GUI
             BindingOperations.EnableCollectionSynchronization(TaskList, _lock);
         }
         */
+
         public AppModel()
         {
-            InputOptions = Plugins.ConvertAll(plugin =>
-            {
-                ObservableCollection<OptionViewModel> collection = new AsyncObservableCollection<OptionViewModel>();
-                foreach (var option in plugin.InputOptions)
-                {
-                    collection.Add(new OptionViewModel(option));
-                }
-                return collection;
-            });
-            OutputOptions = Plugins.ConvertAll(plugin =>
-            {
-                ObservableCollection<OptionViewModel> collection = new AsyncObservableCollection<OptionViewModel>();
-                foreach (var option in plugin.OutputOptions)
-                {
-                    collection.Add(new OptionViewModel(option));
-                }
-                return collection;
-            });
+            RefreshPluginsSource();
         }
 
-        public List<Plugin> Plugins { get; set; } = PluginManager.GetAllPlugins().ToList();
+        public void RefreshPluginsSource()
+        {
+            Plugins = PluginManager.GetAllPlugins().ToList();
+        }
 
-        public List<string> Formats => Plugins.ConvertAll(plugin => $"{plugin.Format} (*.{plugin.Suffix})");
+        private List<Plugin> _plugins;
+
+        public List<Plugin> Plugins
+        {
+            get => _plugins;
+            set
+            {
+                var importId = SelectedInputPlugin?.Identifier;
+                var exportId = SelectedOutputPlugin?.Identifier;
+                _plugins = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Plugins"));
+                SelectedInputPluginIndex = _plugins.FindIndex(plugin => plugin.Identifier == importId);
+                SelectedOutputPluginIndex = _plugins.FindIndex(plugin => plugin.Identifier == exportId);
+                InputOptions = Plugins.ConvertAll(plugin =>
+                {
+                    ObservableCollection<OptionViewModel> collection = new AsyncObservableCollection<OptionViewModel>();
+                    foreach (var option in plugin.InputOptions)
+                    {
+                        collection.Add(new OptionViewModel(option));
+                    }
+                    return collection;
+                });
+                OutputOptions = Plugins.ConvertAll(plugin =>
+                {
+                    ObservableCollection<OptionViewModel> collection = new AsyncObservableCollection<OptionViewModel>();
+                    foreach (var option in plugin.OutputOptions)
+                    {
+                        collection.Add(new OptionViewModel(option));
+                    }
+                    return collection;
+                });
+            }
+        }
 
         private bool _autoDetectFormat;
 
@@ -193,7 +208,18 @@ namespace OpenSvip.GUI
         public ObservableCollection<OptionViewModel> SelectedInputOptions
             => _selectedInputPluginIndex >= 0 ? InputOptions[_selectedInputPluginIndex] : null;
 
-        public List<ObservableCollection<OptionViewModel>> InputOptions { get; }
+        private List<ObservableCollection<OptionViewModel>> _inputOptions;
+
+        public List<ObservableCollection<OptionViewModel>> InputOptions
+        {
+            get => _inputOptions;
+            set
+            {
+                _inputOptions = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("InputOptions"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedInputOptions"));
+            }
+        }
 
         private int _selectedOutputPluginIndex = -1;
 
@@ -221,7 +247,18 @@ namespace OpenSvip.GUI
         public ObservableCollection<OptionViewModel> SelectedOutputOptions
             => _selectedOutputPluginIndex >= 0 ? OutputOptions[_selectedOutputPluginIndex] : null;
 
-        public List<ObservableCollection<OptionViewModel>> OutputOptions { get; }
+        private List<ObservableCollection<OptionViewModel>> _outputOptions;
+
+        public List<ObservableCollection<OptionViewModel>> OutputOptions
+        {
+            get => _outputOptions;
+            set
+            {
+                _outputOptions = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("OutputOptions"));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedOutputOptions"));
+            }
+        }
 
         private string _exportExtension;
 
@@ -292,6 +329,18 @@ namespace OpenSvip.GUI
                 return true;
             }
             return value == 1;
+        }
+
+        private bool _checkForUpdates;
+
+        public bool CheckForUpdates
+        {
+            get => _checkForUpdates;
+            set
+            {
+                _checkForUpdates = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CheckForUpdates"));
+            }
         }
     }
 

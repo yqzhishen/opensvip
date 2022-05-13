@@ -19,6 +19,8 @@ namespace OpenSvip.Framework
 
         public static readonly string BundleShareLink = "https://share.weiyun.com/yMDgO6sz";
 
-        public static readonly string PluginMarket = "https://openvpi.github.io/home";
+        public static readonly string PluginMarket = "https://openvpi.github.io/home/market/summary.html";
+
+        public static readonly string FeedbackQQGroup = "687772360";
     }
 }

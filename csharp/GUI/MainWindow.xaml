@@ -10,7 +10,7 @@
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:panuon="clr-namespace:Panuon.UI.Silver;assembly=Panuon.UI.Silver"
     mc:Ignorable="d"
-    Title="OpenSVIP - 歌声合成工程文件转换器（预览版本）"
+    Title="OpenSVIP - 歌声合成工程文件转换器（公测版本）"
     FontFamily="Microsoft YaHei UI"
     Height="800"
     Width="1200"
@@ -19,6 +19,7 @@
     Style="{StaticResource MaterialDesignWindow}"
     panuon:WindowXCaption.Height="32"
     WindowStartupLocation="CenterScreen"
+    SourceInitialized="MainWindow_SourceInitialized"
     Closing="Window_Closing">
     <WindowChrome.WindowChrome>
         <WindowChrome ResizeBorderThickness="5"/>
@@ -165,33 +166,51 @@
                         <MenuItem Header="重置列表(_R)" Icon="{materialDesign:PackIcon Kind=Autorenew}" InputGestureText="Ctrl+R" Click="ClearTasksButton_Click"/>
                     </MenuItem>
                     <MenuItem Header="转换(_C)" Height="22" Padding="10 0">
-                        <MenuItem Header="导入格式(_F)" ItemsSource="{Binding Items, ElementName=ImportPluginMenuItem}">
+                        <MenuItem.Resources>
+                            <Style x:Key="PluginMenuItem" TargetType="MenuItem" BasedOn="{StaticResource NarrowCheckableMenuItem}">
+                                <Setter Property="Header">
+                                    <Setter.Value>
+                                        <MultiBinding Mode="OneWay">
+                                            <MultiBinding.Converter>
+                                                <local:PluginMenuItemHeaderConverter/>
+                                            </MultiBinding.Converter>
+                                            <Binding/>
+                                            <Binding RelativeSource="{RelativeSource FindAncestor, AncestorType=MenuItem}" Path="ItemsSource"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="CommandParameter" Value="{Binding RelativeSource={RelativeSource Self}}"></Setter>
+                            </Style>
+                        </MenuItem.Resources>
+                        <MenuItem Header="导入格式(_F)" ItemsSource="{Binding Plugins}">
                             <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem" BasedOn="{StaticResource NarrowCheckableMenuItem}">
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource PluginMenuItem}">
                                     <Setter Property="IsChecked">
                                         <Setter.Value>
                                             <MultiBinding Converter="{StaticResource ItemIsCheckedConverter}" Mode="OneWay">
                                                 <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}" Path="DataContext.SelectedInputPluginIndex" Mode="OneWay"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=Self}"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}" Path="Items"/>
+                                                <Binding/>
+                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}" Path="ItemsSource"/>
                                             </MultiBinding>
                                         </Setter.Value>
                                     </Setter>
+                                    <Setter Property="Command" Value="{x:Static local:MainWindow.ImportPluginMenuItemCommand}"/>
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
-                        <MenuItem Header="导出格式(_T)" ItemsSource="{Binding Items, ElementName=ExportPluginMenuItem}">
+                        <MenuItem Header="导出格式(_T)" ItemsSource="{Binding Plugins}">
                             <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem" BasedOn="{StaticResource NarrowCheckableMenuItem}">
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource PluginMenuItem}">
                                     <Setter Property="IsChecked">
                                         <Setter.Value>
                                             <MultiBinding Converter="{StaticResource ItemIsCheckedConverter}" Mode="OneWay">
                                                 <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}" Path="DataContext.SelectedOutputPluginIndex" Mode="OneWay"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=Self}"/>
-                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}" Path="Items"/>
+                                                <Binding/>
+                                                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=MenuItem}" Path="ItemsSource"/>
                                             </MultiBinding>
                                         </Setter.Value>
                                     </Setter>
+                                    <Setter Property="Command" Value="{x:Static local:MainWindow.ExportPluginMenuItemCommand}"/>
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
@@ -206,11 +225,15 @@
                             CommandParameter="{x:Static framework:ConstValues.PluginMarket}"/>
                     </MenuItem>
                     <MenuItem Header="设置(_O)" Height="22" Padding="10 0">
-                        <MenuItem Header="自动检测导入格式(_D)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoDetectToggle}"/>
-                        <MenuItem Header="切换格式时重置列表(_R)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoResetToggle}"/>
-                        <MenuItem Header="自动设置后缀名(_E)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=AutoExtensionToggle}"/>
-                        <MenuItem Header="完成后打开输出路径(_O)" IsCheckable="True" IsChecked="{Binding IsChecked, ElementName=OpenExportFolderToggle}"/>
-                        <MenuItem Header="遇到同名文件时(_H)" HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
+                        <MenuItem Header="自动检测导入格式(_D)" IsCheckable="True" IsChecked="{Binding AutoDetectFormat}"
+                                  IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                        <MenuItem Header="切换格式时重置列表(_R)" IsCheckable="True" IsChecked="{Binding AutoResetTasks}"
+                                  IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                        <MenuItem Header="自动设置后缀名(_E)" IsCheckable="True" IsChecked="{Binding AutoExtension}"
+                                  IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                        <MenuItem Header="完成后打开输出路径(_O)" IsCheckable="True" IsChecked="{Binding OpenExportFolder}"/>
+                        <MenuItem Header="遇到同名文件时(_H)" HorizontalContentAlignment="Stretch" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}"
+                                  IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}">
                             <MenuItem Header="覆盖(_C)"
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"/>
                             <MenuItem Header="跳过(_S)"
@@ -218,7 +241,8 @@
                             <MenuItem Header="询问(_A)"
                                       IsChecked="{Binding SelectedIndex, ElementName=OverwriteOptionComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=2}"/>
                         </MenuItem>
-                        <MenuItem Header="默认输出路径(_P)" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
+                        <MenuItem Header="默认输出路径(_P)" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}"
+                                  IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}">
                             <MenuItem Header="无(_N)"
                                       IsChecked="{Binding SelectedIndex, ElementName=HiddenDefaultExportComboBox, Converter={StaticResource IntegerConstantEqualsConverter}, ConverterParameter=0}"
                                       IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
@@ -247,6 +271,7 @@
                                 CommandParameter="{Binding}"/>
                         </MenuItem>
                         <Separator Style="{StaticResource MenuItemSeparator}"/>
+                        <MenuItem Header="开启更新提醒(_M)" IsCheckable="True" IsChecked="{Binding CheckForUpdates}"/>
                         <MenuItem Header="外观主题(_T)" Icon="{materialDesign:PackIcon Kind=PaletteOutline}" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
                             <MenuItem
                                 Header="浅色(_L)"
@@ -321,8 +346,6 @@
                         <config:AppearanceThemes>System</config:AppearanceThemes>
                     </x:Array>
                 </Grid.Resources>
-                <MenuItem x:Name="ImportPluginMenuItem"/>
-                <MenuItem x:Name="ExportPluginMenuItem"/>
                 <Grid>
                     <ComboBox
                         x:Name="HiddenDefaultExportComboBox"
@@ -352,6 +375,18 @@
                         Margin="20 5 10 10"
                         Padding="0 0 0 5">
                         <materialDesign:Card.Resources>
+                            <Style x:Key="PluginComboBoxItemTextBlock" TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Text">
+                                    <Setter.Value>
+                                        <MultiBinding StringFormat="{}{0} (*.{1})">
+                                            <Binding Path="Format"/>
+                                            <Binding Path="Suffix"/>
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
                             <Style x:Key="PluginComboBox" TargetType="ComboBox" BasedOn="{StaticResource MaterialDesignOutlinedComboBox}">
                                 <Setter Property="VerticalAlignment" Value="Center"/>
                                 <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -364,6 +399,22 @@
                                 <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ThemedHighContrastIndigoBrush}"/>
                                 <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThemedIndigoBrush}"/>
                                 <Setter Property="IsEnabled" Value="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
+                                <Setter Property="ItemTemplateSelector">
+                                    <Setter.Value>
+                                        <local:PluginComboBoxItemTemplateSelector>
+                                            <local:PluginComboBoxItemTemplateSelector.DropDownItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Style="{StaticResource PluginComboBoxItemTextBlock}" TextAlignment="Center"/>
+                                                </DataTemplate>
+                                            </local:PluginComboBoxItemTemplateSelector.DropDownItemTemplate>
+                                            <local:PluginComboBoxItemTemplateSelector.SelectedItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Style="{StaticResource PluginComboBoxItemTextBlock}" TextAlignment="Left"/>
+                                                </DataTemplate>
+                                            </local:PluginComboBoxItemTemplateSelector.SelectedItemTemplate>
+                                        </local:PluginComboBoxItemTemplateSelector>
+                                    </Setter.Value>
+                                </Setter>
                             </Style>
                             <Style x:Key="PluginDetailsPopupBox" TargetType="materialDesign:PopupBox" BasedOn="{StaticResource MaterialDesignPopupBox}">
                                 <Setter Property="Margin" Value="10 10 0 8"/>
@@ -414,6 +465,7 @@
                                         Grid.Column="0"
                                         Style="{StaticResource PluginComboBox}"
                                         materialDesign:HintAssist.Hint="导入工程格式"
+                                        ItemsSource="{Binding Plugins}"
                                         SelectedIndex="{Binding SelectedInputPluginIndex}"
                                         SelectionChanged="ImportPluginComboBox_SelectionChanged">
                                     </ComboBox>
@@ -435,7 +487,8 @@
                                         Grid.Column="0"
                                         VerticalAlignment="Center"
                                         Margin="7 -5 0 0"
-                                        Orientation="Horizontal">
+                                        Orientation="Horizontal"
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}">
                                         <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
                                             <ToggleButton
                                                 x:Name="AutoDetectToggle"
@@ -480,6 +533,7 @@
                                         Grid.Column="0"
                                         Style="{StaticResource PluginComboBox}"
                                         materialDesign:HintAssist.Hint="导出工程格式"
+                                        ItemsSource="{Binding Plugins}"
                                         SelectedIndex="{Binding SelectedOutputPluginIndex}"
                                         SelectionChanged="ExportPluginComboBox_SelectionChanged"/>
                                     <materialDesign:PopupBox
@@ -500,7 +554,8 @@
                                         Grid.Column="0"
                                         VerticalAlignment="Center"
                                         Margin="7 -5 0 0"
-                                        Orientation="Horizontal">
+                                        Orientation="Horizontal"
+                                        IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}">
                                         <StackPanel Margin="10 0 10 0" Orientation="Horizontal">
                                             <ToggleButton
                                                 x:Name="AutoExtensionToggle"
@@ -513,7 +568,6 @@
                                                 IsChecked="{Binding AutoExtension}"/>
                                             <TextBlock x:Name="AutoExtensionText" VerticalAlignment="Center" Margin="5" Text="自动设置后缀名" FontSize="14"/>
                                         </StackPanel>
-
                                     </WrapPanel>
                                 </Grid>
                             </StackPanel>
