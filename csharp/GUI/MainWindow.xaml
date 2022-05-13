@@ -372,7 +372,7 @@
                     <materialDesign:Card
                         x:Name="PluginSelectionCard"
                         Grid.Row="0"
-                        Margin="20 5 10 10"
+                        Margin="20 5 8 8"
                         Padding="0 0 0 5">
                         <materialDesign:Card.Resources>
                             <Style x:Key="PluginComboBoxItemTextBlock" TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
@@ -592,7 +592,7 @@
                     <materialDesign:Card
                         x:Name="ConverterTaskCard"
                         Grid.Row="1"
-                        Margin="20 10 10 12">
+                        Margin="20 8 8 16">
                         <Grid>
                             <DockPanel x:Name="FileDropPanel" Visibility="{Binding Visibility, ElementName=TaskListView, Converter={StaticResource ReversedVisibilityConverter}}">
                                 <Grid>
@@ -739,7 +739,7 @@
                     <materialDesign:Card
                         x:Name="ConverterOptionsCard"
                         Grid.Row="0"
-                        Margin="10 5 20 10">
+                        Margin="8 5 20 8">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>
@@ -906,7 +906,7 @@
                     <materialDesign:Card
                         x:Name="TaskExecutionCard"
                         Grid.Row="1"
-                        Margin="10 10 20 12">
+                        Margin="8 8 20 16">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="35"/>

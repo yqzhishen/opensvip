@@ -10,10 +10,10 @@
     mc:Ignorable="d"
     d:Background="White"
     d:DataContext="{d:DesignInstance Type=framework:Plugin}"
-    MaxWidth="600">
+    MaxWidth="370">
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="90"/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
@@ -21,101 +21,117 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="1.5*"/>
+                <RowDefinition Height="1.25*"/>
+                <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="90"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <materialDesign:PackIcon
                 Grid.Column="0"
                 Grid.Row="0"
-                Grid.RowSpan="2"
-                Kind="Puzzle"
-                Opacity="0.8"
+                Grid.RowSpan="3"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
+                Kind="Puzzle"
+                Opacity="0.8"
                 Width="80"
                 Height="80"/>
-            <DockPanel
+            <TextBlock
                 Grid.Row="0"
                 Grid.Column="1"
-                HorizontalAlignment="Left">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                VerticalAlignment="Center"
+                Margin="5 0 10 0"
+                FontSize="24"
+                FontWeight="Bold"
+                TextTrimming="WordEllipsis"
+                d:Text="BinSvip"
+                Text="{Binding Name}"
+                ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="2 0 0 0">
+                <StackPanel
+                    Margin="5 0 10 0"
+                    Orientation="Horizontal"
+                    VerticalAlignment="Center">
                     <TextBlock
-                        Grid.Column="0"
                         VerticalAlignment="Center"
-                        Margin="5 10 10 0"
-                        FontSize="32"
-                        FontWeight="Bold"
-                        TextTrimming="WordEllipsis"
-                        d:Text="BinSvip"
-                        Text="{Binding Name}"
-                        ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
-                    <TextBlock
-                        Grid.Column="1"
-                        VerticalAlignment="Bottom"
-                        Margin="0 0 5 8"
-                        d:Text="1.1.0"
-                        Text="{Binding Version}"
-                        FontSize="16"/>
-                </Grid>
-            </DockPanel>
-            <StackPanel
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="5 0 20 15"
-                Orientation="Horizontal">
-                <materialDesign:PackIcon
-                    VerticalAlignment="Center"
-                    Kind="Account"
-                    Width="20"
-                    Height="20"
-                    Foreground="{Binding Foreground, ElementName=AuthorName}"/>
-                <TextBlock VerticalAlignment="Center" Margin="5 0">
-                    <Hyperlink
-                        FontSize="16"
+                        Margin="0 0 5 0"
                         Foreground="{StaticResource FunctionalAreaIconBrush}"
-                        NavigateUri="{Binding HomePage}"
-                        ToolTip="{Binding HomePage}"
-                        Cursor="Hand"
-                        Command="{x:Static local:RelayCommands.StartProcessCommand}"
-                        CommandParameter="{Binding HomePage}">
-                        <Hyperlink.TextDecorations>
-                            <TextDecorationCollection>
-                                <TextDecoration PenOffset="3"/>
-                            </TextDecorationCollection>
-                        </Hyperlink.TextDecorations>
-                        <TextBlock
-                            x:Name="AuthorName"
-                            d:Text="YQ之神"
-                            Text="{Binding Author}"/>
+                        d:Text="1.1.0"
+                        Text="{Binding Version, StringFormat=v{0}}"
+                        ToolTip="版本"
+                        FontSize="14"/>
+                </StackPanel>
+                <StackPanel
+                    Margin="5 0 20 0"
+                    Orientation="Horizontal">
+                    <materialDesign:PackIcon
+                        VerticalAlignment="Center"
+                        Kind="Account"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                    <TextBlock VerticalAlignment="Center" Margin="0 0 4 0">
+                        <Hyperlink
+                            FontSize="14"
+                            Foreground="{StaticResource FunctionalAreaIconBrush}"
+                            NavigateUri="{Binding HomePage}"
+                            ToolTip="{Binding HomePage}"
+                            Cursor="Hand"
+                            Command="{x:Static local:RelayCommands.StartProcessCommand}"
+                            CommandParameter="{Binding HomePage}">
+                            <Hyperlink.TextDecorations>
+                                <TextDecorationCollection>
+                                    <TextDecoration PenOffset="2.5"/>
+                                </TextDecorationCollection>
+                            </Hyperlink.TextDecorations>
+                            <TextBlock
+                                d:Text="YQ之神"
+                                Text="{Binding Author}"/>
                     </Hyperlink>
                 </TextBlock>
-                <materialDesign:PackIcon
-                    Margin="-5 -5 0 0"
-                    VerticalAlignment="Center"
-                    Kind="ArrowTopRightThick"
-                    Width="10"
-                    Height="10"
-                    Foreground="{Binding Foreground, ElementName=AuthorName}"/>
+                    <materialDesign:PackIcon
+                        Margin="-5 -5 0 0"
+                        VerticalAlignment="Center"
+                        Kind="ArrowTopRightThick"
+                        Width="10"
+                        Height="10"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel
+                Grid.Row="2"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                Margin=" 4 3 20 0"
+                Orientation="Horizontal"
+                Opacity="0.8"
+                ToolTip="适用格式">
+                <materialDesign:PackIcon Kind="FileSwapOutline" Margin="0 0 2 0">
+                </materialDesign:PackIcon>
+                <TextBlock FontSize="14">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0} (*.{1})">
+                            <Binding Path="Format"/>
+                            <Binding Path="Suffix"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
             </StackPanel>
         </Grid>
         <Separator Grid.Row="1"/>
-        <TextBlock
-            Grid.Row="2"
-            Margin="15 10"
-            LineHeight="20"
-            TextWrapping="Wrap"
-            d:Text="原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，请修改 SingerDict.json。"
-            Text="{Binding Descriptions}"/>
-        <Separator Grid.Row="3"/>
-        <StackPanel Grid.Row="4" Margin="15 10" Orientation="Vertical">
+        <StackPanel Grid.Row="2" Margin="15 10" Orientation="Vertical">
+            <TextBlock
+                LineHeight="25"
+                FontWeight="Bold"
+                Text="简介"/>
+            <TextBlock
+                LineHeight="20"
+                TextWrapping="Wrap"
+                d:Text="原始二进制 .svip 文件转换插件。&#x000A;若要指定歌手编号与名称的转换关系，或添加已拥有编号但未公开发行的歌手，请修改 SingerDict.json。"
+                Text="{Binding Descriptions}"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Margin="15 10" Orientation="Vertical">
             <TextBlock
                 LineHeight="25"
                 FontWeight="Bold"

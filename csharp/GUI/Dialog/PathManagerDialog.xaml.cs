@@ -74,12 +74,7 @@ namespace OpenSvip.GUI.Dialog
 
         private void AddPathMaskPanel_Click(object sender, RoutedEventArgs e)
         {
-            var empty = !Model.CustomExportPaths.Any();
             Model.CustomExportPaths.Add(new CustomPath());
-            if (empty)
-            {
-                Model.SelectedCustomExportPathIndex = 0;
-            }
             PathScrollViewer.ScrollToEnd();
         }
 
@@ -88,7 +83,7 @@ namespace OpenSvip.GUI.Dialog
             var customPath = (CustomPath)((Button)sender).DataContext;
             var dialog = new CommonOpenFileDialog
             {
-                Title = "添加自定义路径",
+                Title = "浏览自定义路径",
                 IsFolderPicker = true
             };
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
