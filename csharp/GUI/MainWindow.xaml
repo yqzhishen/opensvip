@@ -370,19 +370,87 @@
                     </ComboBox>
                 </Grid>
             </Grid>
-            <Grid Visibility="{Binding HasAnyPlugin, Converter={StaticResource InverseBoolToVisConverter}}">
+            <Grid
+                Width="600"
+                Height="280"
+                Visibility="{Binding HasAnyPlugin, Converter={StaticResource InverseBoolToVisConverter}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    Margin="20"
+                    FontSize="30"
+                    Foreground="{StaticResource FunctionalAreaIconBrush}"
+                    Text="  当前未安装任何插件。您可以：">
+                </TextBlock>
                 <Button
-                    x:Name="InstallPluginMaskPanel"
-                    Width="280"
+                    x:Name="VisitMarketMaskPanel"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Width="250"
                     Height="180"
                     Opacity="0"
                     Panel.ZIndex="16"
                     Cursor="Hand"
+                    ToolTip="{x:Static framework:ConstValues.PluginMarket}"
+                    MouseEnter="VisitMarketMaskPanel_Focus"
+                    MouseLeave="VisitMarketMaskPanel_UnFocus"
+                    Command="{x:Static local:RelayCommands.StartProcessCommand}"
+                    CommandParameter="{x:Static framework:ConstValues.PluginMarket}"/>
+                <DockPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Height="240"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <materialDesign:PackIcon
+                        x:Name="VisitMarketPluginIcon"
+                        DockPanel.Dock="Top"
+                        Kind="CloudSearchOutline"
+                        Margin="0 52 0 -2"
+                        HorizontalAlignment="Center"
+                        Width="100"
+                        Height="100"
+                        Opacity="0.4"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                    <TextBlock
+                        DockPanel.Dock="Bottom"
+                        Text="访问在线插件市场"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Margin="0 5 0 0"
+                        FontSize="25"
+                        Opacity="{Binding Opacity, ElementName=VisitMarketPluginIcon}"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                </DockPanel>
+                <Button
+                    Grid.Row="1"
+                    x:Name="InstallPluginMaskPanel"
+                    Grid.Column="1"
+                    Width="250"
+                    Height="180"
+                    Opacity="0"
+                    Panel.ZIndex="16"
+                    Cursor="Hand"
+                    ToolTip="下载插件压缩包后进行安装"
                     MouseEnter="InstallPluginMaskPanel_Focus"
                     MouseLeave="InstallPluginMaskPanel_UnFocus"
                     Command="{x:Static local:MainWindow.InstallPluginCommand}"
                     CommandParameter="{Binding}"/>
                 <DockPanel
+                    Grid.Row="1"
+                    Grid.Column="1"
                     Height="240"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center">
@@ -398,7 +466,7 @@
                         Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                     <TextBlock
                         DockPanel.Dock="Bottom"
-                        Text="单击安装第一个插件"
+                        Text="从压缩包安装插件"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Top"
                         Margin="0 5 0 0"
@@ -406,6 +474,63 @@
                         Opacity="{Binding Opacity, ElementName=InstallPluginIcon}"
                         Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                 </DockPanel>
+                <materialDesign:PopupBox
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Center"
+                    Margin="10"
+                    PlacementMode="BottomAndAlignCentres"
+                    ToolTip="点击查看详细说明"
+                    StaysOpen="True"
+                    Cursor="Hand">
+                    <materialDesign:PopupBox.ToggleContent>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Foreground="{StaticResource FunctionalAreaIconBrush}"
+                            Text="什么是插件?">
+                            <TextBlock.TextDecorations>
+                                <TextDecoration PenOffset="2.5"/>
+                            </TextBlock.TextDecorations>
+                        </TextBlock>
+                    </materialDesign:PopupBox.ToggleContent>
+                    <TextBlock
+                        Margin="16 8"
+                        MaxWidth="480"
+                        LineHeight="20"
+                        TextWrapping="Wrap">
+                        每个插件都代表着对一种格式的支持，因此您需要安装插件才可开启转换流程。<LineBreak/>
+                        转换器本体与插件是分别安装、相互脱离的，这是为了方便对每个插件进行单独的更新、扩展和优化。<LineBreak/>
+                        您只需选择那些对自己感兴趣的格式提供支持的插件，无需全部安装。当新的插件上线或已有插件更新时，您可以访问插件市场并下载安装新的功能，而无需更新整个转换器应用。<LineBreak/>
+                        所有插件均只需安装一次，后续使用几乎不受转换器更新的影响。
+                    </TextBlock>
+                </materialDesign:PopupBox>
+                <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock Text="仍有疑问？查看 "/>
+                    <TextBlock VerticalAlignment="Center" Margin="0 0 4 0">
+                        <Hyperlink
+                            Foreground="{StaticResource FunctionalAreaIconBrush}"
+                            ToolTip="{x:Static config:Information.OnlineDocuments}"
+                            Cursor="Hand"
+                            Command="{x:Static local:RelayCommands.StartProcessCommand}"
+                            CommandParameter="{x:Static config:Information.OnlineDocuments}">
+                            <Hyperlink.TextDecorations>
+                                <TextDecorationCollection>
+                                    <TextDecoration PenOffset="2.5"/>
+                                </TextDecorationCollection>
+                            </Hyperlink.TextDecorations>
+                            <TextBlock
+                                Text="帮助文档"/>
+                        </Hyperlink>
+                    </TextBlock>
+                    <materialDesign:PackIcon
+                        Margin="-5 -5 0 0"
+                        VerticalAlignment="Center"
+                        Kind="ArrowTopRightThick"
+                        Width="10"
+                        Height="10"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
+                </StackPanel>
             </Grid>
             <Grid d:Visibility="Visible" Visibility="{Binding HasAnyPlugin, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>

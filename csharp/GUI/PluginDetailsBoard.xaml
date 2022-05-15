@@ -88,8 +88,8 @@
                             <TextBlock
                                 d:Text="YQ之神"
                                 Text="{Binding Author}"/>
-                    </Hyperlink>
-                </TextBlock>
+                        </Hyperlink>
+                    </TextBlock>
                     <materialDesign:PackIcon
                         Margin="-5 -5 0 0"
                         VerticalAlignment="Center"

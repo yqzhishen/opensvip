@@ -502,6 +502,16 @@ namespace OpenSvip.GUI
             FileDropColorOpacityChange(FileDropIcon, 0.8, 0.4);
         }
 
+        private void VisitMarketMaskPanel_Focus(object sender, RoutedEventArgs e)
+        {
+            FileDropColorOpacityChange(VisitMarketPluginIcon, 0.4, 0.8);
+        }
+
+        private void VisitMarketMaskPanel_UnFocus(object sender, RoutedEventArgs e)
+        {
+            FileDropColorOpacityChange(VisitMarketPluginIcon, 0.8, 0.4);
+        }
+
         private void InstallPluginMaskPanel_Focus(object sender, RoutedEventArgs e)
         {
             FileDropColorOpacityChange(InstallPluginIcon, 0.4, 0.8);
