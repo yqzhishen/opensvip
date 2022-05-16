@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using OpenSvip.Model;
 using OpenSvip.Library;
 using Gjgj.Model;
@@ -59,13 +58,13 @@ namespace Plugin.Gjgj
             {
                 Track track = new SingingTrack
                 {
-                    Title = GetSingingTrackTitle(index),
+                    Title = SingerNameUtil.GetSingerName(gjProject.SingingTrackList[index]),
                     Mute = gjProject.SingingTrackList[index].TrackVolume.Mute,
                     Solo = false,
                     Volume = 0.7,
                     Pan = 0.0,
-                    AISingerName = GetDefaultAISingerName(),
-                    ReverbPreset = GetDefaultReverbPreset(),
+                    AISingerName = "陈水若",
+                    ReverbPreset = "干声",
                     NoteList = DecodeNoteList(index, project),
                     EditedParams = DecodeParams(index)
                 };
@@ -98,44 +97,6 @@ namespace Plugin.Gjgj
             return instrumentalTrackList;
         }
 
-        /// <summary>
-        /// 根据歌手代号返回歌手名称。
-        /// </summary>
-        /// <param name="index">演唱轨索引。</param>
-        /// <returns></returns>
-        private string GetSingingTrackTitle(int index)
-        {
-            switch (gjProject.SingingTrackList[index].Name)
-            {
-                case "513singer":
-                    return "扇宝";
-                case "514singer":
-                    return "SING-林嘉慧";
-                case "881singer":
-                    return "Rocky";
-                default:
-                    return GetUserMadeSingerName(index);
-            }
-        }
-
-        /// <summary>
-        /// 返回用户自制歌手名称。
-        /// </summary>
-        /// <param name="index">演唱轨索引。</param>
-        /// <returns></returns>
-        private string GetUserMadeSingerName(int index)
-        {
-            string singerName = "演唱轨";
-            try
-            {
-                singerName = gjProject.SingingTrackList[index].SingerInfo.SingerName;
-            }
-            catch
-            {
-
-            }
-            return singerName;
-        }
 
         /// <summary>
         /// 转换音符列表。
@@ -162,15 +123,16 @@ namespace Plugin.Gjgj
         /// <returns></returns>
         private Note DecodeNote(int singingTrackIndex, int noteIndex, Project project)
         {
+            GjNote gjNote = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex];
             Note note = new Note
             {
-                StartPos = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project),
-                Length = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration,
-                KeyNumber = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].KeyNumber,
-                Lyric = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Lyric,
-                Pronunciation = DecodePronunciation(singingTrackIndex, noteIndex),
-                EditedPhones = DecodePhones(singingTrackIndex, noteIndex, project),
-                HeadTag = DecodeNoteHeadTag(singingTrackIndex, noteIndex)
+                StartPos = DecodeNoteStartPosition(gjNote, project),
+                Length = gjNote.Duration,
+                KeyNumber = gjNote.KeyNumber,
+                Lyric = gjNote.Lyric,
+                Pronunciation = PronunciationUtil.DecodePronunciation(gjNote),
+                EditedPhones = DecodePhones(gjNote, project),
+                HeadTag = NoteHeadTagUtil.ToStringTag(gjNote.Style)
             };
             return note;
         }
@@ -182,30 +144,9 @@ namespace Plugin.Gjgj
         /// <param name="noteIndex">音符索引。</param>
         /// <param name="project">OpenSvip工程。</param>
         /// <returns></returns>
-        private int DecodeNoteStartPosition(int singingTrackIndex, int noteIndex, Project project)//用了opensvip的拍号列表，是因为gj可能存在拍号列表里面没有拍号的情况
+        private int DecodeNoteStartPosition(GjNote gjNote, Project project)//用了opensvip的拍号列表，是因为gj可能存在拍号列表里面没有拍号的情况
         {
-            return gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-        }
-
-        /// <summary>
-        /// 转换音符读音。
-        /// </summary>
-        /// <param name="singingTrackIndex"></param>
-        /// <param name="noteIndex"></param>
-        /// <returns></returns>
-        private string DecodePronunciation(int singingTrackIndex, int noteIndex)
-        {
-            string pinyin = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Pinyin;
-            string pronunciation;
-            if (pinyin == "")
-            {
-                pronunciation = null;
-            }
-            else
-            {
-                pronunciation = pinyin;
-            }
-            return pronunciation;
+            return gjNote.StartTick - 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
         }
 
         /// <summary>
@@ -215,12 +156,12 @@ namespace Plugin.Gjgj
         /// <param name="noteIndex">音符索引。</param>
         /// <param name="project">OpenSvip工程。</param>
         /// <returns></returns>
-        private Phones DecodePhones(int singingTrackIndex, int noteIndex, Project project)
+        private Phones DecodePhones(GjNote gjNote, Project project)
         {
-            int duration = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Duration;
-            int startPosition = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project);
-            double preTime = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePreTime;
-            double postTime = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].PhonePostTime;
+            int duration = gjNote.Duration;
+            int startPosition = DecodeNoteStartPosition(gjNote, project);
+            double preTime = gjNote.PhonePreTime;
+            double postTime = gjNote.PhonePostTime;
             Phones phones = new Phones();
             try
             {
@@ -287,27 +228,6 @@ namespace Plugin.Gjgj
         }
 
         /// <summary>
-        /// 转换音符标记（无、换气和停顿）。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="noteIndex">音符索引。</param>
-        /// <returns></returns>
-        private string DecodeNoteHeadTag(int singingTrackIndex, int noteIndex)
-        {
-            switch (gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex].Style)
-            {
-                case 0:
-                    return null;
-                case 1:
-                    return "V";
-                case 2:
-                    return "0";
-                default:
-                    return null;
-            }
-        }
-
-        /// <summary>
         /// 转换参数。
         /// </summary>
         /// <param name="singingTrackIndex">演唱轨索引。</param>
@@ -316,94 +236,10 @@ namespace Plugin.Gjgj
         {
             Params paramsFromGj = new Params
             {
-                Volume = DecodeVolumeParam(singingTrackIndex),
-                Pitch = DecodePitchParam(singingTrackIndex)
+                Volume = new VolumeParamUtil().DecodeVolumeParam(singingTrackIndex, gjProject.SingingTrackList[singingTrackIndex].VolumeParam),
+                Pitch = new PitchParamUtil().DecodePitchParam(singingTrackIndex, gjProject)
             };
             return paramsFromGj;
-        }
-
-        /// <summary>
-        /// 转换音量参数。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <returns></returns>
-        private ParamCurve DecodeVolumeParam(int singingTrackIndex)
-        {
-            ParamCurve paramCurve = new ParamCurve();
-            try
-            {
-                List<double> timeBuffer = new List<double>();
-                List<double> valueBuffer = new List<double>();
-                int time;
-                int value;
-                for (int volumeParamPointIndex = 0; volumeParamPointIndex < gjProject.SingingTrackList[singingTrackIndex].VolumeParam.Count; volumeParamPointIndex++)
-                {
-                    time = GetVolumeParamTime(singingTrackIndex, volumeParamPointIndex);
-                    value = GetVolumeParamValue(gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Value);
-                    Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
-                    paramCurve.PointList.Add(volumeParamPoint);
-                }
-
-                paramCurve.PointList.OrderBy(x => x.Item1).ToList();
-            }
-            catch (Exception)
-            {
-
-            }
-            return paramCurve;
-        }
-
-        /// <summary>
-        /// 转换音高参数。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <returns></returns>
-        private ParamCurve DecodePitchParam(int singingTrackIndex)
-        {
-            ParamCurve paramCurvePitch = new ParamCurve();
-            DecodeModifiedPitchParam(singingTrackIndex, paramCurvePitch);
-            paramCurvePitch.PointList.OrderBy(x => x.Item1).ToList();
-            return paramCurvePitch;
-        }
-
-        /// <summary>
-        /// 转换修改部分的音高参数。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="paramCurvePitch">音高参数曲线。</param>
-        private void DecodeModifiedPitchParam(int singingTrackIndex, ParamCurve paramCurvePitch)
-        {
-            Tuple<int, int> defaultLeftEndpoint = Tuple.Create(-192000, -100);
-            paramCurvePitch.PointList.Add(defaultLeftEndpoint);
-
-            try
-            {
-                var index = -1;
-                foreach (var range in gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList)
-                {
-                    Tuple<int, int> leftEndpoint = Tuple.Create(GetPitchParamTime(range.Left), -100);//左间断点
-                    Tuple<int, int> rightEndpoint = Tuple.Create(GetPitchParamTime(range.Right), -100);//右间断点
-                    paramCurvePitch.PointList.Add(leftEndpoint);//添加左间断点
-                    index = gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
-                    if (index == -1)
-                        continue;
-                    for (; (index < gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.Count) && (gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time <= range.Right); ++index)
-                    {
-                        int pitchParamTime = GetPitchParamTime(gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time);
-                        int pitchParamValue = GetPitchParamValue(gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Value);
-                        Tuple<int, int> pitchParamPoint = Tuple.Create(pitchParamTime, pitchParamValue);
-                        paramCurvePitch.PointList.Add(pitchParamPoint);
-                    }
-                    paramCurvePitch.PointList.Add(rightEndpoint);//添加右间断点
-                }
-            }
-            catch (Exception)
-            {
-
-            }
-
-            Tuple<int, int> defaultRightEndpoint = Tuple.Create(1073741823, -100);
-            paramCurvePitch.PointList.Add(defaultRightEndpoint);
         }
 
         /// <summary>
@@ -473,116 +309,11 @@ namespace Plugin.Gjgj
         private List<SongTempo> DecodeSongTempoList()
         {
             List<SongTempo> songTempoList = new List<SongTempo>();
-            for (int i = 0; i < gjProject.TempoMap.TempoList.Count; i++)
+            foreach (GjTempo gjTempo in gjProject.TempoMap.TempoList)
             {
-                songTempoList.Add(DecodeSongTempo(i));
+                songTempoList.Add(TempoUtil.DecodeSongTempo(gjTempo));
             }
             return songTempoList;
-        }
-
-        /// <summary>
-        /// 转换曲速标记。
-        /// </summary>
-        /// <param name="index">曲速标记索引。</param>
-        /// <returns></returns>
-        private SongTempo DecodeSongTempo(int index)
-        {
-            SongTempo songTempo = new SongTempo
-            {
-                Position = GetSongTempoPosition(index),
-                BPM = GetSongTempoBPM(index)
-            };
-            return songTempo;
-        }
-
-        /// <summary>
-        /// 返回曲速标记的位置。
-        /// </summary>
-        /// <param name="index">曲速标记索引。</param>
-        /// <returns></returns>
-        private int GetSongTempoPosition(int index)
-        {
-            return gjProject.TempoMap.TempoList[index].Time;
-        }
-
-        /// <summary>
-        /// 返回曲速标记的BPM。
-        /// </summary>
-        /// <param name="index">曲速标记索引。</param>
-        /// <returns></returns>
-        private float GetSongTempoBPM(int index)
-        {
-            double origin = gjProject.TempoMap.TempoList[index].MicrosecondsPerQuarterNote;
-            return (float)(60.0 / origin * 1000000.0);
-        }
-
-        /// <summary>
-        /// 将Y值转换为音高。
-        /// </summary>
-        /// <param name="y">Y值。</param>
-        /// <returns></returns>
-        private double YToTone(double y)
-        {
-            return 127 + 0.5 - y / 18.0;
-        }
-
-        /// <summary>
-        /// 转换音高参数点的时间。
-        /// </summary>
-        /// <param name="origin">原始时间。</param>
-        /// <returns></returns>
-        private int GetPitchParamTime(double origin)
-        {
-            return (int)(origin * 5.0);
-        }
-
-        /// <summary>
-        /// 转换音高参数点的值。
-        /// </summary>
-        /// <param name="origin">原始值。</param>
-        /// <returns></returns>
-        private int GetPitchParamValue(double origin)
-        {
-            return (int)(YToTone(origin) * 100.0);
-        }
-
-        /// <summary>
-        /// 转换音量参数点的时间。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="volumeParamPointIndex">音量参数点索引。</param>
-        /// <returns></returns>
-        private int GetVolumeParamTime(int singingTrackIndex, int volumeParamPointIndex)
-        {
-            return (int)gjProject.SingingTrackList[singingTrackIndex].VolumeParam[volumeParamPointIndex].Time;
-        }
-
-        /// <summary>
-        /// 转换音量参数点的值。
-        /// </summary>
-        /// <param name="origin">原始值。</param>
-        /// <returns></returns>
-        private int GetVolumeParamValue(double origin)
-        {
-            return (int)origin * 1000 - 1000;
-        }
-
-        /// <summary>
-        /// 设置混响类型。
-        /// </summary>
-        /// <returns></returns>
-        private static string GetDefaultReverbPreset()
-        {
-            return "干声";
-        }
-
-        /// <summary>
-        /// 设置默认歌手。
-        /// </summary>
-        /// <returns></returns>
-        private static string GetDefaultAISingerName()
-        {
-            return "陈水若";
         }
 
         /// <summary>
@@ -668,6 +399,5 @@ namespace Plugin.Gjgj
         {
             return gjProject.TempoMap.TimeSignatureList[index].Numerator;
         }
-
     }
 }
