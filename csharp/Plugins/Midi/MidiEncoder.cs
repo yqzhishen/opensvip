@@ -191,13 +191,13 @@ namespace Plugin.Midi
         /// <returns>带词音符的 MIDI Event 数组。</returns>
         private MidiEvent[] EncodeNoteEventArray(SingingTrack singingTrack)
         {
-            if (SemivowelPreShift != 0)
+            if (SemivowelPreShift > 0) // 小于 0 的“前移”可能会导致更多的问题
             {
                 for (int index = 0; index < singingTrack.NoteList.Count; index++)//这种方式不好，以后再改。
                 {
-                    if (IsSemivowelNote(singingTrack.NoteList[index]))//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
+                    if (IsSemivowelNote(singingTrack.NoteList[index]) && index > 0)//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
                     {
-                        if (index > 0 && singingTrack.NoteList[index - 1].Length >= SemivowelPreShift)
+                        if (singingTrack.NoteList[index - 1].Length >= SemivowelPreShift)
                         {
                             singingTrack.NoteList[index - 1].Length -= SemivowelPreShift;
                         }
