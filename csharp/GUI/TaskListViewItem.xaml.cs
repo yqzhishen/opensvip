@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using OpenSvip.GUI.Dialog;
 
 namespace OpenSvip.GUI
 {
@@ -34,20 +36,34 @@ namespace OpenSvip.GUI
 
         private void OpenProjectFileButton_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(((TaskViewModel)DataContext).ExportPath);
+            try
+            {
+                Process.Start(((TaskViewModel)DataContext).ExportPath);
+            }
+            catch (Exception exception)
+            {
+                MessageDialog.CreateDialog("打开文件出错", exception.Message).ShowDialog();
+            }
         }
 
         private void OpenTargetFolderButton_Click(object sender, RoutedEventArgs e)
         {
             var task = (TaskViewModel)DataContext;
-            Process.Start("explorer.exe", $"/select,{task.ExportPath}");
+            if (File.Exists(task.ExportPath))
+            {
+                Process.Start("explorer.exe", $"/select,{task.ExportPath}");
+            }
+            else
+            {
+                Process.Start("explorer.exe", Path.GetDirectoryName(task.ExportPath));
+            }
         }
 
         private void CopyErrorMessageButton_Click(object sender, RoutedEventArgs e)
         {
             var task = (TaskViewModel)DataContext;
             Clipboard.SetText(task.Error);
-            var button = sender as Button;
+            var button = (Button)sender;
             button.Content = "已复制";
             new Thread(() =>
             {
