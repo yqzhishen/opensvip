@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.3.1</Version>
+    <Version>0.3.2</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。暂不支持 MIDI 格式转换为 OpenSvip 格式。</Descriptions>
@@ -19,11 +19,11 @@
 		</Option>
 		<Option Name="removeSymbols" Type="boolean" Default="true">
 			<Notes>移除歌词中的常见标点符号</Notes>
-			<Tips>移除{ ",", ".", "?", "!", "，", "。", "？", "！" }，防止不支持含标点符号歌词的歌声合成软件无法正常合成。</Tips>
+			<Tips>移除中英文的逗号、句号、问号和感叹号，防止不支持含标点符号歌词的歌声合成软件无法正常合成。</Tips>
 		</Option>
 		<Option Name="compatibleLyric" Type="boolean" Default="false">
 			<Notes>歌词兼容性模式</Notes>
-			<Tips>将所有中文歌词转换为拼音，防止不支持导入带有中文歌词MIDI文件的歌声合成软件出现乱码。</Tips>
+			<Tips>将所有中文歌词转换为拼音，防止不支持导入带有中文歌词 MIDI 文件的歌声合成软件出现乱码。</Tips>
 		</Option>
 		<Option Name="lyricEncoding" Type="enum" Default="UTF8BOM">
 			<Notes>歌词文本编码</Notes>
@@ -47,7 +47,7 @@
 		</Option>
 		<Option Name="semivowelPreShift" Type="integer" Default="0">
 			<Notes>半元音前移量</Notes>
-			<Tips>单位为梯。将发音为 y-、w- 和 er 的音符提前，以缓解某些歌声合成软件半元音音符出现迟滞的问题。推荐值：30~120。</Tips>
+			<Tips>非负整数，单位为梯。输入负数视为零。将发音为 y-、w- 和 er 的音符提前，以缓解某些歌声合成软件半元音音符出现迟滞的问题。推荐值：30~60。</Tips>
 		</Option>
 	</OutputOptions>
 </Plugin>

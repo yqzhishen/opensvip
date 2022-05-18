@@ -274,11 +274,11 @@ namespace Plugin.Midi
             catch (System.Exception)
             {
                 //用于调试。
-                Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
+                /* Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
                 + " StartPos = " + note.StartPos
                 + " Length = " + note.Length
                 + " lastEventAbsoluteTime = " + lastEventAbsoluteTime
-                + " DeltaTime = " + (note.StartPos - lastEventAbsoluteTime).ToString());
+                + " DeltaTime = " + (note.StartPos - lastEventAbsoluteTime).ToString()); */
             }
             return new LyricEvent();
         }
