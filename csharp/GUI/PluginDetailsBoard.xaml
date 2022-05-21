@@ -22,7 +22,7 @@
         <Grid Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1.25*"/>
-                <RowDefinition/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
@@ -50,30 +50,36 @@
                 d:Text="BinSvip"
                 Text="{Binding Name}"
                 ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Margin="2 0 0 0">
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
                 <StackPanel
-                    Margin="5 0 10 0"
+                    Margin="5 0"
                     Orientation="Horizontal"
                     VerticalAlignment="Center">
+                    <materialDesign:PackIcon
+                        VerticalAlignment="Center"
+                        Width="18"
+                        Height="18"
+                        Kind="TagOutline"
+                        Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                     <TextBlock
                         VerticalAlignment="Center"
-                        Margin="0 0 5 0"
+                        Margin="5 0"
                         Foreground="{StaticResource FunctionalAreaIconBrush}"
                         d:Text="1.1.0"
                         Text="{Binding Version, StringFormat=v{0}}"
-                        ToolTip="版本"
-                        FontSize="14"/>
+                        ToolTip="版本"/>
                 </StackPanel>
                 <StackPanel
-                    Margin="5 0 20 0"
+                    Margin="5 0"
                     Orientation="Horizontal">
                     <materialDesign:PackIcon
                         VerticalAlignment="Center"
                         Kind="Account"
+                        Width="18"
+                        Height="18"
                         Foreground="{StaticResource FunctionalAreaIconBrush}"/>
-                    <TextBlock VerticalAlignment="Center" Margin="0 0 4 0">
+                    <TextBlock VerticalAlignment="Center" Margin="4 0 5 0">
                         <Hyperlink
-                            FontSize="14"
                             Foreground="{StaticResource FunctionalAreaIconBrush}"
                             NavigateUri="{Binding HomePage}"
                             ToolTip="{Binding HomePage}"
@@ -82,7 +88,7 @@
                             CommandParameter="{Binding HomePage}">
                             <Hyperlink.TextDecorations>
                                 <TextDecorationCollection>
-                                    <TextDecoration PenOffset="2.5"/>
+                                    <TextDecoration PenOffset="2"/>
                                 </TextDecorationCollection>
                             </Hyperlink.TextDecorations>
                             <TextBlock
@@ -103,13 +109,21 @@
                 Grid.Row="2"
                 Grid.Column="1"
                 HorizontalAlignment="Left"
-                Margin=" 4 3 20 0"
+                VerticalAlignment="Top"
+                Margin=" 4 5 20 0"
                 Orientation="Horizontal"
                 Opacity="0.8"
                 ToolTip="适用格式">
-                <materialDesign:PackIcon Kind="FileSwapOutline" Margin="0 0 2 0">
+                <materialDesign:PackIcon
+                    VerticalAlignment="Center"
+                    Kind="FileOutline"
+                    Width="18"
+                    Height="18">
                 </materialDesign:PackIcon>
-                <TextBlock FontSize="14">
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Margin="5 0"
+                    d:Text="X Studio 工程文件 (*.svip)">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}{0} (*.{1})">
                             <Binding Path="Format"/>
