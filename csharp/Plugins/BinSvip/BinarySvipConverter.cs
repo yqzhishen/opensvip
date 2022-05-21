@@ -40,6 +40,9 @@ namespace OpenSvip.Stream
                     break;
                 case BinarySvipVersions.Automatic:
                     break;
+                case BinarySvipVersions.Compatible:
+                    version = "SVIP0.0.0";
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

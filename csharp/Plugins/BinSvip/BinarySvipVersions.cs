@@ -9,6 +9,8 @@ namespace OpenSvip.Stream
         [Description("7.0.0")]
         SVIP7_0_0,
         [Description("6.0.0")]
-        SVIP6_0_0
+        SVIP6_0_0,
+        [Description("0.0.0")]
+        Compatible
     }
 }
