@@ -14,11 +14,13 @@ namespace SynthV.Param
 
         private readonly ParamExpression VibratoEnv;
 
-        private readonly List<PitchNode> PitchNodes = new List<PitchNode>();
+        private readonly BaseLayerGenerator BaseLayer;
 
-        private readonly List<VibratoNode> VibratoNodes = new List<VibratoNode>();
+        private readonly VibratoLayerGenerator VibratoLayer;
 
-        private const double MinimumInterval = 0.01;
+        private readonly GaussianLayerGenerator GaussianLayer;
+
+        public const double maxBreak = 0.01;
 
         public PitchGenerator(
             TimeSynchronizer synchronizer,
@@ -29,236 +31,31 @@ namespace SynthV.Param
             Synchronizer = synchronizer;
             PitchDiff = pitchDiff;
             VibratoEnv = vibratoEnv;
-
             if (!noteList.Any())
             {
                 return;
             }
 
-            for (var i = 0; i < noteList.Count; i++)
+            var noteStructList = noteList.Select(note => new NoteStruct
             {
-                var start = Synchronizer.GetActualSecsFromTicks(PosToTicks(noteList[i].Onset));
-                var end = Synchronizer.GetActualSecsFromTicks(PosToTicks(noteList[i].Onset + noteList[i].Duration));
-
-                if (!(end - start > noteList[i].Attributes.VibratoStart))
-                {
-                    continue;
-                }
-                if (i < noteList.Count - 1
-                    && Synchronizer.GetActualSecsFromTicks(PosToTicks(noteList[i + 1].Onset)) - end < MinimumInterval)
-                {
-                    end += Math.Min(
-                        noteList[i + 1].Attributes.TransitionOffset,
-                        Math.Min(
-                            noteList[i + 1].Attributes.VibratoStart,
-                            Synchronizer.GetDurationSecsFromTicks(
-                                PosToTicks(noteList[i + 1].Onset),
-                                PosToTicks(noteList[i + 1].Onset + noteList[i + 1].Duration))));
-                }
-                if (start < end)
-                {
-                    VibratoNodes.Add(new VibratoNode
-                    {
-                        Begin = start + noteList[i].Attributes.VibratoStart,
-                        End = end,
-                        FadeLeft = noteList[i].Attributes.VibratoLeft,
-                        FadeRight = noteList[i].Attributes.VibratoRight,
-                        Amplitude = noteList[i].Attributes.VibratoDepth / 2,
-                        Frequency = noteList[i].Attributes.VibratoFrequency,
-                        Phase = noteList[i].Attributes.VibratoPhase
-                    });
-                }
-            }
-            var currentNote = noteList[0];
-            var currentBegin = Synchronizer.GetActualSecsFromTicks(PosToTicks(currentNote.Onset));
-            var currentEnd = Synchronizer.GetActualSecsFromTicks(PosToTicks(currentNote.Onset + currentNote.Duration));
-            var currentMain = Math.Min(currentBegin + currentNote.Attributes.SlideLeft, currentEnd);
-            PitchNodes.Add(new PlainNode
-            {
-                Begin = double.MinValue,
-                End = currentBegin,
-                Pitch = (currentNote.Pitch - currentNote.Attributes.DepthLeft) * 100
-            });
-            // head part of the first note
-            PitchNodes.Add(new BoundaryNode
-            {
-                Begin = currentBegin,
-                End = Math.Min(currentEnd, currentBegin + currentNote.Attributes.SlideLeft),
-                IsHead = true,
-                BaseKey = currentNote.Pitch,
-                Depth = currentNote.Attributes.DepthLeft
-            });
-            var j = 0;
-            for (; j < noteList.Count - 1; j++)
-            {
-                var nextNote = noteList[j + 1];
-                var nextBegin = Synchronizer.GetActualSecsFromTicks(PosToTicks(nextNote.Onset));
-                var nextEnd = Synchronizer.GetActualSecsFromTicks(PosToTicks(nextNote.Onset + nextNote.Duration));
-                double nextMain;
-                double nextBody;
-
-                var interval = nextBegin - currentEnd;
-                if (interval > MinimumInterval) // two notes are far from each other
-                {
-                    nextMain = nextBegin;
-
-                    // main part of current note
-                    PitchNodes.Add(new PlainNode
-                    {
-                        Begin = currentMain,
-                        End = currentEnd,
-                        Pitch = currentNote.Pitch * 100
-                    });
-
-                    nextBody = Math.Min(nextBegin + nextNote.Attributes.SlideLeft, nextEnd);
-                    var mainEnd = Math.Max(currentBegin, currentEnd - currentNote.Attributes.SlideRight);
-
-                    // tail part of current note
-                    PitchNodes.Add(new BoundaryNode
-                    {
-                        Begin = mainEnd,
-                        End = currentEnd,
-                        IsHead = false,
-                        BaseKey = currentNote.Pitch,
-                        Depth = currentNote.Attributes.DepthRight
-                    });
-
-                    // interpolation between two notes
-                    var mid = (currentEnd + nextBegin) / 2;
-                    if (nextBegin - currentEnd > 0.14)
-                    {
-                        PitchNodes.Add(new PlainNode
-                        {
-                            Begin = currentEnd,
-                            End = mid - 0.07,
-                            Pitch = (currentNote.Pitch - currentNote.Attributes.DepthRight) * 100
-                        });
-                        PitchNodes.Add(new TransitionNode
-                        {
-                            Begin = mid - 0.07,
-                            End = mid + 0.07,
-                            Middle = mid,
-                            PitchLeft = (currentNote.Pitch - currentNote.Attributes.DepthRight) * 100,
-                            PitchRight = (nextNote.Pitch - nextNote.Attributes.DepthLeft) * 100,
-                            GaussBegin = mid - 0.07,
-                            GaussEnd = mid + 0.07,
-                            DepthLeft = 0,
-                            DepthRight = 0
-                        });
-                        PitchNodes.Add(new PlainNode
-                        {
-                            Begin = mid + 0.07,
-                            End = nextBegin,
-                            Pitch = (nextNote.Pitch - nextNote.Attributes.DepthLeft) * 100
-                        });
-                    }
-                    else
-                    {
-                        PitchNodes.Add(new TransitionNode
-                        {
-                            Begin = currentEnd,
-                            End = nextBegin,
-                            Middle = mid,
-                            PitchLeft = (currentNote.Pitch - currentNote.Attributes.DepthRight) * 100,
-                            PitchRight = (nextNote.Pitch - nextNote.Attributes.DepthLeft) * 100,
-                            GaussBegin = currentEnd,
-                            GaussEnd = nextBegin,
-                            DepthLeft = 0,
-                            DepthRight = 0
-                        });
-                    }
-
-                    // head part of next note
-                    PitchNodes.Add(new BoundaryNode
-                    {
-                        Begin = nextBegin,
-                        End = nextBody,
-                        IsHead = true,
-                        BaseKey = nextNote.Pitch,
-                        Depth = nextNote.Attributes.DepthLeft
-                    });
-                }
-                else // two notes are close to each other
-                {
-                    nextMain = Math.Max((currentBegin + currentEnd) / 2, Math.Min((nextBegin + nextEnd) / 2,
-                        nextBegin + nextNote.Attributes.TransitionOffset));
-
-                    // main part of current note
-                    if (currentMain < nextMain)
-                    {
-                        PitchNodes.Add(new PlainNode
-                        {
-                            Begin = currentMain,
-                            End = nextMain,
-                            Pitch = currentNote.Pitch * 100
-                        });
-                    }
-
-                    nextBody = Math.Max((currentBegin + currentEnd) / 2, Math.Min((nextBegin + nextEnd) / 2,
-                        nextBegin + 1.25 * nextNote.Attributes.SlideLeft + nextNote.Attributes.TransitionOffset));
-                    var mainEnd = Math.Max((currentBegin + currentEnd) / 2, Math.Min((nextBegin + nextEnd) / 2,
-                        currentEnd - currentNote.Attributes.SlideRight + nextNote.Attributes.TransitionOffset + interval));
-
-                    // transition part of two notes
-                    double Sigmoid(double x)
-                    {
-                        return 2 / (1 + Math.Exp(-2.2 * x)) - 1;
-                    }
-
-                    double Average(double x, double y)
-                    {
-                        return Math.Sqrt(x * y);
-                    }
-
-                    var node = new TransitionNode
-                    {
-                        Middle = Math.Max(mainEnd, Math.Min(nextBody,
-                            (currentEnd + nextBegin) / 2 + nextNote.Attributes.TransitionOffset)),
-                        PitchLeft = currentNote.Pitch * 100,
-                        PitchRight = nextNote.Pitch * 100
-                    };
-                    var slideLength = currentNote.Attributes.SlideRight + nextNote.Attributes.SlideLeft;
-                    node.Begin = Math.Max(currentBegin, node.Middle - slideLength);
-                    node.End = Math.Min(nextEnd, node.Middle + slideLength);
-                    var ratio = Sigmoid(0.125 * Average(
-                        (node.Middle - currentBegin) / currentNote.Attributes.SlideRight,
-                        (nextEnd - node.Middle) / nextNote.Attributes.SlideLeft));
-                    node.GaussBegin = mainEnd * ratio + node.Middle * (1 - ratio);
-                    node.GaussEnd = nextBody * ratio + node.Middle * (1 - ratio);
-                    node.DepthLeft = currentNote.Attributes.DepthRight * Math.Pow(ratio, 0.75);
-                    node.DepthRight = nextNote.Attributes.DepthLeft * Math.Pow(ratio, 0.75);
-                    node.Zoom = Math.Min(10, 1 / Math.Pow(ratio, 2.2));
-                    PitchNodes.Add(node);
-                }
-
-                currentNote = nextNote;
-                currentBegin = nextBegin;
-                currentEnd = nextEnd;
-                currentMain = nextMain;
-            }
-            // main part of the last note
-            PitchNodes.Add(new PlainNode
-            {
-                Begin = currentMain,
-                End = currentEnd,
-                Pitch = currentNote.Pitch * 100
-            });
-
-            // tail part of the last note
-            PitchNodes.Add(new BoundaryNode
-            {
-                Begin = Math.Max(currentBegin, currentEnd - currentNote.Attributes.SlideRight),
-                End = currentEnd,
-                IsHead = false,
-                BaseKey = currentNote.Pitch,
-                Depth = currentNote.Attributes.DepthRight
-            });
-            PitchNodes.Add(new PlainNode
-            {
-                Begin = currentEnd,
-                End = double.MaxValue,
-                Pitch = (currentNote.Pitch - currentNote.Attributes.DepthRight) * 100
-            });
+                Key = note.Pitch,
+                Start = synchronizer.GetActualSecsFromTicks(TickHelper.PosToTicks(note.Onset)),
+                End = synchronizer.GetActualSecsFromTicks(TickHelper.PosToTicks(note.Onset + note.Duration)),
+                SlideOffset = note.Attributes.TransitionOffset,
+                SlideLeft = note.Attributes.SlideLeft,
+                SlideRight = note.Attributes.SlideRight,
+                DepthLeft = note.Attributes.DepthLeft,
+                DepthRight = note.Attributes.DepthRight,
+                VibratoStart = note.Attributes.VibratoStart,
+                VibratoLeft = note.Attributes.VibratoLeft,
+                VibratoRight = note.Attributes.VibratoRight,
+                VibratoDepth = note.Attributes.VibratoDepth,
+                VibratoFrequency = note.Attributes.VibratoFrequency,
+                VibratoPhase = note.Attributes.VibratoPhase
+            }).ToList();
+            BaseLayer = new BaseLayerGenerator(noteStructList);
+            VibratoLayer = new VibratoLayerGenerator(noteStructList);
+            GaussianLayer = new GaussianLayerGenerator(noteStructList);
         }
 
         public override int ValueAtTicks(int ticks)
@@ -268,128 +65,424 @@ namespace SynthV.Param
 
         public int ValueAtSecs(double secs)
         {
-            var nodeHits = PitchNodes.FindAll(node => node.Begin <= secs && node.End > secs);
-            var basePitch = nodeHits.Average(node => node.BasePitch(secs)) +
-                            nodeHits.Sum(node => node.PitchAtSecs(secs) - node.BasePitch(secs));
-            var vibrato = VibratoNodes.Find(node => node.Begin <= secs && node.End > secs);
-            var ticks = (int)Math.Round(Synchronizer.GetActualTicksFromSecs(secs));
-            if (vibrato == null)
-            {
-                return (int)Math.Round(basePitch + PitchDiff.ValueAtTicks(ticks));
-            }
-            return (int)Math.Round(basePitch
-                   + vibrato.PitchDiffAtSecs(secs) * VibratoEnv.ValueAtTicks(ticks) / 1000.0
-                   + PitchDiff.ValueAtTicks(ticks));
+            var ticks = (int) Math.Round(Synchronizer.GetActualTicksFromSecs(secs));
+            return (int) Math.Round(BaseLayer.PitchAtSecs(secs)
+                                    + GaussianLayer.PitchDiffAtSecs(secs)
+                                    + VibratoLayer.PitchDiffAtSecs(secs) * VibratoEnv.ValueAtTicks(ticks) / 1000.0
+                                    + PitchDiff.ValueAtTicks(ticks));
         }
+    }
 
-        private static int PosToTicks(long pos)
+    internal struct NoteStruct
+    {
+        public int Key;
+        public double Start;
+        public double End;
+        public double SlideOffset;
+        public double SlideLeft;
+        public double SlideRight;
+        public double DepthLeft;
+        public double DepthRight;
+        public double VibratoStart;
+        public double VibratoLeft;
+        public double VibratoRight;
+        public double VibratoDepth;
+        public double VibratoFrequency;
+        public double VibratoPhase;
+    }
+
+    internal class BaseLayerGenerator
+    {
+        private readonly struct SigmoidNode
         {
-            return (int)Math.Round(pos / 1470000.0);
-        }
+            public readonly double Start;
+            public readonly double End;
+            private readonly double Center;
+            private readonly Func<double, double> SigmoidL;
+            private readonly Func<double, double> SigmoidR;
+            private readonly Func<double, double> DSigmoidL;
+            private readonly Func<double, double> DSigmoidR;
 
-        private static Func<double, double> GaussFunc(double a, double b, double c)
-        {
-            return x => a * Math.Exp(-Math.Pow((x - b) / c, 2) / 2);
-        }
+            private const double K = 5.5;
 
-        private abstract class PitchNode
-        {
-            public double Begin;
-            public double End;
-
-            public abstract double PitchAtSecs(double secs);
-
-            public abstract double BasePitch(double secs);
-        }
-
-        private class PlainNode : PitchNode
-        {
-            public double Pitch;
-
-            public override double PitchAtSecs(double secs)
+            public SigmoidNode(double start, double end, double center, double radius, int keyLeft, int keyRight)
             {
-                return Pitch;
-            }
+                Start = start;
+                End = end;
+                Center = center;
+                var H = (keyRight - keyLeft) * 100;
+                var A = 1 / (1 + Math.Exp(K));
+                const double power = 0.75;
 
-            public override double BasePitch(double secs)
-            {
-                return Pitch;
-            }
-        }
-
-        private class BoundaryNode : PitchNode
-        {
-            public bool IsHead;
-            public int BaseKey;
-            public double Depth;
-
-            public override double PitchAtSecs(double secs)
-            {
-                var gauss = GaussFunc(Depth, IsHead ? Begin : End, 0.3 * (End - Begin));
-                return (BaseKey - gauss(secs)) * 100;
-            }
-
-            public override double BasePitch(double secs)
-            {
-                return BaseKey * 100;
-            }
-        }
-
-        private class TransitionNode : PitchNode
-        {
-            public double PitchLeft;
-            public double PitchRight;
-            public double Middle;
-            public double GaussBegin;
-            public double GaussEnd;
-            public double DepthLeft;
-            public double DepthRight;
-            public double Zoom = 1.0;
-
-            public override double PitchAtSecs(double secs)
-            {
-                var gaussLeft = Middle - GaussBegin >= MinimumInterval / 2
-                    ? GaussFunc(DepthLeft * 100, GaussBegin * 0.425 + Middle * 0.575, 0.3 * Zoom * (Middle - GaussBegin))
-                    : x => 0;
-                var gaussRight = GaussEnd - Middle >= MinimumInterval / 2
-                    ? GaussFunc(DepthRight * 100, GaussEnd * 0.425 + Middle * 0.575, 0.3 * Zoom * (GaussEnd - Middle))
-                    : x => 0;
-
-                double Sigmoid(double x)
+                var L = center - start;
+                double kL, hL, dL;
+                if (L >= radius)
                 {
-                    var r = Interpolation.SigmoidInterpolation(11.0)((x - Begin) / (End - Begin));
-                    return (1 - r) * PitchLeft + r * PitchRight;
+                    kL = K;
+                    hL = H;
+                    dL = 0;
+                }
+                else
+                {
+                    var AL = A * Math.Pow(radius / L, power);
+                    var BL = L / radius;
+                    var CL = AL * BL * K / (2 * AL - 1);
+                    kL = AL / (2 * AL - 1) * K - 1 / BL * LambertW.Evaluate(CL * Math.Exp(CL), -1);
+                    hL = H * kL / (2 * kL - K);
+                    dL = -radius / kL * Math.Log(2 * hL / H - 1);
                 }
 
-                return PitchLeft >= PitchRight
-                    ? Sigmoid(secs) + gaussLeft(secs) - gaussRight(secs)
-                    : Sigmoid(secs) - gaussLeft(secs) + gaussRight(secs);
+                SigmoidL = x => keyLeft * 100 + hL / (1 + Math.Exp(-kL / radius * (x - center + dL)));
+                DSigmoidL = x =>
+                {
+                    var exp = Math.Exp(-kL / radius * (x - center + dL));
+                    return hL * kL / radius * exp / Math.Pow(1 + exp, 2);
+                };
+
+                var R = end - center;
+                double kR, hR, dR;
+                if (R >= radius)
+                {
+                    kR = K;
+                    hR = H;
+                    dR = 0;
+                }
+                else
+                {
+                    var AR = A * Math.Pow(radius / R, power);
+                    var BR = R / radius;
+                    var CR = AR * BR * K / (2 * AR - 1);
+                    kR = AR / (2 * AR - 1) * K - 1 / BR * LambertW.Evaluate(CR * Math.Exp(CR), -1);
+                    hR = H * kR / (2 * kR - K);
+                    dR = -radius / kR * Math.Log(2 * hR / H - 1);
+                }
+
+                SigmoidR = x => keyRight * 100 - hR / (1 + Math.Exp(-kR / radius * (center - x + dR)));
+                DSigmoidR = x =>
+                {
+                    var exp = Math.Exp(-kR / radius * (center - x + dR));
+                    return hR * kR / radius * exp / Math.Pow(1 + exp, 2);
+                };
             }
 
-            public override double BasePitch(double secs)
+            public double ValueAtSecs(double secs)
             {
-                return secs < Middle ? PitchLeft : PitchRight;
+                return secs <= Center ? SigmoidL(secs) : SigmoidR(secs);
+            }
+
+            public double SlopeAtSecs(double secs)
+            {
+                return secs <= Center ? DSigmoidL(secs) : DSigmoidR(secs);
             }
         }
 
-        private class VibratoNode
-        {
-            public double Begin;
-            public double End;
-            public double FadeLeft;
-            public double FadeRight;
-            public double Amplitude;
-            public double Frequency;
-            public double Phase;
+        private readonly List<NoteStruct> NoteList;
 
-            public double PitchDiffAtSecs(double secs)
+        private readonly List<SigmoidNode> SigmoidNodes = new List<SigmoidNode>();
+
+        private const double defaultRadius = 0.07;
+
+        public BaseLayerGenerator(List<NoteStruct> noteList)
+        {
+            if (!noteList.Any())
+            {
+                return;
+            }
+
+            NoteList = noteList;
+
+            var currentNote = NoteList[0];
+            for (var i = 0; i < NoteList.Count - 1; ++i)
+            {
+                var nextNote = NoteList[i + 1];
+                if (currentNote.Key == nextNote.Key)
+                {
+                    currentNote = nextNote;
+                    continue;
+                }
+                if (nextNote.Start - currentNote.End <= PitchGenerator.maxBreak) // two notes are connected
+                {
+                    var start = Math.Max(currentNote.Start, Math.Min(currentNote.End,
+                        currentNote.End - currentNote.SlideRight + nextNote.SlideOffset));
+                    var end = Math.Max(nextNote.Start, Math.Min(nextNote.End,
+                        nextNote.Start + nextNote.SlideLeft + nextNote.SlideOffset));
+                    var mid = Math.Max(start, Math.Min(end,
+                        (currentNote.End + nextNote.Start) / 2 + nextNote.SlideOffset));
+                    SigmoidNodes.Add(new SigmoidNode(
+                        start,
+                        end,
+                        mid,
+                        (currentNote.SlideRight + nextNote.SlideLeft) / 2,
+                        currentNote.Key,
+                        nextNote.Key));
+                }
+                else
+                {
+                    var mid = (currentNote.End + nextNote.Start) / 2;
+                    SigmoidNodes.Add(new SigmoidNode(
+                        mid - defaultRadius,
+                        mid + defaultRadius,
+                        mid,
+                        defaultRadius,
+                        currentNote.Key,
+                        nextNote.Key));
+                }
+
+                currentNote = nextNote;
+            }
+        }
+
+        public double PitchAtSecs(double secs)
+        {
+            var query = SigmoidNodes.Where(node => secs >= node.Start && secs < node.End).ToArray();
+            switch (query.Length)
+            {
+                case 0:
+                    var onNoteIndex = NoteList.FindIndex(note => secs >= note.Start && secs < note.End);
+                    if (onNoteIndex >= 0)
+                    {
+                        return 100 * NoteList[onNoteIndex].Key;
+                    }
+
+                    return NoteList
+                        .OrderBy(note => Math.Min(Math.Abs(secs - note.Start), Math.Abs(secs - note.End)))
+                        .First()
+                        .Key * 100;
+                case 1:
+                    return query.First().ValueAtSecs(secs);
+                case 2:
+                    var first = query.First();
+                    var second = query.ElementAt(1);
+                    var width = first.End - second.Start;
+                    var bottom = first.ValueAtSecs(second.Start);
+                    var top = second.ValueAtSecs(first.End);
+                    var diff1 = first.SlopeAtSecs(second.Start);
+                    var diff2 = second.SlopeAtSecs(first.End);
+                    return CubicBezier(width, bottom, top, diff1, diff2)(secs - second.Start);
+                default:
+                    throw new ArgumentException("More than two sigmoid nodes overlapped");
+            }
+        }
+
+        private static Func<double, double> CubicBezier(double width, double bottom, double top, double diff1,
+            double diff2)
+        {
+            var a = (2 * bottom - 2 * top + diff1 * width + diff2 * width) / Math.Pow(width, 3);
+            var b = (-3 * bottom + 3 * top - 2 * diff1 * width - diff2 * width) / Math.Pow(width, 2);
+            var c = diff1;
+            var d = bottom;
+            return x => a * Math.Pow(x, 3) + b * Math.Pow(x, 2) + c * x + d;
+        }
+    }
+
+    internal class GaussianLayerGenerator
+    {
+        private readonly struct GaussianNode
+        {
+            public readonly double Start;
+            public readonly double End;
+            private readonly double Origin;
+            private readonly Func<double, double> GaussianL;
+            private readonly Func<double, double> GaussianR;
+
+            private const double RatioMiu = 0.447684;
+            private const double RatioSigma = 0.415;
+            private const double expand = 2.5;
+
+            public GaussianNode(
+                bool isEndPoint,
+                double origin,
+                double depth,
+                double width,
+                double lengthL,
+                double lengthR)
+            {
+                Origin = origin;
+                depth *= 100;
+
+                var sigmaBase = Math.Abs(RatioSigma * width);
+                if (isEndPoint)
+                {
+                    var sigmaL = Math.Min(sigmaBase, lengthL / expand);
+                    Start = Origin - expand * sigmaL;
+                    GaussianL = x => depth * Math.Exp(-Math.Pow((x - origin) / sigmaL, 2));
+
+                    var sigmaR = Math.Min(sigmaBase, lengthR / expand);
+                    End = Origin + expand * sigmaR;
+                    GaussianR = x => depth * Math.Exp(-Math.Pow((x - origin) / sigmaR, 2));
+                }
+                else
+                {
+                    var sign = Math.Sign(depth);
+                    depth = Math.Abs(depth);
+                    var miuBase = RatioMiu * width;
+                    var R2 = Math.Pow(sigmaBase, 2);
+
+                    var lengthBaseL = expand * sigmaBase - miuBase;
+                    if (lengthL >= lengthBaseL)
+                    {
+                        Start = origin - lengthBaseL;
+                        GaussianL = x => sign * depth * Math.Exp(-Math.Pow((x - origin - miuBase) / sigmaBase, 2));
+                    }
+                    else
+                    {
+                        Start = origin - lengthL;
+                        var kL = lengthL / lengthBaseL;
+                        var miuL = miuBase * kL;
+                        var sigma2L = R2 * kL;
+                        var depthL = depth * Math.Exp(Math.Pow(miuBase, 2) / R2 * (kL - 1));
+                        GaussianL = x => sign * depthL * Math.Exp(-Math.Pow(x - origin - miuL, 2) / sigma2L);
+                    }
+
+                    var lengthBaseR = expand * sigmaBase + miuBase;
+                    if (lengthR >= lengthBaseR)
+                    {
+                        End = origin + lengthBaseR;
+                        GaussianR = x => sign * depth * Math.Exp(-Math.Pow((x - origin - miuBase) / sigmaBase, 2));
+                    }
+                    else
+                    {
+                        End = origin + lengthR;
+                        var kR = lengthR / lengthBaseR;
+                        var miuR = miuBase * kR;
+                        var sigma2R = R2 * kR;
+                        var depthR = depth * Math.Exp(Math.Pow(miuBase, 2) / R2 * (kR - 1));
+                        GaussianR = x => sign * depthR * Math.Exp(-Math.Pow(x - origin - miuR, 2) / sigma2R);
+                    }
+                }
+            }
+
+            public double ValueAtSecs(double secs)
+            {
+                var value = secs < Origin ? GaussianL(secs) : GaussianR(secs);
+                return value;
+            }
+        }
+
+        private readonly List<GaussianNode> GaussianNodes = new List<GaussianNode>();
+
+        public GaussianLayerGenerator(List<NoteStruct> noteList)
+        {
+            if (!noteList.Any())
+            {
+                return;
+            }
+
+            var currentNote = noteList[0];
+            // head of the first note
+            GaussianNodes.Add(new GaussianNode(
+                true,
+                currentNote.Start,
+                -currentNote.DepthLeft,
+                currentNote.SlideLeft,
+                double.MaxValue,
+                currentNote.End - currentNote.Start));
+            for (var i = 0; i < noteList.Count - 1; i++)
+            {
+                var nextNote = noteList[i + 1];
+                if (nextNote.Start - currentNote.End >= PitchGenerator.maxBreak)
+                {
+                    GaussianNodes.Add(new GaussianNode(
+                        true,
+                        currentNote.End,
+                        -currentNote.DepthRight,
+                        currentNote.SlideLeft,
+                        currentNote.End - currentNote.Start,
+                        double.MaxValue));
+                    GaussianNodes.Add(new GaussianNode(
+                        true,
+                        nextNote.Start,
+                        -nextNote.DepthLeft,
+                        nextNote.SlideLeft,
+                        double.MaxValue,
+                        nextNote.End - nextNote.Start));
+                }
+                else
+                {
+                    var middle = (currentNote.End + nextNote.Start) / 2;
+                    var origin = Math.Max(currentNote.Start, Math.Min(nextNote.End, middle + nextNote.SlideOffset));
+                    
+                    var depthL = currentNote.Key >= nextNote.Key
+                        ? currentNote.DepthRight
+                        : -currentNote.DepthRight;
+                    GaussianNodes.Add(new GaussianNode(
+                        false,
+                        origin,
+                        depthL,
+                        -currentNote.SlideRight,
+                        origin - currentNote.Start,
+                        nextNote.End - origin));
+
+                    var depthR = currentNote.Key >= nextNote.Key
+                        ? -nextNote.DepthLeft
+                        : nextNote.DepthLeft;
+                    GaussianNodes.Add(new GaussianNode(
+                        false,
+                        origin,
+                        depthR,
+                        nextNote.SlideLeft,
+                        origin - currentNote.Start,
+                        nextNote.End - origin));
+                }
+
+                currentNote = nextNote;
+            }
+            // tail of the last note
+            GaussianNodes.Add(new GaussianNode(
+                true,
+                currentNote.End,
+                -currentNote.DepthRight,
+                currentNote.SlideLeft,
+                currentNote.End - currentNote.Start,
+                double.MaxValue));
+        }
+
+        public double PitchDiffAtSecs(double secs)
+        {
+            return GaussianNodes
+                .Where(node => secs >= node.Start && secs < node.End)
+                .Sum(node => node.ValueAtSecs(secs));
+        }
+    }
+
+    internal class VibratoLayerGenerator
+    {
+        private readonly struct VibratoNode
+        {
+            public readonly double Start;
+            public readonly double End;
+            private readonly double FadeLeft;
+            private readonly double FadeRight;
+            private readonly double Amplitude;
+            private readonly double Frequency;
+            private readonly double Phase;
+
+            public VibratoNode(
+                double start,
+                double end,
+                double fadeLeft,
+                double fadeRight,
+                double amplitude,
+                double frequency,
+                double phase)
+            {
+                Start = start;
+                End = end;
+                FadeLeft = fadeLeft;
+                FadeRight = fadeRight;
+                Amplitude = amplitude;
+                Frequency = frequency;
+                Phase = phase;
+            }
+
+            public double ValueAtSecs(double secs)
             {
                 double zoom;
-                if (End - Begin >= FadeLeft + FadeLeft)
+                if (End - Start >= FadeLeft + FadeLeft)
                 {
-                    if (secs < Begin + FadeLeft)
+                    if (secs < Start + FadeLeft)
                     {
-                        zoom = (secs - Begin) / FadeLeft;
+                        zoom = (secs - Start) / FadeLeft;
                     }
                     else if (secs > End - FadeRight)
                     {
@@ -402,14 +495,67 @@ namespace SynthV.Param
                 }
                 else
                 {
-                    var mid = (Begin * FadeRight + End * FadeLeft) / (FadeLeft + FadeRight);
+                    var mid = (Start * FadeRight + End * FadeLeft) / (FadeLeft + FadeRight);
                     zoom = secs < mid
-                        ? (secs - Begin) / FadeLeft
+                        ? (secs - Start) / FadeLeft
                         : (End - secs) / FadeRight;
                 }
-                return zoom * Amplitude * 100.0 * Math.Sin(2 * Math.PI * Frequency * (secs - Begin) + Phase);
+
+                return zoom * Amplitude * 100.0 * Math.Sin(2 * Math.PI * Frequency * (secs - Start) + Phase);
             }
+        }
+
+        private readonly List<VibratoNode> VibratoNodes = new List<VibratoNode>();
+
+        public VibratoLayerGenerator(List<NoteStruct> noteList)
+        {
+            for (var i = 0; i < noteList.Count; i++)
+            {
+                var start = noteList[i].Start;
+                var end = noteList[i].End;
+                if (end - start <= noteList[i].VibratoStart)
+                {
+                    continue;
+                }
+
+                if (i < noteList.Count - 1 && noteList[i + 1].Start - end < PitchGenerator.maxBreak)
+                {
+                    end += Math.Min(
+                        noteList[i + 1].SlideOffset,
+                        Math.Min(
+                            noteList[i + 1].VibratoStart,
+                            noteList[i + 1].End - noteList[i + 1].Start));
+                }
+
+                if (start >= end)
+                {
+                    continue;
+                }
+
+                VibratoNodes.Add(new VibratoNode(
+                    start + noteList[i].VibratoStart,
+                    end,
+                    noteList[i].VibratoLeft,
+                    noteList[i].VibratoRight,
+                    noteList[i].VibratoDepth / 2,
+                    noteList[i].VibratoFrequency,
+                    noteList[i].VibratoPhase));
+            }
+        }
+
+        public double PitchDiffAtSecs(double secs)
+        {
+            return VibratoNodes
+                .Where(node => secs >= node.Start && secs < node.End)
+                .Sum(node => node.ValueAtSecs(secs));
         }
     }
 
+    internal static class TickHelper
+    {
+        public static int PosToTicks(long pos)
+        {
+            return (int) Math.Round(pos / 1470000.0);
+        }
+    }
 }

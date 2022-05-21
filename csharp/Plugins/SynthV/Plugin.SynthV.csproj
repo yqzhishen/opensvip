@@ -51,12 +51,13 @@
         <Compile Include="CurveGenerator.cs" />
         <Compile Include="GroupOptions.cs" />
         <Compile Include="Interpolation.cs" />
+        <Compile Include="LambertW.cs" />
         <Compile Include="ParamExpression.cs" />
         <Compile Include="CompoundParam.cs" />
+        <Compile Include="PitchGenerator.cs" />
         <Compile Include="RangeUtils.cs" />
         <Compile Include="TrackMergeUtils.cs" />
         <Compile Include="PhonemeUtils.cs" />
-        <Compile Include="PitchGenerator.cs" />
         <Compile Include="PitchOptions.cs" />
         <Compile Include="PitchSimulator.cs" />
         <Compile Include="PitchSlide.cs" />

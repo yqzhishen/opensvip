@@ -16,6 +16,10 @@ namespace SynthV.Stream
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
             var svProject = JsonConvert.DeserializeObject<SVProject>(reader.ReadToEnd());
+            if (svProject == null)
+            {
+                throw new InvalidDataException("Deserialized json object is null.");
+            }
             stream.Close();
             reader.Close();
             return new SynthVDecoder
