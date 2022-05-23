@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>BinSvip</Name>
-    <Version>1.1.2</Version>
+    <Version>1.1.4</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>原始二进制 .svip 文件转换插件。</Descriptions>
@@ -19,15 +19,24 @@
         </Option>
         <Option Name="tempo" Type="integer" Default="60">
             <Notes>曲速过低或过高时，使用此曲速进行对齐</Notes>
-			<Tips>X Studio 支持的曲速范围为 20 ~ 300。曲速超出范围时，将会启用绝对时间轴以确保音符对齐。请尽量将此值设置为源工程文件中曲速的整数倍或整数分之一。只要在合理数值范围内，此选项的值不会影响对齐效果。</Tips>
+			<Tips>X Studio 支持的曲速范围为 20 ~ 300。曲速超出范围时，将会启用绝对时间轴以确保音符对齐。请尽量将此值设置为源工程文件中曲速的整数倍或整数分之一；只要在合理数值范围内，此选项的值不会影响对齐效果。</Tips>
         </Option>
         <Option Name="version" Type="enum" Default="auto">
             <Notes>指定生成的 .svip 文件版本</Notes>
 			<Tips>此选项仅控制输出工程文件的头部版本信息。选择较旧的工程文件版本不会造成数据丢失。</Tips>
             <EnumChoices>
-                <Choice Name="根据当前安装的 X Studio 自动选择" Tag="auto"/>
-                <Choice Name="SVIP 7.0.0 (X Studio 2.0)" Tag="7.0.0"/>
-                <Choice Name="SVIP 6.0.0 (X Studio 1.8)" Tag="6.0.0"/>
+                <Choice Name="自动选择" Tag="auto">
+                    <Label>使用当前系统安装的 X Studio 所对应的工程文件版本。</Label>
+                </Choice>
+                <Choice Name="SVIP 7.0.0" Tag="7.0.0">
+                    <Label>使用 X Studio 2.0 对应的工程文件版本。</Label>
+                </Choice>
+                <Choice Name="SVIP 6.0.0" Tag="6.0.0">
+                    <Label>使用兼容 X Studio 1.8 的工程文件版本。</Label>
+                </Choice>
+                <Choice Name="最大兼容性" Tag="0.0.0">
+                    <Label>此选项导出的工程文件可使用任意版本的 X Studio 打开，但若使用较低版本的软件进行编辑，可能会丢失部分数据。</Label>
+                </Choice>
             </EnumChoices>
         </Option>
     </OutputOptions>

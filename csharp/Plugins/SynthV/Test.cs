@@ -18,9 +18,13 @@ namespace SynthV.Test
 
         private static void Svp2Json()
         {
-            var project = new SynthVConverter().Load(@"C:\Users\YQ之神\Desktop\instant.svp", new ConverterOptions(new Dictionary<string, string>()));
+            var project = new SynthVConverter().Load(@"C:\Users\YQ之神\Desktop\暗香.svp",
+                new ConverterOptions(new Dictionary<string, string>
+                {
+                    {"pitch", "full"}
+                }));
             var stream = new FileStream(
-                @"C:\Users\YQ之神\Desktop\test.json",
+                @"C:\Users\YQ之神\Desktop\暗香.json",
                 FileMode.Create,
                 FileAccess.Write);
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
@@ -30,6 +34,7 @@ namespace SynthV.Test
             writer.Close();
             stream.Close();
         }
+
         private static void Json2Svp()
         {
             var stream = new FileStream(
@@ -40,7 +45,8 @@ namespace SynthV.Test
             var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            new SynthVConverter().Save(@"C:\Users\YQ之神\Desktop\test.svp", project, new ConverterOptions(new Dictionary<string, string>()));
+            new SynthVConverter().Save(@"C:\Users\YQ之神\Desktop\test.svp", project,
+                new ConverterOptions(new Dictionary<string, string>()));
         }
     }
 }

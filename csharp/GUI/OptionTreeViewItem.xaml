@@ -135,7 +135,11 @@
                     ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type framework:Choice}">
-                            <TextBlock Style="{StaticResource OptionTextBlock}" TextAlignment="Center" Text="{Binding Name}" Padding="0" ToolTip="{Binding Label}"/>
+                            <TextBlock Style="{StaticResource OptionTextBlock}" TextAlignment="Center" Text="{Binding Name}" Padding="0">
+                                <TextBlock.ToolTip>
+                                    <TextBlock Text="{Binding Label}" MaxWidth="320" TextWrapping="Wrap"/>
+                                </TextBlock.ToolTip>
+                            </TextBlock>
                         </DataTemplate>
                     </ComboBox.ItemTemplate>
                 </ComboBox>

@@ -277,6 +277,11 @@ namespace SynthV.Core
             {
                 return svCurve;
             }
+
+            if (ParamSampleInterval > 15)
+            {
+                svCurve.Mode = "cubic";
+            }
             var pointList = svCurve.Points;
             var skipped = 0;
             if (curve.PointList[0].Item1 == -192000)
