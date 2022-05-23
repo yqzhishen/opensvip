@@ -17,12 +17,14 @@ namespace OpenSvip.Stream
         public Project Load(string path, ConverterOptions options)
         {
             libraryPath = FindLibrary();
+            AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
             return DoLoad(path);
         }
 
         public void Save(string path, Project project, ConverterOptions options)
         {
             libraryPath = FindLibrary();
+            AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
             DoSave(path, project, options);
         }
 
@@ -73,11 +75,6 @@ namespace OpenSvip.Stream
             stream.Close();
         }
         
-        public BinarySvipConverter()
-        {
-            AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
-        }
-        
         private static string FindLibrary()
         {
             try
@@ -99,7 +96,7 @@ namespace OpenSvip.Stream
         private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)
         {
             var filename = args.Name.Split(',')[0];
-            return Assembly.LoadFile(Path.Combine(libraryPath, filename + ".dll"));
+            return Assembly.LoadFrom(Path.Combine(libraryPath, filename + ".dll"));
         }
     }
 }
