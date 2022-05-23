@@ -11,7 +11,22 @@ namespace OpenSvip.Stream
 {
     public class BinarySvipConverter : IProjectConverter
     {
+        
+        private static string libraryPath;
+        
         public Project Load(string path, ConverterOptions options)
+        {
+            libraryPath = FindLibrary();
+            return DoLoad(path);
+        }
+
+        public void Save(string path, Project project, ConverterOptions options)
+        {
+            libraryPath = FindLibrary();
+            DoSave(path, project, options);
+        }
+
+        private Project DoLoad(string path)
         {
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new BinaryReader(stream);
@@ -21,8 +36,8 @@ namespace OpenSvip.Stream
             var model = SingingTool.Model.ProjectModelFileMgr.ReadModelFile(path, out _, out _);
             return new BinarySvipDecoder().DecodeProject(version, model);
         }
-
-        public void Save(string path, Project project, ConverterOptions options)
+        
+        private void DoSave(string path, Project project, ConverterOptions options)
         {
             var (version, model) = new BinarySvipEncoder
             {
@@ -58,27 +73,33 @@ namespace OpenSvip.Stream
             stream.Close();
         }
         
-        static BinarySvipConverter()
+        public BinarySvipConverter()
         {
             AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
         }
         
         private static string FindLibrary()
         {
-            var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
-            if (key == null)
+            try
             {
-                throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。");
+                var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
+                var value = key?.GetValue("").ToString().Split('"')[1];
+                if (!File.Exists(value))
+                {
+                    throw new FileNotFoundException();
+                }
+                return Path.GetDirectoryName(value);
             }
-            var value = key.GetValue("").ToString().Split('"')[1];
-            return Path.GetDirectoryName(value);
+            catch
+            {
+                throw new FileLoadException("未检测到已安装的 X Studio · 歌手软件。请查看插件依赖说明。");
+            }
         }
 
         private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)
         {
-            var path = FindLibrary();
             var filename = args.Name.Split(',')[0];
-            return Assembly.LoadFile(Path.Combine(path, filename + ".dll"));
+            return Assembly.LoadFile(Path.Combine(libraryPath, filename + ".dll"));
         }
     }
 }
