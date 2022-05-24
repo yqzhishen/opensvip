@@ -204,7 +204,7 @@ namespace OpenSvip.Library
             {
                 new Tuple<int, int>(Math.Max(Start, ranges[startIndex].Item1), ranges[startIndex].Item2)
             };
-            intersectRanges.AddRange(ranges.GetRange(startIndex, endIndex - startIndex + 1));
+            intersectRanges.AddRange(ranges.GetRange(startIndex + 1, endIndex - startIndex - 1));
             intersectRanges.Add(new Tuple<int, int>(ranges[endIndex].Item1, Math.Min(End, ranges[endIndex].Item2)));
 
             return intersectRanges.Count == 1
