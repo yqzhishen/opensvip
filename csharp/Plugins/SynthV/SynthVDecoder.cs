@@ -318,30 +318,6 @@ namespace SynthV.Core
                         paramEditedRange |= masterVibratoEnv.EditedRange(1.0);
                     }
                     range &= noteEditedRange | paramEditedRange;
-                    if (regardDefaultVibratoAsUnedited)
-                    {
-                        NoteList.ForEach(note =>
-                        {
-                            if (note.PitchEdited(considerInstantPitchMode: ImportInstantPitch)
-                                || note.Attributes.VibratoDepth == 0.0)
-                            {
-                                return;
-                            }
-                            var vibStartTicks = (int) Math.Round(Synchronizer.GetActualTicksFromSecsOffset(
-                                DecodePosition(note.Onset),
-                                note.Attributes.VibratoStart));
-                            var vibEndTicks = DecodePosition(note.Onset + note.Duration);
-                            var vibratoRange = Range.Create(new Tuple<int, int>(vibStartTicks, vibEndTicks));
-                            if (vibratoRange.CoveredBy(range))
-                            {
-                                return;
-                            }
-                            if (!vibratoRange.Intersect(range).IsEmpty())
-                            {
-                                range |= vibratoRange;
-                            }
-                        });
-                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
