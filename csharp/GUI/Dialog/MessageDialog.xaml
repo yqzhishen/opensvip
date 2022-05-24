@@ -44,7 +44,8 @@
                 Content="{Binding ButtonText}"
                 IsDefault="True"
                 IsCancel="True"
-                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
+                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                Click="Button_Click">
             </Button>
         </StackPanel>
     </Grid>

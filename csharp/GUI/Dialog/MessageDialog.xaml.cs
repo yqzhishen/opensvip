@@ -1,6 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
 
 namespace OpenSvip.GUI.Dialog
@@ -8,15 +8,17 @@ namespace OpenSvip.GUI.Dialog
     /// <summary>
     /// MessageDialog.xaml 的交互逻辑
     /// </summary>
-    public partial class MessageDialog : UserControl
+    public partial class MessageDialog
     {
         private readonly object _lock = new object();
 
-        public string Title { get; set; }
+        public string Title { get; private set; }
 
-        public string Message { get; set; }
+        public string Message { get; private set; }
 
-        public string ButtonText { get; set; } = "确定";
+        public string ButtonText { get; private set; } = "确定";
+        
+        public Action ButtonAction { get; private set; }
 
         public MessageDialog()
         {
@@ -24,7 +26,11 @@ namespace OpenSvip.GUI.Dialog
             DataContext = this;
         }
 
-        public static MessageDialog CreateDialog(string title, string message, string buttonText = "确定")
+        public static MessageDialog CreateDialog(
+            string title,
+            string message,
+            string buttonText = "确定",
+            Action buttonAction = null)
         {
             MessageDialog dialog = null;
             App.Current.Dispatcher.Invoke(() =>
@@ -33,7 +39,8 @@ namespace OpenSvip.GUI.Dialog
                 {
                     Title = title,
                     Message = message,
-                    ButtonText = buttonText
+                    ButtonText = buttonText,
+                    ButtonAction = buttonAction
                 };
             });
             return dialog;
@@ -50,9 +57,10 @@ namespace OpenSvip.GUI.Dialog
             Monitor.Exit(_lock);
         }
 
-        public void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             Monitor.Exit(_lock);
+            ButtonAction?.Invoke();
         }
     }
 }
