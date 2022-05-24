@@ -7,20 +7,20 @@ namespace OpenSvip.Framework
     {
         public const string FrameworkName = "OpenSVIP";
 
-        public const string FrameworkVersion = "1.2.2";
+        public const string FrameworkVersion = "1.2.3";
 
         public static readonly string CommonDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FrameworkName);
 
         public static readonly string CommonConfigPath = Path.Combine(CommonDataPath, "Config");
 
-        public static readonly string ProjectHomePage = "https://openvpi.github.io/home";
+        public const string ProjectHomePage = "https://openvpi.github.io/home";
 
-        public static readonly string AuthorHomePage = "https://space.bilibili.com/102844209";
+        public const string AuthorHomePage = "https://space.bilibili.com/102844209";
 
-        public static readonly string BundleShareLink = "https://share.weiyun.com/yMDgO6sz";
+        public const string BundleShareLink = "https://share.weiyun.com/yMDgO6sz";
 
-        public static readonly string PluginMarket = "https://openvpi.github.io/home/market/summary.html";
+        public const string PluginMarket = "https://openvpi.github.io/home/market/summary.html";
 
-        public static readonly string FeedbackQQGroup = "687772360";
+        public const string FeedbackQQGroup = "687772360";
     }
 }
