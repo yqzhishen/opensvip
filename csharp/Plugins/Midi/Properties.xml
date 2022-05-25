@@ -1,17 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.4.0</Version>
+    <Version>0.4.1</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。暂不支持 MIDI 格式转换为 OpenSvip 格式。</Descriptions>
+    <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
     <Requirements>无</Requirements>
     <Format>MIDI 文件</Format>
     <Suffix>mid</Suffix>
     <Identifier>midi</Identifier>
-    <LibraryPath>Midi\Plugin.Midi.dll</LibraryPath>
-    <Converter>Midi.Stream.MidiConverter</Converter>
+    <LibraryPath>Midi\FlutyDeer.MidiPlugin.dll</LibraryPath>
+    <Converter>FlutyDeer.MidiStream.MidiConverter</Converter>
 	<InputOptions>
+		<Option Name="lyricEncoding" Type="enum" Default="UTF8BOM">
+			<Notes>歌词文本编码</Notes>
+			<Tips>除非打开歌词兼容性模式后仍然乱码，否则不应更改此设置。</Tips>
+			<EnumChoices>
+				<Choice Name="ASCII" Tag="ASCII" />
+				<Choice Name="BigEndianUnicode" Tag="BigEndianUnicode" />
+				<Choice Name="Default" Tag="Default">
+					<Label>操作系统的当前 ANSI 代码页的编码。</Label>
+				</Choice>
+				<Choice Name="Unicode" Tag="Unicode" />
+				<Choice Name="UTF-32" Tag="UTF32" />
+				<Choice Name="UTF-7" Tag="UTF7" />
+				<Choice Name="UTF-8 BOM" Tag="UTF8BOM" />
+				<Choice Name="UTF-8" Tag="UTF8" />
+			</EnumChoices>
+		</Option>
 	</InputOptions>
 	<OutputOptions>
 		<Option Name="transpose" Type="integer" Default="0">

@@ -7,8 +7,8 @@
 		<ProjectGuid>{9959258B-F7D7-47EE-823F-54B60BB7935C}</ProjectGuid>
 		<OutputType>Library</OutputType>
 		<AppDesignerFolder>Properties</AppDesignerFolder>
-		<RootNamespace>Plugin.Midi</RootNamespace>
-		<AssemblyName>Plugin.Midi</AssemblyName>
+		<RootNamespace>FlutyDeer.MidiPlugin</RootNamespace>
+		<AssemblyName>FlutyDeer.MidiPlugin</AssemblyName>
 		<TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
 		<FileAlignment>512</FileAlignment>
 		<Deterministic>true</Deterministic>
@@ -58,6 +58,7 @@
 		<Compile Include="Properties\AssemblyInfo.cs"/>
 		<Compile Include="SymbolList.cs"/>
 		<Compile Include="Test.cs"/>
+		<Compile Include="Utils/EncodingUtil.cs"/>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="packages.config"/>

@@ -2,22 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Melanchall.DryWetMidi.Core;
 using Note = OpenSvip.Model.Note;
 using TimeSignature = OpenSvip.Model.TimeSignature;
 using System.Text.RegularExpressions;
 
-namespace Plugin.Midi
+namespace FlutyDeer.MidiPlugin
 {
     public class MidiDecoder
     {
+        /// <summary>
+        /// 歌词文本编码。
+        /// </summary>
+        public LyricEncodings LyricEncoding { get; set; }
         private MidiFile midiFile;
         public Project DecodeMidiFile(string path)
         {
             var osProject = new Project();
             ReadingSettings readingSettings = new ReadingSettings();
-            readingSettings.TextEncoding = Encoding.UTF8;
+            readingSettings.TextEncoding = EncodingUtil.GetEncoding(LyricEncoding);
             midiFile = MidiFile.Read(path, readingSettings);
             IEnumerable<TrackChunk> midiChunk = midiFile.GetTrackChunks();
             bool isTempoMapTrack = true;

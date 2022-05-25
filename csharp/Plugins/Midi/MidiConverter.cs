@@ -1,15 +1,18 @@
 ﻿using OpenSvip.Framework;
 using OpenSvip.Model;
-using Plugin.Midi;
+using FlutyDeer.MidiPlugin;
 
-namespace Midi.Stream
+namespace FlutyDeer.MidiStream
 {
     internal class MidiConverter : IProjectConverter
     {
 
         public Project Load(string path, ConverterOptions options)
         {
-            return new MidiDecoder().DecodeMidiFile(path);
+            return new MidiDecoder
+            {
+                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM)
+            }.DecodeMidiFile(path);
         }
 
         public void Save(string path, Project project, ConverterOptions options)
