@@ -3,9 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using OpenSvip.Model;
 using OpenSvip.Library;
-using Gjgj.Model;
+using FlutyDeer.GjgjPlugin.Model;
 
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public class GjgjDecoder
     {
@@ -23,7 +23,6 @@ namespace Plugin.Gjgj
             gjProject = originalProject;
             var osProject = new Project
             {
-                Version = GetSvipProjectVersion(),
                 SongTempoList = DecodeSongTempoList(),
                 TimeSignatureList = DecodeTimeSignatureList()
             };
@@ -124,14 +123,15 @@ namespace Plugin.Gjgj
         private Note DecodeNote(int singingTrackIndex, int noteIndex, Project project)
         {
             GjNote gjNote = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex];
+            int noteStartPosition = DecodeNoteStartPosition(gjNote, project);
             Note note = new Note
             {
-                StartPos = DecodeNoteStartPosition(gjNote, project),
+                StartPos = noteStartPosition,
                 Length = gjNote.Duration,
                 KeyNumber = gjNote.KeyNumber,
                 Lyric = gjNote.Lyric,
                 Pronunciation = PronunciationUtil.DecodePronunciation(gjNote),
-                EditedPhones = DecodePhones(gjNote, project),
+                EditedPhones = DecodePhones(gjNote, noteStartPosition),
                 HeadTag = NoteHeadTagUtil.ToStringTag(gjNote.Style)
             };
             return note;
@@ -140,8 +140,6 @@ namespace Plugin.Gjgj
         /// <summary>
         /// 转换音符起始位置。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="noteIndex">音符索引。</param>
         /// <param name="project">OpenSvip工程。</param>
         /// <returns></returns>
         private int DecodeNoteStartPosition(GjNote gjNote, Project project)//用了opensvip的拍号列表，是因为gj可能存在拍号列表里面没有拍号的情况
@@ -152,14 +150,10 @@ namespace Plugin.Gjgj
         /// <summary>
         /// 转换音素。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="noteIndex">音符索引。</param>
-        /// <param name="project">OpenSvip工程。</param>
         /// <returns></returns>
-        private Phones DecodePhones(GjNote gjNote, Project project)
+        private Phones DecodePhones(GjNote gjNote, int startPosition)
         {
             int duration = gjNote.Duration;
-            int startPosition = DecodeNoteStartPosition(gjNote, project);
             double preTime = gjNote.PhonePreTime;
             double postTime = gjNote.PhonePostTime;
             Phones phones = new Phones();
@@ -344,15 +338,6 @@ namespace Plugin.Gjgj
         private bool GetInstrumentalMute(int instrumentalTrackIndex)
         {
             return gjProject.InstrumentalTrackList[instrumentalTrackIndex].TrackVolume.Mute;
-        }
-
-        /// <summary>
-        /// 设置工程版本。
-        /// </summary>
-        /// <returns></returns>
-        private static string GetSvipProjectVersion()
-        {
-            return "SVIP7.0.0";
         }
 
         /// <summary>

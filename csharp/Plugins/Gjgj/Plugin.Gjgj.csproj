@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Plugin.Gjgj</RootNamespace>
-    <AssemblyName>Plugin.Gjgj</AssemblyName>
+    <RootNamespace>FlutyDeer.GjgjPlugin</RootNamespace>
+    <AssemblyName>FlutyDeer.GjgjPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

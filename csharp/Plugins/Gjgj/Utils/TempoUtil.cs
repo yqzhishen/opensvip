@@ -1,7 +1,7 @@
-using Gjgj.Model;
+using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Model;
 
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public static class TempoUtil
     {

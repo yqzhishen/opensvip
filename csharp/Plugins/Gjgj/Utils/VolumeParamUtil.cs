@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gjgj.Model;
+using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Framework;
 using OpenSvip.Library;
 using OpenSvip.Model;
 
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public class VolumeParamUtil
     {

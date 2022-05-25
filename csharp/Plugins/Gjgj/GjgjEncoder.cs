@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenSvip.Model;
-using Gjgj.Model;
+using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Library;
 using OpenSvip.Framework;
 
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public class GjgjEncoder
     {
@@ -361,8 +361,6 @@ namespace Plugin.Gjgj
         {
             return origin + 1920 * GetNumerator(0) / GetDenominator(0);
         }
-
-
 
         /// <summary>
         /// 转换音素的第一根杆子。

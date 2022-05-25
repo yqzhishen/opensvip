@@ -1,4 +1,4 @@
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public static class NoteHeadTagUtil
     {
