@@ -27,6 +27,8 @@ namespace OpenSvip.GUI
     {
         public AppModel Model { get; set; }
 
+        private readonly List<Thread> _converterThreads = new List<Thread>();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -190,7 +192,8 @@ namespace OpenSvip.GUI
             {
                 return;
             }
-            new Thread(() =>
+            // ReSharper disable once InconsistentlySynchronizedField
+            _converterThreads.Add(new Thread(() =>
             {
                 // Prepare for execution
                 Model.ExecutionInProgress = true;
@@ -286,6 +289,66 @@ namespace OpenSvip.GUI
 
                 // Unload the domain to release assembly files
                 AppDomain.Unload(domain);
+                lock (_converterThreads)
+                {
+                    _converterThreads.Remove(Thread.CurrentThread);
+                }
+            }));
+            lock (_converterThreads)
+            {
+                _converterThreads.ForEach(t => t.Start());
+            }
+        }
+
+        private void QuitApplication()
+        {
+            lock (_converterThreads)
+            {
+                _converterThreads.ForEach(t =>
+                {
+                    try
+                    {
+                        t.Abort();
+                    }
+                    catch
+                    {
+                        // ignored
+                    }
+                });
+            }
+            new AppConfig
+            {
+                Properties =
+                {
+                    MainWindowSize = new Tuple<double, double>(Width, Height),
+                    MainWindowState = WindowState
+                },
+                Settings =
+                {
+                    ImportPluginId = Model.SelectedInputPlugin?.Identifier,
+                    ExportPluginId = Model.SelectedOutputPlugin?.Identifier,
+                    AutoDetectFormat = Model.AutoDetectFormat,
+                    AutoResetTasks = Model.AutoResetTasks,
+                    AutoExtension = Model.AutoExtension,
+                    OpenExportFolder = Model.OpenExportFolder,
+                    OverwriteOption = Model.OverWriteOption,
+                    DefaultExportPath = Model.DefaultExportPath,
+                    CustomExportPaths = Model.CustomExportPaths.Select(path => new PathConfig
+                    {
+                        Path = path.PathValue,
+                        Selected = path == Model.SelectedCustomExportPath
+                    }).ToArray(),
+                    LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
+                        ? Model.ExportPath.PathValue
+                        : null,
+                    AppearanceTheme = Model.AppearanceThemes,
+                    CheckForUpdates = Model.CheckForUpdates
+                }
+            }.SaveToFile();
+            // Shutdown the application by force
+            new Thread(() =>
+            {
+                Environment.Exit(0);
             }).Start();
         }
 
@@ -469,22 +532,6 @@ namespace OpenSvip.GUI
                     MessageDialog.CreateDialog(
                         "插件安装完成",
                         $"已成功安装 {success} 个插件。新的功能已准备就绪。").ShowDialog();
-                    /*
-                        var restartDialog = YesNoDialog.CreateDialog(
-                            "插件安装完成。重启本应用？",
-                            $"已成功安装 {success} 个插件。需要重启本应用以使新的功能生效。",
-                            "重启",
-                            "稍后");
-                        if (restartDialog.ShowDialog())
-                        {
-                            Application.Current.Dispatcher.Invoke(() =>
-                            {
-                                Application.Current.MainWindow?.Close();
-                                Application.Current.Shutdown();
-                            });
-                            System.Windows.Forms.Application.Restart();
-                        }
-                        */
                 }).Start();
             });
 
@@ -720,49 +767,20 @@ namespace OpenSvip.GUI
         {
             if (Model.ExecutionInProgress)
             {
-                var confirmDialog = YesNoDialog.CreateDialog(
+                e.Cancel = true;
+                YesNoDialog.CreateDialog(
                     "确认退出？",
-                    "转换任务仍在进行中。现在退出可能导致输出文件损坏。");
-                if (!confirmDialog.ShowDialog())
-                {
-                    e.Cancel = true;
-                    return;
-                }
-            }
-            new AppConfig
-            {
-                Properties =
-                {
-                    MainWindowSize = new Tuple<double, double>(Width, Height),
-                    MainWindowState = WindowState
-                },
-                Settings =
-                {
-                    ImportPluginId = Model.SelectedInputPlugin?.Identifier,
-                    ExportPluginId = Model.SelectedOutputPlugin?.Identifier,
-                    AutoDetectFormat = Model.AutoDetectFormat,
-                    AutoResetTasks = Model.AutoResetTasks,
-                    AutoExtension = Model.AutoExtension,
-                    OpenExportFolder = Model.OpenExportFolder,
-                    OverwriteOption = Model.OverWriteOption,
-                    DefaultExportPath = Model.DefaultExportPath,
-                    CustomExportPaths = Model.CustomExportPaths.Select(path => new PathConfig
+                    "转换任务仍在进行中。现在退出可能导致输出文件损坏。",
+                    yesAction: () =>
                     {
-                        Path = path.PathValue,
-                        Selected = path == Model.SelectedCustomExportPath
-                    }).ToArray(),
-                    LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
-                        ? Model.ExportPath.PathValue
-                        : null,
-                    AppearanceTheme = Model.AppearanceThemes,
-                    CheckForUpdates = Model.CheckForUpdates
-                }
-            }.SaveToFile();
-            // Shutdown the application by force
-            new Thread(() =>
+                        QuitApplication();
+                        Close();
+                    }).ShowDialog();
+            }
+            else
             {
-                Environment.Exit(0);
-            }).Start();
+                QuitApplication();
+            }
         }
     }
 }

@@ -77,20 +77,13 @@ namespace OpenSvip.Stream
         
         private static string FindLibrary()
         {
-            try
+            var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
+            var value = key?.GetValue("").ToString().Trim('"');
+            if (!File.Exists(value))
             {
-                var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
-                var value = key?.GetValue("").ToString().Split('"')[1];
-                if (!File.Exists(value))
-                {
-                    throw new FileNotFoundException();
-                }
-                return Path.GetDirectoryName(value);
+                throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。请查看插件依赖说明。");
             }
-            catch
-            {
-                throw new FileLoadException("未检测到已安装的 X Studio · 歌手软件。请查看插件依赖说明。");
-            }
+            return Path.GetDirectoryName(value);
         }
 
         private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)

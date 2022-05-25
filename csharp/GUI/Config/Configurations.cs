@@ -84,15 +84,15 @@ namespace OpenSvip.GUI.Config
         }
     }
 
-    public class Information
+    public static class Information
     {
-        public static readonly string ApplicationVersion = "1.2.1";
+        public const string ApplicationVersion = "1.2.2";
 
-        public static readonly string OnlineDocuments = "https://openvpi.github.io/home";
+        public const string OnlineDocuments = "https://openvpi.github.io/home";
 
-        public static readonly string GitHubRepository = "https://github.com/yqzhishen/opensvip";
+        public const string GitHubRepository = "https://github.com/yqzhishen/opensvip";
 
-        public static readonly string UpdateLogUrl = "https://openvpi.github.io/home/updatelogs/converter.toml";
+        public const string UpdateLogUrl = "https://openvpi.github.io/home/updatelogs/converter.toml";
     }
 
     [TomlDoNotInlineObject]

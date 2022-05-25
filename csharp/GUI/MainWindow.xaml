@@ -488,7 +488,7 @@
                         <TextBlock
                             HorizontalAlignment="Center"
                             Foreground="{StaticResource FunctionalAreaIconBrush}"
-                            Text="什么是插件?">
+                            Text="为什么要安装插件?">
                             <TextBlock.TextDecorations>
                                 <TextDecoration PenOffset="2.5"/>
                             </TextBlock.TextDecorations>

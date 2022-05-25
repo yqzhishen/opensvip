@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using MaterialDesignThemes.Wpf;
@@ -12,13 +13,17 @@ namespace OpenSvip.GUI.Dialog
     {
         private readonly object _lock = new object();
 
-        public string Title { get; set; }
+        public string Title { get; private set; }
 
-        public string Message { get; set; }
+        public string Message { get; private set; }
 
-        public string YesText { get; set; } = "确定";
+        public string YesText { get; private set; } = "确定";
 
-        public string NoText { get; set; } = "取消";
+        public string NoText { get; private set; } = "取消";
+
+        public Action YesAction { get; private set; }
+        
+        public Action NoAction { get; private set; }
 
         private bool _yes;
 
@@ -28,7 +33,13 @@ namespace OpenSvip.GUI.Dialog
             DataContext = this;
         }
 
-        public static YesNoDialog CreateDialog(string title, string message, string yesText = "确定", string noText = "取消")
+        public static YesNoDialog CreateDialog(
+            string title,
+            string message,
+            string yesText = "确定",
+            string noText = "取消",
+            Action yesAction = null,
+            Action noAction = null)
         {
             YesNoDialog dialog = null;
             App.Current.Dispatcher.Invoke(() =>
@@ -38,7 +49,9 @@ namespace OpenSvip.GUI.Dialog
                     Title = title,
                     Message = message,
                     YesText = yesText,
-                    NoText = noText
+                    NoText = noText,
+                    YesAction = yesAction,
+                    NoAction = noAction
                 };
             });
             return dialog;
@@ -56,10 +69,19 @@ namespace OpenSvip.GUI.Dialog
             return _yes;
         }
 
-        public void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            _yes = (bool)((Button)sender).CommandParameter;
+            var button = (Button) sender;
+            _yes = (bool)button.CommandParameter;
             Monitor.Exit(_lock);
+            if (_yes)
+            {
+                YesAction?.Invoke();
+            }
+            else
+            {
+                NoAction?.Invoke();
+            }
         }
     }
 }
