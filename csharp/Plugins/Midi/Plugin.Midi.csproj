@@ -59,6 +59,8 @@
 		<Compile Include="SymbolList.cs"/>
 		<Compile Include="Test.cs"/>
 		<Compile Include="Utils/EncodingUtil.cs"/>
+		<Compile Include="Utils/MidiEventsUtil.cs"/>
+		<Compile Include="ErrorMidiFilePolicyOption.cs"/>
 	</ItemGroup>
 	<ItemGroup>
 		<None Include="packages.config"/>

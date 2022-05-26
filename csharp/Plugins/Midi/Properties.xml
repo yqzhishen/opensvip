@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.4.1</Version>
+    <Version>0.5.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
@@ -12,9 +12,13 @@
     <LibraryPath>Midi\FlutyDeer.MidiPlugin.dll</LibraryPath>
     <Converter>FlutyDeer.MidiStream.MidiConverter</Converter>
 	<InputOptions>
+		<Option Name="importLyrics" Type="boolean" Default="false">
+			<Notes>导入歌词（实验性）</Notes>
+			<Tips>此功能尚不成熟，启用本选项可能出现无法预料的情况。</Tips>
+		</Option>
 		<Option Name="lyricEncoding" Type="enum" Default="UTF8BOM">
 			<Notes>歌词文本编码</Notes>
-			<Tips>除非打开歌词兼容性模式后仍然乱码，否则不应更改此设置。</Tips>
+			<Tips>除非歌词出现乱码，否则不应更改此设置。</Tips>
 			<EnumChoices>
 				<Choice Name="ASCII" Tag="ASCII" />
 				<Choice Name="BigEndianUnicode" Tag="BigEndianUnicode" />
@@ -26,6 +30,14 @@
 				<Choice Name="UTF-7" Tag="UTF7" />
 				<Choice Name="UTF-8 BOM" Tag="UTF8BOM" />
 				<Choice Name="UTF-8" Tag="UTF8" />
+			</EnumChoices>
+		</Option>
+		<Option Name="errorMidiFilePolicy" Type="enum" Default="abort">
+			<Notes>有错误的 MIDI 文件导入策略</Notes>
+			<Tips>选择“忽略错误”，软件将会尝试导入含有错误的 MIDI 文件，但不保证能正确导入。</Tips>
+			<EnumChoices>
+				<Choice Name="中止" Tag="abort" />
+				<Choice Name="忽略错误" Tag="ignore" />
 			</EnumChoices>
 		</Option>
 	</InputOptions>

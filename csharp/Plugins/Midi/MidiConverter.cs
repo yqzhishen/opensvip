@@ -11,7 +11,9 @@ namespace FlutyDeer.MidiStream
         {
             return new MidiDecoder
             {
-                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM)
+                ImportLyrics = options.GetValueAsBoolean("importLyrics", false),
+                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
+                ErrorMidiFilePolicy = options.GetValueAsEnum("errorMidiFilePolicy", ErrorMidiFilePolicyOption.Abort)
             }.DecodeMidiFile(path);
         }
 
