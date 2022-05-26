@@ -32,9 +32,11 @@ namespace OpenSvip.Stream
         {
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new BinaryReader(stream);
-            var version = reader.ReadString() + reader.ReadString();
+            var version = reader.ReadString();
+            var versionNumber = reader.ReadString();
+            version += versionNumber;
             SingingTool.Model.AppModel model;
-            if (version != "SVIP0.0.0")
+            if (version != "0.0.0" && new Version(versionNumber) < new Version("2.0.0"))
             {
                 stream.Close();
                 model = SingingTool.Model.ProjectModelFileMgr.ReadModelFile(path, out _, out _);
