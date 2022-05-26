@@ -33,9 +33,18 @@ namespace OpenSvip.Stream
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new BinaryReader(stream);
             var version = reader.ReadString() + reader.ReadString();
-            stream.Close();
+            SingingTool.Model.AppModel model;
+            if (version != "SVIP0.0.0")
+            {
+                stream.Close();
+                model = SingingTool.Model.ProjectModelFileMgr.ReadModelFile(path, out _, out _);
+            }
+            else
+            {
+                model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(stream);
+                stream.Close();
+            }
             reader.Close();
-            var model = SingingTool.Model.ProjectModelFileMgr.ReadModelFile(path, out _, out _);
             return new BinarySvipDecoder().DecodeProject(version, model);
         }
         
