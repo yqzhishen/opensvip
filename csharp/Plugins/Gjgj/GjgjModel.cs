@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Gjgj.Model
+namespace FlutyDeer.GjgjPlugin.Model
 {
     public class GjProject
     {

@@ -1,9 +1,10 @@
 using System.Collections.Generic;
-using Gjgj.Model;
+using System.Text.RegularExpressions;
+using FlutyDeer.GjgjPlugin.Model;
 using NPinyin;
 using OpenSvip.Model;
 
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public static class PronunciationUtil
     {
@@ -28,13 +29,19 @@ namespace Plugin.Gjgj
                     }
                     else//仅拼音、歌词和拼音
                     {
-                        return Pinyin.GetPinyin(note.Lyric);
+                        string strRet = "";
+                        var collection = Regex.Matches(Pinyin.GetPinyin(note.Lyric).ToLower(), "[a-z]");
+                        foreach(var ch in collection)
+                        {
+                            strRet += ch.ToString();
+                        }
+                        return strRet;
                     }
                 }
                 else//有拼音的音符
                 {
-                    string pinyin = note.Pronunciation;
-                    if (pinyin != "" && !GjgjSupportedPinyin.SupportedPinyinList().Contains(pinyin.ToLower()))
+                    string pinyin = note.Pronunciation.ToLower();
+                    if (pinyin != "" && !GjgjSupportedPinyin.SupportedPinyinList().Contains(pinyin))
                     {
                         if (!unsupportedPinyinList.Contains(pinyin))
                         {

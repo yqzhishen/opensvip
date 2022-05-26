@@ -3,12 +3,9 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using Plugin.Gjgj;
-using Gjgj.Model;
-using System.Windows.Forms;
-using System;
+using FlutyDeer.GjgjPlugin.Model;
 
-namespace Gjgj.Stream
+namespace FlutyDeer.GjgjPlugin.Stream
 {
     internal class GjgjConverter : IProjectConverter
     {

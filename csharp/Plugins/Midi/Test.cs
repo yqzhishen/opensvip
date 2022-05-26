@@ -4,9 +4,9 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using Midi.Stream;
+using FlutyDeer.MidiStream;
 
-namespace Plugin.Midi
+namespace FlutyDeer.MidiPlugin
 {
     public static class Test
     {

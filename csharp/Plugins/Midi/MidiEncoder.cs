@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Collections.Generic;
 using System.Text;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Interaction;
-using Melanchall.DryWetMidi.MusicTheory;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using Note = OpenSvip.Model.Note;
 using NPinyin;
 
-namespace Plugin.Midi
+namespace FlutyDeer.MidiPlugin
 {
     public class MidiEncoder
     {
@@ -62,7 +58,7 @@ namespace Plugin.Midi
             EncodeMidiChunks();//相当于 MIDI 里面的轨道。
             WritingSettings settings = new WritingSettings
             {
-                TextEncoding = GetEncoding()
+                TextEncoding = EncodingUtil.GetEncoding(LyricEncoding)
             };
             midiFile.Write(path, true, settings: settings);
         }
@@ -78,34 +74,7 @@ namespace Plugin.Midi
             }
         }
 
-        /// <summary>
-        /// 将选项转换为编码。
-        /// </summary>
-        /// <returns>文本编码。</returns>
-        private Encoding GetEncoding()
-        {
-            switch (LyricEncoding)
-            {
-                case LyricEncodings.ASCII:
-                    return Encoding.ASCII;
-                case LyricEncodings.BigEndianUnicode:
-                    return Encoding.BigEndianUnicode;
-                case LyricEncodings.Default:
-                    return Encoding.Default;
-                case LyricEncodings.Unicode:
-                    return Encoding.Unicode;
-                case LyricEncodings.UTF32:
-                    return Encoding.UTF32;
-                case LyricEncodings.UTF7:
-                    return Encoding.UTF7;
-                case LyricEncodings.UTF8BOM:
-                    return Encoding.UTF8;
-                case LyricEncodings.UTF8:
-                    return new UTF8Encoding(false);//不带BOM的UTF-8
-                default:
-                    return Encoding.UTF8;
-            }
-        }
+
 
         /// <summary>
         /// 生成 MIDI Track Chuck 列表
@@ -145,11 +114,11 @@ namespace Plugin.Midi
         private MidiEvent[] EncodeSetTemopEventArray()
         {
             List<MidiEvent> midiEventList = new List<MidiEvent>();
-            int lastEventAbsoluteTime = 0;
+            int PreviousEventTime = 0;
             foreach (var tempo in osProject.SongTempoList)
             {
-                midiEventList.Add(EncodeSetTempoEvent(tempo, ref lastEventAbsoluteTime));
-                lastEventAbsoluteTime = tempo.Position;
+                midiEventList.Add(EncodeSetTempoEvent(tempo, ref PreviousEventTime));
+                PreviousEventTime = tempo.Position;
             }
             return midiEventList.ToArray();
         }
@@ -158,16 +127,16 @@ namespace Plugin.Midi
         /// 将单个曲速标记转换为设置曲速 MIDI 事件。
         /// </summary>
         /// <param name="tempo">曲速。</param>
-        /// <param name="lastEventAbsoluteTime">上一个曲速事件的绝对时间，单位为梯。</param>
+        /// <param name="PreviousEventTime">上一个曲速事件的绝对时间，单位为梯。</param>
         /// <returns>设置曲速 MIDI 事件。</returns>
-        private SetTempoEvent EncodeSetTempoEvent(SongTempo tempo, ref int lastEventAbsoluteTime)
+        private SetTempoEvent EncodeSetTempoEvent(SongTempo tempo, ref int PreviousEventTime)
         {
             SetTempoEvent setTempoEvent = new SetTempoEvent
             {
                 MicrosecondsPerQuarterNote = GetMicrosecondsPerQuarterNote((long)tempo.BPM),
-                DeltaTime = tempo.Position - lastEventAbsoluteTime
+                DeltaTime = tempo.Position - PreviousEventTime
             };
-            lastEventAbsoluteTime = tempo.Position;
+            PreviousEventTime = tempo.Position;
             return setTempoEvent;
         }
 
@@ -197,28 +166,34 @@ namespace Plugin.Midi
                 {
                     if (IsSemivowelNote(singingTrack.NoteList[index]) && index > 0)//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
                     {
-                        if (singingTrack.NoteList[index - 1].Length >= SemivowelPreShift)
+                        int currentNoteStartPos = singingTrack.NoteList[index].StartPos;
+                        int currentNotePreShiftedStartPos = currentNoteStartPos - SemivowelPreShift;
+                        int previousNoteEndPos = singingTrack.NoteList[index - 1].StartPos + singingTrack.NoteList[index - 1].Length;
+                        if (currentNotePreShiftedStartPos > singingTrack.NoteList[index - 1].StartPos)//如果前移后没有超过上一个音符的起始位置，才前移，否则忽略。
                         {
-                            singingTrack.NoteList[index - 1].Length -= SemivowelPreShift;
+                            if (currentNotePreShiftedStartPos < previousNoteEndPos)//如果前移后侵吞了上一个音符的尾部导致重叠，则减短上一个音符的长度，否则不处理。
+                            {
+                                singingTrack.NoteList[index - 1].Length -= previousNoteEndPos - currentNotePreShiftedStartPos;
+                            }
+                            singingTrack.NoteList[index].StartPos -= SemivowelPreShift;
+                            singingTrack.NoteList[index].Length += SemivowelPreShift;
                         }
                         else
                         {
                             Warnings.AddWarning("半元音前移量过大，将导致音符长度小于或等于零，已忽略。", $"歌词：{singingTrack.NoteList[index - 1].Lyric}，长度：{singingTrack.NoteList[index - 1].Length}", WarningTypes.Notes);
                         }
-                        singingTrack.NoteList[index].StartPos -= SemivowelPreShift;
-                        singingTrack.NoteList[index].Length += SemivowelPreShift;
                     }
                 }
             }
             List<MidiEvent> midiEventList = new List<MidiEvent>();
-            int lastEventAbsoluteTime = 0;
+            int PreviousEventTime = 0;
             //bool IsSemivowelShiftForwardHandled = false;
             //这里不能用 DryWetMidi 的音符管理器来转换音符，因为不能设置音符的歌词。需要手动生成歌词、音符按下和松开三个事件。
             foreach (var note in singingTrack.NoteList)
             {
-                midiEventList.Add(EncodeLyricEvent(note, lastEventAbsoluteTime));//歌词事件设置在音符按下事件的前面。
+                midiEventList.Add(EncodeLyricEvent(note, PreviousEventTime));//歌词事件设置在音符按下事件的前面。
                 midiEventList.Add(EncodeNoteOnEvent(note));
-                midiEventList.Add(EncodeNoteOffEvent(note, ref lastEventAbsoluteTime));
+                midiEventList.Add(EncodeNoteOffEvent(note, ref PreviousEventTime));
             }
             return midiEventList.ToArray();
         }
@@ -258,16 +233,16 @@ namespace Plugin.Midi
         /// 将歌词转换成 MIDI 事件。
         /// </summary>
         /// <param name="note">音符。</param>
-        /// <param name="lastEventAbsoluteTime">上一个 MIDI 事件的绝对时间。</param>
+        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
         /// <returns>歌词事件。</returns>
-        private LyricEvent EncodeLyricEvent(Note note, int lastEventAbsoluteTime)
+        private LyricEvent EncodeLyricEvent(Note note, int PreviousEventTime)
         {
             try
             {
                 LyricEvent lyricEvent = new LyricEvent
                 {
                     Text = GetLyric(note),
-                    DeltaTime = note.StartPos - lastEventAbsoluteTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
+                    DeltaTime = note.StartPos - PreviousEventTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
                 };
                 return lyricEvent;
             }
@@ -277,8 +252,8 @@ namespace Plugin.Midi
                 /* Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
                 + " StartPos = " + note.StartPos
                 + " Length = " + note.Length
-                + " lastEventAbsoluteTime = " + lastEventAbsoluteTime
-                + " DeltaTime = " + (note.StartPos - lastEventAbsoluteTime).ToString()); */
+                + " PreviousEventTime = " + PreviousEventTime
+                + " DeltaTime = " + (note.StartPos - PreviousEventTime).ToString()); */
             }
             return new LyricEvent();
         }
@@ -333,9 +308,9 @@ namespace Plugin.Midi
         /// 生成 Note Off 事件。
         /// </summary>
         /// <param name="note">音符。</param>
-        /// <param name="lastEventAbsoluteTime">上一个 MIDI 事件的绝对时间。</param>
+        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
         /// <returns> Note Off 事件。</returns>
-        private NoteOffEvent EncodeNoteOffEvent(Note note, ref int lastEventAbsoluteTime)
+        private NoteOffEvent EncodeNoteOffEvent(Note note, ref int PreviousEventTime)
         {
             NoteOffEvent noteOffEvent = new NoteOffEvent
             {
@@ -344,7 +319,7 @@ namespace Plugin.Midi
                 DeltaTime = note.Length,
                 Channel = (FourBitNumber)0
             };
-            lastEventAbsoluteTime = note.StartPos + note.Length;
+            PreviousEventTime = note.StartPos + note.Length;
             return noteOffEvent;
         }
 

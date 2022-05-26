@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>歌叽歌叽工程转换插件</Name>
-    <Version>1.6.1</Version>
+    <Version>1.6.2</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的歌叽歌叽工程格式转换插件。</Descriptions>
@@ -9,8 +9,8 @@
     <Format>歌叽歌叽工程文件</Format>
     <Suffix>gj</Suffix>
     <Identifier>gj</Identifier>
-    <LibraryPath>Gjgj\Plugin.Gjgj.dll</LibraryPath>
-    <Converter>Gjgj.Stream.GjgjConverter</Converter>
+    <LibraryPath>Gjgj\FlutyDeer.GjgjPlugin.dll</LibraryPath>
+    <Converter>FlutyDeer.GjgjPlugin.Stream.GjgjConverter</Converter>
     <InputOptions />
     <OutputOptions>
         <Option Name="lyricsAndPinyinSettings" Type="enum" Default="sameAsSource">

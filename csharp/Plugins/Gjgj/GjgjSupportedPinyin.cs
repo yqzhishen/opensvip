@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Plugin.Gjgj
+namespace FlutyDeer.GjgjPlugin
 {
     public static class GjgjSupportedPinyin
     {
