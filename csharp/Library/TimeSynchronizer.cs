@@ -16,7 +16,7 @@ namespace OpenSvip.Library
 
         private readonly bool IsAbsoluteTimeMode;
 
-        private readonly int DefaultTempo;
+        private readonly double DefaultTempo;
 
         /// <summary>
         /// 实例化一个新的曲谱时间同步器。通常每个工程文件只需要使用一个时间同步器。
@@ -31,7 +31,7 @@ namespace OpenSvip.Library
         public TimeSynchronizer(List<SongTempo> originalTempoList,
             int skipTicks = 0,
             bool isAbsoluteTimeMode = false,
-            int defaultTempo = 60)
+            double defaultTempo = 60)
         {
             TempoList = skipTicks > 0 ? ScoreMarkUtils.SkipTempoList(originalTempoList, skipTicks) : originalTempoList;
             IsAbsoluteTimeMode = isAbsoluteTimeMode;
