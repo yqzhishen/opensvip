@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Midi", "Plugins\Midi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecodeMidi.Console", "DecodeMidi.Console\DecodeMidi.Console.csproj", "{B9A66731-A69A-4BF8-A602-AC049C71BD15}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Ace", "Plugins\Ace\Plugin.Ace.csproj", "{57AF3313-2531-479C-84AE-40EF14E753AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57AF3313-2531-479C-84AE-40EF14E753AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57AF3313-2531-479C-84AE-40EF14E753AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57AF3313-2531-479C-84AE-40EF14E753AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57AF3313-2531-479C-84AE-40EF14E753AE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
