@@ -10,13 +10,13 @@ namespace OpenSvip.Library
     public class TimeSynchronizer
     {
         /// <summary>
-        /// 经过 ignoredTicks 偏移后的曲速列表。若 ignoredTicks == 0，此列表和传入的曲速列表是一致的。
+        /// 经过 ignoredTicks 偏移后的曲速列表。若 skipTicks == 0，此列表和传入的曲速列表是一致的。
         /// </summary>
         public List<SongTempo> TempoList { get; }
 
         private readonly bool IsAbsoluteTimeMode;
 
-        private readonly double DefaultTempo;
+        public double DefaultTempo { get; set; }
 
         /// <summary>
         /// 实例化一个新的曲谱时间同步器。通常每个工程文件只需要使用一个时间同步器。
@@ -28,16 +28,17 @@ namespace OpenSvip.Library
         /// <param name="isAbsoluteTimeMode">是否采用绝对时间对齐模式。
         ///     当出现不支持的拍号、曲速等情况时可以开启此模式，将使用恒定曲速进行绝对时间的对齐。</param>
         /// <param name="defaultTempo">当采用绝对时间对齐模式时，可以指定用于对齐的默认曲速。</param>
-        public TimeSynchronizer(List<SongTempo> originalTempoList,
+        public TimeSynchronizer(
+            List<SongTempo> originalTempoList,
             int skipTicks = 0,
             bool isAbsoluteTimeMode = false,
-            double defaultTempo = 60)
+            int defaultTempo = 60)
         {
             TempoList = skipTicks > 0 ? ScoreMarkUtils.SkipTempoList(originalTempoList, skipTicks) : originalTempoList;
             IsAbsoluteTimeMode = isAbsoluteTimeMode;
             DefaultTempo = defaultTempo;
         }
-
+        
         /// <summary>
         /// 将原始谱面位置（梯）转换为对齐后的实际谱面位置（梯）。
         /// </summary>
