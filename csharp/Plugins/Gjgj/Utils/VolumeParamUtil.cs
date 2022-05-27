@@ -25,7 +25,7 @@ namespace FlutyDeer.GjgjPlugin
                 int time;
                 double valueOrigin;
                 double value;
-                int lastTime = 0;
+                int previousTime = 0;
                 ParamCurve paramCurve = ParamCurveUtils.ReduceSampleRate(singingTrack.EditedParams.Volume, paramSampleInterval);
                 for (int index = 1; index < paramCurve.PointList.Count - 1; index++)
                 {
@@ -33,7 +33,7 @@ namespace FlutyDeer.GjgjPlugin
                     valueOrigin = GetOriginalVolumeParamPointValue(index, paramCurve);
                     value = GetVolumeParamPointValue(valueOrigin);
 
-                    if (lastTime != time)
+                    if (previousTime != time)
                     {
                         if (valueOrigin != 0)
                         {
@@ -59,7 +59,7 @@ namespace FlutyDeer.GjgjPlugin
                             }
                         }
                     }
-                    lastTime = time;
+                    previousTime = time;
                 }
             }
             catch (Exception ex)
@@ -116,7 +116,6 @@ namespace FlutyDeer.GjgjPlugin
         {
             return (volume + 1000.0) / 1000.0;
         }
-
         
         /// <summary>
         /// 转换音量参数。

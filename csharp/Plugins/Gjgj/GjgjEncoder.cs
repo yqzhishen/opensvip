@@ -106,12 +106,25 @@ namespace FlutyDeer.GjgjPlugin
             {
                 TrackID = Convert.ToString(trackID),
                 Path = instrumentalTrack.AudioFilePath,
-                Offset = 0,//暂不转换伴奏位置偏移
+                Offset = EncodeInstOffset(instrumentalTrack.Offset),
                 EQProgram = "",
                 SortIndex = 0,
                 TrackVolume = gjTrackVolume
             };
             return gjInstrumentalTrack;
+        }
+
+        private int EncodeInstOffset(int origin)
+        {
+            int position = origin + 1920 * GetNumerator(0) / GetDenominator(0);
+            if (position > 0)
+            {
+                return (int)(timeSync.GetActualSecsFromTicks(position) * 10000000);
+            }
+            else
+            {
+                return (int)(position / 480 * 60 / osProject.SongTempoList[0].BPM * 10000000);
+            }
         }
 
         /// <summary>
@@ -249,7 +262,6 @@ namespace FlutyDeer.GjgjPlugin
             }
             return gjTempoList;
         }
-
 
         /// <summary>
         /// 返回转换后的拍号列表。
