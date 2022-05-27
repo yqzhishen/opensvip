@@ -29,7 +29,6 @@ namespace FlutyDeer.GjgjPlugin
             timeSynchronizer = new TimeSynchronizer(osProject.SongTempoList);
             osProject.TrackList = DecodeTrackList(osProject);
             return osProject;
-
         }
 
         /// <summary>
@@ -79,23 +78,27 @@ namespace FlutyDeer.GjgjPlugin
         private List<Track> DecodeInstrumentalTracks()
         {
             List<Track> instrumentalTrackList = new List<Track>();
-            for (int index = 0; index < gjProject.InstrumentalTrackList.Count; index++)
+            foreach (var instTrack in gjProject.InstrumentalTrackList)
             {
                 Track track = new InstrumentalTrack
                 {
-                    Title = GetInstrumentalName(index),
-                    Mute = GetInstrumentalMute(index),
+                    Title = GetInstrumentalName(instTrack.Path),
+                    Mute = instTrack.TrackVolume.Mute,
                     Solo = false,
                     Volume = 0.3,
                     Pan = 0.0,
-                    AudioFilePath = GetInstrumentalFilePath(index),
-                    Offset = 0
+                    AudioFilePath = instTrack.Path,
+                    Offset = DecodeInstOffset(instTrack.Offset),
                 };
                 instrumentalTrackList.Add(track);
             }
             return instrumentalTrackList;
         }
 
+        private int DecodeInstOffset(int offset)
+        {
+            return (int)(timeSynchronizer.GetActualTicksFromSecs(offset / 10000000) - 1920 * GetNumerator(0) / GetDenominator(0));
+        }
 
         /// <summary>
         /// 转换音符列表。
@@ -311,33 +314,12 @@ namespace FlutyDeer.GjgjPlugin
         }
 
         /// <summary>
-        /// 返回伴奏路径。
-        /// </summary>
-        /// <param name="instrumentalTrackIndex">伴奏轨索引。</param>
-        /// <returns></returns>
-        private string GetInstrumentalFilePath(int instrumentalTrackIndex)
-        {
-            return gjProject.InstrumentalTrackList[instrumentalTrackIndex].Path;
-        }
-
-        /// <summary>
         /// 返回伴奏文件名作为伴奏轨的标题。
         /// </summary>
-        /// <param name="instrumentalTrackIndex">伴奏轨索引。</param>
         /// <returns></returns>
-        private string GetInstrumentalName(int instrumentalTrackIndex)
+        private string GetInstrumentalName(string path)
         {
-            return Path.GetFileNameWithoutExtension(gjProject.InstrumentalTrackList[instrumentalTrackIndex].Path);//返回伴奏文件名作为轨道标题
-        }
-
-        /// <summary>
-        /// 返回伴奏轨静音状态。
-        /// </summary>
-        /// <param name="instrumentalTrackIndex">伴奏轨索引。</param>
-        /// <returns></returns>
-        private bool GetInstrumentalMute(int instrumentalTrackIndex)
-        {
-            return gjProject.InstrumentalTrackList[instrumentalTrackIndex].TrackVolume.Mute;
+            return Path.GetFileNameWithoutExtension(path);//返回伴奏文件名作为轨道标题
         }
 
         /// <summary>

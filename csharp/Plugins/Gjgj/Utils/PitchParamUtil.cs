@@ -16,7 +16,7 @@ namespace FlutyDeer.GjgjPlugin
         {
             List<double> timeBuffer = new List<double>();
             List<double> valueBuffer = new List<double>();
-            int lastTimeOrigin = -100;
+            int previousTimeOrigin = -100;
             int timeOrigin;
             int valueOrigin;
             List<GjPitchParamPoint> pitchParamPointList = new List<GjPitchParamPoint>();
@@ -26,7 +26,7 @@ namespace FlutyDeer.GjgjPlugin
                 timeOrigin = GetOriginalPitchParamPointTime(index, singingTrack);
                 valueOrigin = GetOriginalPitchParamPointValue(index, singingTrack);
 
-                if (lastTimeOrigin != timeOrigin)
+                if (previousTimeOrigin != timeOrigin)
                 {
                     if (valueOrigin != -100 && timeOrigin != -192000 && timeOrigin != 1073741823)
                     {
@@ -51,7 +51,7 @@ namespace FlutyDeer.GjgjPlugin
                         }
                     }
                 }
-                lastTimeOrigin = timeOrigin;
+                previousTimeOrigin = timeOrigin;
             }
             GjPitchParam gjPitchParam = new GjPitchParam
             {
@@ -135,7 +135,7 @@ namespace FlutyDeer.GjgjPlugin
             return ToneToY((double)((origin) / 100.0));
         }
 
-        
+
         /// <summary>
         /// 将音高转换为Y值。
         /// </summary>
@@ -186,7 +186,7 @@ namespace FlutyDeer.GjgjPlugin
             paramCurvePitch.PointList.Add(defaultRightEndpoint);
             return paramCurvePitch;
         }
-        
+
         /// <summary>
         /// 将Y值转换为音高。
         /// </summary>
