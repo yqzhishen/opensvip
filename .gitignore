@@ -66,6 +66,7 @@ coverage.xml
 
 # Visual Studio
 .vs/
+.vscode/
 
 # Django stuff:
 *.log
