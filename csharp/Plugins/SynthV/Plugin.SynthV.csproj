@@ -67,7 +67,7 @@
         <Compile Include="SynthVEncoder.cs" />
         <Compile Include="SynthVSerialization.cs" />
         <Compile Include="SynthVModel.cs" />
-        <Compile Include="Test.cs" />
+        <Compile Include="Test.cs" Condition=" '$(Configuration)' == 'Debug' " />
         <Compile Include="ScaledParam.cs" />
         <Compile Include="TranslationalParam.cs" />
         <Compile Include="VibratoOptions.cs" />
