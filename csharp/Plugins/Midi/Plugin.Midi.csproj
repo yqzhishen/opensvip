@@ -5,7 +5,7 @@
 		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
 		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 		<ProjectGuid>{9959258B-F7D7-47EE-823F-54B60BB7935C}</ProjectGuid>
-		<OutputType>Library</OutputType>
+		<OutputType>Exe</OutputType>
 		<AppDesignerFolder>Properties</AppDesignerFolder>
 		<RootNamespace>FlutyDeer.MidiPlugin</RootNamespace>
 		<AssemblyName>FlutyDeer.MidiPlugin</AssemblyName>

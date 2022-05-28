@@ -2,9 +2,12 @@
 using System.Text;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using Note = OpenSvip.Model.Note;
+using MidiTimeSignature = Melanchall.DryWetMidi.Interaction.TimeSignature;
+using OsTimeSignature = OpenSvip.Model.TimeSignature;
 using NPinyin;
 
 namespace FlutyDeer.MidiPlugin
@@ -45,6 +48,8 @@ namespace FlutyDeer.MidiPlugin
 
         private MidiFile midiFile = new MidiFile();
 
+        private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
+
         /// <summary>
         /// 转换为 MIDI 文件。
         /// </summary>
@@ -55,12 +60,36 @@ namespace FlutyDeer.MidiPlugin
             osProject = project;
             TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision((short)PPQ);
             midiFile.TimeDivision = timeDivision;//设置时基。
+            //导出曲速和拍号
+            midiFile.Chunks.Add(EncodeTempoTrackChunk());
+            using (TempoMapManager tempoMapManager = midiFile.ManageTempoMap())
+            {
+                tempoMapManager.ClearTempoMap();//暂不清楚为什么一定要写入一个含有SetTempo事件的Chunk之后TempoMapManager才能正常工作。
+                foreach (var tempo in osProject.SongTempoList)
+                {
+                    tempoMapManager.SetTempo(tempo.Position, new Tempo(midiEventsUtil.BPMToMicrosecondsPerQuarterNote((long)tempo.BPM)));
+                }
+                foreach (var timeSignature in osProject.TimeSignatureList)
+                {
+                    tempoMapManager.SetTimeSignature(new BarBeatTicksTimeSpan(timeSignature.BarIndex), new MidiTimeSignature(timeSignature.Numerator, timeSignature.Denominator));
+                }
+            }
             EncodeMidiChunks();//相当于 MIDI 里面的轨道。
             WritingSettings settings = new WritingSettings
             {
                 TextEncoding = EncodingUtil.GetEncoding(LyricEncoding)
             };
             midiFile.Write(path, true, settings: settings);
+        }
+
+        /// <summary>
+        /// 生成曲速轨。
+        /// </summary>
+        /// <returns>含有曲速事件数组的 Track Chunk。</returns>
+        private TrackChunk EncodeTempoTrackChunk()
+        {
+            TrackChunk tempoTrackChunk = new TrackChunk(midiEventsUtil.SongTempoListToMidiEvents(osProject.SongTempoList));
+            return new TrackChunk();
         }
 
         /// <summary>
@@ -74,8 +103,6 @@ namespace FlutyDeer.MidiPlugin
             }
         }
 
-
-
         /// <summary>
         /// 生成 MIDI Track Chuck 列表
         /// </summary>
@@ -83,7 +110,7 @@ namespace FlutyDeer.MidiPlugin
         private List<TrackChunk> EncodeTrackChunkList()
         {
             List<TrackChunk> trackChunkList = new List<TrackChunk>();
-            trackChunkList.Add(EncodeTempoTrackChunk());//MIDI 里的曲速轨。
+
             foreach (var track in osProject.TrackList)
             {
                 switch (track)
@@ -99,48 +126,6 @@ namespace FlutyDeer.MidiPlugin
         }
 
         /// <summary>
-        /// 生成曲速轨。
-        /// </summary>
-        /// <returns>含有曲速事件数组的 Track Chunk。</returns>
-        private TrackChunk EncodeTempoTrackChunk()
-        {
-            return new TrackChunk(EncodeSetTemopEventArray());
-        }
-
-        /// <summary>
-        /// 将曲速标记列表转换为 MIDI 事件数组。
-        /// </summary>
-        /// <returns>含有曲速事件的 MIDI Event 数组。</returns>
-        private MidiEvent[] EncodeSetTemopEventArray()
-        {
-            List<MidiEvent> midiEventList = new List<MidiEvent>();
-            int PreviousEventTime = 0;
-            foreach (var tempo in osProject.SongTempoList)
-            {
-                midiEventList.Add(EncodeSetTempoEvent(tempo, ref PreviousEventTime));
-                PreviousEventTime = tempo.Position;
-            }
-            return midiEventList.ToArray();
-        }
-
-        /// <summary>
-        /// 将单个曲速标记转换为设置曲速 MIDI 事件。
-        /// </summary>
-        /// <param name="tempo">曲速。</param>
-        /// <param name="PreviousEventTime">上一个曲速事件的绝对时间，单位为梯。</param>
-        /// <returns>设置曲速 MIDI 事件。</returns>
-        private SetTempoEvent EncodeSetTempoEvent(SongTempo tempo, ref int PreviousEventTime)
-        {
-            SetTempoEvent setTempoEvent = new SetTempoEvent
-            {
-                MicrosecondsPerQuarterNote = GetMicrosecondsPerQuarterNote((long)tempo.BPM),
-                DeltaTime = tempo.Position - PreviousEventTime
-            };
-            PreviousEventTime = tempo.Position;
-            return setTempoEvent;
-        }
-
-        /// <summary>
         /// 转换演唱轨。
         /// </summary>
         /// <param name="singingTrack">原始演唱轨。</param>
@@ -149,7 +134,6 @@ namespace FlutyDeer.MidiPlugin
         {
             MidiEvent[] midiEvents = EncodeNoteEventArray(singingTrack);
             TrackChunk trackChunk = new TrackChunk(midiEvents);
-
             return trackChunk;
         }
 
@@ -188,6 +172,7 @@ namespace FlutyDeer.MidiPlugin
             List<MidiEvent> midiEventList = new List<MidiEvent>();
             int PreviousEventTime = 0;
             //bool IsSemivowelShiftForwardHandled = false;
+            midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
             //这里不能用 DryWetMidi 的音符管理器来转换音符，因为不能设置音符的歌词。需要手动生成歌词、音符按下和松开三个事件。
             foreach (var note in singingTrack.NoteList)
             {
@@ -341,16 +326,5 @@ namespace FlutyDeer.MidiPlugin
             }
             return transposedKeyNumber;
         }
-
-        /// <summary>
-        /// 将曲速转换为每四分音符的微秒数。
-        /// </summary>
-        /// <param name="BPM">曲速。</param>
-        /// <returns>每四分音符的微秒数。</returns>
-        private long GetMicrosecondsPerQuarterNote(long BPM)
-        {
-            return (long)(60.0 / BPM * 1000000.0);
-        }
-
     }
 }

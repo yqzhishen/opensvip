@@ -9,7 +9,7 @@
     <Format>MIDI 文件</Format>
     <Suffix>mid</Suffix>
     <Identifier>midi</Identifier>
-    <LibraryPath>Midi\FlutyDeer.MidiPlugin.dll</LibraryPath>
+    <LibraryPath>Midi\FlutyDeer.MidiPlugin.exe</LibraryPath>
     <Converter>FlutyDeer.MidiStream.MidiConverter</Converter>
 	<InputOptions>
 		<Option Name="importLyrics" Type="boolean" Default="false">

@@ -28,39 +28,82 @@ namespace FlutyDeer.MidiPlugin
             midiEventsUtil.SetPPQ(timeDivision.TicksPerQuarterNote);
             PPQ = timeDivision.TicksPerQuarterNote;
 
-            if (ImportLyrics)
+            //导入曲速和拍号
+            TempoMap tempoMap = midiFile.GetTempoMap();
+            var tempoChanges = tempoMap.GetTempoChanges();
+            var timesignatureChanges = tempoMap.GetTimeSignatureChanges();
+            foreach (var change in tempoChanges)
             {
-                bool isTempoMapTrack = true;
-                List<Track> singingTrackList = new List<Track>();
-                foreach (var chunkItem in midiFile.GetTrackChunks())
+                var tempo = change.Value;
+                var time = change.Time;
+                osProject.SongTempoList.Add(new SongTempo
                 {
-                    if (isTempoMapTrack)//解析曲速轨
+                    Position = (int)time,
+                    BPM = (float)(60000000 / tempo.MicrosecondsPerQuarterNote)
+                });
+            }
+            if (timesignatureChanges != null && timesignatureChanges.Count() > 0)
+            {
+                var firstTimeSignatureTime = timesignatureChanges.First().Time;
+                if (firstTimeSignatureTime != 0)//由于位于0且为四四拍的拍号不存在，所以需要添加一个拍号
+                {
+                    osProject.TimeSignatureList.Add(new TimeSignature
                     {
-                        osProject.SongTempoList.AddRange(midiEventsUtil.MidiEventsToSongTempoList(chunkItem.Events));
-                        isTempoMapTrack = false;
-                    }
-                    else//解析其他轨
-                    {
-                        singingTrackList.Add(new SingingTrack
-                        {
-                            Title = "演唱轨",
-                            Mute = false,
-                            Solo = false,
-                            Volume = 0.7,
-                            Pan = 0.0,
-                            AISingerName = "陈水若",
-                            ReverbPreset = "干声",
-                            NoteList = midiEventsUtil.MidiEventsToNoteList(chunkItem.Events)
-                        });
-                    }
+                        BarIndex = 0,
+                        Numerator = 4,
+                        Denominator = 4
+                    });
                 }
-                osProject.TrackList.AddRange(singingTrackList);
+                foreach (var change in timesignatureChanges)
+                {
+                    var time = change.Time;
+                    var midiTimeSignature = change.Value;
+                    MetricTimeSpan metricTime = TimeConverter.ConvertTo<MetricTimeSpan>(time, tempoMap);
+                    BarBeatTicksTimeSpan barBeatTicksTimeFromMetric = TimeConverter.ConvertTo<BarBeatTicksTimeSpan>(metricTime, tempoMap);
+                    osProject.TimeSignatureList.Add(new TimeSignature
+                    {
+                        BarIndex = (int)barBeatTicksTimeFromMetric.Bars,
+                        Numerator = midiTimeSignature.Numerator,
+                        Denominator = midiTimeSignature.Denominator
+                    });
+                }
             }
             else
             {
+                osProject.TimeSignatureList.Add(new TimeSignature
+                {
+                    BarIndex = 0,
+                    Numerator = 4,
+                    Denominator = 4
+                });
+            }
+
+            if (ImportLyrics)//导入歌词，使用实验性方法。
+            {
+                List<Track> singingTrackList = new List<Track>();
+                int index = 0;
+                foreach (var chunkItem in midiFile.GetTrackChunks())
+                {
+                    if (index > 0)
+                    {
+                        singingTrackList.Add(midiEventsUtil.MidiEventsToSingingTrack(chunkItem.Events));
+                    }
+                    index++;
+                }
+                osProject.TrackList.AddRange(singingTrackList);
+            }
+            else//不导入歌词，使用 DryWetMidi 的方法。
+            {
+                string trackName = "演唱轨";
                 List<Track> singingTrackList = new List<Track>();
                 foreach (TrackChunk trackChunk in midiFile.GetTrackChunks())
                 {
+                    var midiEvents = trackChunk.Events;
+                    var sequenceTrackNameEvent = midiEvents.Where(x => x.EventType == MidiEventType.SequenceTrackName);
+                    if (sequenceTrackNameEvent != null && sequenceTrackNameEvent.Count() > 0)
+                    {
+                        trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvent.First()).Text;
+                    }
                     List<Melanchall.DryWetMidi.Interaction.Note> list = trackChunk.GetNotes().ToList<Melanchall.DryWetMidi.Interaction.Note>();
                     if (list.Count > 0)
                     {
@@ -78,7 +121,7 @@ namespace FlutyDeer.MidiPlugin
                         }
                         singingTrackList.Add(new SingingTrack
                         {
-                            Title = "演唱轨",
+                            Title = trackName,
                             Mute = false,
                             Solo = false,
                             Volume = 0.7,
@@ -91,13 +134,6 @@ namespace FlutyDeer.MidiPlugin
                 }
                 osProject.TrackList.AddRange(singingTrackList);
             }
-
-            osProject.TimeSignatureList.Add(new TimeSignature
-            {
-                BarIndex = 0,
-                Numerator = 4,
-                Denominator = 4
-            });
             return osProject;
         }
 
