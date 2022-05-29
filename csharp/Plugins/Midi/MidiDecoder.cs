@@ -1,13 +1,12 @@
 ﻿using OpenSvip.Model;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
 using TimeSignature = OpenSvip.Model.TimeSignature;
 using OpenSvip.Framework;
+using System.Text.RegularExpressions;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -107,16 +106,26 @@ namespace FlutyDeer.MidiPlugin
                             Pronunciation = null
                         });
                     }
-                    if (ImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
+                    ParamCurve pitchParamCurve = new ParamCurve();
+                    using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
                     {
-                        using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
+                        TimedEventsCollection events = timedEventsManager.Events;
+                        if (ImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
                         {
-                            TimedEventsCollection events = timedEventsManager.Events;
                             foreach (var note in noteList)
                             {
                                 try
                                 {
-                                    note.Lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos).Select(e => ((LyricEvent)e.Event).Text).FirstOrDefault();
+                                    string lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos).Select(e => ((LyricEvent)e.Event).Text).FirstOrDefault();
+                                    if (Regex.IsMatch(lyric, @"[a-zA-Z]"))
+                                    {
+                                        note.Lyric = "啊";
+                                        note.Pronunciation = lyric;
+                                    }
+                                    else
+                                    {
+                                        note.Lyric = lyric;
+                                    }
                                 }
                                 catch
                                 {
@@ -124,10 +133,15 @@ namespace FlutyDeer.MidiPlugin
                                 }
                             }
                         }
+                        var pitchBendEvents = events.Where(e => e.Event is PitchBendEvent);
+                        foreach (var timedEvent in pitchBendEvents)
+                        {
+                            var pitchBendEvent = (PitchBendEvent)timedEvent.Event;
+                        }
                     }
                     if (new NoteOverlapUtil().IsOverlapedItemsExists(noteList))
                     {
-                        Warnings.AddWarning("音符重叠", type:WarningTypes.Notes);
+                        Warnings.AddWarning("音符重叠", type: WarningTypes.Notes);
                     }
                     singingTrackList.Add(new SingingTrack
                     {

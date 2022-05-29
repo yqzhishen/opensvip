@@ -57,11 +57,12 @@
 		<Compile Include="MidiEncoder.cs"/>
 		<Compile Include="Properties\AssemblyInfo.cs"/>
 		<Compile Include="SymbolList.cs"/>
-		<Compile Include="Test.cs"/>
+		<Compile Include="Test.cs" />
 		<Compile Include="Utils/EncodingUtil.cs"/>
 		<Compile Include="Utils/MidiEventsUtil.cs"/>
 		<Compile Include="Utils/NoteMergeUtil.cs"/>
 		<Compile Include="Utils/NoteOverlapUtil.cs"/>
+		<Compile Include="Utils/SemivowelPreShiftUtil.cs"/>
 		<Compile Include="ErrorMidiFilePolicyOption.cs"/>
 	</ItemGroup>
 	<ItemGroup>

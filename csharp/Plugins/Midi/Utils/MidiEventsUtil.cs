@@ -5,6 +5,8 @@ using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
 using System.Text.RegularExpressions;
+using NPinyin;
+using OpenSvip.Framework;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -16,6 +18,11 @@ namespace FlutyDeer.MidiPlugin
         {
             this.PPQ = PPQ;
         }
+
+        public int SemivowelPreShift { get; set; }
+        public bool IsUseCompatibleLyric { get; set; }
+        public bool IsRemoveSymbols { get; set; }
+        public int Transpose { get; set; }
 
         /// <summary>
         /// 将曲速标记列表转换为 MIDI 事件数组。
@@ -60,7 +67,143 @@ namespace FlutyDeer.MidiPlugin
             return (long)(60.0 / BPM * 1000000.0);
         }
 
-        public SingingTrack MidiEventsToSingingTrackLegacy(IEnumerable<MidiEvent> midiEvents, SevenBitNumber channel)
+        /// <summary>
+        /// 转换演唱轨。
+        /// </summary>
+        /// <param name="singingTrack">原始演唱轨。</param>
+        /// <returns>含有音符事件数组的 Track Chunk。</returns>
+        public TrackChunk SingingTrackToMidiTrackChunk(SingingTrack singingTrack)
+        {
+            SemivowelPreShiftUtil.PreShiftSemivowelNotes(singingTrack.NoteList, SemivowelPreShift);
+            List<MidiEvent> midiEventList = new List<MidiEvent>();
+            int PreviousEventTime = 0;
+            //bool IsSemivowelShiftForwardHandled = false;
+            midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
+            //这里不能用 DryWetMidi 的音符管理器来转换音符，因为不能设置音符的歌词。需要手动生成歌词、音符按下和松开三个事件。
+            foreach (var note in singingTrack.NoteList)
+            {
+                midiEventList.Add(EncodeLyricEvent(note, PreviousEventTime));//歌词事件设置在音符按下事件的前面。
+                midiEventList.Add(EncodeNoteOnEvent(note));
+                midiEventList.Add(EncodeNoteOffEvent(note, ref PreviousEventTime));
+            }
+            TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
+            return trackChunk;
+        }
+        
+        /// <summary>
+        /// 将歌词转换成 MIDI 事件。
+        /// </summary>
+        /// <param name="note">音符。</param>
+        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
+        /// <returns>歌词事件。</returns>
+        private LyricEvent EncodeLyricEvent(Note note, int PreviousEventTime)
+        {
+            try
+            {
+                LyricEvent lyricEvent = new LyricEvent
+                {
+                    Text = GetLyric(note),
+                    DeltaTime = note.StartPos - PreviousEventTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
+                };
+                return lyricEvent;
+            }
+            catch (System.Exception)
+            {
+                //用于调试。
+                /* Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
+                + " StartPos = " + note.StartPos
+                + " Length = " + note.Length
+                + " PreviousEventTime = " + PreviousEventTime
+                + " DeltaTime = " + (note.StartPos - PreviousEventTime).ToString()); */
+            }
+            return new LyricEvent();
+        }
+
+        /// <summary>
+        /// 根据输出选项转换歌词。
+        /// </summary>
+        /// <param name="note">音符。</param>
+        /// <returns></returns>
+        private string GetLyric(Note note)
+        {
+            string lyric;
+            if (note.Pronunciation != null)
+            {
+                lyric = note.Pronunciation;
+            }
+            else
+            {
+                lyric = note.Lyric;
+                if (lyric.Length > 1 && IsRemoveSymbols)
+                {
+                    foreach (var symbol in SymbolList.SymbolToRemoveList())
+                    {
+                        lyric = lyric.Replace(symbol, "");
+                    }
+                }
+                if (IsUseCompatibleLyric)
+                {
+                    lyric = Pinyin.GetPinyin(lyric);
+                }
+            }
+            return lyric;
+        }
+
+        /// <summary>
+        /// 生成 Note On 事件。
+        /// </summary>
+        /// <param name="note">音符。</param>
+        /// <returns>Note On 事件。</returns>
+        private NoteOnEvent EncodeNoteOnEvent(Note note)
+        {
+            NoteOnEvent noteOnEvent = new NoteOnEvent
+            {
+                NoteNumber = (SevenBitNumber)GetTransposedKeyNumber(note),
+                Velocity = (SevenBitNumber)45,
+                Channel = (FourBitNumber)0
+            };
+            return noteOnEvent;
+        }
+
+        /// <summary>
+        /// 生成 Note Off 事件。
+        /// </summary>
+        /// <param name="note">音符。</param>
+        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
+        /// <returns> Note Off 事件。</returns>
+        private NoteOffEvent EncodeNoteOffEvent(Note note, ref int PreviousEventTime)
+        {
+            NoteOffEvent noteOffEvent = new NoteOffEvent
+            {
+                NoteNumber = (SevenBitNumber)GetTransposedKeyNumber(note),
+                Velocity = (SevenBitNumber)0,
+                DeltaTime = note.Length,
+                Channel = (FourBitNumber)0
+            };
+            PreviousEventTime = note.StartPos + note.Length;
+            return noteOffEvent;
+        }
+
+        /// <summary>
+        /// 获取移调后的音高。
+        /// </summary>
+        /// <param name="note">音符。</param>
+        /// <returns>移调后的音高。</returns>
+        private int GetTransposedKeyNumber(Note note)
+        {
+            int transposedKeyNumber = note.KeyNumber + Transpose;
+            if (transposedKeyNumber < 0)
+            {
+                transposedKeyNumber = 0;
+            }
+            else if (transposedKeyNumber > 127)
+            {
+                transposedKeyNumber = 127;
+            }
+            return transposedKeyNumber;
+        }
+
+        /* public SingingTrack MidiEventsToSingingTrackLegacy(IEnumerable<MidiEvent> midiEvents, SevenBitNumber channel)
         {
             double previousEventTime = 0;
             List<Note> noteList = new List<Note>();
@@ -131,6 +274,6 @@ namespace FlutyDeer.MidiPlugin
                 ReverbPreset = "干声",
                 NoteList = noteList
             };
-        }
+        } */
     }
 }

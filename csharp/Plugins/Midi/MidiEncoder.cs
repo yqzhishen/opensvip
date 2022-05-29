@@ -1,14 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Text;
-using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using OpenSvip.Framework;
 using OpenSvip.Model;
-using Note = OpenSvip.Model.Note;
 using MidiTimeSignature = Melanchall.DryWetMidi.Interaction.TimeSignature;
-using NPinyin;
-using System.Linq;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -116,215 +110,18 @@ namespace FlutyDeer.MidiPlugin
                 switch (track)
                 {
                     case SingingTrack singingTrack:
-                        trackChunkList.Add(EncodeNoteTrackChunk(singingTrack));
+                        trackChunkList.Add(new MidiEventsUtil{
+                            IsUseCompatibleLyric = IsUseCompatibleLyric,
+                            IsRemoveSymbols = IsRemoveSymbols,
+                            SemivowelPreShift = SemivowelPreShift,
+                            Transpose = Transpose
+                        }.SingingTrackToMidiTrackChunk(singingTrack));
                         break;
                     default:
                         break;
                 }
             }
             return trackChunkList;
-        }
-
-        /// <summary>
-        /// 转换演唱轨。
-        /// </summary>
-        /// <param name="singingTrack">原始演唱轨。</param>
-        /// <returns>含有音符事件数组的 Track Chunk。</returns>
-        private TrackChunk EncodeNoteTrackChunk(SingingTrack singingTrack)
-        {
-            MidiEvent[] midiEvents = EncodeNoteEventArray(singingTrack);
-            TrackChunk trackChunk = new TrackChunk(midiEvents);
-            return trackChunk;
-        }
-
-        /// <summary>
-        /// 转换音符列表。
-        /// </summary>
-        /// <param name="singingTrack">原始演唱轨。</param>
-        /// <returns>带词音符的 MIDI Event 数组。</returns>
-        private MidiEvent[] EncodeNoteEventArray(SingingTrack singingTrack)
-        {
-            if (SemivowelPreShift > 0) // 小于 0 的“前移”可能会导致更多的问题
-            {
-                for (int index = 0; index < singingTrack.NoteList.Count; index++)//这种方式不好，以后再改。
-                {
-                    if (IsSemivowelNote(singingTrack.NoteList[index]) && index > 0)//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
-                    {
-                        int currentNoteStartPos = singingTrack.NoteList[index].StartPos;
-                        int currentNotePreShiftedStartPos = currentNoteStartPos - SemivowelPreShift;
-                        int previousNoteEndPos = singingTrack.NoteList[index - 1].StartPos + singingTrack.NoteList[index - 1].Length;
-                        if (currentNotePreShiftedStartPos > singingTrack.NoteList[index - 1].StartPos)//如果前移后没有超过上一个音符的起始位置，才前移，否则忽略。
-                        {
-                            if (currentNotePreShiftedStartPos < previousNoteEndPos)//如果前移后侵吞了上一个音符的尾部导致重叠，则减短上一个音符的长度，否则不处理。
-                            {
-                                singingTrack.NoteList[index - 1].Length -= previousNoteEndPos - currentNotePreShiftedStartPos;
-                            }
-                            singingTrack.NoteList[index].StartPos -= SemivowelPreShift;
-                            singingTrack.NoteList[index].Length += SemivowelPreShift;
-                        }
-                        else
-                        {
-                            Warnings.AddWarning("半元音前移量过大，将导致音符长度小于或等于零，已忽略。", $"歌词：{singingTrack.NoteList[index - 1].Lyric}，长度：{singingTrack.NoteList[index - 1].Length}", WarningTypes.Notes);
-                        }
-                    }
-                }
-            }
-            List<MidiEvent> midiEventList = new List<MidiEvent>();
-            int PreviousEventTime = 0;
-            //bool IsSemivowelShiftForwardHandled = false;
-            midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
-            //这里不能用 DryWetMidi 的音符管理器来转换音符，因为不能设置音符的歌词。需要手动生成歌词、音符按下和松开三个事件。
-            foreach (var note in singingTrack.NoteList)
-            {
-                midiEventList.Add(EncodeLyricEvent(note, PreviousEventTime));//歌词事件设置在音符按下事件的前面。
-                midiEventList.Add(EncodeNoteOnEvent(note));
-                midiEventList.Add(EncodeNoteOffEvent(note, ref PreviousEventTime));
-            }
-            return midiEventList.ToArray();
-        }
-
-        /// <summary>
-        /// 判断是否为半元音音符。
-        /// </summary>
-        private bool IsSemivowelNote(Note note)
-        {
-            string notePinyin = GetPinyin(note);
-            if (notePinyin.StartsWith("y") || notePinyin.StartsWith("w") || notePinyin == "er")
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// 获取音符的拼音。
-        /// </summary>
-        private string GetPinyin(Note note)
-        {
-            if (note.Pronunciation != null)
-            {
-                return note.Pronunciation;
-            }
-            else
-            {
-                return Pinyin.GetPinyin(note.Lyric);
-            }
-        }
-
-        /// <summary>
-        /// 将歌词转换成 MIDI 事件。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
-        /// <returns>歌词事件。</returns>
-        private LyricEvent EncodeLyricEvent(Note note, int PreviousEventTime)
-        {
-            try
-            {
-                LyricEvent lyricEvent = new LyricEvent
-                {
-                    Text = GetLyric(note),
-                    DeltaTime = note.StartPos - PreviousEventTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
-                };
-                return lyricEvent;
-            }
-            catch (System.Exception)
-            {
-                //用于调试。
-                /* Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
-                + " StartPos = " + note.StartPos
-                + " Length = " + note.Length
-                + " PreviousEventTime = " + PreviousEventTime
-                + " DeltaTime = " + (note.StartPos - PreviousEventTime).ToString()); */
-            }
-            return new LyricEvent();
-        }
-
-        /// <summary>
-        /// 根据输出选项转换歌词。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <returns></returns>
-        private string GetLyric(Note note)
-        {
-            string lyric;
-            if (note.Pronunciation != null)
-            {
-                lyric = note.Pronunciation;
-            }
-            else
-            {
-                lyric = note.Lyric;
-                if (lyric.Length > 1 && IsRemoveSymbols)
-                {
-                    foreach (var symbol in SymbolList.SymbolToRemoveList())
-                    {
-                        lyric = lyric.Replace(symbol, "");
-                    }
-                }
-                if (IsUseCompatibleLyric)
-                {
-                    lyric = Pinyin.GetPinyin(lyric);
-                }
-            }
-            return lyric;
-        }
-
-        /// <summary>
-        /// 生成 Note On 事件。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <returns>Note On 事件。</returns>
-        private NoteOnEvent EncodeNoteOnEvent(Note note)
-        {
-            NoteOnEvent noteOnEvent = new NoteOnEvent
-            {
-                NoteNumber = (SevenBitNumber)GetTransposedKeyNumber(note),
-                Velocity = (SevenBitNumber)45,
-                Channel = (FourBitNumber)0
-            };
-            return noteOnEvent;
-        }
-
-        /// <summary>
-        /// 生成 Note Off 事件。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
-        /// <returns> Note Off 事件。</returns>
-        private NoteOffEvent EncodeNoteOffEvent(Note note, ref int PreviousEventTime)
-        {
-            NoteOffEvent noteOffEvent = new NoteOffEvent
-            {
-                NoteNumber = (SevenBitNumber)GetTransposedKeyNumber(note),
-                Velocity = (SevenBitNumber)0,
-                DeltaTime = note.Length,
-                Channel = (FourBitNumber)0
-            };
-            PreviousEventTime = note.StartPos + note.Length;
-            return noteOffEvent;
-        }
-
-        /// <summary>
-        /// 获取移调后的音高。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <returns>移调后的音高。</returns>
-        private int GetTransposedKeyNumber(Note note)
-        {
-            int transposedKeyNumber = note.KeyNumber + Transpose;
-            if (transposedKeyNumber < 0)
-            {
-                transposedKeyNumber = 0;
-            }
-            else if (transposedKeyNumber > 127)
-            {
-                transposedKeyNumber = 127;
-            }
-            return transposedKeyNumber;
         }
     }
 }
