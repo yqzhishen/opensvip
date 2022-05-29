@@ -12,8 +12,8 @@ namespace FlutyDeer.MidiPlugin
     {
         public static void Main(string[] args)
         {
-            //Midi2Json();
-            Json2Midi();
+            Midi2Json();
+            //Json2Midi();
         }
 
         private static void Midi2Json()

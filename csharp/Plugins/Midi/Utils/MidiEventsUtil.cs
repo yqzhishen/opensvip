@@ -60,7 +60,7 @@ namespace FlutyDeer.MidiPlugin
             return (long)(60.0 / BPM * 1000000.0);
         }
 
-        public SingingTrack MidiEventsToSingingTrack(IEnumerable<MidiEvent> midiEvents, SevenBitNumber channel)
+        public SingingTrack MidiEventsToSingingTrackLegacy(IEnumerable<MidiEvent> midiEvents, SevenBitNumber channel)
         {
             double previousEventTime = 0;
             List<Note> noteList = new List<Note>();

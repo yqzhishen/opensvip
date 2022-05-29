@@ -7,6 +7,7 @@ using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
 using TimeSignature = OpenSvip.Model.TimeSignature;
+using OpenSvip.Framework;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -80,62 +81,68 @@ namespace FlutyDeer.MidiPlugin
                 });
             }
 
-            if (ImportLyrics)//导入歌词，使用实验性方法。
+            //先用DryWetMidi的方法导入音符
+            string trackName = "演唱轨";
+            List<Track> singingTrackList = new List<Track>();
+            foreach (TrackChunk trackChunk in midiFile.GetTrackChunks())
             {
-                List<Track> singingTrackList = new List<Track>();
-                int index = 0;
-                foreach (var chunkItem in midiFile.GetTrackChunks())
+                var midiEvents = trackChunk.Events;
+                var sequenceTrackNameEvent = midiEvents.Where(x => x.EventType == MidiEventType.SequenceTrackName);
+                if (sequenceTrackNameEvent != null && sequenceTrackNameEvent.Count() > 0)
                 {
-                    if (index > 0)
-                    {
-                        singingTrackList.Add(midiEventsUtil.MidiEventsToSingingTrack(chunkItem.Events, (SevenBitNumber)Channel));
-                    }
-                    index++;
+                    trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvent.First()).Text;
                 }
-                osProject.TrackList.AddRange(singingTrackList);
-            }
-            else//不导入歌词，使用 DryWetMidi 的方法。
-            {
-                string trackName = "演唱轨";
-                List<Track> singingTrackList = new List<Track>();
-                foreach (TrackChunk trackChunk in midiFile.GetTrackChunks())
+                List<Melanchall.DryWetMidi.Interaction.Note> list = trackChunk.GetNotes().ToList<Melanchall.DryWetMidi.Interaction.Note>();
+                if (list.Count > 0)
                 {
-                    var midiEvents = trackChunk.Events;
-                    var sequenceTrackNameEvent = midiEvents.Where(x => x.EventType == MidiEventType.SequenceTrackName);
-                    if (sequenceTrackNameEvent != null && sequenceTrackNameEvent.Count() > 0)
+                    List<Note> noteList = new List<Note>();
+                    foreach (Melanchall.DryWetMidi.Interaction.Note midiNote in list)
                     {
-                        trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvent.First()).Text;
-                    }
-                    List<Melanchall.DryWetMidi.Interaction.Note> list = trackChunk.GetNotes().ToList<Melanchall.DryWetMidi.Interaction.Note>();
-                    if (list.Count > 0)
-                    {
-                        List<Note> noteList = new List<Note>();
-                        foreach (Melanchall.DryWetMidi.Interaction.Note midiNote in list)
+                        noteList.Add(new Note
                         {
-                            noteList.Add(new Note
-                            {
-                                StartPos = (int)(midiNote.Time * 480 / PPQ),
-                                Length = (int)(midiNote.Length * 480 / PPQ),
-                                KeyNumber = midiNote.NoteNumber,
-                                Lyric = "啊",
-                                Pronunciation = null
-                            });
-                        }
-                        singingTrackList.Add(new SingingTrack
-                        {
-                            Title = trackName,
-                            Mute = false,
-                            Solo = false,
-                            Volume = 0.7,
-                            Pan = 0.0,
-                            AISingerName = "陈水若",
-                            ReverbPreset = "干声",
-                            NoteList = noteList
+                            StartPos = (int)(midiNote.Time * 480 / PPQ),
+                            Length = (int)(midiNote.Length * 480 / PPQ),
+                            KeyNumber = midiNote.NoteNumber,
+                            Lyric = "啊",
+                            Pronunciation = null
                         });
                     }
+                    if (ImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
+                    {
+                        using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
+                        {
+                            TimedEventsCollection events = timedEventsManager.Events;
+                            foreach (var note in noteList)
+                            {
+                                try
+                                {
+                                    note.Lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos).Select(e => ((LyricEvent)e.Event).Text).FirstOrDefault();
+                                }
+                                catch
+                                {
+                                    note.Lyric = "啊";
+                                }
+                            }
+                        }
+                    }
+                    if (new NoteOverlapUtil().IsOverlapedItemsExists(noteList))
+                    {
+                        Warnings.AddWarning("音符重叠", type:WarningTypes.Notes);
+                    }
+                    singingTrackList.Add(new SingingTrack
+                    {
+                        Title = trackName,
+                        Mute = false,
+                        Solo = false,
+                        Volume = 0.7,
+                        Pan = 0.0,
+                        AISingerName = "陈水若",
+                        ReverbPreset = "干声",
+                        NoteList = noteList
+                    });
                 }
-                osProject.TrackList.AddRange(singingTrackList);
             }
+            osProject.TrackList.AddRange(singingTrackList);
             return osProject;
         }
 

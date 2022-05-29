@@ -60,6 +60,8 @@
 		<Compile Include="Test.cs"/>
 		<Compile Include="Utils/EncodingUtil.cs"/>
 		<Compile Include="Utils/MidiEventsUtil.cs"/>
+		<Compile Include="Utils/NoteMergeUtil.cs"/>
+		<Compile Include="Utils/NoteOverlapUtil.cs"/>
 		<Compile Include="ErrorMidiFilePolicyOption.cs"/>
 	</ItemGroup>
 	<ItemGroup>
