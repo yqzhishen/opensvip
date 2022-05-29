@@ -7,8 +7,8 @@ using OpenSvip.Framework;
 using OpenSvip.Model;
 using Note = OpenSvip.Model.Note;
 using MidiTimeSignature = Melanchall.DryWetMidi.Interaction.TimeSignature;
-using OsTimeSignature = OpenSvip.Model.TimeSignature;
 using NPinyin;
+using System.Linq;
 
 namespace FlutyDeer.MidiPlugin
 {

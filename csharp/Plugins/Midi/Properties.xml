@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
@@ -32,6 +32,10 @@
 				<Choice Name="UTF-8" Tag="UTF8" />
 			</EnumChoices>
 		</Option>
+		<!-- <Option Name="channel" Type="integer" Default="0">
+			<Notes>通道</Notes>
+			<Tips>指定要导入哪条通道上的音符。默认导入首条通道上的音符，即通道0。取值范围：0-15。</Tips>
+		</Option> -->
 		<Option Name="errorMidiFilePolicy" Type="enum" Default="abort">
 			<Notes>有错误的 MIDI 文件导入策略</Notes>
 			<Tips>选择“忽略错误”，软件将会尝试导入含有错误的 MIDI 文件，但不保证能正确导入。</Tips>

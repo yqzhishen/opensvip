@@ -13,6 +13,7 @@ namespace FlutyDeer.MidiStream
             {
                 ImportLyrics = options.GetValueAsBoolean("importLyrics", false),
                 LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
+                Channel = options.GetValueAsInteger("channel", 0),
                 ErrorMidiFilePolicy = options.GetValueAsEnum("errorMidiFilePolicy", ErrorMidiFilePolicyOption.Abort)
             }.DecodeMidiFile(path);
         }

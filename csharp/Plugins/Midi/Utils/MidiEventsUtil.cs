@@ -2,6 +2,7 @@ using OpenSvip.Model;
 using System.Collections.Generic;
 using System.Linq;
 using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
 using System.Text.RegularExpressions;
 
@@ -59,7 +60,7 @@ namespace FlutyDeer.MidiPlugin
             return (long)(60.0 / BPM * 1000000.0);
         }
 
-        public SingingTrack MidiEventsToSingingTrack(IEnumerable<MidiEvent> midiEvents)
+        public SingingTrack MidiEventsToSingingTrack(IEnumerable<MidiEvent> midiEvents, SevenBitNumber channel)
         {
             double previousEventTime = 0;
             List<Note> noteList = new List<Note>();
@@ -91,22 +92,30 @@ namespace FlutyDeer.MidiPlugin
                         }
                         break;
                     case MidiEventType.NoteOn:
-                        tempKeyNumber = ((NoteOnEvent)midiEvent).NoteNumber;
-                        tempStratPosition = (int)(previousEventTime + midiEvent.DeltaTime);
+                        NoteOnEvent noteOnEvent = (NoteOnEvent)midiEvent;
+                        if (noteOnEvent.Channel == channel)
+                        {
+                            tempKeyNumber = noteOnEvent.NoteNumber;
+                            tempStratPosition = (int)(previousEventTime + midiEvent.DeltaTime);
+                        }
                         break;
                     case MidiEventType.NoteOff:
-                        tempDuration = (int)midiEvent.DeltaTime;
-                        Note note = new Note
+                        NoteOffEvent noteOffEvent = (NoteOffEvent)midiEvent;
+                        if (noteOffEvent.Channel == channel)
                         {
-                            Lyric = tempLyric,
-                            Pronunciation = tempPronunciation,
-                            StartPos = (int)(tempStratPosition * 480.0 / PPQ),
-                            Length = (int)(tempDuration * 480.0 / PPQ),
-                            KeyNumber = tempKeyNumber
-                        };
-                        tempPronunciation = null;
-                        tempLyric = "啊";
-                        noteList.Add(note);
+                            tempDuration = (int)midiEvent.DeltaTime;
+                            Note note = new Note
+                            {
+                                Lyric = tempLyric,
+                                Pronunciation = tempPronunciation,
+                                StartPos = (int)(tempStratPosition * 480.0 / PPQ),
+                                Length = (int)(tempDuration * 480.0 / PPQ),
+                                KeyNumber = tempKeyNumber
+                            };
+                            tempPronunciation = null;
+                            tempLyric = "啊";
+                            noteList.Add(note);
+                        }
                         break;
                 }
                 previousEventTime += (int)midiEvent.DeltaTime;

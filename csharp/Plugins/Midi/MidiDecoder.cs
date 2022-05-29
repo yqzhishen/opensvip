@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
+using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
 using TimeSignature = OpenSvip.Model.TimeSignature;
 
@@ -17,6 +18,7 @@ namespace FlutyDeer.MidiPlugin
         public LyricEncodings LyricEncoding { get; set; }
         public bool ImportLyrics { get; set; }
         public ErrorMidiFilePolicyOption ErrorMidiFilePolicy { get; set; }
+        public int Channel { get; set; }
         private MidiFile midiFile;
         private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
         private short PPQ;
@@ -86,7 +88,7 @@ namespace FlutyDeer.MidiPlugin
                 {
                     if (index > 0)
                     {
-                        singingTrackList.Add(midiEventsUtil.MidiEventsToSingingTrack(chunkItem.Events));
+                        singingTrackList.Add(midiEventsUtil.MidiEventsToSingingTrack(chunkItem.Events, (SevenBitNumber)Channel));
                     }
                     index++;
                 }
