@@ -23,8 +23,8 @@ namespace FlutyDeer.GjgjPlugin
             gjProject = originalProject;
             var osProject = new Project
             {
-                SongTempoList = DecodeSongTempoList(),
-                TimeSignatureList = DecodeTimeSignatureList()
+                SongTempoList = DecodeSongTempoList(gjProject.TempoMap.TempoList),
+                TimeSignatureList = DecodeTimeSignatureList(gjProject.TempoMap.TimeSignatureList)
             };
             timeSynchronizer = new TimeSynchronizer(osProject.SongTempoList);
             osProject.TrackList = DecodeTrackList(osProject);
@@ -52,19 +52,19 @@ namespace FlutyDeer.GjgjPlugin
         private List<Track> DecodeSingingTracks(Project project)
         {
             List<Track> singingTrackList = new List<Track>();
-            for (int index = 0; index < gjProject.SingingTrackList.Count; index++)
+            foreach(var gjSingingTrack in gjProject.SingingTrackList)
             {
                 Track track = new SingingTrack
                 {
-                    Title = SingerNameUtil.GetSingerName(gjProject.SingingTrackList[index]),
-                    Mute = gjProject.SingingTrackList[index].TrackVolume.Mute,
+                    Title = SingerNameUtil.GetSingerName(gjSingingTrack),
+                    Mute = gjSingingTrack.TrackVolume.Mute,
                     Solo = false,
                     Volume = 0.7,
                     Pan = 0.0,
                     AISingerName = "陈水若",
                     ReverbPreset = "干声",
-                    NoteList = DecodeNoteList(index, project),
-                    EditedParams = DecodeParams(index)
+                    NoteList = DecodeNoteList(gjSingingTrack, project),
+                    EditedParams = DecodeParams(gjSingingTrack)
                 };
                 singingTrackList.Add(track);
             }
@@ -103,15 +103,14 @@ namespace FlutyDeer.GjgjPlugin
         /// <summary>
         /// 转换音符列表。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
         /// <param name="project">OpenSvip工程。</param>
         /// <returns></returns>
-        private List<Note> DecodeNoteList(int singingTrackIndex, Project project)
+        private List<Note> DecodeNoteList(GjSingingTrack gjSingingTrack, Project project)
         {
             List<Note> noteList = new List<Note>();
-            for (int noteIndex = 0; noteIndex < gjProject.SingingTrackList[singingTrackIndex].NoteList.Count; noteIndex++)
+            foreach(var gjNote in gjSingingTrack.NoteList)
             {
-                noteList.Add(DecodeNote(singingTrackIndex, noteIndex, project));
+                noteList.Add(DecodeNote(gjNote, project));
             }
             return noteList;
         }
@@ -119,13 +118,10 @@ namespace FlutyDeer.GjgjPlugin
         /// <summary>
         /// 转换音符。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="noteIndex">音符索引。</param>
         /// <param name="project">OpenSvip工程。</param>
         /// <returns></returns>
-        private Note DecodeNote(int singingTrackIndex, int noteIndex, Project project)
+        private Note DecodeNote(GjNote gjNote, Project project)
         {
-            GjNote gjNote = gjProject.SingingTrackList[singingTrackIndex].NoteList[noteIndex];
             int noteStartPosition = DecodeNoteStartPosition(gjNote, project);
             Note note = new Note
             {
@@ -227,14 +223,13 @@ namespace FlutyDeer.GjgjPlugin
         /// <summary>
         /// 转换参数。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
         /// <returns></returns>
-        private Params DecodeParams(int singingTrackIndex)
+        private Params DecodeParams(GjSingingTrack gjSingingTrack)
         {
             Params paramsFromGj = new Params
             {
-                Volume = new VolumeParamUtil().DecodeVolumeParam(singingTrackIndex, gjProject.SingingTrackList[singingTrackIndex].VolumeParam),
-                Pitch = new PitchParamUtil().DecodePitchParam(singingTrackIndex, gjProject)
+                Volume = new VolumeParamUtil().DecodeVolumeParam(gjSingingTrack.VolumeParam),
+                Pitch = new PitchParamUtil().DecodePitchParam(gjSingingTrack.PitchParam)
             };
             return paramsFromGj;
         }
@@ -243,26 +238,26 @@ namespace FlutyDeer.GjgjPlugin
         /// 转换拍号列表。
         /// </summary>
         /// <returns></returns>
-        private List<TimeSignature> DecodeTimeSignatureList()
+        private List<TimeSignature> DecodeTimeSignatureList(List<GjTimeSignature> gjTimeSignatureList)
         {
             List<TimeSignature> timeSignatureList = new List<TimeSignature>();
-            if (gjProject.TempoMap.TimeSignatureList.Count == 0)//如果拍号只有4/4，gjgj不存
+            if (gjTimeSignatureList.Count == 0)//如果拍号只有4/4，gjgj不存
             {
                 timeSignatureList.Add(GetInitialTimeSignature());
             }
             else
             {
-                if (gjProject.TempoMap.TimeSignatureList[0].Time != 0)//如果存的第一个拍号不在0处，说明0处的拍号是4/4
+                if (gjTimeSignatureList[0].Time != 0)//如果存的第一个拍号不在0处，说明0处的拍号是4/4
                 {
                     timeSignatureList.Add(GetInitialTimeSignature());
 
                     int sumOfTime = 0;
-                    for (int index = 0; index < gjProject.TempoMap.TimeSignatureList.Count; index++)
+                    for (int index = 0; index < gjTimeSignatureList.Count; index++)
                     {
                         TimeSignature timeSignature = new TimeSignature();
                         if (index == 0)
                         {
-                            sumOfTime += gjProject.TempoMap.TimeSignatureList[0].Time / 1920;
+                            sumOfTime += gjTimeSignatureList[0].Time / 1920;
                             timeSignature.BarIndex = sumOfTime;
                         }
                         else
@@ -278,7 +273,7 @@ namespace FlutyDeer.GjgjPlugin
                 else
                 {
                     int sumOfTime = 0;
-                    for (int index = 0; index < gjProject.TempoMap.TimeSignatureList.Count; index++)
+                    for (int index = 0; index < gjTimeSignatureList.Count; index++)
                     {
                         TimeSignature timeSignature = new TimeSignature();
                         if (index == 0)
@@ -303,10 +298,10 @@ namespace FlutyDeer.GjgjPlugin
         /// 转换曲速列表。
         /// </summary>
         /// <returns></returns>
-        private List<SongTempo> DecodeSongTempoList()
+        private List<SongTempo> DecodeSongTempoList(List<GjTempo> gjTempoList)
         {
             List<SongTempo> songTempoList = new List<SongTempo>();
-            foreach (GjTempo gjTempo in gjProject.TempoMap.TempoList)
+            foreach (GjTempo gjTempo in gjTempoList)
             {
                 songTempoList.Add(TempoUtil.DecodeSongTempo(gjTempo));
             }

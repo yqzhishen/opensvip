@@ -121,9 +121,6 @@ namespace FlutyDeer.GjgjPlugin.Model
         [JsonProperty("Modifys")]
         public List<GjPitchParamPoint> PitchParamPointList { get; set; }
 
-        [JsonProperty("Origins")]
-        public List<GjDefaultPitchParamPoint> DefaultPitchParamPointList { get; set; }
-
         [JsonProperty("ModifyRanges")]
         public List<GjModifyRange> ModifyRangeList { get; set; }
     }

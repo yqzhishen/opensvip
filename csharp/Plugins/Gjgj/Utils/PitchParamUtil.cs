@@ -149,8 +149,7 @@ namespace FlutyDeer.GjgjPlugin
         /// <summary>
         /// 转换修改部分的音高参数。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        public ParamCurve DecodePitchParam(int singingTrackIndex, GjProject gjProject)
+        public ParamCurve DecodePitchParam(GjPitchParam gjPitchParam)
         {
             ParamCurve paramCurvePitch = new ParamCurve();
             Tuple<int, int> defaultLeftEndpoint = Tuple.Create(-192000, -100);
@@ -159,18 +158,18 @@ namespace FlutyDeer.GjgjPlugin
             try
             {
                 var index = -1;
-                foreach (var range in gjProject.SingingTrackList[singingTrackIndex].PitchParam.ModifyRangeList)
+                foreach (var range in gjPitchParam.ModifyRangeList)
                 {
                     Tuple<int, int> leftEndpoint = Tuple.Create(GetPitchParamTime(range.Left), -100);//左间断点
                     Tuple<int, int> rightEndpoint = Tuple.Create(GetPitchParamTime(range.Right), -100);//右间断点
                     paramCurvePitch.PointList.Add(leftEndpoint);//添加左间断点
-                    index = gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
+                    index = gjPitchParam.PitchParamPointList.FindIndex(index + 1, p => p.Time >= range.Left && p.Value <= range.Right);
                     if (index == -1)
                         continue;
-                    for (; (index < gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList.Count) && (gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time <= range.Right); ++index)
+                    for (; (index < gjPitchParam.PitchParamPointList.Count) && (gjPitchParam.PitchParamPointList[index].Time <= range.Right); ++index)
                     {
-                        int pitchParamTime = GetPitchParamTime(gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Time);
-                        int pitchParamValue = GetPitchParamValue(gjProject.SingingTrackList[singingTrackIndex].PitchParam.PitchParamPointList[index].Value);
+                        int pitchParamTime = GetPitchParamTime(gjPitchParam.PitchParamPointList[index].Time);
+                        int pitchParamValue = GetPitchParamValue(gjPitchParam.PitchParamPointList[index].Value);
                         Tuple<int, int> pitchParamPoint = Tuple.Create(pitchParamTime, pitchParamValue);
                         paramCurvePitch.PointList.Add(pitchParamPoint);
                     }

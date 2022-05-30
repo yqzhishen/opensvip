@@ -273,8 +273,7 @@ namespace FlutyDeer.GjgjPlugin
             int sumOfTime = 0;
             for (int index = 0; index < osProject.TimeSignatureList.Count; index++)
             {
-
-                gjTimeSignatureList.Add(EncodeTimeSignature(sumOfTime, index));
+                gjTimeSignatureList.Add(EncodeTimeSignature(ref sumOfTime, index));
             }
             return gjTimeSignatureList;
         }
@@ -285,11 +284,11 @@ namespace FlutyDeer.GjgjPlugin
         /// <param name="sumOfTime">从谱面开始到当前拍号的累计时间。</param>
         /// <param name="index">原始拍号的索引。</param>
         /// <returns></returns>
-        private GjTimeSignature EncodeTimeSignature(int sumOfTime, int index)
+        private GjTimeSignature EncodeTimeSignature(ref int sumOfTime, int index)
         {
             GjTimeSignature gjTimeSignature = new GjTimeSignature
             {
-                Time = GetTimeSignatureTime(sumOfTime, index),
+                Time = GetTimeSignatureTime(ref sumOfTime, index),
                 Numerator = GetNumerator(index),
                 Denominator = GetDenominator(index)
             };
@@ -302,12 +301,12 @@ namespace FlutyDeer.GjgjPlugin
         /// <param name="sumOfTime">从谱面开始到当前拍号的累计时间。</param>
         /// <param name="index">原始拍号的索引。</param>
         /// <returns></returns>
-        private int GetTimeSignatureTime(int sumOfTime, int index)
+        private int GetTimeSignatureTime(ref int sumOfTime, int index)
         {
             int time;
             if (index == 0)
             {
-                time = GetBarIndex(0) * 1920 * GetNumerator(index) / GetDenominator(index);
+                time = 0;
             }
             else
             {
