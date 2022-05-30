@@ -13,6 +13,8 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public int Transpose { get; set; }
 
+        public bool IsExportLyrics { get; set; }
+
         /// <summary>
         /// 是否使用歌词兼容性模式，默认为否。
         /// </summary>
@@ -111,6 +113,7 @@ namespace FlutyDeer.MidiPlugin
                 {
                     case SingingTrack singingTrack:
                         trackChunkList.Add(new MidiEventsUtil{
+                            IsExportLyrics = IsExportLyrics,
                             IsUseCompatibleLyric = IsUseCompatibleLyric,
                             IsRemoveSymbols = IsRemoveSymbols,
                             SemivowelPreShift = SemivowelPreShift,

@@ -9,7 +9,7 @@
     <Format>MIDI 文件</Format>
     <Suffix>mid</Suffix>
     <Identifier>midi</Identifier>
-    <LibraryPath>Midi\FlutyDeer.MidiPlugin.exe</LibraryPath>
+    <LibraryPath>Midi\FlutyDeer.MidiPlugin.dll</LibraryPath>
     <Converter>FlutyDeer.MidiStream.MidiConverter</Converter>
 	<InputOptions>
 		<Option Name="importLyrics" Type="boolean" Default="false">
@@ -32,13 +32,17 @@
 				<Choice Name="UTF-8" Tag="UTF8" />
 			</EnumChoices>
 		</Option>
+		<Option Name="importTimeSignatures" Type="boolean" Default="true">
+			<Notes>导入拍号</Notes>
+			<Tips>关闭此选项，拍号设置为4/4。</Tips>
+		</Option>
 		<!-- <Option Name="channel" Type="integer" Default="0">
 			<Notes>通道</Notes>
 			<Tips>指定要导入哪条通道上的音符。默认导入首条通道上的音符，即通道0。取值范围：0-15。</Tips>
 		</Option> -->
 		<Option Name="errorMidiFilePolicy" Type="enum" Default="abort">
-			<Notes>有错误的 MIDI 文件导入策略</Notes>
-			<Tips>选择“忽略错误”，软件将会尝试导入含有错误的 MIDI 文件，但不保证能正确导入。</Tips>
+			<Notes>导入有错误或损坏的 MIDI 文件时</Notes>
+			<Tips>选择“忽略错误”，软件将会尝试导入有错误或损坏的 MIDI 文件，但不保证能正确导入。</Tips>
 			<EnumChoices>
 				<Choice Name="中止" Tag="abort" />
 				<Choice Name="忽略错误" Tag="ignore" />
@@ -46,8 +50,8 @@
 		</Option>
 	</InputOptions>
 	<OutputOptions>
-		<Option Name="transpose" Type="integer" Default="0">
-			<Notes>移调</Notes>
+		<Option Name="exportLyrics" Type="boolean" Default="true">
+			<Notes>导出歌词</Notes>
 		</Option>
 		<Option Name="removeSymbols" Type="boolean" Default="true">
 			<Notes>移除歌词中的常见标点符号</Notes>
@@ -72,6 +76,9 @@
 				<Choice Name="UTF-8 BOM" Tag="UTF8BOM" />
 				<Choice Name="UTF-8" Tag="UTF8" />
 			</EnumChoices>
+		</Option>
+		<Option Name="transpose" Type="integer" Default="0">
+			<Notes>移调</Notes>
 		</Option>
 		<Option Name="ppq" Type="integer" Default="480">
 			<Notes>时基(PPQ)</Notes>

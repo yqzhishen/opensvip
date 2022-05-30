@@ -5,7 +5,6 @@ using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Note = OpenSvip.Model.Note;
 using TimeSignature = OpenSvip.Model.TimeSignature;
-using OpenSvip.Framework;
 using System.Text.RegularExpressions;
 
 namespace FlutyDeer.MidiPlugin
@@ -16,9 +15,10 @@ namespace FlutyDeer.MidiPlugin
         /// 歌词文本编码。
         /// </summary>
         public LyricEncodings LyricEncoding { get; set; }
-        public bool ImportLyrics { get; set; }
+        public bool IsImportLyrics { get; set; }
         public ErrorMidiFilePolicyOption ErrorMidiFilePolicy { get; set; }
         public int Channel { get; set; }
+        public bool IsImportTimeSignatures { get; set; }
         private MidiFile midiFile;
         private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
         private short PPQ;
@@ -56,7 +56,9 @@ namespace FlutyDeer.MidiPlugin
                         Denominator = 4
                     });
                 }
-                foreach (var change in timesignatureChanges)
+                if(IsImportTimeSignatures)
+                {
+                    foreach (var change in timesignatureChanges)
                 {
                     var time = change.Time;
                     var midiTimeSignature = change.Value;
@@ -68,6 +70,7 @@ namespace FlutyDeer.MidiPlugin
                         Numerator = midiTimeSignature.Numerator,
                         Denominator = midiTimeSignature.Denominator
                     });
+                }
                 }
             }
             else
@@ -110,7 +113,7 @@ namespace FlutyDeer.MidiPlugin
                     using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
                     {
                         TimedEventsCollection events = timedEventsManager.Events;
-                        if (ImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
+                        if (IsImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
                         {
                             foreach (var note in noteList)
                             {
@@ -141,7 +144,7 @@ namespace FlutyDeer.MidiPlugin
                     }
                     if (new NoteOverlapUtil().IsOverlapedItemsExists(noteList))
                     {
-                        Warnings.AddWarning("音符重叠", type: WarningTypes.Notes);
+                        //Warnings.AddWarning("音符重叠", type: WarningTypes.Notes);
                     }
                     singingTrackList.Add(new SingingTrack
                     {

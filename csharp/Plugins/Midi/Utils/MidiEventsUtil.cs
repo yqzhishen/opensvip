@@ -1,12 +1,10 @@
 using OpenSvip.Model;
 using System.Collections.Generic;
-using System.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
-using System.Text.RegularExpressions;
 using NPinyin;
-using OpenSvip.Framework;
+using Melanchall.DryWetMidi.Interaction;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -20,6 +18,7 @@ namespace FlutyDeer.MidiPlugin
         }
 
         public int SemivowelPreShift { get; set; }
+        public bool IsExportLyrics { get; set; }
         public bool IsUseCompatibleLyric { get; set; }
         public bool IsRemoveSymbols { get; set; }
         public int Transpose { get; set; }
@@ -76,47 +75,22 @@ namespace FlutyDeer.MidiPlugin
         {
             SemivowelPreShiftUtil.PreShiftSemivowelNotes(singingTrack.NoteList, SemivowelPreShift);
             List<MidiEvent> midiEventList = new List<MidiEvent>();
-            int PreviousEventTime = 0;
-            //bool IsSemivowelShiftForwardHandled = false;
             midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
-            //这里不能用 DryWetMidi 的音符管理器来转换音符，因为不能设置音符的歌词。需要手动生成歌词、音符按下和松开三个事件。
-            foreach (var note in singingTrack.NoteList)
-            {
-                midiEventList.Add(EncodeLyricEvent(note, PreviousEventTime));//歌词事件设置在音符按下事件的前面。
-                midiEventList.Add(EncodeNoteOnEvent(note));
-                midiEventList.Add(EncodeNoteOffEvent(note, ref PreviousEventTime));
-            }
             TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
-            return trackChunk;
-        }
-        
-        /// <summary>
-        /// 将歌词转换成 MIDI 事件。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
-        /// <returns>歌词事件。</returns>
-        private LyricEvent EncodeLyricEvent(Note note, int PreviousEventTime)
-        {
-            try
+            using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
             {
-                LyricEvent lyricEvent = new LyricEvent
+                TimedEventsCollection events = timedEventsManager.Events;
+                foreach(var note in singingTrack.NoteList)
                 {
-                    Text = GetLyric(note),
-                    DeltaTime = note.StartPos - PreviousEventTime//歌词事件支撑起乐谱中无音符的空白部分，防止所有音符粘连。
-                };
-                return lyricEvent;
+                    if(IsExportLyrics)
+                    {
+                        events.Add(new TimedEvent(new LyricEvent(GetLyric(note)), note.StartPos));
+                    }
+                    events.Add(new TimedEvent(new NoteOnEvent(GetTransposedKeyNumber(note), (SevenBitNumber)45), note.StartPos));
+                    events.Add(new TimedEvent(new NoteOffEvent(GetTransposedKeyNumber(note), (SevenBitNumber)0), note.StartPos + note.Length));
+                }
             }
-            catch (System.Exception)
-            {
-                //用于调试。
-                /* Warnings.AddWarning("[LyricEvent] Text = " + GetLyric(note)
-                + " StartPos = " + note.StartPos
-                + " Length = " + note.Length
-                + " PreviousEventTime = " + PreviousEventTime
-                + " DeltaTime = " + (note.StartPos - PreviousEventTime).ToString()); */
-            }
-            return new LyricEvent();
+            return trackChunk;
         }
 
         /// <summary>
@@ -150,46 +124,11 @@ namespace FlutyDeer.MidiPlugin
         }
 
         /// <summary>
-        /// 生成 Note On 事件。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <returns>Note On 事件。</returns>
-        private NoteOnEvent EncodeNoteOnEvent(Note note)
-        {
-            NoteOnEvent noteOnEvent = new NoteOnEvent
-            {
-                NoteNumber = (SevenBitNumber)GetTransposedKeyNumber(note),
-                Velocity = (SevenBitNumber)45,
-                Channel = (FourBitNumber)0
-            };
-            return noteOnEvent;
-        }
-
-        /// <summary>
-        /// 生成 Note Off 事件。
-        /// </summary>
-        /// <param name="note">音符。</param>
-        /// <param name="PreviousEventTime">上一个 MIDI 事件的绝对时间。</param>
-        /// <returns> Note Off 事件。</returns>
-        private NoteOffEvent EncodeNoteOffEvent(Note note, ref int PreviousEventTime)
-        {
-            NoteOffEvent noteOffEvent = new NoteOffEvent
-            {
-                NoteNumber = (SevenBitNumber)GetTransposedKeyNumber(note),
-                Velocity = (SevenBitNumber)0,
-                DeltaTime = note.Length,
-                Channel = (FourBitNumber)0
-            };
-            PreviousEventTime = note.StartPos + note.Length;
-            return noteOffEvent;
-        }
-
-        /// <summary>
         /// 获取移调后的音高。
         /// </summary>
         /// <param name="note">音符。</param>
         /// <returns>移调后的音高。</returns>
-        private int GetTransposedKeyNumber(Note note)
+        private SevenBitNumber GetTransposedKeyNumber(Note note)
         {
             int transposedKeyNumber = note.KeyNumber + Transpose;
             if (transposedKeyNumber < 0)
@@ -200,80 +139,7 @@ namespace FlutyDeer.MidiPlugin
             {
                 transposedKeyNumber = 127;
             }
-            return transposedKeyNumber;
+            return (SevenBitNumber)transposedKeyNumber;
         }
-
-        /* public SingingTrack MidiEventsToSingingTrackLegacy(IEnumerable<MidiEvent> midiEvents, SevenBitNumber channel)
-        {
-            double previousEventTime = 0;
-            List<Note> noteList = new List<Note>();
-            string tempLyric = "啊";
-            string tempPronunciation = null;
-            int tempStratPosition = 0;
-            int tempDuration = 0;
-            int tempKeyNumber = 0;
-            string trackName = "演唱轨";
-            var sequenceTrackNameEvent = midiEvents.Where(x => x.EventType == MidiEventType.SequenceTrackName);
-            if (sequenceTrackNameEvent != null)
-            {
-                trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvent.First()).Text;
-            }
-            foreach (var midiEvent in midiEvents)
-            {
-                switch (midiEvent.EventType)
-                {
-                    case MidiEventType.Lyric:
-                        string lyric = ((LyricEvent)midiEvent).Text;
-                        if (Regex.IsMatch(lyric, @"[a-zA-Z]"))
-                        {
-                            tempLyric = "啊";
-                            tempPronunciation = lyric;
-                        }
-                        else
-                        {
-                            tempLyric = lyric;
-                        }
-                        break;
-                    case MidiEventType.NoteOn:
-                        NoteOnEvent noteOnEvent = (NoteOnEvent)midiEvent;
-                        if (noteOnEvent.Channel == channel)
-                        {
-                            tempKeyNumber = noteOnEvent.NoteNumber;
-                            tempStratPosition = (int)(previousEventTime + midiEvent.DeltaTime);
-                        }
-                        break;
-                    case MidiEventType.NoteOff:
-                        NoteOffEvent noteOffEvent = (NoteOffEvent)midiEvent;
-                        if (noteOffEvent.Channel == channel)
-                        {
-                            tempDuration = (int)midiEvent.DeltaTime;
-                            Note note = new Note
-                            {
-                                Lyric = tempLyric,
-                                Pronunciation = tempPronunciation,
-                                StartPos = (int)(tempStratPosition * 480.0 / PPQ),
-                                Length = (int)(tempDuration * 480.0 / PPQ),
-                                KeyNumber = tempKeyNumber
-                            };
-                            tempPronunciation = null;
-                            tempLyric = "啊";
-                            noteList.Add(note);
-                        }
-                        break;
-                }
-                previousEventTime += (int)midiEvent.DeltaTime;
-            }
-            return new SingingTrack
-            {
-                Title = trackName,
-                Mute = false,
-                Solo = false,
-                Volume = 0.7,
-                Pan = 0.0,
-                AISingerName = "陈水若",
-                ReverbPreset = "干声",
-                NoteList = noteList
-            };
-        } */
     }
 }

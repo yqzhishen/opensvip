@@ -11,7 +11,8 @@ namespace FlutyDeer.MidiStream
         {
             return new MidiDecoder
             {
-                ImportLyrics = options.GetValueAsBoolean("importLyrics", false),
+                IsImportTimeSignatures = options.GetValueAsBoolean("importTimeSignatures", true),
+                IsImportLyrics = options.GetValueAsBoolean("importLyrics", false),
                 LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
                 Channel = options.GetValueAsInteger("channel", 0),
                 ErrorMidiFilePolicy = options.GetValueAsEnum("errorMidiFilePolicy", ErrorMidiFilePolicyOption.Abort)
@@ -22,6 +23,7 @@ namespace FlutyDeer.MidiStream
         {
             new MidiEncoder
             {
+                IsExportLyrics = options.GetValueAsBoolean("exportLyrics", true),
                 Transpose = options.GetValueAsInteger("transpose", 0),
                 IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
