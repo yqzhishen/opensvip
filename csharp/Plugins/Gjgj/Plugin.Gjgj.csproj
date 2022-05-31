@@ -60,13 +60,14 @@
     <Compile Include="GjgjEncoder.cs" />
     <Compile Include="GjgjModel.cs" />
     <Compile Include="GjgjSupportedPinyin.cs" />
-    <Compile Include="LyricsAndPinyinSettings.cs"/>
-    <Compile Include="Utils\PitchParamUtil.cs"/>
-    <Compile Include="Utils\VolumeParamUtil.cs"/>
-    <Compile Include="Utils\SingerNameUtil.cs"/>
-    <Compile Include="Utils\PronunciationUtil.cs"/>
-    <Compile Include="Utils\TempoUtil.cs"/>
-    <Compile Include="Utils\NoteHeadTagUtil.cs"/>
+    <Compile Include="LyricsAndPinyinSettings.cs" />
+    <Compile Include="Test.cs" />
+    <Compile Include="Utils\PitchParamUtil.cs" />
+    <Compile Include="Utils\VolumeParamUtil.cs" />
+    <Compile Include="Utils\SingerNameUtil.cs" />
+    <Compile Include="Utils\PronunciationUtil.cs" />
+    <Compile Include="Utils\TempoUtil.cs" />
+    <Compile Include="Utils\NoteHeadTagUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

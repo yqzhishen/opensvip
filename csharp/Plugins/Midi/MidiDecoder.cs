@@ -1,11 +1,11 @@
 ﻿using OpenSvip.Model;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Note = OpenSvip.Model.Note;
 using TimeSignature = OpenSvip.Model.TimeSignature;
+using System.Text.RegularExpressions;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -15,8 +15,10 @@ namespace FlutyDeer.MidiPlugin
         /// 歌词文本编码。
         /// </summary>
         public LyricEncodings LyricEncoding { get; set; }
-        public bool ImportLyrics { get; set; }
+        public bool IsImportLyrics { get; set; }
         public ErrorMidiFilePolicyOption ErrorMidiFilePolicy { get; set; }
+        public int Channel { get; set; }
+        public bool IsImportTimeSignatures { get; set; }
         private MidiFile midiFile;
         private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
         private short PPQ;
@@ -28,76 +30,136 @@ namespace FlutyDeer.MidiPlugin
             midiEventsUtil.SetPPQ(timeDivision.TicksPerQuarterNote);
             PPQ = timeDivision.TicksPerQuarterNote;
 
-            if (ImportLyrics)
+            //导入曲速和拍号
+            TempoMap tempoMap = midiFile.GetTempoMap();
+            var tempoChanges = tempoMap.GetTempoChanges();
+            var timesignatureChanges = tempoMap.GetTimeSignatureChanges();
+            foreach (var change in tempoChanges)
             {
-                bool isTempoMapTrack = true;
-                List<Track> singingTrackList = new List<Track>();
-                foreach (var chunkItem in midiFile.GetTrackChunks())
+                var tempo = change.Value;
+                var time = change.Time;
+                osProject.SongTempoList.Add(new SongTempo
                 {
-                    if (isTempoMapTrack)//解析曲速轨
+                    Position = (int)time,
+                    BPM = (float)(60000000 / tempo.MicrosecondsPerQuarterNote)
+                });
+            }
+            if (timesignatureChanges != null && timesignatureChanges.Count() > 0)
+            {
+                var firstTimeSignatureTime = timesignatureChanges.First().Time;
+                if (firstTimeSignatureTime != 0)//由于位于0且为四四拍的拍号不存在，所以需要添加一个拍号
+                {
+                    osProject.TimeSignatureList.Add(new TimeSignature
                     {
-                        osProject.SongTempoList.AddRange(midiEventsUtil.MidiEventsToSongTempoList(chunkItem.Events));
-                        isTempoMapTrack = false;
-                    }
-                    else//解析其他轨
-                    {
-                        singingTrackList.Add(new SingingTrack
-                        {
-                            Title = "演唱轨",
-                            Mute = false,
-                            Solo = false,
-                            Volume = 0.7,
-                            Pan = 0.0,
-                            AISingerName = "陈水若",
-                            ReverbPreset = "干声",
-                            NoteList = midiEventsUtil.MidiEventsToNoteList(chunkItem.Events)
-                        });
-                    }
+                        BarIndex = 0,
+                        Numerator = 4,
+                        Denominator = 4
+                    });
                 }
-                osProject.TrackList.AddRange(singingTrackList);
+                if(IsImportTimeSignatures)
+                {
+                    foreach (var change in timesignatureChanges)
+                {
+                    var time = change.Time;
+                    var midiTimeSignature = change.Value;
+                    MetricTimeSpan metricTime = TimeConverter.ConvertTo<MetricTimeSpan>(time, tempoMap);
+                    BarBeatTicksTimeSpan barBeatTicksTimeFromMetric = TimeConverter.ConvertTo<BarBeatTicksTimeSpan>(metricTime, tempoMap);
+                    osProject.TimeSignatureList.Add(new TimeSignature
+                    {
+                        BarIndex = (int)barBeatTicksTimeFromMetric.Bars,
+                        Numerator = midiTimeSignature.Numerator,
+                        Denominator = midiTimeSignature.Denominator
+                    });
+                }
+                }
             }
             else
             {
-                List<Track> singingTrackList = new List<Track>();
-                foreach (TrackChunk trackChunk in midiFile.GetTrackChunks())
+                osProject.TimeSignatureList.Add(new TimeSignature
                 {
-                    List<Melanchall.DryWetMidi.Interaction.Note> list = trackChunk.GetNotes().ToList<Melanchall.DryWetMidi.Interaction.Note>();
-                    if (list.Count > 0)
-                    {
-                        List<Note> noteList = new List<Note>();
-                        foreach (Melanchall.DryWetMidi.Interaction.Note midiNote in list)
-                        {
-                            noteList.Add(new Note
-                            {
-                                StartPos = (int)(midiNote.Time * 480 / PPQ),
-                                Length = (int)(midiNote.Length * 480 / PPQ),
-                                KeyNumber = midiNote.NoteNumber,
-                                Lyric = "啊",
-                                Pronunciation = null
-                            });
-                        }
-                        singingTrackList.Add(new SingingTrack
-                        {
-                            Title = "演唱轨",
-                            Mute = false,
-                            Solo = false,
-                            Volume = 0.7,
-                            Pan = 0.0,
-                            AISingerName = "陈水若",
-                            ReverbPreset = "干声",
-                            NoteList = noteList
-                        });
-                    }
-                }
-                osProject.TrackList.AddRange(singingTrackList);
+                    BarIndex = 0,
+                    Numerator = 4,
+                    Denominator = 4
+                });
             }
 
-            osProject.TimeSignatureList.Add(new TimeSignature
+            //先用DryWetMidi的方法导入音符
+            string trackName = "演唱轨";
+            List<Track> singingTrackList = new List<Track>();
+            foreach (TrackChunk trackChunk in midiFile.GetTrackChunks())
             {
-                BarIndex = 0,
-                Numerator = 4,
-                Denominator = 4
-            });
+                var midiEvents = trackChunk.Events;
+                var sequenceTrackNameEvent = midiEvents.Where(x => x.EventType == MidiEventType.SequenceTrackName);
+                if (sequenceTrackNameEvent != null && sequenceTrackNameEvent.Count() > 0)
+                {
+                    trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvent.First()).Text;
+                }
+                List<Melanchall.DryWetMidi.Interaction.Note> list = trackChunk.GetNotes().ToList<Melanchall.DryWetMidi.Interaction.Note>();
+                if (list.Count > 0)
+                {
+                    List<Note> noteList = new List<Note>();
+                    foreach (Melanchall.DryWetMidi.Interaction.Note midiNote in list)
+                    {
+                        noteList.Add(new Note
+                        {
+                            StartPos = (int)(midiNote.Time * 480 / PPQ),
+                            Length = (int)(midiNote.Length * 480 / PPQ),
+                            KeyNumber = midiNote.NoteNumber,
+                            Lyric = "啊",
+                            Pronunciation = null
+                        });
+                    }
+                    ParamCurve pitchParamCurve = new ParamCurve();
+                    using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
+                    {
+                        TimedEventsCollection events = timedEventsManager.Events;
+                        if (IsImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
+                        {
+                            foreach (var note in noteList)
+                            {
+                                try
+                                {
+                                    string lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos).Select(e => ((LyricEvent)e.Event).Text).FirstOrDefault();
+                                    if (Regex.IsMatch(lyric, @"[a-zA-Z]"))
+                                    {
+                                        note.Lyric = "啊";
+                                        note.Pronunciation = lyric;
+                                    }
+                                    else
+                                    {
+                                        note.Lyric = lyric;
+                                    }
+                                }
+                                catch
+                                {
+                                    note.Lyric = "啊";
+                                }
+                            }
+                        }
+                        var pitchBendEvents = events.Where(e => e.Event is PitchBendEvent);
+                        foreach (var timedEvent in pitchBendEvents)
+                        {
+                            var pitchBendEvent = (PitchBendEvent)timedEvent.Event;
+                        }
+                    }
+                    if (new NoteOverlapUtil().IsOverlapedItemsExists(noteList))
+                    {
+                        //Warnings.AddWarning("音符重叠", type: WarningTypes.Notes);
+                    }
+                    singingTrackList.Add(new SingingTrack
+                    {
+                        Title = trackName,
+                        Mute = false,
+                        Solo = false,
+                        Volume = 0.7,
+                        Pan = 0.0,
+                        AISingerName = "陈水若",
+                        ReverbPreset = "干声",
+                        NoteList = noteList
+                    });
+                }
+            }
+            osProject.TrackList.AddRange(singingTrackList);
             return osProject;
         }
 

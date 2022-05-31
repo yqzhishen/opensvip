@@ -4,7 +4,7 @@
     <Version>1.6.2</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>适用于 OpenSvip 的歌叽歌叽工程格式转换插件。</Descriptions>
+    <Descriptions>适用于 OpenSvip 的歌叽歌叽工程格式转换插件。&#x000A;仅支持歌叽歌叽2.0版本。</Descriptions>
     <Requirements>无</Requirements>
     <Format>歌叽歌叽工程文件</Format>
     <Suffix>gj</Suffix>

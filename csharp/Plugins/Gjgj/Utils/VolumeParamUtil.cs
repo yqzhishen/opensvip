@@ -120,9 +120,8 @@ namespace FlutyDeer.GjgjPlugin
         /// <summary>
         /// 转换音量参数。
         /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
         /// <returns></returns>
-        public ParamCurve DecodeVolumeParam(int singingTrackIndex, List<GjVolumeParamPoint> VolumeParam)
+        public ParamCurve DecodeVolumeParam(List<GjVolumeParamPoint> volumeParam)
         {
             ParamCurve paramCurve = new ParamCurve();
             try
@@ -131,10 +130,10 @@ namespace FlutyDeer.GjgjPlugin
                 List<double> valueBuffer = new List<double>();
                 int time;
                 int value;
-                for (int volumeParamPointIndex = 0; volumeParamPointIndex < VolumeParam.Count; volumeParamPointIndex++)
+                for (int volumeParamPointIndex = 0; volumeParamPointIndex < volumeParam.Count; volumeParamPointIndex++)
                 {
-                    time = GetVolumeParamTime(VolumeParam[volumeParamPointIndex].Time);
-                    value = GetVolumeParamValue(VolumeParam[volumeParamPointIndex].Value);
+                    time = GetVolumeParamTime(volumeParam[volumeParamPointIndex].Time);
+                    value = GetVolumeParamValue(volumeParam[volumeParamPointIndex].Value);
                     Tuple<int, int> volumeParamPoint = Tuple.Create(time, value);
                     paramCurve.PointList.Add(volumeParamPoint);
                 }
