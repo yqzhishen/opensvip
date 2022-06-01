@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Y77.Model
+namespace FlutyDeer.Y77Plugin
 {
     public class Y77Project
     {

@@ -9,8 +9,8 @@
     <Format>元七七工程文件</Format>
     <Suffix>y77</Suffix>
     <Identifier>y77</Identifier>
-    <LibraryPath>Y77\Plugin.Y77.dll</LibraryPath>
-    <Converter>Y77.Stream.Y77Converter</Converter>
+    <LibraryPath>Y77\FlutyDeer.Y77Plugin.exe</LibraryPath>
+    <Converter>FlutyDeer.Y77Plugin.Y77Converter</Converter>
     <InputOptions/>
 	<OutputOptions/>
 </Plugin>
