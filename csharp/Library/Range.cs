@@ -196,6 +196,10 @@ namespace OpenSvip.Library
             }
             var startIndex = ranges.FindIndex(e => Start <= e.Item2);
             var endIndex = ranges.FindLastIndex(e => End >= e.Item1);
+            if (startIndex > endIndex)
+            {
+                return EmptyRange.Instance;
+            }
             if (startIndex == endIndex)
             {
                 return new SingleRange(Math.Max(Start, ranges[startIndex].Item1), Math.Min(End, ranges[endIndex].Item2));
