@@ -3,11 +3,8 @@ using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Y77.Model;
 
-namespace Plugin.Y77
+namespace FlutyDeer.Y77Plugin
 {
     public class Y77Encoder
     {
@@ -15,9 +12,12 @@ namespace Plugin.Y77
 
         private int noteCount = 0;
 
+        private int firstBarLength = 0;
+
         public Y77Project EncodeProject(Project project)
         {
             osProject = project;
+            firstBarLength = 1920 * GetNumerator(0) / GetDenominator(0);
             Y77Project y77Project = new Y77Project
             {
                 BarCount = 100,
@@ -40,7 +40,7 @@ namespace Plugin.Y77
                     case SingingTrack singingTrack:
                         foreach (var note in singingTrack.NoteList)
                         {
-                            y77NoteList.Add(EncodeNote(note));
+                            y77NoteList.Add(EncodeNote(singingTrack, note));
                         }
                         break;
                     default:
@@ -52,7 +52,7 @@ namespace Plugin.Y77
             return y77NoteList;
         }
 
-        private Y77Note EncodeNote(Note note)
+        private Y77Note EncodeNote(SingingTrack singingTrack, Note note)
         {
             Y77Note y77Note = new Y77Note
             {
@@ -61,7 +61,7 @@ namespace Plugin.Y77
                 StartPosition = note.StartPos / 30,
                 Lyric = note.Lyric,
                 KeyNumber = 88 - note.KeyNumber,
-                PitchParam = EncodePitchParam()
+                PitchParam = EncodePitchParam(singingTrack.EditedParams.Pitch, note)
             };
             return y77Note;
         }
@@ -91,15 +91,79 @@ namespace Plugin.Y77
                 return origin;
             }
         }
-        
-        private List<int> EncodePitchParam()
+
+        private List<int> EncodePitchParam(ParamCurve pitchParamCurve, Note note)
         {
-            List<int> pitchParam = new List<int>();
+            List<int> sampleTimeList = new List<int>();//采样时间点列表
             for (int i = 0; i < 500; i++)
             {
-                pitchParam.Add(50);
+                sampleTimeList.Add(note.StartPos + firstBarLength + (int)((note.Length / 500.0) * i));
             }
-            return pitchParam;
+            var pitchParamInNote = pitchParamCurve.PointList.Where(p => p.Item1 >= note.StartPos + firstBarLength && p.Item1 <= note.StartPos + firstBarLength + note.Length).ToList();
+            
+            List<int> pitchParamTimeInNote = new List<int>();
+            foreach (var paramPoint in pitchParamInNote)
+            {
+                pitchParamTimeInNote.Add(paramPoint.Item1);
+            }
+
+            List<int> y77PitchParam = new List<int>();
+            foreach (var sampleTime in sampleTimeList)
+            {
+                if (pitchParamTimeInNote.Contains(sampleTime))
+                {
+                    var pitch = pitchParamCurve.PointList.Where(p => p.Item1 == sampleTime).First().Item2;
+                    if (pitch == -100)
+                    {
+                        y77PitchParam.Add(50);
+                    }
+                    else
+                    {
+                        var value = 50 + (pitch - note.KeyNumber * 100) / 2;
+                        y77PitchParam.Add(value);
+                    }
+                }
+                else
+                {
+                    var distance = -1;
+                    var value = 50;
+
+                    foreach (var point in pitchParamInNote)
+                    {
+                        if (distance > Math.Abs(point.Item1 - sampleTime) || distance == -1)
+                        {
+                            distance = Math.Abs(point.Item1 - sampleTime);
+                            value = 50 + (point.Item2 - note.KeyNumber * 100) / 2;
+                        }
+                    }
+                    y77PitchParam.Add(value);
+                }
+            }
+            var buffer = new List<int>();
+            int previousNode = y77PitchParam[0];
+            int previousNodeIndex = 0;
+            for (int i = 0; i < y77PitchParam.Count(); i++)
+            {
+                if (y77PitchParam[i] == previousNode)
+                {
+                    buffer.Add(y77PitchParam[i]);
+                }
+                else
+                {
+                    int currentNode = y77PitchParam[i];
+                    for(int j = 0; j < buffer.Count(); j++)//插值
+                    {
+                        y77PitchParam[previousNodeIndex + j] = previousNode + j * (y77PitchParam[i] - buffer[j]) / buffer.Count();
+                    }
+                    buffer.Clear();
+                }
+                if(y77PitchParam[i] != previousNode)
+                {
+                    previousNodeIndex = i;
+                    previousNode = y77PitchParam[i];
+                }
+            }
+            return y77PitchParam;
         }
 
         /// <summary>

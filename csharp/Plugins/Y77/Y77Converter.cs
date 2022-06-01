@@ -4,10 +4,8 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using Plugin.Y77;
-using Y77.Model;
 
-namespace Y77.Stream
+namespace FlutyDeer.Y77Plugin
 {
     internal class Y77Converter : IProjectConverter
     {

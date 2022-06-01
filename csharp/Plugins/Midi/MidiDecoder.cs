@@ -110,9 +110,9 @@ namespace FlutyDeer.MidiPlugin
                         });
                     }
                     ParamCurve pitchParamCurve = new ParamCurve();
-                    using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
+                    using (var objectsManager = new TimedObjectsManager<TimedEvent>(trackChunk.Events))
                     {
-                        TimedEventsCollection events = timedEventsManager.Events;
+                        var events = objectsManager.Objects;
                         if (IsImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
                         {
                             foreach (var note in noteList)

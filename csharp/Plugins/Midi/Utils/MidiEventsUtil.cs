@@ -77,9 +77,9 @@ namespace FlutyDeer.MidiPlugin
             List<MidiEvent> midiEventList = new List<MidiEvent>();
             midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
             TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
-            using (TimedEventsManager timedEventsManager = trackChunk.ManageTimedEvents())
+            using (var objectsManager = new TimedObjectsManager<TimedEvent>(trackChunk.Events))
             {
-                TimedEventsCollection events = timedEventsManager.Events;
+                var events = objectsManager.Objects;
                 foreach(var note in singingTrack.NoteList)
                 {
                     if(IsExportLyrics)

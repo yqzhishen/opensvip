@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Melanchall.DryWetMidi, Version=6.0.1.0, Culture=neutral, PublicKeyToken=83d0ffad275219ad, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Melanchall.DryWetMidi.6.0.1\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -61,7 +58,6 @@
     <Compile Include="ErrorMidiFilePolicyOption.cs" />
     <Compile Include="Utils\EncodingUtil.cs" />
     <Compile Include="Utils\MidiEventsUtil.cs" />
-    <Compile Include="Utils\NoteMergeUtil.cs" />
     <Compile Include="Utils\NoteOverlapUtil.cs" />
     <Compile Include="Utils\SemivowelPreShiftUtil.cs" />
   </ItemGroup>

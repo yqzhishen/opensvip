@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Plugin.Y77
+namespace FlutyDeer.Y77Plugin
 {
     public class SymbolList
     {

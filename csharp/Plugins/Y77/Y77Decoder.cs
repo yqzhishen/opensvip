@@ -1,12 +1,7 @@
 ﻿using OpenSvip.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Y77.Model;
 
-namespace Plugin.Y77
+namespace FlutyDeer.Y77Plugin
 {
     public class Y77Decoder
     {
