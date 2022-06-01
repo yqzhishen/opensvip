@@ -89,7 +89,7 @@ namespace OpenSvip.Stream
         private static string FindLibrary()
         {
             var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
-            var value = key?.GetValue("").ToString().Trim('"');
+            var value = key?.GetValue("").ToString().Split('"')[1];
             if (!File.Exists(value))
             {
                 throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。请查看插件依赖说明。");
