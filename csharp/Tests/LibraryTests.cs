@@ -92,5 +92,28 @@ namespace OpenSvip.Tests
                 new Tuple<int, int>(4, 0),
             }));
         }
+        
+        [Test]
+        public void TestCurveSplit04()
+        {
+            var curve = new ParamCurve
+            {
+                PointList = new List<Tuple<int, int>>
+                {
+                    new Tuple<int, int>(-192000, 0),
+                    new Tuple<int, int>(2, 1),
+                    new Tuple<int, int>(3, 1),
+                    new Tuple<int, int>(int.MaxValue / 2, 0)
+                }
+            };
+            var segments = curve.SplitIntoSegments();
+            Assert.AreEqual(1, segments.Count);
+            Assert.IsTrue(segments[0].SequenceEqual(new List<Tuple<int, int>>
+            {
+                new Tuple<int, int>(2, 1),
+                new Tuple<int, int>(3, 1)
+            }));
+        }
+
     }
 }

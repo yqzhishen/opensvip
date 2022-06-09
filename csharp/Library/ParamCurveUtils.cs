@@ -102,7 +102,7 @@ namespace OpenSvip.Library
             }
             if (curve.PointList.Count == 1)
             {
-                if (curve.PointList[0].Item2 != interruptValue)
+                if (curve.PointList[0].Item1 >= 0 && curve.PointList[0].Item2 != interruptValue)
                 {
                     segments.Add(new List<Tuple<int, int>>(1)
                     {
@@ -123,7 +123,7 @@ namespace OpenSvip.Library
                 }
                 else if (nextPoint.Item2 != interruptValue)
                 {
-                    if (i <= 1 || curve.PointList[i - 2].Item2 != interruptValue)
+                    if (currentPoint.Item1 >= 0 && (i <= 1 || curve.PointList[i - 2].Item2 != interruptValue))
                     {
                         buffer.Add(currentPoint);
                     }
@@ -135,8 +135,8 @@ namespace OpenSvip.Library
                 }
                 currentPoint = nextPoint;
             }
-            if (currentPoint.Item2 != interruptValue
-                || i <= 1 || curve.PointList[i - 2].Item2 != interruptValue)
+            if (currentPoint.Item1 < int.MaxValue / 2
+                && (currentPoint.Item2 != interruptValue || i <= 1 || curve.PointList[i - 2].Item2 != interruptValue))
             {
                 buffer.Add(currentPoint);
             }
