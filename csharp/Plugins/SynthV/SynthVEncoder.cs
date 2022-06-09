@@ -216,8 +216,8 @@ namespace SynthV.Core
             const int minInterval = 1;
             Tuple<int, int> lastPoint = null;
             foreach (var point in curve.PointList
-                         .Where(point => point.Item1 >= FirstBarTick).ToList()
-                         .ConvertAll(point => new Tuple<int, int>(point.Item1 - FirstBarTick, point.Item2)))
+                         .Where(point => point.Item1 >= FirstBarTick)
+                         .Select(point => new Tuple<int, int>(point.Item1 - FirstBarTick, point.Item2)))
             {
                 if (point.Item2 == -100)
                 {
