@@ -9,8 +9,8 @@
         <OutputType>Exe</OutputType>
         <PlatformTarget>AnyCPU</PlatformTarget>
         <Version>1.2.0</Version>
-        <AssemblyVersion>1.2.1.0</AssemblyVersion>
-        <FileVersion>1.2.1.0</FileVersion>
+        <AssemblyVersion>1.2.2.0</AssemblyVersion>
+        <FileVersion>1.2.2.0</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
