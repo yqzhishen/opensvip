@@ -458,6 +458,14 @@ namespace OpenSvip.GUI
                         {
                             var plugin = PluginManager.ExtractPlugin(path, out var folder);
                             YesNoDialog confirmDialog;
+                            if (new Version(ConstValues.FrameworkVersion) < new Version(plugin.TargetFramework))
+                            {
+                                MessageDialog.CreateDialog(
+                                    "不兼容的插件版本",
+                                    $"当前应用版本过旧，无法安装插件“{plugin.Name}”。请使用菜单栏“帮助-检查更新”升级应用后再次尝试。")
+                                    .ShowDialog();
+                                continue;
+                            }
                             if (!PluginManager.HasPlugin(plugin.Identifier))
                             {
                                 confirmDialog = YesNoDialog.CreateDialog(

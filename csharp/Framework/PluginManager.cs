@@ -37,6 +37,10 @@ namespace OpenSvip.Framework
                     try
                     {
                         var plugin = (Plugin) new XmlSerializer(typeof(Plugin)).Deserialize(reader);
+                        if (new Version(ConstValues.FrameworkVersion) < new Version(plugin.TargetFramework))
+                        {
+                            continue;
+                        }
                         Plugins[plugin.Identifier] = plugin;
                         Folders[plugin.Identifier] = pluginDir;
                     }
