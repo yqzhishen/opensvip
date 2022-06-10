@@ -283,6 +283,8 @@
                                 CommandParameter="{Binding}"/>
                         </MenuItem>
                         <Separator Style="{StaticResource MenuItemSeparator}"/>
+                        <MenuItem Header="启用多线程转换(_T)" IsCheckable="True" IsChecked="{Binding EnableMultiThreading}"
+                                  IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
                         <MenuItem Header="开启更新提醒(_M)" IsCheckable="True" IsChecked="{Binding CheckForUpdates}"/>
                         <MenuItem Header="外观主题(_T)" Icon="{materialDesign:PackIcon Kind=PaletteOutline}" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
                             <MenuItem

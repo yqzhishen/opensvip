@@ -308,6 +308,18 @@ namespace OpenSvip.GUI
             }
         }
 
+        private bool _enableMultiThreading;
+
+        public bool EnableMultiThreading
+        {
+            get => _enableMultiThreading;
+            set
+            {
+                _enableMultiThreading = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("EnableMultiThreading"));
+            }
+        }
+
         private AppearanceThemes _appearanceTheme;
 
         public AppearanceThemes AppearanceThemes

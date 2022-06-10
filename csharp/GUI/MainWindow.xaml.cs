@@ -26,8 +26,18 @@ namespace OpenSvip.GUI
     public partial class MainWindow
     {
         public AppModel Model { get; set; }
+        
+        private bool _skipSameFilename;
+
+        private bool _askBeforeOverwrite;
+        
+        private Queue<TaskViewModel> _taskQueue;
 
         private readonly List<Thread> _converterThreads = new List<Thread>();
+
+        private readonly object _overwriteDialogLock = new object();
+        
+        private readonly List<AppDomain> _appDomains = new List<AppDomain>();
 
         public MainWindow()
         {
@@ -57,6 +67,7 @@ namespace OpenSvip.GUI
                 AutoExtension = settings.AutoExtension,
                 OpenExportFolder = settings.OpenExportFolder,
                 OverWriteOption = settings.OverwriteOption,
+                EnableMultiThreading = settings.EnableMultiThreading,
                 AppearanceThemes = settings.AppearanceTheme,
                 CheckForUpdates = settings.CheckForUpdates
             };
@@ -192,10 +203,10 @@ namespace OpenSvip.GUI
             {
                 return;
             }
-            // ReSharper disable once InconsistentlySynchronizedField
-            _converterThreads.Add(new Thread(() =>
+
+            // Prepare for execution
+            new Thread(() =>
             {
-                // Prepare for execution
                 Model.ExecutionInProgress = true;
                 foreach (var task in Model.TaskList)
                 {
@@ -216,88 +227,119 @@ namespace OpenSvip.GUI
                 var inputOptions = new ConverterOptions(inputOptionDictionary);
                 var outputOptions = new ConverterOptions(outputOptionDictionary);
                 
-                // Create sandbox for tasks
-                var domain = AppDomain.CreateDomain("TaskExecution" + new Random().Next());
-                var container = (TaskContainer)domain.CreateInstanceAndUnwrap(
-                    Assembly.GetAssembly(typeof(TaskContainer)).FullName,
-                    typeof(TaskContainer).ToString());
-                container.Init(
-                    Model.SelectedInputPlugin,
-                    Model.SelectedOutputPlugin,
-                    inputOptions,
-                    outputOptions);
+                // Common variables
+                _skipSameFilename = Model.OverWriteOption == OverwriteOptions.Skip;
+                _askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
                 
-                var skipSameFilename = Model.OverWriteOption == OverwriteOptions.Skip;
-                var askBeforeOverwrite = Model.OverWriteOption == OverwriteOptions.Ask;
-                foreach (var task in Model.TaskList)
+                // Determine number of threads
+                // ReSharper disable once InconsistentlySynchronizedField
+                _taskQueue = new Queue<TaskViewModel>(Model.TaskList);
+                // ReSharper disable once InconsistentlySynchronizedField
+                var threadNum = Model.EnableMultiThreading
+                    ? Math.Max(1, Math.Min(Environment.ProcessorCount - 2, _taskQueue.Count / 2))
+                    : 1;
+                
+                for (var i = 0; i < threadNum; ++i)
                 {
-                    try
+                    _converterThreads.Add(new Thread(() =>
                     {
-                        task.ExportDirectory = Model.ExportPath.IsRelative ? Path.Combine(task.ImportDirectory, Model.ExportPath.ActualValue) : Model.ExportPath.PathValue;
-                        Directory.CreateDirectory(task.ExportDirectory);
-                        task.ExportPath = Path.Combine(task.ExportDirectory, task.ExportTitle + Model.ExportExtension);
-                        if (File.Exists(task.ExportPath))
+                        // Create sandbox for tasks
+                        var domain = AppDomain.CreateDomain("TaskExecution" + new Random().Next());
+                        var container = (TaskContainer)domain.CreateInstanceAndUnwrap(
+                            Assembly.GetAssembly(typeof(TaskContainer)).FullName,
+                            typeof(TaskContainer).ToString());
+                        container.Init(
+                            Model.SelectedInputPlugin,
+                            Model.SelectedOutputPlugin,
+                            inputOptions,
+                            outputOptions);
+                        _appDomains.Add(domain);
+
+                        while (true)
                         {
-                            if (askBeforeOverwrite)
+                            TaskViewModel task;
+                            lock (_taskQueue)
                             {
-                                var dialog = FileOverwriteDialog.CreateDialog(task.ExportPath);
-                                dialog.ShowDialog();
-                                skipSameFilename = !dialog.Overwrite;
-                                askBeforeOverwrite = !dialog.KeepChoice;
+                                if (!_taskQueue.Any())
+                                {
+                                    return;
+                                }
+                                task = _taskQueue.Dequeue();
                             }
-                            if (skipSameFilename)
+                            
+                            try
                             {
-                                task.Status = TaskStates.Skipped;
+                                task.ExportDirectory = Model.ExportPath.IsRelative ? Path.Combine(task.ImportDirectory, Model.ExportPath.ActualValue) : Model.ExportPath.PathValue;
+                                Directory.CreateDirectory(task.ExportDirectory);
+                                task.ExportPath = Path.Combine(task.ExportDirectory, task.ExportTitle + Model.ExportExtension);
+                                if (File.Exists(task.ExportPath))
+                                {
+                                    lock (_overwriteDialogLock)
+                                    {
+                                        if (_askBeforeOverwrite)
+                                        {
+                                            var dialog = FileOverwriteDialog.CreateDialog(task.ExportPath);
+                                            dialog.ShowDialog();
+                                            _skipSameFilename = !dialog.Overwrite;
+                                            _askBeforeOverwrite = !dialog.KeepChoice;
+                                        }
+                                        if (_skipSameFilename)
+                                        {
+                                            task.Status = TaskStates.Skipped;
+                                            continue;
+                                        }
+                                    }
+                                }
+                                // Run the container
+                                container.Run(task.ImportPath, task.ExportPath);
+                            }
+                            catch (Exception e)
+                            {
+                                task.Status = TaskStates.Error;
+                                task.Error = e.Message;
                                 continue;
                             }
+                            var warnings = container.GetWarnings();
+                            if (warnings.Any())
+                            {
+                                task.Status = TaskStates.Warning;
+                                foreach (var warning in warnings)
+                                {
+                                    task.Warnings.Add(warning);
+                                }
+                                container.ClearWarnings();
+                            }
+                            else
+                            {
+                                task.Status = TaskStates.Success;
+                            }
                         }
-                        // Run the container
-                        container.Run(task.ImportPath, task.ExportPath);
-                    }
-                    catch (Exception e)
-                    {
-                        task.Status = TaskStates.Error;
-                        task.Error = e.Message;
-                        continue;
-                    }
-                    var warnings = container.GetWarnings();
-                    if (warnings.Any())
-                    {
-                        task.Status = TaskStates.Warning;
-                        foreach (var warning in warnings)
-                        {
-                            task.Warnings.Add(warning);
-                        }
-                        container.ClearWarnings();
-                    }
-                    else
-                    {
-                        task.Status = TaskStates.Success;
-                    }
+                    }));
                 }
-
-                // Things after execution
-                Model.ExecutionInProgress = false;
-                Dispatcher.Invoke(CommandManager.InvalidateRequerySuggested);
-                if (Model.OpenExportFolder)
-                {
-                    foreach (var folder in Model.TaskList.Select(task => task.ExportDirectory).ToHashSet())
-                    {
-                        Process.Start("explorer.exe", folder);
-                    }
-                }
-
-                // Unload the domain to release assembly files
-                AppDomain.Unload(domain);
                 lock (_converterThreads)
                 {
-                    _converterThreads.Remove(Thread.CurrentThread);
+                    _converterThreads.ForEach(t => t.Start());
+                    foreach (var thread in _converterThreads)
+                    {
+                        thread.Join();
+                    }
+                    _converterThreads.Clear();
+                    _taskQueue = null;
+                    
+                    // Things after execution
+                    Model.ExecutionInProgress = false;
+                    Dispatcher.Invoke(CommandManager.InvalidateRequerySuggested);
+                    if (Model.OpenExportFolder)
+                    {
+                        foreach (var folder in Model.TaskList.Select(task => task.ExportDirectory).ToHashSet())
+                        {
+                            Process.Start("explorer.exe", folder);
+                        }
+                    }
+                    // Unload the domain to release assembly files
+                    _appDomains.ForEach(AppDomain.Unload);
                 }
-            }));
-            lock (_converterThreads)
-            {
-                _converterThreads.ForEach(t => t.Start());
-            }
+            }).Start();
         }
 
         private void QuitApplication()
@@ -341,6 +383,7 @@ namespace OpenSvip.GUI
                     LastExportPath = Model.DefaultExportPath == ExportPaths.Unset && !string.IsNullOrWhiteSpace(Model.ExportPath.PathValue)
                         ? Model.ExportPath.PathValue
                         : null,
+                    EnableMultiThreading = Model.EnableMultiThreading,
                     AppearanceTheme = Model.AppearanceThemes,
                     CheckForUpdates = Model.CheckForUpdates
                 }

@@ -125,6 +125,8 @@ namespace OpenSvip.GUI.Config
 
         public string LastExportPath { get; set; }
 
+        public bool EnableMultiThreading { get; set; } = true;
+
         public AppearanceThemes AppearanceTheme { get; set; } = AppearanceThemes.System;
 
         public bool CheckForUpdates { get; set; } = true;
