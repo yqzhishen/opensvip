@@ -4,13 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vogen.Model;
+using FlutyDeer.VogenPlugin.Model;
 using NPinyin;
 
-namespace Plugin.Vogen
+namespace FlutyDeer.VogenPlugin
 {
     public class VogenEncoder
     {
+        public string Singer { get; set; }
+
         private Project osProject;
 
         private VogenProject vogenProject;
@@ -57,7 +59,7 @@ namespace Plugin.Vogen
             VogTrack vogTrack = new VogTrack
             {
                 TrackName = "utt-" + trackID,
-                SingerName = "Doaz",
+                SingerName = Singer,
                 RomScheme = "man",
                 NoteList = EncodeNoteList(singingTrack.NoteList)
             };

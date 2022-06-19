@@ -4,10 +4,9 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using Plugin.Vogen;
-using Vogen.Model;
+using FlutyDeer.VogenPlugin.Model;
 
-namespace Vogen.Stream
+namespace FlutyDeer.VogenPlugin.Stream
 {
     internal class VogenConverter : IProjectConverter
     {
@@ -28,7 +27,10 @@ namespace Vogen.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            var VogenProject = new VogenEncoder().EncodeProject(project);
+            var VogenProject = new VogenEncoder
+            {
+                Singer = options.GetValueAsString("singer", "Doaz")
+            }.EncodeProject(project);
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new StreamWriter(stream, Encoding.UTF8);
             var jsonString = JsonConvert.SerializeObject(VogenProject);

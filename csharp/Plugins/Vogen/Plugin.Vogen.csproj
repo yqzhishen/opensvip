@@ -7,8 +7,8 @@
     <ProjectGuid>{2094D048-0F25-4052-A24E-B4783CB0E5E0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Plugin.Vogen</RootNamespace>
-    <AssemblyName>Plugin.Vogen</AssemblyName>
+    <RootNamespace>FlutyDeer.VogenPlugin</RootNamespace>
+    <AssemblyName>FlutyDeer.VogenPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
