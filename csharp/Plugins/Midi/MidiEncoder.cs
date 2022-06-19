@@ -13,6 +13,9 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public int Transpose { get; set; }
 
+        /// <summary>
+        /// 是否导出歌词。
+        /// </summary>
         public bool IsExportLyrics { get; set; }
 
         /// <summary>
@@ -31,12 +34,12 @@ namespace FlutyDeer.MidiPlugin
         public LyricEncodings LyricEncoding { get; set; }
 
         /// <summary>
-        /// 半元音前移量，单位为梯。
+        /// 拖拍前移补偿量，单位为梯。
         /// </summary>
-        public int SemivowelPreShift { get; set; }
+        public int PreShift { get; set; }
 
         /// <summary>
-        /// 时基，默认为480。
+        /// PPQ默认为480。
         /// </summary>
         public int PPQ { get; set; }
 
@@ -116,7 +119,7 @@ namespace FlutyDeer.MidiPlugin
                             IsExportLyrics = IsExportLyrics,
                             IsUseCompatibleLyric = IsUseCompatibleLyric,
                             IsRemoveSymbols = IsRemoveSymbols,
-                            SemivowelPreShift = SemivowelPreShift,
+                            SemivowelPreShift = PreShift,
                             Transpose = Transpose
                         }.SingingTrackToMidiTrackChunk(singingTrack));
                         break;

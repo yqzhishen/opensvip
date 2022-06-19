@@ -73,7 +73,7 @@ namespace FlutyDeer.MidiPlugin
         /// <returns>含有音符事件数组的 Track Chunk。</returns>
         public TrackChunk SingingTrackToMidiTrackChunk(SingingTrack singingTrack)
         {
-            SemivowelPreShiftUtil.PreShiftSemivowelNotes(singingTrack.NoteList, SemivowelPreShift);
+            PreShiftUtil.PreShiftSemivowelNotes(singingTrack.NoteList, SemivowelPreShift);
             List<MidiEvent> midiEventList = new List<MidiEvent>();
             midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
             TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
@@ -117,7 +117,8 @@ namespace FlutyDeer.MidiPlugin
                 }
                 if (IsUseCompatibleLyric)
                 {
-                    lyric = Pinyin.GetPinyin(lyric);
+                    //lyric = Pinyin.GetPinyin(lyric);
+                    lyric = new Pinyin().ConvertToPinyin(lyric);
                 }
             }
             return lyric;
