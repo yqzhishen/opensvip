@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Vogen.Model
+namespace FlutyDeer.VogenPlugin.Model
 {
     public class VogenProject
     {

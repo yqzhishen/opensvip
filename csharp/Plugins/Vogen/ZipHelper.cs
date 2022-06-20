@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace Plugin.Vogen
+namespace FlutyDeer.VogenPlugin
 {
     public static class ZipHelper
     {

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Vogen.Model;
+using FlutyDeer.VogenPlugin.Model;
 
-namespace Plugin.Vogen
+namespace FlutyDeer.VogenPlugin
 {
     public class VogenDecoder
     {

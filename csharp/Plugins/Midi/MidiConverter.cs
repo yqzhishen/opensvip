@@ -14,7 +14,8 @@ namespace FlutyDeer.MidiStream
                 IsImportTimeSignatures = options.GetValueAsBoolean("importTimeSignatures", true),
                 IsImportLyrics = options.GetValueAsBoolean("importLyrics", false),
                 LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
-                Channel = options.GetValueAsInteger("channel", 0),
+                MultiChannelOption = options.GetValueAsEnum("multiChannel", MultiChannelOption.First),
+                Channels = options.GetValueAsString("channels", "1"),
                 ErrorMidiFilePolicy = options.GetValueAsEnum("errorMidiFilePolicy", ErrorMidiFilePolicyOption.Abort)
             }.DecodeMidiFile(path);
         }
@@ -29,7 +30,7 @@ namespace FlutyDeer.MidiStream
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
                 LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
                 PPQ = options.GetValueAsInteger("ppq", 480),
-                SemivowelPreShift = options.GetValueAsInteger("semivowelPreShift", 0)
+                PreShift = options.GetValueAsInteger("preShift", 0)
             }.EncodeMidiFile(project, path);
         }
     }
