@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using NPinyin;
 using NUnit.Framework;
 using ToolGood.Words.Pinyin;
 
