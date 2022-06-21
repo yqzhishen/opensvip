@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>SynthV</Name>
-    <Version>1.8.2</Version>
+    <Version>1.8.3</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>Synthesizer V 工程格式转换插件，支持包括曲谱、歌词、参数曲线、音符属性、音符组、即时音高模式在内所有数据的读取与写入。&#x000A;请注意：输入带有重叠音符的工程文件是未定义的行为，可能导致无法预料的异常。</Descriptions>

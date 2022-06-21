@@ -61,7 +61,25 @@ namespace SynthV.Model
         [JsonProperty("name")] public string Name { get; set; } = "main";
         [JsonProperty("uuid")] public string UUID { get; set; } = "aba7184c-14a3-4caf-a740-69d9cdc35a80";
         [JsonProperty("parameters")] public SVParams Params = new SVParams();
-        [JsonProperty("notes")] public List<SVNote> Notes = new List<SVNote>();
+
+        [JsonIgnore] private List<SVNote> _notes = new List<SVNote>();
+
+        [JsonProperty("notes")]
+        public List<SVNote> Notes
+        {
+            get
+            {
+                if (_notes.Any(note => note.Onset < 0))
+                {
+                    _notes = _notes.Where(note => note.Onset >= 0).ToList();
+                }
+                return _notes;
+            }
+            set
+            {
+                _notes = value.Where(note => note.Onset >= 0).ToList();
+            }
+        }
 
         public bool IsOverlappedWith(SVGroup another)
         {
