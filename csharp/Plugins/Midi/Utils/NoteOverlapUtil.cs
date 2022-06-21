@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using OpenSvip.Model;
 
-namespace FlutyDeer.MidiPlugin
+namespace FlutyDeer.MidiPlugin.Utils
 {
     public class NoteOverlapUtil
     {

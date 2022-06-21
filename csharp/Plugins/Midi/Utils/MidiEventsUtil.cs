@@ -6,16 +6,10 @@ using Note = OpenSvip.Model.Note;
 using NPinyin;
 using Melanchall.DryWetMidi.Interaction;
 
-namespace FlutyDeer.MidiPlugin
+namespace FlutyDeer.MidiPlugin.Utils
 {
     public class MidiEventsUtil
     {
-        private short PPQ;
-
-        public void SetPPQ(short PPQ)
-        {
-            this.PPQ = PPQ;
-        }
 
         public int SemivowelPreShift { get; set; }
         public bool IsExportLyrics { get; set; }
@@ -108,12 +102,9 @@ namespace FlutyDeer.MidiPlugin
             else
             {
                 lyric = note.Lyric;
-                if (lyric.Length > 1 && IsRemoveSymbols)
+                if (IsRemoveSymbols)
                 {
-                    foreach (var symbol in SymbolList.SymbolToRemoveList())
-                    {
-                        lyric = lyric.Replace(symbol, "");
-                    }
+                    lyric = LyricsUtil.GetSymbolRemovedLyric(lyric);
                 }
                 if (IsUseCompatibleLyric)
                 {

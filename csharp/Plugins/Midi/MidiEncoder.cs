@@ -3,6 +3,8 @@ using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using OpenSvip.Model;
 using MidiTimeSignature = Melanchall.DryWetMidi.Interaction.TimeSignature;
+using FlutyDeer.MidiPlugin.Options;
+using FlutyDeer.MidiPlugin.Utils;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -31,7 +33,7 @@ namespace FlutyDeer.MidiPlugin
         /// <summary>
         /// 歌词文本编码。
         /// </summary>
-        public LyricEncodings LyricEncoding { get; set; }
+        public LyricEncodingOption LyricEncoding { get; set; }
 
         /// <summary>
         /// 拖拍前移补偿量，单位为梯。

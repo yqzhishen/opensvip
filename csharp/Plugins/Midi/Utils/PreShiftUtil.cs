@@ -3,7 +3,7 @@ using NPinyin;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 
-namespace FlutyDeer.MidiPlugin
+namespace FlutyDeer.MidiPlugin.Utils
 {
     public static class PreShiftUtil
     {

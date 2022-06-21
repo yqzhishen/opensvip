@@ -1,4 +1,4 @@
-namespace FlutyDeer.MidiPlugin
+namespace FlutyDeer.MidiPlugin.Options
 {
     public enum ErrorMidiFilePolicyOption
     {

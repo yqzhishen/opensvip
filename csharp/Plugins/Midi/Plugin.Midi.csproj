@@ -54,20 +54,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LyricEncodings.cs" />
+    <Compile Include="Options\LyricEncodingOption.cs" />
     <Compile Include="MidiConverter.cs" />
     <Compile Include="MidiDecoder.cs" />
     <Compile Include="MidiEncoder.cs" />
-    <Compile Include="MultiChannelOption.cs" />
+    <Compile Include="Options\MultiChannelOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SymbolList.cs" />
     <Compile Include="Test.cs" />
-    <Compile Include="ErrorMidiFilePolicyOption.cs" />
+    <Compile Include="Options\ErrorMidiFilePolicyOption.cs" />
     <Compile Include="Utils\EncodingUtil.cs" />
+    <Compile Include="Utils\LyricsUtil.cs" />
     <Compile Include="Utils\MidiEventsUtil.cs" />
     <Compile Include="Utils\MultiChannelUtil.cs" />
     <Compile Include="Utils\NoteOverlapUtil.cs" />
     <Compile Include="Utils\PreShiftUtil.cs" />
+    <Compile Include="Utils\TempoListUtil.cs" />
+    <Compile Include="Utils\TimeSignatureListUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">

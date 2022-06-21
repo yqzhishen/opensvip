@@ -1,8 +1,8 @@
 ﻿using OpenSvip.Framework;
 using OpenSvip.Model;
-using FlutyDeer.MidiPlugin;
+using FlutyDeer.MidiPlugin.Options;
 
-namespace FlutyDeer.MidiStream
+namespace FlutyDeer.MidiPlugin.Stream
 {
     internal class MidiConverter : IProjectConverter
     {
@@ -13,7 +13,7 @@ namespace FlutyDeer.MidiStream
             {
                 IsImportTimeSignatures = options.GetValueAsBoolean("importTimeSignatures", true),
                 IsImportLyrics = options.GetValueAsBoolean("importLyrics", false),
-                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
+                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodingOption.UTF8BOM),
                 MultiChannelOption = options.GetValueAsEnum("multiChannel", MultiChannelOption.First),
                 Channels = options.GetValueAsString("channels", "1"),
                 ErrorMidiFilePolicy = options.GetValueAsEnum("errorMidiFilePolicy", ErrorMidiFilePolicyOption.Abort)
@@ -28,7 +28,7 @@ namespace FlutyDeer.MidiStream
                 Transpose = options.GetValueAsInteger("transpose", 0),
                 IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
-                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodings.UTF8BOM),
+                LyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodingOption.UTF8BOM),
                 PPQ = options.GetValueAsInteger("ppq", 480),
                 PreShift = options.GetValueAsInteger("preShift", 0)
             }.EncodeMidiFile(project, path);

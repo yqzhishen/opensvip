@@ -1,6 +1,6 @@
-﻿namespace FlutyDeer.MidiPlugin
+﻿namespace FlutyDeer.MidiPlugin.Options
 {
-    public enum LyricEncodings
+    public enum LyricEncodingOption
     {
         ASCII,
         BigEndianUnicode,
