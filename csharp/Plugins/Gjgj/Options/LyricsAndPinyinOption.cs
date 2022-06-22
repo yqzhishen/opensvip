@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FlutyDeer.GjgjPlugin
+namespace FlutyDeer.GjgjPlugin.Optiions
 {
-    public enum LyricsAndPinyinSettings
+    public enum LyricsAndPinyinOption
     {
         lyricsOnly,
         SameAsSource,

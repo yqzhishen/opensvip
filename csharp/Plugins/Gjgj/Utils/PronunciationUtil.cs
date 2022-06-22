@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using FlutyDeer.GjgjPlugin.Model;
+using FlutyDeer.GjgjPlugin.Optiions;
 using NPinyin;
 using OpenSvip.Model;
 
-namespace FlutyDeer.GjgjPlugin
+namespace FlutyDeer.GjgjPlugin.Utils
 {
     public static class PronunciationUtil
     {
@@ -13,9 +14,9 @@ namespace FlutyDeer.GjgjPlugin
         /// </summary>
         /// <param name="note">原始音符。</param>
         /// <returns>如果原始发音为空值或者歌叽歌叽不支持，返回空字符串，否则返回原始的发音。</returns>
-        public static string GetNotePinyin(Note note, LyricsAndPinyinSettings lyricsAndPinyinSettings, ref List<string> unsupportedPinyinList)
+        public static string GetNotePinyin(Note note, LyricsAndPinyinOption lyricsAndPinyinSettings, ref List<string> unsupportedPinyinList)
         {
-            if ((lyricsAndPinyinSettings == LyricsAndPinyinSettings.lyricsOnly))//仅歌词
+            if ((lyricsAndPinyinSettings == LyricsAndPinyinOption.lyricsOnly))//仅歌词
             {
                 return null;
             }
@@ -23,7 +24,7 @@ namespace FlutyDeer.GjgjPlugin
             {
                 if (note.Pronunciation == null)//没有拼音的音符
                 {
-                    if (lyricsAndPinyinSettings == LyricsAndPinyinSettings.SameAsSource)//和源相同时
+                    if (lyricsAndPinyinSettings == LyricsAndPinyinOption.SameAsSource)//和源相同时
                     {
                         return "";
                     }
@@ -41,7 +42,7 @@ namespace FlutyDeer.GjgjPlugin
                 else//有拼音的音符
                 {
                     string pinyin = note.Pronunciation.ToLower();
-                    if (pinyin != "" && !GjgjSupportedPinyin.SupportedPinyinList().Contains(pinyin))
+                    if (pinyin != "" && !PinyinUtil.SupportedPinyinList().Contains(pinyin))
                     {
                         if (!unsupportedPinyinList.Contains(pinyin))
                         {

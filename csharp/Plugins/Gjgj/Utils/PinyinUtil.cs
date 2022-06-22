@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace FlutyDeer.GjgjPlugin
+namespace FlutyDeer.GjgjPlugin.Utils
 {
-    public static class GjgjSupportedPinyin
+    public static class PinyinUtil
     {
         /// <summary>
 		/// 歌叽歌叽支持的拼音列表。

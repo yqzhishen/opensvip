@@ -12,43 +12,14 @@ namespace FlutyDeer.MidiPlugin.Utils
     {
 
         public int SemivowelPreShift { get; set; }
+        
         public bool IsExportLyrics { get; set; }
+
         public bool IsUseCompatibleLyric { get; set; }
+
         public bool IsRemoveSymbols { get; set; }
+        
         public int Transpose { get; set; }
-
-        /// <summary>
-        /// 将曲速标记列表转换为 MIDI 事件数组。
-        /// </summary>
-        /// <returns>含有曲速事件的 MIDI Event 数组。</returns>
-        public MidiEvent[] SongTempoListToMidiEvents(List<SongTempo> songTempoList)
-        {
-            List<MidiEvent> midiEventList = new List<MidiEvent>();
-            int PreviousEventTime = 0;
-            foreach (var tempo in songTempoList)
-            {
-                midiEventList.Add(EncodeSetTempoEvent(tempo, ref PreviousEventTime));
-                PreviousEventTime = tempo.Position;
-            }
-            return midiEventList.ToArray();
-        }
-
-        /// <summary>
-        /// 将单个曲速标记转换为设置曲速 MIDI 事件。
-        /// </summary>
-        /// <param name="tempo">曲速。</param>
-        /// <param name="PreviousEventTime">上一个曲速事件的绝对时间，单位为梯。</param>
-        /// <returns>设置曲速 MIDI 事件。</returns>
-        private SetTempoEvent EncodeSetTempoEvent(SongTempo tempo, ref int PreviousEventTime)
-        {
-            SetTempoEvent setTempoEvent = new SetTempoEvent
-            {
-                MicrosecondsPerQuarterNote = BPMToMicrosecondsPerQuarterNote((long)tempo.BPM),
-                DeltaTime = tempo.Position - PreviousEventTime
-            };
-            PreviousEventTime = tempo.Position;
-            return setTempoEvent;
-        }
 
         /// <summary>
         /// 将曲速转换为每四分音符的微秒数。
@@ -108,8 +79,8 @@ namespace FlutyDeer.MidiPlugin.Utils
                 }
                 if (IsUseCompatibleLyric)
                 {
-                    //lyric = Pinyin.GetPinyin(lyric);
-                    lyric = new Pinyin().ConvertToPinyin(lyric);
+                    lyric = Pinyin.GetPinyin(lyric);
+                    //lyric = new Pinyin().ConvertToPinyin(lyric);
                 }
             }
             return lyric;

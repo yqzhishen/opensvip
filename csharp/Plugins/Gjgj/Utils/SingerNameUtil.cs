@@ -1,6 +1,6 @@
 using FlutyDeer.GjgjPlugin.Model;
 
-namespace FlutyDeer.GjgjPlugin
+namespace FlutyDeer.GjgjPlugin.Utils
 {
     public static class SingerNameUtil
     {

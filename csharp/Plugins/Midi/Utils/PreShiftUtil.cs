@@ -95,8 +95,8 @@ namespace FlutyDeer.MidiPlugin.Utils
             }
             else
             {
-                //return Pinyin.GetPinyin(note.Lyric);
-                return new Pinyin().ConvertToPinyin(note.Lyric);
+                return Pinyin.GetPinyin(note.Lyric);
+                //return new Pinyin().ConvertToPinyin(note.Lyric);
             }
         }
     }

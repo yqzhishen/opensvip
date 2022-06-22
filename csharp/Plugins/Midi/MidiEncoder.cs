@@ -31,11 +31,6 @@ namespace FlutyDeer.MidiPlugin
         public bool IsRemoveSymbols { get; set; }
 
         /// <summary>
-        /// 歌词文本编码。
-        /// </summary>
-        public LyricEncodingOption LyricEncoding { get; set; }
-
-        /// <summary>
         /// 拖拍前移补偿量，单位为梯。
         /// </summary>
         public int PreShift { get; set; }
@@ -47,8 +42,6 @@ namespace FlutyDeer.MidiPlugin
 
         private Project osProject;
 
-        private MidiFile midiFile = new MidiFile();
-
         private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
 
         /// <summary>
@@ -56,13 +49,14 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         /// <param name="project">原始的 OpenSvip 工程。</param>
         /// <param name="path">输出路径。</param>
-        public void EncodeMidiFile(Project project, string path)
+        public MidiFile EncodeMidiFile(Project project)
         {
+            MidiFile midiFile = new MidiFile();
             osProject = project;
             TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision((short)PPQ);
             midiFile.TimeDivision = timeDivision;//设置时基。
             //导出曲速和拍号
-            midiFile.Chunks.Add(EncodeTempoTrackChunk());
+            midiFile.Chunks.Add(new TrackChunk());
             using (TempoMapManager tempoMapManager = midiFile.ManageTempoMap())
             {
                 tempoMapManager.ClearTempoMap();//暂不清楚为什么一定要写入一个含有SetTempo事件的Chunk之后TempoMapManager才能正常工作。
@@ -75,28 +69,14 @@ namespace FlutyDeer.MidiPlugin
                     tempoMapManager.SetTimeSignature(new BarBeatTicksTimeSpan(timeSignature.BarIndex), new MidiTimeSignature(timeSignature.Numerator, timeSignature.Denominator));
                 }
             }
-            EncodeMidiChunks();//相当于 MIDI 里面的轨道。
-            WritingSettings settings = new WritingSettings
-            {
-                TextEncoding = EncodingUtil.GetEncoding(LyricEncoding)
-            };
-            midiFile.Write(path, true, settings: settings);
-        }
-
-        /// <summary>
-        /// 生成曲速轨。
-        /// </summary>
-        /// <returns>含有曲速事件数组的 Track Chunk。</returns>
-        private TrackChunk EncodeTempoTrackChunk()
-        {
-            TrackChunk tempoTrackChunk = new TrackChunk(midiEventsUtil.SongTempoListToMidiEvents(osProject.SongTempoList));
-            return new TrackChunk();
+            EncodeMidiChunks(midiFile);//相当于 MIDI 里面的轨道。
+            return midiFile;
         }
 
         /// <summary>
         /// 生成 MIDI Chunks。
         /// </summary>
-        private void EncodeMidiChunks()
+        private void EncodeMidiChunks(MidiFile midiFile)
         {
             foreach (var trackChunk in EncodeTrackChunkList())
             {

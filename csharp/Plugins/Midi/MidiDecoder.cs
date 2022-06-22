@@ -11,28 +11,18 @@ namespace FlutyDeer.MidiPlugin
 {
     public class MidiDecoder
     {
-        /// <summary>
-        /// 歌词文本编码。
-        /// </summary>
-        public LyricEncodingOption LyricEncoding { get; set; }
-
         public bool IsImportLyrics { get; set; }
 
         public MultiChannelOption MultiChannelOption { get; set; }
-
-        public ErrorMidiFilePolicyOption ErrorMidiFilePolicy { get; set; }
 
         public string Channels { get; set; }
 
         public bool IsImportTimeSignatures { get; set; }
 
-        private MidiFile midiFile;        
-
         private short PPQ;
-        
-        public Project DecodeMidiFile(string path)
+
+        public Project DecodeMidiFile(MidiFile midiFile)
         {
-            midiFile = MidiFile.Read(path, GetReadingSettings());
             TicksPerQuarterNoteTimeDivision timeDivision = midiFile.TimeDivision as TicksPerQuarterNoteTimeDivision;
             PPQ = timeDivision.TicksPerQuarterNote;
             TempoMap tempoMap = midiFile.GetTempoMap();
@@ -126,27 +116,6 @@ namespace FlutyDeer.MidiPlugin
                     NoteList = noteList
                 });
             }
-        }
-        
-        private ReadingSettings GetReadingSettings()
-        {
-
-            ReadingSettings readingSettings = new ReadingSettings();
-            readingSettings.TextEncoding = EncodingUtil.GetEncoding(LyricEncoding);
-            if (ErrorMidiFilePolicy == ErrorMidiFilePolicyOption.Ignore)
-            {
-                readingSettings.InvalidChannelEventParameterValuePolicy = InvalidChannelEventParameterValuePolicy.ReadValid;
-                readingSettings.InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore;
-                readingSettings.InvalidMetaEventParameterValuePolicy = InvalidMetaEventParameterValuePolicy.SnapToLimits;
-                readingSettings.MissedEndOfTrackPolicy = MissedEndOfTrackPolicy.Ignore;
-                readingSettings.NoHeaderChunkPolicy = NoHeaderChunkPolicy.Ignore;
-                readingSettings.NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore;
-                readingSettings.UnexpectedTrackChunksCountPolicy = UnexpectedTrackChunksCountPolicy.Ignore;
-                readingSettings.UnknownChannelEventPolicy = UnknownChannelEventPolicy.SkipStatusByteAndOneDataByte;
-                readingSettings.UnknownChunkIdPolicy = UnknownChunkIdPolicy.ReadAsUnknownChunk;
-                readingSettings.UnknownFileFormatPolicy = UnknownFileFormatPolicy.Ignore;
-            }
-            return readingSettings;
         }
     }
 }

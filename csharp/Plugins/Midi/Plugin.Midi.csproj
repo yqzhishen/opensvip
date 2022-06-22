@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9959258B-F7D7-47EE-823F-54B60BB7935C}</ProjectGuid>
+    <ProjectGuid>{FE326AD0-5B40-42B6-9958-9D6C5F830935}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FlutyDeer.MidiPlugin</RootNamespace>
@@ -12,7 +12,6 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,21 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NPinyin, Version=0.2.6321.26573, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\NPinyin\NPinyin\bin\Release\net35\NPinyin.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -54,22 +41,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Options\LyricEncodingOption.cs" />
     <Compile Include="MidiConverter.cs" />
     <Compile Include="MidiDecoder.cs" />
     <Compile Include="MidiEncoder.cs" />
+    <Compile Include="Options\ErrorMidiFilePolicyOption.cs" />
+    <Compile Include="Options\LyricEncodingOption.cs" />
     <Compile Include="Options\MultiChannelOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />
-    <Compile Include="Options\ErrorMidiFilePolicyOption.cs" />
     <Compile Include="Utils\EncodingUtil.cs" />
     <Compile Include="Utils\LyricsUtil.cs" />
     <Compile Include="Utils\MidiEventsUtil.cs" />
     <Compile Include="Utils\MultiChannelUtil.cs" />
     <Compile Include="Utils\NoteOverlapUtil.cs" />
     <Compile Include="Utils\PreShiftUtil.cs" />
+    <Compile Include="Utils\RWSettingsUtil.cs" />
     <Compile Include="Utils\TempoListUtil.cs" />
     <Compile Include="Utils\TimeSignatureListUtil.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -86,19 +77,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <PackageReference Include="Melanchall.DryWetMidi">
+      <Version>6.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="NPinyin">
+      <Version>0.2.6321.26573</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Melanchall.DryWetMidi.6.0.1\build\Melanchall.DryWetMidi.targets" Condition="Exists('..\..\packages\Melanchall.DryWetMidi.6.0.1\build\Melanchall.DryWetMidi.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Melanchall.DryWetMidi.6.0.1\build\Melanchall.DryWetMidi.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Melanchall.DryWetMidi.6.0.1\build\Melanchall.DryWetMidi.targets'))" />
-  </Target>
-  <ItemGroup>
-    <PackageReference Include="Melanchall.DryWetMidi" Version="6.1.0" />
-  </ItemGroup>
 </Project>
