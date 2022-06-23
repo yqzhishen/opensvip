@@ -6,7 +6,7 @@ using OpenSvip.Framework;
 using OpenSvip.Library;
 using OpenSvip.Model;
 
-namespace FlutyDeer.GjgjPlugin
+namespace FlutyDeer.GjgjPlugin.Utils
 {
     public class VolumeParamUtil
     {

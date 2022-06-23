@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Model;
 
-namespace FlutyDeer.GjgjPlugin
+namespace FlutyDeer.GjgjPlugin.Utils
 {
     public class PitchParamUtil
     {

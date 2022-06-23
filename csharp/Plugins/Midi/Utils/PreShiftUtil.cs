@@ -3,7 +3,7 @@ using NPinyin;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 
-namespace FlutyDeer.MidiPlugin
+namespace FlutyDeer.MidiPlugin.Utils
 {
     public static class PreShiftUtil
     {
@@ -95,8 +95,8 @@ namespace FlutyDeer.MidiPlugin
             }
             else
             {
-                //return Pinyin.GetPinyin(note.Lyric);
-                return new Pinyin().ConvertToPinyin(note.Lyric);
+                return Pinyin.GetPinyin(note.Lyric);
+                //return new Pinyin().ConvertToPinyin(note.Lyric);
             }
         }
     }

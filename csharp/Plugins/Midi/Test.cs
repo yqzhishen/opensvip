@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using FlutyDeer.MidiStream;
+using FlutyDeer.MidiPlugin.Stream;
 
 namespace FlutyDeer.MidiPlugin
 {

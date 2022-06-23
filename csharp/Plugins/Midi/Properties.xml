@@ -10,7 +10,7 @@
     <Suffix>mid</Suffix>
     <Identifier>midi</Identifier>
     <LibraryPath>Midi\FlutyDeer.MidiPlugin.dll</LibraryPath>
-    <Converter>FlutyDeer.MidiStream.MidiConverter</Converter>
+    <Converter>FlutyDeer.MidiPlugin.Stream.MidiConverter</Converter>
 	<InputOptions>
 		<Option Name="importLyrics" Type="boolean" Default="false">
 			<Notes>导入歌词（实验性）</Notes>
@@ -60,7 +60,7 @@
 	<OutputOptions>
 		<Option Name="preShift" Type="integer" Default="0">
 			<Notes>拖拍前移补偿量</Notes>
-			<Tips>非负整数，单位为梯。输入负数视为零。将发音为 y-、w- 和 er 的音符提前，以缓解某些歌声合成软件半元音音符出现迟滞的问题。推荐值：30~60。</Tips>
+			<Tips>非负整数，单位为梯。输入负数视为零。将发音为 y-、w-、a-、o- 和 e- 的音符提前，以缓解某些歌声合成软件半元音或元音音符出现迟滞的问题。推荐值：30~60。</Tips>
 		</Option>
 		<Option Name="exportLyrics" Type="boolean" Default="true">
 			<Notes>导出歌词</Notes>

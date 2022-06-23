@@ -59,8 +59,8 @@
     <Compile Include="GjgjDecoder.cs" />
     <Compile Include="GjgjEncoder.cs" />
     <Compile Include="GjgjModel.cs" />
-    <Compile Include="GjgjSupportedPinyin.cs" />
-    <Compile Include="LyricsAndPinyinSettings.cs" />
+    <Compile Include="Utils\PinyinUtil.cs" />
+    <Compile Include="Options\LyricsAndPinyinOption.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Utils\PitchParamUtil.cs" />
     <Compile Include="Utils\VolumeParamUtil.cs" />

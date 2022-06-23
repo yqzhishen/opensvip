@@ -4,12 +4,14 @@ using OpenSvip.Model;
 using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Library;
 using OpenSvip.Framework;
+using FlutyDeer.GjgjPlugin.Utils;
+using FlutyDeer.GjgjPlugin.Optiions;
 
 namespace FlutyDeer.GjgjPlugin
 {
     public class GjgjEncoder
     {
-        public LyricsAndPinyinSettings lyricsAndPinyinSettings { get; set; }
+        public LyricsAndPinyinOption lyricsAndPinyinOption { get; set; }
 
         /// <summary>
         /// 指定的参数平均采样间隔。
@@ -180,7 +182,7 @@ namespace FlutyDeer.GjgjPlugin
             {
                 NoteID = noteID,
                 Lyric = GetLyric(note),
-                Pinyin = PronunciationUtil.GetNotePinyin(note, lyricsAndPinyinSettings, ref unsupportedPinyinList),
+                Pinyin = PronunciationUtil.GetNotePinyin(note, lyricsAndPinyinOption, ref unsupportedPinyinList),
                 StartTick = GetNoteStartTick(note.StartPos),
                 Duration = note.Length,
                 KeyNumber = note.KeyNumber,
@@ -194,7 +196,7 @@ namespace FlutyDeer.GjgjPlugin
 
         private string GetLyric(Note note)
         {
-            if (lyricsAndPinyinSettings == LyricsAndPinyinSettings.PinyinOnly)
+            if (lyricsAndPinyinOption == LyricsAndPinyinOption.PinyinOnly)
             {
                 return "啊";
             }
