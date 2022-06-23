@@ -283,9 +283,9 @@
                                 CommandParameter="{Binding}"/>
                         </MenuItem>
                         <Separator Style="{StaticResource MenuItemSeparator}"/>
-                        <MenuItem Header="启用多线程转换(_T)" IsCheckable="True" IsChecked="{Binding EnableMultiThreading}"
+                        <MenuItem Header="启用多线程转换(_A)" IsCheckable="True" IsChecked="{Binding EnableMultiThreading}"
                                   IsEnabled="{Binding ExecutionInProgress, Converter={StaticResource InvertBooleanConverter}}"/>
-                        <MenuItem Header="开启更新提醒(_M)" IsCheckable="True" IsChecked="{Binding CheckForUpdates}"/>
+                        <MenuItem Header="开启更新提醒(_U)" IsCheckable="True" IsChecked="{Binding CheckForUpdates}"/>
                         <MenuItem Header="外观主题(_T)" Icon="{materialDesign:PackIcon Kind=PaletteOutline}" ItemContainerStyle="{StaticResource NarrowCheckableMenuItem}">
                             <MenuItem
                                 Header="浅色(_L)"
@@ -571,6 +571,7 @@
                                 <Setter Property="Padding" Value="16 5"/>
                                 <Setter Property="Height" Value="45"/>
                                 <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="MaxDropDownHeight" Value="600"/>
                                 <Setter Property="materialDesign:HintAssist.HintOpacity" Value="1"/>
                                 <Setter Property="materialDesign:HintAssist.Foreground" Value="{StaticResource ThemedHighContrastIndigoBrush}"/>
                                 <Setter Property="materialDesign:TextFieldAssist.UnderlineBrush" Value="{StaticResource ThemedIndigoBrush}"/>
@@ -644,6 +645,9 @@
                                         ItemsSource="{Binding Plugins}"
                                         SelectedIndex="{Binding SelectedInputPluginIndex}"
                                         SelectionChanged="ImportPluginComboBox_SelectionChanged">
+                                        <ComboBox.Resources>
+                                            <Style TargetType="ScrollViewer" BasedOn="{StaticResource OptimizedScrollViewer}"/>
+                                        </ComboBox.Resources>
                                     </ComboBox>
                                     <materialDesign:PopupBox
                                         Grid.Row="0"
@@ -711,7 +715,11 @@
                                         materialDesign:HintAssist.Hint="导出工程格式"
                                         ItemsSource="{Binding Plugins}"
                                         SelectedIndex="{Binding SelectedOutputPluginIndex}"
-                                        SelectionChanged="ExportPluginComboBox_SelectionChanged"/>
+                                        SelectionChanged="ExportPluginComboBox_SelectionChanged">
+                                        <ComboBox.Resources>
+                                            <Style TargetType="ScrollViewer" BasedOn="{StaticResource OptimizedScrollViewer}"/>
+                                        </ComboBox.Resources>
+                                    </ComboBox>
                                     <materialDesign:PopupBox
                                         Grid.Row="0"
                                         Grid.Column="1"

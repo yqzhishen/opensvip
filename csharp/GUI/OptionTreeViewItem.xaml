@@ -135,6 +135,9 @@
                     SelectedIndex="{Binding ChoiceIndex}"
                     ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=SelectedItem.Label}"
                     ToolTipService.ShowDuration="20000">
+                    <ComboBox.Resources>
+                        <Style TargetType="ScrollViewer" BasedOn="{StaticResource OptimizedScrollViewer}"/>
+                    </ComboBox.Resources>
                     <ComboBox.ItemTemplate>
                         <DataTemplate DataType="{x:Type framework:Choice}">
                             <TextBlock
