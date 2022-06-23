@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>歌叽歌叽工程转换插件</Name>
-    <Version>1.6.2</Version>
+    <Version>1.7.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的歌叽歌叽工程格式转换插件。&#x000A;仅支持歌叽歌叽2.0版本。</Descriptions>
-    <Requirements>无</Requirements>
+	<TargetFramework>1.3.0</TargetFramework>
+	<Requirements>无</Requirements>
     <Format>歌叽歌叽工程文件</Format>
     <Suffix>gj</Suffix>
     <Identifier>gj</Identifier>
@@ -29,6 +30,10 @@
                 </Choice>
             </EnumChoices>
         </Option>
+		<Option Name="isUseLegacyPinyin" Type="boolean" Default="false">
+			<Notes>使用旧版的汉字转拼音方案</Notes>
+			<Tips>不推荐开启，且未来有可能会移除。</Tips>
+		</Option>
         <Option Name="desample" Type="integer" Default="32">
             <Notes>音量参数平均采样间隔</Notes>
             <Tips>单位为梯。数值越大，编辑器越流畅；数值越小，音量参数越精确。</Tips>

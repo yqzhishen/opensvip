@@ -3,13 +3,16 @@ using System.Linq;
 
 namespace FlutyDeer.GjgjPlugin.Utils
 {
-    public static class PinyinUtil
+    public static class UnsupportedPinyin
     {
+        public static List<string> UnsupportedPinyins = new List<string>();
+        
+        #region 歌叽歌叽支持的拼音
         /// <summary>
-		/// 歌叽歌叽支持的拼音列表。
-		/// </summary>
-		/// <returns></returns>
-		public static List<string> SupportedPinyinList()
+        /// 歌叽歌叽支持的拼音列表。
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> SupportedPinyinList()
         {
             string[] supportedPinyinArray = { "a", "ai", "an", "ang", "ao", "ba", "bai", "ban",
             "bang", "bao", "bei", "ben", "beng", "bi", "bian", "biao", "bie",
@@ -56,6 +59,19 @@ namespace FlutyDeer.GjgjPlugin.Utils
             "zheng", "zhi", "zhong", "zhou", "zhu", "zhua", "zhuai", "zhuan",
             "zhuang", "zhui", "zhun", "zhuo", "zi", "zong", "zou", "zu", "zuan", "zui", "zun", "zuo" };
             return supportedPinyinArray.ToList();
+        }
+        #endregion
+        public static bool IsSupportedPinyin(string pinyin)
+        {
+            return SupportedPinyinList().Contains(pinyin);
+        }
+
+        public static void AddPinyin(string pinyin)
+        {
+            if (!UnsupportedPinyins.Contains(pinyin))
+            {
+                UnsupportedPinyins.Add(pinyin);
+            }
         }
     }
 }

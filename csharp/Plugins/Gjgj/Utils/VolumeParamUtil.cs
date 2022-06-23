@@ -1,21 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Framework;
 using OpenSvip.Library;
 using OpenSvip.Model;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FlutyDeer.GjgjPlugin.Utils
 {
-    public class VolumeParamUtil
+    public static class VolumeParamUtil
     {
         /// <summary>
         /// 返回演唱轨的音量参数曲线。
         /// </summary>
         /// <param name="singingTrack">原始演唱轨。</param>
         /// <returns></returns>
-        public List<GjVolumeParamPoint> EncodeVolumeParam(SingingTrack singingTrack, int paramSampleInterval)
+        public static List<GjVolumeParamPoint> EncodeVolumeParam(SingingTrack singingTrack, int paramSampleInterval)
         {
             List<GjVolumeParamPoint> gjVolumeParam = new List<GjVolumeParamPoint>();
             try
@@ -75,7 +75,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="index">参数点的索引。</param>
         /// <param name="paramCurve">原始参数曲线。</param>
         /// <returns></returns>
-        private int GetVolumeParamPointTime(int index, ParamCurve paramCurve)
+        private static int GetVolumeParamPointTime(int index, ParamCurve paramCurve)
         {
             return paramCurve.PointList[index].Item1;
         }
@@ -86,7 +86,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="index">参数点的索引。</param>
         /// <param name="paramCurve">原始参数曲线。</param>
         /// <returns></returns>
-        private double GetOriginalVolumeParamPointValue(int index, ParamCurve paramCurve)
+        private static double GetOriginalVolumeParamPointValue(int index, ParamCurve paramCurve)
         {
             return paramCurve.PointList[index].Item2;
         }
@@ -97,7 +97,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="time">时间。</param>
         /// <param name="value">值。</param>
         /// <returns></returns>
-        private GjVolumeParamPoint EncodeVolumeParamPoint(double time, double value)
+        private static GjVolumeParamPoint EncodeVolumeParamPoint(double time, double value)
         {
             GjVolumeParamPoint gjVolumeParamPoint = new GjVolumeParamPoint
             {
@@ -112,7 +112,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="volume">原始参数点的值</param>
         /// <returns></returns>
-        private double GetVolumeParamPointValue(double volume)
+        private static double GetVolumeParamPointValue(double volume)
         {
             return (volume + 1000.0) / 1000.0;
         }
@@ -121,7 +121,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// 转换音量参数。
         /// </summary>
         /// <returns></returns>
-        public ParamCurve DecodeVolumeParam(List<GjVolumeParamPoint> volumeParam)
+        public static ParamCurve DecodeVolumeParam(List<GjVolumeParamPoint> volumeParam)
         {
             ParamCurve paramCurve = new ParamCurve();
             try
@@ -152,7 +152,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="origin">原始时间。</param>
         /// <returns></returns>
-        private int GetVolumeParamTime(double origin)
+        private static int GetVolumeParamTime(double origin)
         {
             return (int)origin;
         }
@@ -162,7 +162,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="origin">原始值。</param>
         /// <returns></returns>
-        private int GetVolumeParamValue(double origin)
+        private static int GetVolumeParamValue(double origin)
         {
             return (int)origin * 1000 - 1000;
         }
