@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+  <Name>ustx 转换插件</Name>
+  <Version>0.0.1</Version>
+  <Author>Oxygen Dioxide</Author>
+  <HomePage>https://github.com/oxygen-dioxide</HomePage>
+  <Descriptions>适用于 OpenSvip 的 ustx 格式转换插件。</Descriptions>
+  <Requirements>无</Requirements>
+  <Format>OpenUTAU ustx 文件</Format>
+  <Suffix>ustx</Suffix>
+  <Identifier>ustx</Identifier>
+  <LibraryPath>ustx\OxygenDioxide.UstxPlugin</LibraryPath>
+  <Converter>OxygenDioxide.UstxPlugin.UstxConverter</Converter>
+  <InputOptions>
+  </InputOptions>
+  <OutputOptions>
+  </OutputOptions>
+</Plugin>
