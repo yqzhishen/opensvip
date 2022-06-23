@@ -111,39 +111,65 @@ namespace OpenSvip.Library
                 }
                 return segments;
             }
-            var buffer = new List<Tuple<int, int>>();
-            var currentPoint = curve.PointList[0];
-            int i;
-            for (i = 1; i < curve.PointList.Count; ++i)
+
+            if (interruptValue != 0)
             {
-                var nextPoint = curve.PointList[i];
-                if (currentPoint.Item2 != interruptValue)
+                var buffer = new List<Tuple<int, int>>();
+                foreach (var point in curve.PointList.Where(p => p.Item1 >= 0 && p.Item1 < int.MaxValue / 2))
                 {
-                    buffer.Add(currentPoint);
+                    if (point.Item2 != interruptValue)
+                    {
+                        buffer.Add(point);
+                    }
+                    else if (buffer.Any())
+                    {
+                        segments.Add(new List<Tuple<int, int>>(buffer));
+                        buffer.Clear();
+                    }
                 }
-                else if (nextPoint.Item2 != interruptValue)
+
+                if (buffer.Any())
                 {
-                    if (currentPoint.Item1 >= 0 && (i <= 1 || curve.PointList[i - 2].Item2 != interruptValue))
+                    segments.Add(new List<Tuple<int, int>>(buffer));
+                }
+            }
+            else
+            {
+                var buffer = new List<Tuple<int, int>>();
+                var currentPoint = curve.PointList[0];
+                int i;
+                for (i = 1; i < curve.PointList.Count; ++i)
+                {
+                    var nextPoint = curve.PointList[i];
+                    if (currentPoint.Item2 != interruptValue)
                     {
                         buffer.Add(currentPoint);
                     }
+                    else if (nextPoint.Item2 != interruptValue)
+                    {
+                        if (currentPoint.Item1 >= 0 && (i <= 1 || curve.PointList[i - 2].Item2 != interruptValue))
+                        {
+                            buffer.Add(currentPoint);
+                        }
+                    }
+                    else if (buffer.Any())
+                    {
+                        segments.Add(new List<Tuple<int, int>>(buffer));
+                        buffer.Clear();
+                    }
+                    currentPoint = nextPoint;
                 }
-                else if (buffer.Any())
+                if (currentPoint.Item1 < int.MaxValue / 2
+                    && (currentPoint.Item2 != interruptValue || i <= 1 || curve.PointList[i - 2].Item2 != interruptValue))
+                {
+                    buffer.Add(currentPoint);
+                }
+                if (buffer.Any())
                 {
                     segments.Add(new List<Tuple<int, int>>(buffer));
-                    buffer.Clear();
                 }
-                currentPoint = nextPoint;
             }
-            if (currentPoint.Item1 < int.MaxValue / 2
-                && (currentPoint.Item2 != interruptValue || i <= 1 || curve.PointList[i - 2].Item2 != interruptValue))
-            {
-                buffer.Add(currentPoint);
-            }
-            if (buffer.Any())
-            {
-                segments.Add(new List<Tuple<int, int>>(buffer));
-            }
+            
             return segments;
         }
     }
