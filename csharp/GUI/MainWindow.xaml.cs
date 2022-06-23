@@ -319,10 +319,7 @@ namespace OpenSvip.GUI
                 lock (_converterThreads)
                 {
                     _converterThreads.ForEach(t => t.Start());
-                    foreach (var thread in _converterThreads)
-                    {
-                        thread.Join();
-                    }
+                    _converterThreads.ForEach(t => t.Join());
                     _converterThreads.Clear();
                     _taskQueue = null;
                     
@@ -338,6 +335,7 @@ namespace OpenSvip.GUI
                     }
                     // Unload the domain to release assembly files
                     _appDomains.ForEach(AppDomain.Unload);
+                    _appDomains.Clear();
                 }
             }).Start();
         }
