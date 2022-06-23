@@ -12,8 +12,8 @@ namespace FlutyDeer.GjgjPlugin
     {
         public static void Main(string[] args)
         {
-            Gj2Json();
-            //Json2Gj();
+            //Gj2Json();
+            Json2Gj();
         }
 
         private static void Gj2Json()

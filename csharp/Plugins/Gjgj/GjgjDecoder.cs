@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using OpenSvip.Model;
-using OpenSvip.Library;
-using FlutyDeer.GjgjPlugin.Model;
+﻿using FlutyDeer.GjgjPlugin.Model;
 using FlutyDeer.GjgjPlugin.Utils;
+using OpenSvip.Library;
+using OpenSvip.Model;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace FlutyDeer.GjgjPlugin
 {
@@ -130,7 +130,7 @@ namespace FlutyDeer.GjgjPlugin
                 Length = gjNote.Duration,
                 KeyNumber = gjNote.KeyNumber,
                 Lyric = gjNote.Lyric,
-                Pronunciation = PronunciationUtil.DecodePronunciation(gjNote),
+                Pronunciation = PinyinAndLyricUtil.DecodePronunciation(gjNote),
                 EditedPhones = DecodePhones(gjNote, noteStartPosition),
                 HeadTag = NoteHeadTagUtil.ToStringTag(gjNote.Style)
             };
@@ -229,8 +229,8 @@ namespace FlutyDeer.GjgjPlugin
         {
             Params paramsFromGj = new Params
             {
-                Volume = new VolumeParamUtil().DecodeVolumeParam(gjSingingTrack.VolumeParam),
-                Pitch = new PitchParamUtil().DecodePitchParam(gjSingingTrack.PitchParam)
+                Volume = VolumeParamUtil.DecodeVolumeParam(gjSingingTrack.VolumeParam),
+                Pitch = PitchParamUtil.DecodePitchParam(gjSingingTrack.PitchParam)
             };
             return paramsFromGj;
         }

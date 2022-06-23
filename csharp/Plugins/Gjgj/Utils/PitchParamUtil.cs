@@ -1,18 +1,18 @@
-using System;
-using System.Collections.Generic;
 using FlutyDeer.GjgjPlugin.Model;
 using OpenSvip.Model;
+using System;
+using System.Collections.Generic;
 
 namespace FlutyDeer.GjgjPlugin.Utils
 {
-    public class PitchParamUtil
+    public static class PitchParamUtil
     {
         /// <summary>
         /// 返回演唱轨的音高参数曲线。
         /// </summary>
         /// <param name="singingTrack">原始演唱轨。</param>
         /// <returns></returns>
-        public GjPitchParam EncodePitchParam(SingingTrack singingTrack)
+        public static GjPitchParam EncodePitchParam(SingingTrack singingTrack)
         {
             List<double> timeBuffer = new List<double>();
             List<double> valueBuffer = new List<double>();
@@ -67,7 +67,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="index">参数点的索引。</param>
         /// <param name="singingTrack">原始演唱轨。</param>
         /// <returns></returns>
-        private int GetOriginalPitchParamPointTime(int index, SingingTrack singingTrack)
+        private static int GetOriginalPitchParamPointTime(int index, SingingTrack singingTrack)
         {
             return singingTrack.EditedParams.Pitch.PointList[index].Item1;
         }
@@ -78,7 +78,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="index">参数点的索引。</param>
         /// <param name="singingTrack">原始演唱轨。</param>
         /// <returns></returns>
-        private int GetOriginalPitchParamPointValue(int index, SingingTrack singingTrack)
+        private static int GetOriginalPitchParamPointValue(int index, SingingTrack singingTrack)
         {
             return singingTrack.EditedParams.Pitch.PointList[index].Item2;
         }
@@ -89,7 +89,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="time">时间。</param>
         /// <param name="value">值。</param>
         /// <returns></returns>
-        private GjPitchParamPoint EncodePitchParamPoint(double time, double value)
+        private static GjPitchParamPoint EncodePitchParamPoint(double time, double value)
         {
             GjPitchParamPoint gjPitchParamPoint = new GjPitchParamPoint
             {
@@ -105,7 +105,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <param name="left">左端点。</param>
         /// <param name="right">右端点。</param>
         /// <returns></returns>
-        private GjModifyRange EncodeModifyRange(double left, double right)
+        private static GjModifyRange EncodeModifyRange(double left, double right)
         {
             GjModifyRange gjModifyRange = new GjModifyRange
             {
@@ -120,7 +120,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="origin">原始时间。</param>
         /// <returns></returns>
-        private double GetPitchParamPointTime(double origin)
+        private static double GetPitchParamPointTime(double origin)
         {
             return origin / 5.0;
         }
@@ -130,18 +130,17 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="origin">原始值。</param>
         /// <returns></returns>
-        private double GetPitchParamPointValue(double origin)
+        private static double GetPitchParamPointValue(double origin)
         {
             return ToneToY((double)((origin) / 100.0));
         }
-
 
         /// <summary>
         /// 将音高转换为Y值。
         /// </summary>
         /// <param name="tone"></param>
         /// <returns></returns>
-        private double ToneToY(double tone)
+        private static double ToneToY(double tone)
         {
             return (127 - tone + 0.5) * 18.0;
         }
@@ -149,7 +148,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// <summary>
         /// 转换修改部分的音高参数。
         /// </summary>
-        public ParamCurve DecodePitchParam(GjPitchParam gjPitchParam)
+        public static ParamCurve DecodePitchParam(GjPitchParam gjPitchParam)
         {
             ParamCurve paramCurvePitch = new ParamCurve();
             Tuple<int, int> defaultLeftEndpoint = Tuple.Create(-192000, -100);
@@ -191,7 +190,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="y">Y值。</param>
         /// <returns></returns>
-        private double YToTone(double y)
+        private static double YToTone(double y)
         {
             return 127 + 0.5 - y / 18.0;
         }
@@ -201,7 +200,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="origin">原始时间。</param>
         /// <returns></returns>
-        private int GetPitchParamTime(double origin)
+        private static int GetPitchParamTime(double origin)
         {
             return (int)(origin * 5.0);
         }
@@ -211,7 +210,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
         /// </summary>
         /// <param name="origin">原始值。</param>
         /// <returns></returns>
-        private int GetPitchParamValue(double origin)
+        private static int GetPitchParamValue(double origin)
         {
             return (int)(YToTone(origin) * 100.0);
         }
