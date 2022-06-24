@@ -24,7 +24,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
         { 
             UProject ustxProject = new UstxEncoder().EncodeProject(project);
             string text = Yaml.DefaultSerializer.Serialize(ustxProject); 
-            File.WriteAllText(path, text);
+            File.WriteAllText(path, text, new System.Text.UTF8Encoding(true));//编码：utf8 bom
         }
     }
 }

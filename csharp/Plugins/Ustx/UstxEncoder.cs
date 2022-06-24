@@ -18,21 +18,24 @@ namespace OxygenDioxide.UstxPlugin.Stream
             UProject ustxProject = new UProject {
                 bpm = osProject.SongTempoList[0].BPM,//OpenUTAU不支持变速，因此这里采用音轨开头的bpm
                 beatPerBar = osProject.TimeSignatureList[0].Numerator,
-                beatUnit = osProject.TimeSignatureList[0].Denominator
+                beatUnit = osProject.TimeSignatureList[0].Denominator,
+                voiceParts = new List<UVoicePart>(),
+                ustxVersion = new System.Version("0.5")
+                
             };
             int trackNo = 0;
             foreach (Track osTrack in osProject.TrackList)
             {
                 ustxProject.tracks.Add(EncodeTrack(osTrack));
-                trackNo += 1;
                 if(osTrack.Type=="Singing")//合成音轨
                 {
-                    ustxProject.voiceParts.Add(EncodeVoicePart((SingingTrack)osTrack));
+                    ustxProject.voiceParts.Add(EncodeVoicePart((SingingTrack)osTrack,trackNo));
                 }
                 else
                 {
-                    //#TODO：伴奏音轨
+                    ustxProject.waveParts.Add(EncodeWavePart((InstrumentalTrack)osTrack,trackNo));
                 }
+                trackNo += 1;
             }
             return ustxProject;
         }
@@ -48,20 +51,72 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxTrack;
         }
-        public UVoicePart EncodeVoicePart(SingingTrack osTrack)
+        public UVoicePart EncodeVoicePart(SingingTrack osTrack, int trackNo)
         {
-            UVoicePart ustxVoicePart = new UVoicePart { 
-                
+            UVoicePart ustxVoicePart = new UVoicePart {
+                name = osTrack.Title,
+                trackNo = trackNo,
+                position = 0
             };
+            int lastNoteEndPos = -480;//上一个音符的结束时间
+            int lastNoteKeyNumber = 60;//上一个音符的音高
+            foreach (Note osNote in osTrack.NoteList)
+            {
+                ustxVoicePart.notes.Add(EncodeNote(osNote,lastNoteEndPos>=osNote.StartPos,lastNoteKeyNumber));
+                lastNoteEndPos = osNote.StartPos + osNote.Length;
+                lastNoteKeyNumber = osNote.KeyNumber;
+            }
             return ustxVoicePart;
         }
-        public UNote EncodeNote(Note osNote)
+        public UWavePart EncodeWavePart(InstrumentalTrack osTrack, int trackNo)
         {
+            UWavePart ustxWavePart = new UWavePart
+            {
+                name = osTrack.Title,
+                trackNo = trackNo,
+                position = 0,
+                FilePath = osTrack.AudioFilePath
+            };
+            return ustxWavePart;
+        }
+        public UNote EncodeNote(Note osNote,bool snapFirst,int lastNoteKeyNumber)
+        {
+            //snapFirst：是否与上一个音符挨着，挨着就是True
+            //lastNoteKeyNumber：上一个音符的音高
+            int Y0 = 0;
+            if(snapFirst==true)
+            {
+                Y0=(lastNoteKeyNumber-osNote.KeyNumber)*10;
+            }
+            string lyric = osNote.Lyric;
+            if ("-" ==  lyric)
+            {
+                lyric = "+";
+            }
             UNote ustxNote = new UNote{
                 position = osNote.StartPos,
                 duration = osNote.Length,
                 tone = osNote.KeyNumber,
-                lyric = osNote.Lyric
+                lyric = lyric,
+                pitch = new UPitch
+                {
+                    snapFirst=snapFirst,
+                    data= new List<PitchPoint>
+                    {
+                        new PitchPoint {X=-40,Y=0,shape=PitchPointShape.io},
+                        new PitchPoint {X=0,Y=0,shape=PitchPointShape.io}
+                    }
+                },
+                vibrato = new UVibrato
+                {
+                    length = 0,
+                    period = 175,
+                    depth = 25,
+                    @in = 10,
+                    @out = 10,
+                    shift = 0,
+                    drift = 0
+                }
             };
             return ustxNote;
         }
