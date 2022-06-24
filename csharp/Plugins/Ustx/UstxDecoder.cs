@@ -9,7 +9,7 @@ using OpenSvip.Model;
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core;
 
-namespace OxygenDioxide.UstxPlugin
+namespace OxygenDioxide.UstxPlugin.Stream
 {
     public class UstxDecoder
     {

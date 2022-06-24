@@ -8,7 +8,7 @@ using OpenSvip.Model;
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core;
 
-namespace OxygenDioxide.UstxPlugin
+namespace OxygenDioxide.UstxPlugin.Stream
 {
     public class UstxConverter : IProjectConverter
     {
@@ -22,7 +22,9 @@ namespace OxygenDioxide.UstxPlugin
         }
         public void Save(string path, Project project, ConverterOptions options)
         { 
-
+            UProject ustxProject = new UstxEncoder().EncodeProject(project);
+            string text = Yaml.DefaultSerializer.Serialize(ustxProject); 
+            File.WriteAllText(path, text);
         }
     }
 }

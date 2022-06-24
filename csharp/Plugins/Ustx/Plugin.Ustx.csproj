@@ -58,6 +58,7 @@
     <Compile Include="UstxConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OpenUtau.Core\Ustx\UTrack.cs" />
+    <Compile Include="UstxEncoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -71,6 +72,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
