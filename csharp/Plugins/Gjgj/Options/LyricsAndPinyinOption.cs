@@ -1,4 +1,4 @@
-namespace FlutyDeer.GjgjPlugin.Optiions
+namespace FlutyDeer.GjgjPlugin.Options
 {
     public enum LyricsAndPinyinOption
     {
