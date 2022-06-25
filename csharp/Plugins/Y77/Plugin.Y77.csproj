@@ -37,6 +37,9 @@
     <Reference Include="NPinyin, Version=0.2.6321.26573, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NPinyin.0.2.6321.26573\lib\net20\NPinyin.dll</HintPath>
     </Reference>
+    <Reference Include="PinYinConverterCore, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PinYinConverterCore.1.0.2\lib\net45\PinYinConverterCore.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
