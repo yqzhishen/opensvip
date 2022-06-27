@@ -7,7 +7,7 @@ namespace OpenSvip.Framework
     {
         public const string FrameworkName = "OpenSVIP";
 
-        public const string FrameworkVersion = "1.3.0";
+        public const string FrameworkVersion = "1.4.0";
 
         public static readonly string CommonDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), FrameworkName);
 
