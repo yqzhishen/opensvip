@@ -3,6 +3,7 @@ using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.International.Converters.PinYinConverter;
 
 namespace FlutyDeer.Y77Plugin
 {
@@ -57,12 +58,12 @@ namespace FlutyDeer.Y77Plugin
             Y77Note y77Note = new Y77Note
             {
                 Pinyin = GetNotePinyin(note),
-                Length = note.Length / 30,
-                StartPosition = note.StartPos / 30,
                 Lyric = note.Lyric,
                 KeyNumber = 88 - note.KeyNumber,
                 PitchParam = EncodePitchParam(singingTrack.EditedParams.Pitch, note)
             };
+            y77Note.StartPosition = note.StartPos / 30;
+            y77Note.Length = (note.StartPos + note.Length) / 30 - y77Note.StartPosition;
             return y77Note;
         }
 
@@ -83,8 +84,7 @@ namespace FlutyDeer.Y77Plugin
                         lyric = lyric.Replace(symbol, "");
                     }
                 }
-                origin = Pinyin.GetPinyin(lyric);
-                return origin;
+                return Pinyin.GetPinyin(lyric);
             }
             else
             {
@@ -100,7 +100,7 @@ namespace FlutyDeer.Y77Plugin
                 sampleTimeList.Add(note.StartPos + firstBarLength + (int)((note.Length / 500.0) * i));
             }
             var pitchParamInNote = pitchParamCurve.PointList.Where(p => p.Item1 >= note.StartPos + firstBarLength && p.Item1 <= note.StartPos + firstBarLength + note.Length).ToList();
-            
+
             List<int> pitchParamTimeInNote = new List<int>();
             foreach (var paramPoint in pitchParamInNote)
             {
@@ -151,13 +151,13 @@ namespace FlutyDeer.Y77Plugin
                 else
                 {
                     int currentNode = y77PitchParam[i];
-                    for(int j = 0; j < buffer.Count(); j++)//插值
+                    for (int j = 0; j < buffer.Count(); j++)//插值
                     {
                         y77PitchParam[previousNodeIndex + j] = previousNode + j * (y77PitchParam[i] - buffer[j]) / buffer.Count();
                     }
                     buffer.Clear();
                 }
-                if(y77PitchParam[i] != previousNode)
+                if (y77PitchParam[i] != previousNode)
                 {
                     previousNodeIndex = i;
                     previousNode = y77PitchParam[i];

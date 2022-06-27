@@ -1,10 +1,10 @@
-﻿using System.IO;
-using System.Text;
+﻿using FlutyDeer.GjgjPlugin.Model;
+using FlutyDeer.GjgjPlugin.Options;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using FlutyDeer.GjgjPlugin.Model;
-using FlutyDeer.GjgjPlugin.Optiions;
+using System.IO;
+using System.Text;
 
 namespace FlutyDeer.GjgjPlugin.Stream
 {
@@ -36,7 +36,8 @@ namespace FlutyDeer.GjgjPlugin.Stream
         {
             var gjProject = new GjgjEncoder
             {
-                lyricsAndPinyinOption = options.GetValueAsEnum("lyricsAndPinyinSettings", LyricsAndPinyinOption.SameAsSource),
+                LyricsAndPinyinOption = options.GetValueAsEnum("lyricsAndPinyinSettings", LyricsAndPinyinOption.SameAsSource),
+                IsUseLegacyPinyin = options.GetValueAsBoolean("isUseLegacyPinyin", false),
                 ParamSampleInterval = options.GetValueAsInteger("desample", 32),
                 SingerName = options.GetValueAsString("singer", "扇宝"),
             }.EncodeProject(project);

@@ -4,17 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}</ProjectGuid>
+    <ProjectGuid>{CED66EF4-8393-45BE-BF75-35476F840B2C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>FlutyDeer.GjgjPlugin</RootNamespace>
-    <AssemblyName>FlutyDeer.GjgjPlugin</AssemblyName>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FlutyDeer.LyricsPlugin</RootNamespace>
+    <AssemblyName>FlutyDeer.LyricsPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,10 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -34,19 +31,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NPinyin, Version=0.2.6321.26573, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NPinyin.0.2.6321.26573\lib\net20\NPinyin.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,31 +44,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GjgjConverter.cs" />
-    <Compile Include="GjgjDecoder.cs" />
-    <Compile Include="GjgjEncoder.cs" />
-    <Compile Include="GjgjModel.cs" />
-    <Compile Include="Utils\TrackListUtil.cs" />
-    <Compile Include="Utils\NoteListUtil.cs" />
-    <Compile Include="UnsupportedPinyin.cs" />
-    <Compile Include="Options\LyricsAndPinyinOption.cs" />
-    <Compile Include="Test.cs" />
-    <Compile Include="Utils\PhonemeUtil.cs" />
-    <Compile Include="Utils\PitchParamUtil.cs" />
-    <Compile Include="Utils\ProjectSettingUtil.cs" />
-    <Compile Include="Utils\TempoMapUtil.cs" />
-    <Compile Include="Utils\TimeSignatureUtil.cs" />
-    <Compile Include="Utils\TrackUtil.cs" />
-    <Compile Include="Utils\VolumeParamUtil.cs" />
-    <Compile Include="Utils\SingerNameUtil.cs" />
-    <Compile Include="Utils\PinyinAndLyricUtil.cs" />
-    <Compile Include="Utils\TempoUtil.cs" />
-    <Compile Include="Utils\NoteHeadTagUtil.cs" />
+    <Compile Include="LyricLine.cs" />
+    <Compile Include="LyricsConverter.cs" />
+    <Compile Include="LyricsEncoder.cs" />
+    <Compile Include="LyricsFile.cs" />
+    <Compile Include="LyricsUtil.cs" />
+    <Compile Include="MetaInfo\MetaInfoLine.cs" />
+    <Compile Include="MetaInfo\MetaInfoType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Test.cs" />
+    <Compile Include="WritingSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
+    <Content Include="Properties.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -96,13 +75,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
 </Project>
