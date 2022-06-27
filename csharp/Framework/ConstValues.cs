@@ -13,6 +13,8 @@ namespace OpenSvip.Framework
 
         public static readonly string CommonConfigPath = Path.Combine(CommonDataPath, "Config");
 
+        public static readonly string CommonDownloadPath = Path.Combine(CommonDataPath, "Downloads");
+
         public const string ProjectHomePage = "https://openvpi.github.io/home";
 
         public const string AuthorHomePage = "https://space.bilibili.com/102844209";
@@ -20,6 +22,8 @@ namespace OpenSvip.Framework
         public const string BundleShareLink = "https://share.weiyun.com/yMDgO6sz";
 
         public const string PluginMarket = "https://openvpi.github.io/home/market/summary.html";
+
+        public const string PluginUpdateRoot = "https://openvpi.github.io/home/market/";
 
         public const string FeedbackQQGroup = "687772360";
     }

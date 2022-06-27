@@ -86,7 +86,7 @@ namespace OpenSvip.GUI.Config
 
     public static class Information
     {
-        public const string ApplicationVersion = "1.3.0";
+        public const string ApplicationVersion = "1.4.0";
 
         public const string OnlineDocuments = "https://openvpi.github.io/home";
 
@@ -142,6 +142,8 @@ namespace OpenSvip.GUI.Config
     public class UpdateLog
     {
         public string Version { get; set; }
+
+        public string RequiredFrameworkVersion { get; set; } = "1.0.0";
 
         public string Date { get; set; }
 
