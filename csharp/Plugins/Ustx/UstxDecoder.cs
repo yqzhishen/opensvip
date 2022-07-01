@@ -50,24 +50,31 @@ namespace OxygenDioxide.UstxPlugin.Stream
         }
         public SingingTrack DecodeTrack(UTrack ustxTrack)
         {
-            return new SingingTrack
+            SingingTrack osTrack = new SingingTrack
             {
                 Title = "",
                 Mute = ustxTrack.Mute,
                 Solo = ustxTrack.Solo,
                 Volume = Math.Min(Math.Pow(10, ustxTrack.Volume / 10), 2.0),//OpenUTAU的音量以分贝存储（#TODO:待实测），这里转为绝对音量
                 Pan = 0,
-                AISingerName = ustxTrack.singer
+                AISingerName = ustxTrack.singer,
             };
+            osTrack.EditedParams.Pitch = new ParamCurve
+            {
+                PointList = new List<Tuple<int, int>>
+                {
+                }
+            };
+            return osTrack;
         }
         public void DecodeVoicePart(UVoicePart ustxVoicePart, SingingTrack osTrack, UProject ustxProject)
         {
             int partOffset = ustxVoicePart.position;
-            foreach(UNote ustxNote in ustxVoicePart.notes)
+            foreach (UNote ustxNote in ustxVoicePart.notes)
             {
                 osTrack.NoteList.Add(DecodeNote(ustxNote,partOffset));
             }
-            osTrack.EditedParams.Pitch = DecodePitch(ustxVoicePart, ustxProject);
+            osTrack.EditedParams.Pitch.PointList.AddRange(DecodePitch(ustxVoicePart, ustxProject));
         }
         public Note DecodeNote(UNote ustxNote,int partOffset)
         {
@@ -85,7 +92,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 Lyric = lyric
             };
         }
-        public ParamCurve DecodePitch(UVoicePart part, UProject project)
+        public List<Tuple<int,int>> DecodePitch(UVoicePart part, UProject project)
         {
             int pitchStart;
             var uNotes = part.notes;//音符列表
@@ -180,20 +187,18 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 }
             }
 
-            ParamCurve osPitchCurve=new ParamCurve
-            {
-                PointList = new List<Tuple<int, int>>
-                {
-                }
-            };
             //============================================
-            osPitchCurve.PointList.Add(new Tuple<int, int>(1920 + part.position,-100));
+            List<Tuple<int, int>> PointList = new List<Tuple<int, int>>
+            {
+            };
+            int firstBarLength = 1920 * project.beatPerBar / project.beatUnit;
+            PointList.Add(new Tuple<int, int>(firstBarLength + part.position,-100));
             for (int i = 0; i < pitches.Length; ++i)
             {
-                osPitchCurve.PointList.Add(new Tuple<int, int>(1920 + part.position + i * pitchInterval, (int)pitches[i]));
+                PointList.Add(new Tuple<int, int>(firstBarLength + part.position + i * pitchInterval, (int)pitches[i]));
             }
-            osPitchCurve.PointList.Add(new Tuple<int, int>(1920 + part.position + pitches.Length * pitchInterval,-100));
-            return osPitchCurve;
+            PointList.Add(new Tuple<int, int>(firstBarLength + part.position + pitches.Length * pitchInterval,-100));
+            return PointList;
         }
     }
 }

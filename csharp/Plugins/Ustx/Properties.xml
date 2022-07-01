@@ -12,6 +12,7 @@
   <LibraryPath>ustx\OxygenDioxide.UstxPlugin</LibraryPath>
   <Converter>OxygenDioxide.UstxPlugin.UstxConverter</Converter>
   <InputOptions>
+    <!--（尚未实现）
     <Option Name="importPitch" Type="enum" Default="Full">
       <Notes>音高线导入模式</Notes>
       <EnumChoices>
@@ -25,7 +26,7 @@
           <Label>输出的文件中将完全不包含音高信息</Label>
         </Choice>
       </EnumChoices>
-    </Option>
+    </Option>-->
   </InputOptions>
   <OutputOptions>
   </OutputOptions>
