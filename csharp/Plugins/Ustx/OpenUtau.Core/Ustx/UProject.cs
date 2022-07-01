@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using YamlDotNet.Serialization;
 
-namespace OpenUtau.Core.Ustx {
-    public class UProject {
+namespace OpenUtau.Core.Ustx 
+{
+    public class UProject 
+    {
         public string name = "New Project";
         public string comment = string.Empty;
         public string outputDir = "Vocal";
@@ -28,5 +30,15 @@ namespace OpenUtau.Core.Ustx {
         /// Transient field used for serialization.
         /// </summary>
         public List<UWavePart> waveParts;
+
+        public int MillisecondToTick(double ms)
+        {
+            return MusicMath.MillisecondToTick(ms, bpm, beatUnit, resolution);
+        }
+
+        public double TickToMillisecond(double tick)
+        {
+            return MusicMath.TickToMillisecond(tick, bpm, beatUnit, resolution);
+        }
     }
 }

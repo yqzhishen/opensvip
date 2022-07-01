@@ -16,6 +16,8 @@ namespace OpenUtau.Core.Ustx {
         public UPitch pitch;
         public UVibrato vibrato;
 
+        [YamlIgnore] public int End => position + duration;
+
         public static UNote Create() {
             var note = new UNote();
             note.pitch = new UPitch();
@@ -78,6 +80,35 @@ namespace OpenUtau.Core.Ustx {
         public float drift { get => _drift; set => _drift = Math.Max(-100, Math.Min(100, value)); }
 
         [YamlIgnore] public float NormalizedStart => 1f - length / 100f;
+
+        /// <summary>
+        /// Evaluate a position on the vibrato curve.
+        /// </summary>
+        /// <param name="nPos">Normalized position in note length.</param>
+        /// <returns>Vector2(tick, noteNum)</returns>
+        public Vector2 Evaluate(float nPos, float nPeriod, UNote note)
+        {
+            float nStart = NormalizedStart;
+            float nIn = length / 100f * @in / 100f;
+            float nInPos = nStart + nIn;
+            float nOut = length / 100f * @out / 100f;
+            float nOutPos = 1f - nOut;
+            float t = (nPos - nStart) / nPeriod + shift / 100f;
+            float y = (float)Math.Sin(2 * Math.PI * t) * depth;
+            if (nPos < nStart)
+            {
+                y = 0;
+            }
+            else if (nPos < nInPos)
+            {
+                y *= (nPos - nStart) / nIn;
+            }
+            else if (nPos > nOutPos)
+            {
+                y *= (1f - nPos) / nOut;
+            }
+            return new Vector2(note.position + note.duration * nPos, note.tone + y / 100f);
+        }
     }
 
     public enum PitchPointShape {
@@ -99,10 +130,27 @@ namespace OpenUtau.Core.Ustx {
         o
     };
 
-    public class PitchPoint{
+    public class PitchPoint : IComparable<PitchPoint>
+    {
         public float X;
         public float Y;
         public PitchPointShape shape;
+
+        public PitchPoint() { }
+
+        public PitchPoint(float x, float y, PitchPointShape shape = PitchPointShape.io)
+        {
+            X = x;
+            Y = y;
+            this.shape = shape;
+        }
+
+        public PitchPoint Clone()
+        {
+            return new PitchPoint(X, Y, shape);
+        }
+
+        public int CompareTo(PitchPoint other) { return X.CompareTo(other.X); }
     }
 
     public class UPitch {
