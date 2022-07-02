@@ -17,6 +17,8 @@ namespace FlutyDeer.GjgjPlugin.Utils
                     return "514singer";
                 case "Rocky":
                     return "881singer";
+                case "超越AI":
+                    return "ycysinger";
                 default:
                     return "513singer";
             }
@@ -37,6 +39,8 @@ namespace FlutyDeer.GjgjPlugin.Utils
                     return "SING-林嘉慧";
                 case "881singer":
                     return "Rocky";
+                case "ycysinger":
+                    return "超越AI";
                 default:
                     return GetUserMadeSingerName(gjSingingTrack);
             }
