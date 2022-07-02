@@ -11,7 +11,7 @@ namespace FlutyDeer.LyricsPlugin
         Title,
         Artist,
         Album,
-        Author,
+        By,
         Offset
     }
 }

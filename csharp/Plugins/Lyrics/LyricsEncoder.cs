@@ -13,16 +13,30 @@ namespace FlutyDeer.LyricsPlugin
 {
     public class LyricsEncoder
     {
-        private Project osProject;
+        public string Artist { get; set; }
         
-        private string lrcContent = "";
+        public string Title { get; set; }
+        
+        public string Album { get; set; }
+
+        public string By { get; set; }
+        
+        public int Offset { get; set; }
+
+        private Project osProject;
 
         private int firstBarLength;
 
         private TimeSynchronizer timeSynchronizer;
         
-        public string EncodeProject(Project project)
+        public LyricsFile EncodeProject(Project project)
         {
+            LyricsFile lyricsFile = new LyricsFile();
+            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Artist, Artist));
+            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Title, Title));
+            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Album, Album));
+            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.By, By));
+            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Offset, Offset.ToString()));
             osProject = project;
             timeSynchronizer = new TimeSynchronizer(osProject.SongTempoList);
             var firstBarTimeSignature = osProject.TimeSignatureList[0];
@@ -35,28 +49,32 @@ namespace FlutyDeer.LyricsPlugin
                 var note = noteList[i];
                 buffer.Add(new Tuple<int, string>(note.StartPos, note.Lyric));
                 int currentNoteEndPos = note.StartPos + note.Length;
-                if ((i < noteList.Count - 1 && currentNoteEndPos != noteList[i + 1].StartPos) || i == noteList.Count - 1 || note.Lyric.Contains("。"))
+                if ((i < noteList.Count - 1 && noteList[i + 1].StartPos - currentNoteEndPos >= 60) || i == noteList.Count - 1)
                 {
                     var time = ConvertTicksToFormattedTime(buffer[0].Item1);
-                    var lyricLine = new LyricLine();
-                    lyricLine.Time = time;
+                    var lyric = "";
                     foreach (var item in buffer)
                     {
                         var currentLyric = LyricsUtil.GetSymbolRemovedLyric(item.Item2);
-                        lyricLine.Lyric += currentLyric;
+                        lyric += currentLyric;
                     }
-                    lrcContent += lyricLine.ToString() + "\n";
+                    var lyricLine = new LyricLine
+                    {
+                        Time = time,
+                        Lyric = lyric
+                    };
+                    lyricsFile.AddLyric(lyricLine);
                     buffer.Clear();
                 }
             }
-            return lrcContent;
+            return lyricsFile;
         }
         //把秒转换为时分秒格式
-        public string ConvertTicksToFormattedTime(int tick)
+        public TimeSpan ConvertTicksToFormattedTime(int tick)
         {
             var secs = timeSynchronizer.GetActualSecsFromTicks(tick);
             var time = TimeSpan.FromSeconds(secs);
-            return $"{time.Minutes:D2}:{time.Seconds:D2}.{time.Milliseconds:D3}";
+            return time;
         }
     }
 }

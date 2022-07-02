@@ -8,15 +8,14 @@ namespace FlutyDeer.LyricsPlugin
 {
     public class LyricLine
     {
-        public string Time { get; set; } = "";
+        public TimeSpan Time { get; set; }
         public string Lyric { get; set; } = "";
 
         public override string ToString()
         {
-            return $"[{Time}]{Lyric}";
+            return $"[{Time.Minutes:D2}:{Time.Seconds:D2}.{Time.Milliseconds:D3}]{Lyric}";
         }
-
-        public LyricLine(string time, string lyric)
+        public LyricLine(TimeSpan time, string lyric)
         {
             Time = time;
             Lyric = lyric;

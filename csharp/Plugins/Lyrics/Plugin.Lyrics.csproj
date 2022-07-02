@@ -44,16 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LyricLine.cs" />
+    <Compile Include="Core\Utils\EncodingUtil.cs" />
+    <Compile Include="Options\LyricEncodingOption.cs" />
+    <Compile Include="Core\LyricLine.cs" />
     <Compile Include="LyricsConverter.cs" />
     <Compile Include="LyricsEncoder.cs" />
-    <Compile Include="LyricsFile.cs" />
-    <Compile Include="LyricsUtil.cs" />
-    <Compile Include="MetaInfo\MetaInfoLine.cs" />
-    <Compile Include="MetaInfo\MetaInfoType.cs" />
+    <Compile Include="Core\LyricsFile.cs" />
+    <Compile Include="Core\Utils\LyricsUtil.cs" />
+    <Compile Include="Core\MetaInfo\MetaInfoLine.cs" />
+    <Compile Include="Core\MetaInfo\MetaInfoType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />
-    <Compile Include="WritingSettings.cs" />
+    <Compile Include="Core\WritingSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties.xml">

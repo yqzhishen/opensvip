@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using FlutyDeer.LyricsPlugin.Options;
+using FlutyDeer.LyricsPlugin.Utils;
+using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using System;
@@ -19,17 +21,19 @@ namespace FlutyDeer.LyricsPlugin.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            var lrcString = new LyricsEncoder().EncodeProject(project);
-            var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
-            var writer = new StreamWriter(stream, new UTF8Encoding(true));
-            foreach (var ch in lrcString)
+            var lrcFile = new LyricsEncoder {
+                Artist = options.GetValueAsString("artist"),
+                Title = options.GetValueAsString("title"),
+                Album = options.GetValueAsString("album"),
+                By = options.GetValueAsString("by"),
+                Offset = options.GetValueAsInteger("offset"),
+            }.EncodeProject(project);
+            var lyricEncoding = options.GetValueAsEnum("encoding", LyricEncodingOption.UTF8);
+            var writingSettings = new WritingSettings
             {
-                writer.Write(ch);
-            }
-            writer.Flush();
-            stream.Flush();
-            writer.Close();
-            stream.Close();
+                Encoding = EncodingUtil.GetEncoding(lyricEncoding)
+            };
+            lrcFile.Write(path, writingSettings);
         }
     }
 
