@@ -1,0 +1,20 @@
+# OpenUTAU ustx插件
+
+## ustx输入
+* 支持的数据：
+  * 曲速、拍号
+  * 音轨
+    * 同一音轨上的多个区段将被合并，音轨名称为第一个区段的名称
+  * 音符
+  * 音高
+    * 锚点、手绘音高线、颤音，将合并转化为手绘音高线。
+
+## ustx输出
+* 支持的数据：
+  * 音轨、音符
+  * 曲速、拍号
+    * 暂不支持变速曲自动转换，仅保留输入文件中的第一个曲速
+
+## 开源软件声明
+本插件基于以下开源软件：
+* [OpenUTAU](https://github.com/stakira/OpenUtau)（[MIT协议](https://github.com/stakira/OpenUtau/blob/master/LICENSE.txt)）
