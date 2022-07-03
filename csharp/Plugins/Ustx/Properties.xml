@@ -6,11 +6,11 @@
   <HomePage>https://github.com/oxygen-dioxide</HomePage>
   <Descriptions>适用于 OpenSvip 的 ustx 格式转换插件。</Descriptions>
   <Requirements>无</Requirements>
-  <Format>OpenUTAU ustx 文件</Format>
+  <Format>OpenUTAU 工程文件</Format>
   <Suffix>ustx</Suffix>
   <Identifier>ustx</Identifier>
-  <LibraryPath>ustx\OxygenDioxide.UstxPlugin</LibraryPath>
-  <Converter>OxygenDioxide.UstxPlugin.UstxConverter</Converter>
+  <LibraryPath>ustx\OxygenDioxide.UstxPlugin.dll</LibraryPath>
+  <Converter>OxygenDioxide.UstxPlugin.Stream.UstxConverter</Converter>
   <InputOptions>
     <!--（尚未实现）
     <Option Name="importPitch" Type="enum" Default="Full">
