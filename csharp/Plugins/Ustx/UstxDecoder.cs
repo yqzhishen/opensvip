@@ -75,6 +75,10 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 osTrack.NoteList.Add(DecodeNote(ustxNote,partOffset));
             }
             osTrack.EditedParams.Pitch.PointList.AddRange(DecodePitch(ustxVoicePart, ustxProject));
+            if(osTrack.Title=="")
+            {
+                osTrack.Title = ustxVoicePart.name;//音轨名称采用第一个区段的名称
+            }
         }
         public Note DecodeNote(UNote ustxNote,int partOffset)
         {
