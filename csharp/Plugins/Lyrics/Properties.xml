@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>LRC 歌词转换插件</Name>
+    <Version>0.0.1</Version>
+    <Author>笛鹿FlutyDeer</Author>
+    <HomePage>https://space.bilibili.com/386270936</HomePage>
+    <Descriptions>适用于 OpenSvip 的 LRC 歌词格式转换插件。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>LRC 歌词文件</Format>
+    <Suffix>lrc</Suffix>
+    <Identifier>lrc</Identifier>
+    <LibraryPath>Lyrics\FlutyDeer.LyricsPlugin.dll</LibraryPath>
+    <Converter>FlutyDeer.LyricsPlugin.Stream.LyricsConverter</Converter>
+    <InputOptions/>
+	<OutputOptions>
+		<Option Name="artist" Type="string" Default="">
+			<Notes>歌手名</Notes>
+		</Option>
+		<Option Name="title" Type="string" Default="">
+			<Notes>歌曲名</Notes>
+		</Option>
+		<Option Name="album" Type="string" Default="">
+			<Notes>专辑名</Notes>
+		</Option>
+		<Option Name="by" Type="string" Default="">
+			<Notes>歌词作者</Notes>
+		</Option>
+		<Option Name="offset" Type="integer" Default="0">
+			<Notes>偏移</Notes>
+			<Tips>单位为毫秒，正值表示整体提前，负值相反。</Tips>
+		</Option>
+		<Option Name="encoding" Type="enum" Default="UTF8">
+			<Notes>歌词文本编码</Notes>
+			<EnumChoices>
+				<Choice Name="ASCII" Tag="ASCII" />
+				<Choice Name="BigEndianUnicode" Tag="BigEndianUnicode" />
+				<Choice Name="Default" Tag="Default">
+					<Label>操作系统的当前 ANSI 代码页的编码。</Label>
+				</Choice>
+				<Choice Name="Unicode" Tag="Unicode" />
+				<Choice Name="UTF-32" Tag="UTF32" />
+				<Choice Name="UTF-7" Tag="UTF7" />
+				<Choice Name="UTF-8 BOM" Tag="UTF8BOM" />
+				<Choice Name="UTF-8" Tag="UTF8" />
+			</EnumChoices>
+		</Option>
+	</OutputOptions>
+</Plugin>

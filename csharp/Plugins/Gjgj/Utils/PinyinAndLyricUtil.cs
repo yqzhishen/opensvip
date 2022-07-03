@@ -1,5 +1,5 @@
 using FlutyDeer.GjgjPlugin.Model;
-using FlutyDeer.GjgjPlugin.Optiions;
+using FlutyDeer.GjgjPlugin.Options;
 using NPinyin;
 using OpenSvip.Library;
 using OpenSvip.Model;

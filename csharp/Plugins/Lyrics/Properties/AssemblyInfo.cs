@@ -1,16 +1,15 @@
-﻿using System.Resources;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("歌叽歌叽工程转换插件")]
-[assembly: AssemblyDescription("适用于 OpenSvip 的歌叽歌叽工程格式转换插件。")]
+[assembly: AssemblyTitle("LRC 歌词转换插件")]
+[assembly: AssemblyDescription("适用于 OpenSvip 的 LRC 歌词格式转换插件。")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("笛鹿FlutyDeer")]
-[assembly: AssemblyProduct("歌叽歌叽工程转换插件")]
+[assembly: AssemblyProduct("LRC 歌词转换插件")]
 [assembly: AssemblyCopyright("Copyright ©  2022 笛鹿FlutyDeer")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -21,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("643e7eed-85e2-4fd6-99af-9eaa718cf5fd")]
+[assembly: Guid("ced66ef4-8393-45be-bf75-35476f840b2c")]
 
 // 程序集的版本信息由下列四个值组成: 
 //
@@ -33,6 +32,5 @@ using System.Runtime.InteropServices;
 //可以指定所有这些值，也可以使用“生成号”和“修订号”的默认值
 //通过使用 "*"，如下所示:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.7.1.0")]
-[assembly: AssemblyFileVersion("1.7.1.0")]
-[assembly: NeutralResourcesLanguage("zh-Hans")]
+[assembly: AssemblyVersion("0.0.1.0")]
+[assembly: AssemblyFileVersion("0.0.1.0")]

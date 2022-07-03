@@ -14,6 +14,15 @@ namespace OpenSvip.Framework
         [XmlElement] public string Author { get; set; }
         
         [XmlElement] public string HomePage { get; set; }
+
+        [XmlIgnore] private string _updateUri;
+
+        [XmlElement]
+        public string UpdateUri
+        {
+            get => _updateUri ?? (_updateUri == "none" ? null : ConstValues.PluginUpdateRoot + $"plugin-{Identifier}.toml");
+            set => _updateUri = value;
+        }
         
         [XmlElement] public string Descriptions { get; set; }
         

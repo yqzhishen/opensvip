@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B5FB653-3637-47CE-B3FD-E184419A058E}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{CED66EF4-8393-45BE-BF75-35476F840B2C}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FlutyDeer.Y77Plugin</RootNamespace>
-    <AssemblyName>FlutyDeer.Y77Plugin</AssemblyName>
+    <RootNamespace>FlutyDeer.LyricsPlugin</RootNamespace>
+    <AssemblyName>FlutyDeer.LyricsPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -30,16 +30,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NPinyin, Version=0.2.6321.26573, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NPinyin.0.2.6321.26573\lib\net20\NPinyin.dll</HintPath>
-    </Reference>
-    <Reference Include="PinYinConverterCore, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\PinYinConverterCore.1.0.2\lib\net45\PinYinConverterCore.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,16 +44,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SymbolList.cs" />
-    <Compile Include="Y77Converter.cs" />
+    <Compile Include="Core\Utils\EncodingUtil.cs" />
+    <Compile Include="Options\LyricEncodingOption.cs" />
+    <Compile Include="Core\LyricLine.cs" />
+    <Compile Include="LyricsConverter.cs" />
+    <Compile Include="LyricsEncoder.cs" />
+    <Compile Include="Core\LyricsFile.cs" />
+    <Compile Include="Core\Utils\LyricsUtil.cs" />
+    <Compile Include="Core\MetaInfo\MetaInfoLine.cs" />
+    <Compile Include="Core\MetaInfo\MetaInfoType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Y77Decoder.cs" />
-    <Compile Include="Y77Encoder.cs" />
-    <Compile Include="Y77Model.cs" />
     <Compile Include="Test.cs" />
+    <Compile Include="Core\WritingSettings.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Content Include="Properties.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -76,9 +77,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

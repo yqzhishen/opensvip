@@ -10,7 +10,8 @@
     mc:Ignorable="d"
     d:Background="White"
     d:DataContext="{d:DesignInstance Type=framework:Plugin}"
-    MaxWidth="370">
+    MaxWidth="370"
+    DataContextChanged="PluginDetailsBoard_DataContextChanged">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="90"/>
@@ -63,11 +64,23 @@
                         Foreground="{StaticResource FunctionalAreaIconBrush}"/>
                     <TextBlock
                         VerticalAlignment="Center"
-                        Margin="5 0"
+                        Margin="5 0 2 0"
                         Foreground="{StaticResource FunctionalAreaIconBrush}"
                         d:Text="1.1.0"
                         Text="{Binding Version, StringFormat=v{0}}"
                         ToolTip="版本"/>
+                    <Button
+                        Width="60"
+                        Height="18"
+                        Padding="0"
+                        materialDesign:ButtonAssist.CornerRadius="3"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Foreground="{StaticResource ThemedHighContrastIndigoBrush}"
+                        FontSize="13"
+                        Content="获取更新"
+                        ToolTip="有更新可用"
+                        Visibility="{Binding HasUpdate, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:PluginDetailsBoard}, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Click="UpdateButton_Click"/>
                 </StackPanel>
                 <StackPanel
                     Margin="5 0"

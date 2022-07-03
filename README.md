@@ -30,8 +30,10 @@
 - Synthesizer V 工程文件 (*.svp)
 - 歌叽歌叽工程文件 (*.gj)
 - Project Vogen 工程文件 (*.vog)
-- MIDI 文件 (*.mid)（开发中）
-- 元七七编辑器工程文件 (*.y77)（开发中）
+- MIDI 文件 (*.mid)
+- 元七七编辑器工程文件 (*.y77)
+- ACE Studio 工程文件 (*.acep)（内测中）
+- OpenUtau 工程文件 (*.ustx)（开发中）
 
 ## 使用方法
 
