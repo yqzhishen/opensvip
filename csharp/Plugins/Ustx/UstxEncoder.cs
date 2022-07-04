@@ -20,6 +20,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 beatPerBar = osProject.TimeSignatureList[0].Numerator,
                 beatUnit = osProject.TimeSignatureList[0].Denominator,
                 voiceParts = new List<UVoicePart>(),
+                waveParts = new List<UWavePart>(),
                 ustxVersion = new System.Version("0.5")
                 
             };
@@ -31,7 +32,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 {
                     ustxProject.voiceParts.Add(EncodeVoicePart((SingingTrack)osTrack,trackNo));
                 }
-                else
+                else//伴奏音轨
                 {
                     ustxProject.waveParts.Add(EncodeWavePart((InstrumentalTrack)osTrack,trackNo));
                 }
