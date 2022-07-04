@@ -53,6 +53,8 @@
     <Compile Include="Core\Utils\LyricsUtil.cs" />
     <Compile Include="Core\MetaInfo\MetaInfoLine.cs" />
     <Compile Include="Core\MetaInfo\MetaInfoType.cs" />
+    <Compile Include="Options\SplitByOption.cs" />
+    <Compile Include="Options\OffsetPolicyOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Core\WritingSettings.cs" />

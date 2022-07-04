@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FlutyDeer.LyricsPlugin
 {
@@ -13,7 +9,7 @@ namespace FlutyDeer.LyricsPlugin
 
         public override string ToString()
         {
-            return $"[{Time.Minutes:D2}:{Time.Seconds:D2}.{Time.Milliseconds:D3}]{Lyric}";
+            return $"[{Time:mm\\:ss\\.ff}]{Lyric}";
         }
         public LyricLine(TimeSpan time, string lyric)
         {

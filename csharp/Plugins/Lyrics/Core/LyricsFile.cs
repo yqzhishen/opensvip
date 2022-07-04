@@ -24,22 +24,22 @@ namespace FlutyDeer.LyricsPlugin
             LyricLines = lyricLines;
         }
 
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            foreach (var meta in MetaInfoLines)
-            {
-                if (meta.Value != null && meta.Value != "")
-                {
-                    sb.AppendLine(meta.ToString());
-                }
-            }
-            foreach (var line in LyricLines)
-            {
-                sb.AppendLine(line.ToString() + "\n");
-            }
-            return sb.ToString();
-        }
+        //public override string ToString()
+        //{
+        //    var sb = new StringBuilder();
+        //    foreach (var meta in MetaInfoLines)
+        //    {
+        //        if (meta.Value != null && meta.Value != "")
+        //        {
+        //            sb.AppendLine(meta.ToString());
+        //        }
+        //    }
+        //    foreach (var line in LyricLines)
+        //    {
+        //        sb.AppendLine(line.ToString());
+        //    }
+        //    return sb.ToString();
+        //}
 
         public void AddLyric(LyricLine line)
         {
@@ -58,16 +58,16 @@ namespace FlutyDeer.LyricsPlugin
             var writer = new StreamWriter(stream, writingSettings.Encoding);
             foreach (var meta in MetaInfoLines)
             {
-                if (meta.Type != MetaInfoType.Offset)
+                if (meta.Type == MetaInfoType.Offset)
                 {
-                    if (meta.Value != null && meta.Value != "")
+                    if (meta.Value != "0")
                     {
                         writer.WriteLine(meta.ToString());
                     }
                 }
                 else
                 {
-                    if (meta.Value != "0")
+                    if (meta.Value != null && meta.Value != "")
                     {
                         writer.WriteLine(meta.ToString());
                     }
@@ -75,7 +75,10 @@ namespace FlutyDeer.LyricsPlugin
             }
             foreach (var line in LyricLines)
             {
-                writer.WriteLine(line.ToString());
+                var content = writingSettings.WriteTimeLine
+                    ? line.ToString()
+                    : line.Lyric;
+                writer.WriteLine(content);
             }
             writer.Flush();
             stream.Flush();

@@ -1,14 +1,8 @@
 ﻿using FlutyDeer.LyricsPlugin.Options;
 using FlutyDeer.LyricsPlugin.Utils;
-using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FlutyDeer.LyricsPlugin.Stream
 {
@@ -27,14 +21,16 @@ namespace FlutyDeer.LyricsPlugin.Stream
                 Album = options.GetValueAsString("album"),
                 By = options.GetValueAsString("by"),
                 Offset = options.GetValueAsInteger("offset"),
+                OffsetPolicyOption = options.GetValueAsEnum("offsetPolicy", OffsetPolicyOption.Timeline),
+                SplitByOption = options.GetValueAsEnum("splitBy", SplitByOption.Both)
             }.EncodeProject(project);
             var lyricEncoding = options.GetValueAsEnum("encoding", LyricEncodingOption.UTF8);
             var writingSettings = new WritingSettings
             {
-                Encoding = EncodingUtil.GetEncoding(lyricEncoding)
+                Encoding = EncodingUtil.GetEncoding(lyricEncoding),
+                WriteTimeLine = options.GetValueAsBoolean("timeline", true)
             };
             lrcFile.Write(path, writingSettings);
         }
     }
-
 }

@@ -9,5 +9,6 @@ namespace FlutyDeer.LyricsPlugin
     public class WritingSettings
     {
         public Encoding Encoding { get; set; }
+        public bool WriteTimeLine { get; set; } = true;
     }
 }

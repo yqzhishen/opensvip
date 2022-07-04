@@ -26,8 +26,37 @@
 			<Notes>歌词作者</Notes>
 		</Option>
 		<Option Name="offset" Type="integer" Default="0">
-			<Notes>偏移</Notes>
+			<Notes>偏移量</Notes>
 			<Tips>单位为毫秒，正值表示整体提前，负值相反。</Tips>
+		</Option>
+		<Option Name="offsetPolicy" Type="enum" Default="timeline">
+			<Notes>偏移处理方式</Notes>
+			<EnumChoices>
+				<Choice Name="作用于时间轴" Tag="timeline">
+					<Label>对每一行歌词的时间轴作偏移，元数据的“offset”保持为0。</Label>
+				</Choice>
+				<Choice Name="作用于元数据" Tag="meta">
+					<Label>写入偏移量到元数据的“offset”，不处理歌词的时间轴。注意：由于部分播放器不支持元数据里的“offset”标签，选择此选项可能会导致歌词显示时间不准确。</Label>
+				</Choice>
+			</EnumChoices>
+		</Option>
+		<Option Name="splitBy" Type="enum" Default="both">
+			<Notes>歌词换行方式</Notes>
+			<EnumChoices>
+				<Choice Name="音符间隙和标点符号" Tag="both">
+					<Label>两个相邻的音符间距大于等于32分音符或遇到标点符号时另起新行。</Label>
+				</Choice>
+				<Choice Name="仅音符间隙" Tag="gap">
+					<Label>两个相邻的音符间距大于等于32分音符时另起新行。</Label>
+				</Choice>
+				<Choice Name="仅标点符号" Tag="symbol">
+					<Label>遇到标点符号时另起新行。</Label>
+				</Choice>
+			</EnumChoices>
+		</Option>
+		<Option Name="timeline" Type="boolean" Default="true">
+			<Notes>写入时间轴</Notes>
+			<Tips>如果需要无时间轴的歌词，关闭此选项即可。</Tips>
 		</Option>
 		<Option Name="encoding" Type="enum" Default="UTF8">
 			<Notes>歌词文本编码</Notes>
