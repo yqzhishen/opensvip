@@ -60,7 +60,9 @@
     <Compile Include="Utils\TimeSignatureListUtil.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Properties.xml" />
+    <Content Include="Properties.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">

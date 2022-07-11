@@ -26,9 +26,9 @@ namespace FlutyDeer.MidiPlugin.Utils
         /// </summary>
         /// <param name="BPM">曲速。</param>
         /// <returns>每四分音符的微秒数。</returns>
-        public long BPMToMicrosecondsPerQuarterNote(long BPM)
+        public long BPMToMicrosecondsPerQuarterNote(float BPM)
         {
-            return (long)(60.0 / BPM * 1000000.0);
+            return (long)(60000000.0 / BPM);
         }
 
         /// <summary>

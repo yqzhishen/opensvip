@@ -21,7 +21,7 @@ namespace FlutyDeer.MidiPlugin.Utils
                 songTempoList.Add(new SongTempo
                 {
                     Position = (int)time,
-                    BPM = 60000000 / tempo.MicrosecondsPerQuarterNote
+                    BPM = (float)(60.0 / tempo.MicrosecondsPerQuarterNote * 1000000.0)
                 });
             }
             return songTempoList;

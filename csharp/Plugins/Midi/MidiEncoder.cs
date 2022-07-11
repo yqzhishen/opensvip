@@ -62,7 +62,7 @@ namespace FlutyDeer.MidiPlugin
                 tempoMapManager.ClearTempoMap();//暂不清楚为什么一定要写入一个含有SetTempo事件的Chunk之后TempoMapManager才能正常工作。
                 foreach (var tempo in osProject.SongTempoList)
                 {
-                    tempoMapManager.SetTempo(tempo.Position, new Tempo(midiEventsUtil.BPMToMicrosecondsPerQuarterNote((long)tempo.BPM)));
+                    tempoMapManager.SetTempo(tempo.Position, new Tempo(midiEventsUtil.BPMToMicrosecondsPerQuarterNote(tempo.BPM)));
                 }
                 foreach (var timeSignature in osProject.TimeSignatureList)
                 {
