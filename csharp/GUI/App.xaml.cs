@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Windows;
 using MaterialDesignThemes.Wpf;
 
 namespace OpenSvip.GUI
@@ -16,6 +17,18 @@ namespace OpenSvip.GUI
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            DispatcherUnhandledException += App_DispatcherUnhandledException;
+        }
+
+        void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            var exception = e.Exception;
+            MessageBox.Show($"{exception.Message}\n{exception.StackTrace}");
         }
 
         private bool _appUsesLightMode;
