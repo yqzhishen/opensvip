@@ -86,13 +86,13 @@ namespace OpenSvip.GUI.Config
 
     public static class Information
     {
-        public const string ApplicationVersion = "1.4.0";
+        public const string ApplicationVersion = "1.4.1";
 
-        public const string OnlineDocuments = "https://openvpi.github.io/home";
+        public const string OnlineDocuments = "https://openvpi.github.io";
 
         public const string GitHubRepository = "https://github.com/yqzhishen/opensvip";
 
-        public const string UpdateLogUrl = "https://openvpi.github.io/home/updatelogs/converter.toml";
+        public const string UpdateLogUrl = "https://openvpi.github.io/updatelogs/converter.toml";
     }
 
     [TomlDoNotInlineObject]
