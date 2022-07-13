@@ -4,7 +4,7 @@
 
 项目成果现已公测：[B站专栏](https://www.bilibili.com/read/cv16468227)
 
-日常发行版更新已移至：[OpenVPI 主页](https://openvpi.github.io/home/)
+日常发行版更新已移至：[OpenVPI 主页](https://openvpi.github.io/)
 
 # OpenSVIP
 
