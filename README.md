@@ -32,8 +32,12 @@
 - Project Vogen 工程文件 (*.vog)
 - MIDI 文件 (*.mid)
 - 元七七编辑器工程文件 (*.y77)
-- ACE Studio 工程文件 (*.acep)（内测中）
+- ACE Studio 工程文件 (*.acep)
 - OpenUtau 工程文件 (*.ustx)（开发中）
+- VOCALOID 3/4 工程文件 (*.vsqx)（计划中）
+- Utau 工程文件 (*.ust)（计划中）
+- DeepVocal 工程文件 (*.dv)（计划中）
+- VocalSharp 工程文件 (*.vspx)（计划中）
 
 ## 使用方法
 
