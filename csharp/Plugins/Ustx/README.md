@@ -18,3 +18,4 @@
 ## 开源软件声明
 本插件基于以下开源软件：
 * [OpenUTAU](https://github.com/stakira/OpenUtau)（[MIT协议](https://github.com/stakira/OpenUtau/blob/master/LICENSE.txt)）
+* [YamlDotNet](https://github.com/aaubry/YamlDotNet) （[MIT协议](https://github.com/aaubry/YamlDotNet/blob/master/LICENSE.txt)）
