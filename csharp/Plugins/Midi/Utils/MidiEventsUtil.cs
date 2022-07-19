@@ -1,10 +1,11 @@
+using FlutyDeer.GjgjPlugin.Utils;
+using Melanchall.DryWetMidi.Common;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
+using NPinyin;
 using OpenSvip.Model;
 using System.Collections.Generic;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Common;
 using Note = OpenSvip.Model.Note;
-using NPinyin;
-using Melanchall.DryWetMidi.Interaction;
 
 namespace FlutyDeer.MidiPlugin.Utils
 {
@@ -16,6 +17,8 @@ namespace FlutyDeer.MidiPlugin.Utils
         public bool IsExportLyrics { get; set; }
 
         public bool IsUseCompatibleLyric { get; set; }
+
+        public bool IsUseLegacyPinyin { get; set; }
 
         public bool IsRemoveSymbols { get; set; }
         
@@ -42,17 +45,27 @@ namespace FlutyDeer.MidiPlugin.Utils
             List<MidiEvent> midiEventList = new List<MidiEvent>();
             midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
             TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
+            List<string> lyricList = new List<string>();
+            lyricList.Clear();
+            foreach (var note in singingTrack.NoteList)
+            {
+                lyricList.Add(note.Lyric);
+            }
+            PinyinAndLyricUtil.ClearAllPinyin();
+            PinyinAndLyricUtil.AddPinyin(lyricList);
             using (var objectsManager = new TimedObjectsManager<TimedEvent>(trackChunk.Events))
             {
                 var events = objectsManager.Objects;
-                foreach(var note in singingTrack.NoteList)
+                int index = 0;
+                foreach (var note in singingTrack.NoteList)
                 {
                     if(IsExportLyrics)
                     {
-                        events.Add(new TimedEvent(new LyricEvent(GetLyric(note)), note.StartPos));
+                        events.Add(new TimedEvent(new LyricEvent(GetLyric(note, index)), note.StartPos));
                     }
                     events.Add(new TimedEvent(new NoteOnEvent(GetTransposedKeyNumber(note), (SevenBitNumber)45), note.StartPos));
                     events.Add(new TimedEvent(new NoteOffEvent(GetTransposedKeyNumber(note), (SevenBitNumber)0), note.StartPos + note.Length));
+                    index++;
                 }
             }
             return trackChunk;
@@ -63,7 +76,7 @@ namespace FlutyDeer.MidiPlugin.Utils
         /// </summary>
         /// <param name="note">音符。</param>
         /// <returns></returns>
-        private string GetLyric(Note note)
+        private string GetLyric(Note note, int index)
         {
             string lyric;
             if (note.Pronunciation != null)
@@ -79,8 +92,7 @@ namespace FlutyDeer.MidiPlugin.Utils
                 }
                 if (IsUseCompatibleLyric)
                 {
-                    lyric = Pinyin.GetPinyin(lyric);
-                    //lyric = new Pinyin().ConvertToPinyin(lyric);
+                    lyric = PinyinAndLyricUtil.GetNotePinyin(lyric, IsUseLegacyPinyin, index);
                 }
             }
             return lyric;

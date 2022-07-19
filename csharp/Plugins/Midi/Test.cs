@@ -18,7 +18,7 @@ namespace FlutyDeer.MidiPlugin
 
         private static void Midi2Json()
         {
-            var project = new MidiConverter().Load(@"D:\Users\fluty\Downloads\test.mid", new ConverterOptions(new Dictionary<string, string>()));
+            var project = new MidiConverter().Load(@"D:\Users\fluty\Downloads\sora.mid", new ConverterOptions(new Dictionary<string, string>()));
             var stream = new FileStream(
                 @"D:\Users\fluty\Downloads\test.json",
                 FileMode.Create,

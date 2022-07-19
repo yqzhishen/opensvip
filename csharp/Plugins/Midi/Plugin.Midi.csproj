@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +49,7 @@
     <Compile Include="MidiEncoder.cs" />
     <Compile Include="Options\ErrorMidiFilePolicyOption.cs" />
     <Compile Include="Options\LyricEncodingOption.cs" />
+    <Compile Include="Options\LyricsAndPinyinOption.cs" />
     <Compile Include="Options\MultiChannelOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test.cs" />
@@ -54,6 +58,7 @@
     <Compile Include="Utils\MidiEventsUtil.cs" />
     <Compile Include="Utils\MultiChannelUtil.cs" />
     <Compile Include="Utils\NoteOverlapUtil.cs" />
+    <Compile Include="Utils\PinyinAndLyricUtil.cs" />
     <Compile Include="Utils\PreShiftUtil.cs" />
     <Compile Include="Utils\RWSettingsUtil.cs" />
     <Compile Include="Utils\TempoListUtil.cs" />

@@ -1,11 +1,12 @@
-﻿using OpenSvip.Model;
-using System.Collections.Generic;
-using System.Linq;
+﻿using FlutyDeer.MidiPlugin.Options;
+using FlutyDeer.MidiPlugin.Utils;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
+using OpenSvip.Framework;
+using OpenSvip.Model;
+using System.Collections.Generic;
+using System.Linq;
 using Note = OpenSvip.Model.Note;
-using FlutyDeer.MidiPlugin.Utils;
-using FlutyDeer.MidiPlugin.Options;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -37,7 +38,6 @@ namespace FlutyDeer.MidiPlugin
 
         private List<Track> DecodeTrackList(IEnumerable<TrackChunk> trackChunks)
         {
-            //先用DryWetMidi的方法导入音符
             List<Track> singingTrackList = new List<Track>();
             foreach (TrackChunk trackChunk in trackChunks)
             {
@@ -47,14 +47,16 @@ namespace FlutyDeer.MidiPlugin
                 {
                     case MultiChannelOption.First:
                         midiNoteList = trackChunk.GetNotes()
-                            .Where(n => n.Channel == 0).ToList();
+                                                 .Where(n => n.Channel == 0)
+                                                 .ToList();
                         ImportTracks(singingTrackList, trackChunk, midiNoteList);
                         break;
                     case MultiChannelOption.Split:
                         for (int i = 0; i < 16; i++)
                         {
                             midiNoteList = trackChunk.GetNotes()
-                                    .Where(n => n.Channel == i).ToList();
+                                                     .Where(n => n.Channel == i)
+                                                     .ToList();
                             ImportTracks(singingTrackList, trackChunk, midiNoteList);
                         }
                         break;
@@ -62,7 +64,8 @@ namespace FlutyDeer.MidiPlugin
                         foreach (var channel in channels)
                         {
                             midiNoteList = trackChunk.GetNotes()
-                                .Where(n => n.Channel == channel).ToList();
+                                                     .Where(n => n.Channel == channel)
+                                                     .ToList();
                             ImportTracks(singingTrackList, trackChunk, midiNoteList);
                         }
                         break;
@@ -75,10 +78,10 @@ namespace FlutyDeer.MidiPlugin
         {
             string trackName = "演唱轨";
             var midiEvents = trackChunk.Events;
-            var sequenceTrackNameEvent = midiEvents.Where(x => x.EventType == MidiEventType.SequenceTrackName);
-            if (sequenceTrackNameEvent != null && sequenceTrackNameEvent.Count() > 0)
+            var sequenceTrackNameEvents = midiEvents.Where(e => e is SequenceTrackNameEvent);
+            if (sequenceTrackNameEvents != null && sequenceTrackNameEvents.Count() > 0)
             {
-                trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvent.First()).Text;
+                trackName = ((SequenceTrackNameEvent)sequenceTrackNameEvents.First()).Text;
             }
             if (midiNoteList.Count > 0)
             {
@@ -100,9 +103,9 @@ namespace FlutyDeer.MidiPlugin
                     LyricsUtil.ImportLyricsFromTrackChunk(trackChunk, noteList);
                 }
 
-                if (new NoteOverlapUtil().IsOverlapedItemsExists(noteList))
+                if (NoteOverlapUtil.IsOverlapedItemsExists(noteList))
                 {
-                    //Warnings.AddWarning("音符重叠", type: WarningTypes.Notes);
+                    Warnings.AddWarning("音符重叠。", type: WarningTypes.Notes);
                 }
                 singingTrackList.Add(new SingingTrack
                 {
