@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.7.1</Version>
+    <Version>0.8.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
@@ -12,9 +12,8 @@
     <LibraryPath>Midi\FlutyDeer.MidiPlugin.dll</LibraryPath>
     <Converter>FlutyDeer.MidiPlugin.Stream.MidiConverter</Converter>
 	<InputOptions>
-		<Option Name="importLyrics" Type="boolean" Default="false">
-			<Notes>导入歌词（实验性）</Notes>
-			<Tips>此功能尚不成熟，启用本选项可能出现无法预料的情况。</Tips>
+		<Option Name="importLyrics" Type="boolean" Default="true">
+			<Notes>导入歌词</Notes>
 		</Option>
 		<Option Name="lyricEncoding" Type="enum" Default="UTF8">
 			<Notes>歌词文本编码</Notes>
@@ -72,6 +71,10 @@
 		<Option Name="compatibleLyric" Type="boolean" Default="false">
 			<Notes>歌词兼容性模式</Notes>
 			<Tips>将所有中文歌词转换为拼音，防止不支持导入带有中文歌词 MIDI 文件的歌声合成软件出现乱码。</Tips>
+		</Option>
+		<Option Name="isUseLegacyPinyin" Type="boolean" Default="false">
+			<Notes>使用旧版的汉字转拼音方案</Notes>
+			<Tips>不推荐开启，且未来有可能会移除。</Tips>
 		</Option>
 		<Option Name="lyricEncoding" Type="enum" Default="UTF8">
 			<Notes>歌词文本编码</Notes>

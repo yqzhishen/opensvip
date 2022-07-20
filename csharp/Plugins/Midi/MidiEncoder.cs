@@ -25,6 +25,8 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public bool IsUseCompatibleLyric { get; set; }
 
+        public bool IsUseLegacyPinyin { get; set; }
+
         /// <summary>
         /// 是否移除歌词中的常见标点符号，默认为是。
         /// </summary>
@@ -59,14 +61,15 @@ namespace FlutyDeer.MidiPlugin
             midiFile.Chunks.Add(new TrackChunk());
             using (TempoMapManager tempoMapManager = midiFile.ManageTempoMap())
             {
-                tempoMapManager.ClearTempoMap();//暂不清楚为什么一定要写入一个含有SetTempo事件的Chunk之后TempoMapManager才能正常工作。
+                tempoMapManager.ClearTempoMap();
                 foreach (var tempo in osProject.SongTempoList)
                 {
                     tempoMapManager.SetTempo(tempo.Position, new Tempo(midiEventsUtil.BPMToMicrosecondsPerQuarterNote(tempo.BPM)));
                 }
                 foreach (var timeSignature in osProject.TimeSignatureList)
                 {
-                    tempoMapManager.SetTimeSignature(new BarBeatTicksTimeSpan(timeSignature.BarIndex), new MidiTimeSignature(timeSignature.Numerator, timeSignature.Denominator));
+                    tempoMapManager.SetTimeSignature(new BarBeatTicksTimeSpan(timeSignature.BarIndex),
+                                                     new MidiTimeSignature(timeSignature.Numerator, timeSignature.Denominator));
                 }
             }
             EncodeMidiChunks(midiFile);//相当于 MIDI 里面的轨道。
@@ -100,6 +103,7 @@ namespace FlutyDeer.MidiPlugin
                         trackChunkList.Add(new MidiEventsUtil{
                             IsExportLyrics = IsExportLyrics,
                             IsUseCompatibleLyric = IsUseCompatibleLyric,
+                            IsUseLegacyPinyin = IsUseLegacyPinyin,
                             IsRemoveSymbols = IsRemoveSymbols,
                             SemivowelPreShift = PreShift,
                             Transpose = Transpose

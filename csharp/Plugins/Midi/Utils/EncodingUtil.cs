@@ -1,5 +1,5 @@
-using System.Text;
 using FlutyDeer.MidiPlugin.Options;
+using System.Text;
 
 namespace FlutyDeer.MidiPlugin.Utils
 {
