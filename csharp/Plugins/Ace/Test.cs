@@ -1,9 +1,8 @@
-﻿#define EXPORT
+﻿#define IMPORT
 
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using AceStdio.Model;
 using AceStdio.Resources;
@@ -49,9 +48,25 @@ namespace AceStdio.Test
             }
 #endif
 #if IMPORT
-            new AceConverter().Load(
-                @"C:\Users\YQ之神\ACE_Studio\project\fb17c2868ec9b5295deea30ca3d0f4f9\暗香.acep",
-                null);
+            string[] src =
+            {
+                @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\黏黏黏黏\黏黏黏黏.acep",
+                @"C:\Users\YQ之神\Desktop\test space\groups.acep"
+            };
+            string[] dst =
+            {
+                @"C:\Users\YQ之神\Desktop\黏黏黏黏.json",
+                @"C:\Users\YQ之神\Desktop\test space\groups.json"
+            };
+            const int index = 1; 
+            var project = new AceConverter().Load(
+                src[index],
+                new ConverterOptions(new Dictionary<string, string>()));
+            using (var stream = new FileStream(dst[index], FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(stream))
+            {
+                writer.Write(JsonConvert.SerializeObject(project));
+            }
 #endif
 #if EXPORT
             string[] src =

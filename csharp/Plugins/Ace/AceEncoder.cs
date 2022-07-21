@@ -26,10 +26,8 @@ namespace AceStdio.Core
         public StrengthMappingOption MapStrengthTo { get; set; }
         
         public int SplitThreshold { get; set; }
-        
-        public bool ConvertAudioTrack { get; set; }
 
-        private TimeSynchronizer Synchronizer;
+        private TimeSynchronizer _synchronizer;
 
         private int _firstBarTicks;
 
@@ -79,12 +77,12 @@ namespace AceStdio.Core
             });
             _aceTempoList = content.TempoList;
             
-            Synchronizer = new TimeSynchronizer(project.SongTempoList, _firstBarTicks, _hasMultiTempo)
+            _synchronizer = new TimeSynchronizer(project.SongTempoList, _firstBarTicks, _hasMultiTempo)
             {
                 DefaultTempo = DefaultTempo
             };
             
-            content.TrackList.AddRange(project.TrackList.ConvertAll(EncodeTrack).Where(track => track != null));
+            content.TrackList.AddRange(project.TrackList.Select(EncodeTrack).Where(track => track != null));
             content.Duration = content.TrackList.Any()
                 ? content.TrackList.Max(track => track.Length()) + 9600
                 : 9600;
@@ -123,12 +121,12 @@ namespace AceStdio.Core
                     {
                         var padding = SplitThreshold > 0 ? SplitThreshold / 2 : 1920;
                         _patternStart = (int) Math.Round(
-                            Synchronizer.GetActualTicksFromTicks(Math.Max(0, buffer.First().StartPos - padding)));
+                            _synchronizer.GetActualTicksFromTicks(Math.Max(0, buffer.First().StartPos - padding)));
                         var vocalPattern = new AceVocalPattern
                         {
                             Position = _patternStart,
                             Duration = (int) Math.Round(
-                                Synchronizer.GetActualTicksFromTicks(
+                                _synchronizer.GetActualTicksFromTicks(
                                     buffer.Last().StartPos + buffer.Last().Length + padding)) - _patternStart
                         };
                         var pinyinSeries = PinyinUtils.GetPinyinSeries(buffer.Select(note => note.Lyric));
@@ -170,10 +168,6 @@ namespace AceStdio.Core
                     aceTrack = aceVocalTrack;
                     break;
                 case InstrumentalTrack instrumentalTrack:
-                    if (!ConvertAudioTrack)
-                    {
-                        return null;
-                    }
                     var aceAudioTrack = new AceAudioTrack();
                     var audioPattern = new AceAudioPattern
                     {
@@ -183,21 +177,21 @@ namespace AceStdio.Core
                     var actualOriginalOffset = EncodeAudioOffset(instrumentalTrack.Offset);
                     if (actualOriginalOffset < 0)
                     {
-                        audioPattern.ClipPosition = (int)Math.Round(Synchronizer.GetActualTicksFromTicks(-actualOriginalOffset));
+                        audioPattern.ClipPosition = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(-actualOriginalOffset));
                         audioPattern.Position = -audioPattern.ClipPosition;
                     }
                     else
                     {
-                        audioPattern.Position = (int)Math.Round(Synchronizer.GetActualTicksFromTicks(actualOriginalOffset));
+                        audioPattern.Position = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(actualOriginalOffset));
                     }
                     try
                     {
                         using (var reader = new AudioFileReader(instrumentalTrack.AudioFilePath))
                         {
                             var offset = audioPattern.Position >= 0
-                                ? Synchronizer.GetActualSecsFromTicks(audioPattern.Position)
+                                ? _synchronizer.GetActualSecsFromTicks(audioPattern.Position)
                                 : audioPattern.Position / DefaultTempo / 8;
-                            audioPattern.Duration = (int) Synchronizer.GetActualTicksFromSecs(offset + reader.TotalTime.TotalSeconds)
+                            audioPattern.Duration = (int) _synchronizer.GetActualTicksFromSecs(offset + reader.TotalTime.TotalSeconds)
                                 - audioPattern.Position;
                             audioPattern.ClipDuration = audioPattern.Duration - audioPattern.ClipPosition;
                         }
@@ -224,11 +218,11 @@ namespace AceStdio.Core
         {
             var aceNote = new AceNote
             {
-                Position = (int) Math.Round(Synchronizer.GetActualTicksFromTicks(note.StartPos)),
+                Position = (int) Math.Round(_synchronizer.GetActualTicksFromTicks(note.StartPos)),
                 Pitch = note.KeyNumber,
                 Lyrics = note.Lyric
             };
-            aceNote.Duration = (int) Math.Round(Synchronizer.GetActualTicksFromTicks(note.StartPos + note.Length)) - aceNote.Position;
+            aceNote.Duration = (int) Math.Round(_synchronizer.GetActualTicksFromTicks(note.StartPos + note.Length)) - aceNote.Position;
             aceNote.Position -= _patternStart;
             
             if (!note.Lyric.Contains("-"))
@@ -242,15 +236,15 @@ namespace AceStdio.Core
             }
             if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs >= 0)
             {
-                var phoneStartInSecs = Synchronizer.GetActualSecsFromTicks(note.StartPos) - note.EditedPhones.HeadLengthInSecs;
-                var phoneStartInTicks = Synchronizer.GetActualTicksFromSecs(phoneStartInSecs);
-                aceNote.ConsonantLength = (int)Math.Round(Synchronizer.GetActualTicksFromTicks(note.StartPos) - phoneStartInTicks);
+                var phoneStartInSecs = _synchronizer.GetActualSecsFromTicks(note.StartPos) - note.EditedPhones.HeadLengthInSecs;
+                var phoneStartInTicks = _synchronizer.GetActualTicksFromSecs(phoneStartInSecs);
+                aceNote.ConsonantLength = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(note.StartPos) - phoneStartInTicks);
             }
             if (note.HeadTag == "V" && BreathLength > 0)
             {
-                var breathStartInSecs = Synchronizer.GetActualSecsFromTicks(note.StartPos) - BreathLength / 1000.0;
-                var breathStartInTicks = Synchronizer.GetActualTicksFromSecs(breathStartInSecs);
-                aceNote.BreathLength = (int)Math.Round(Synchronizer.GetActualTicksFromTicks(note.StartPos) - breathStartInTicks);
+                var breathStartInSecs = _synchronizer.GetActualSecsFromTicks(note.StartPos) - BreathLength / 1000.0;
+                var breathStartInTicks = _synchronizer.GetActualTicksFromSecs(breathStartInSecs);
+                aceNote.BreathLength = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(note.StartPos) - breathStartInTicks);
             }
             return aceNote;
         }
@@ -358,9 +352,9 @@ namespace AceStdio.Core
                         return false;
                     }
                     var startSec = seg.First().Item1 >= _firstBarTicks
-                        ? Synchronizer.GetActualSecsFromTicks(seg.First().Item1 - _firstBarTicks) - patternStartSecond
+                        ? _synchronizer.GetActualSecsFromTicks(seg.First().Item1 - _firstBarTicks) - patternStartSecond
                         : 0;
-                    var endSec = Synchronizer.GetActualSecsFromTicks(seg.Last().Item1 - _firstBarTicks) - patternStartSecond;
+                    var endSec = _synchronizer.GetActualSecsFromTicks(seg.Last().Item1 - _firstBarTicks) - patternStartSecond;
                     return startSec <= rightBound && endSec >= leftBound;
                 });
 
@@ -368,19 +362,19 @@ namespace AceStdio.Core
             {
                 var startPoint = segment.BinaryFindLast(point =>
                                      point.Item1 >= _firstBarTicks
-                                     && Synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) <= patternStartSecond + leftBound)
+                                     && _synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) <= patternStartSecond + leftBound)
                                  ?? segment.First();
 
                 var endPoint = segment.BinaryFindFirst(point =>
                                    point.Item1 >= _firstBarTicks
-                                   && Synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) >= patternStartSecond + rightBound)
+                                   && _synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) >= patternStartSecond + rightBound)
                                ?? segment.Last();
                 
                 var aceCurve = new AceParamCurve
                 {
-                    Offset = (int) Math.Round(Synchronizer.GetActualTicksFromTicks(startPoint.Item1 - _firstBarTicks)) - _patternStart
+                    Offset = (int) Math.Round(_synchronizer.GetActualTicksFromTicks(startPoint.Item1 - _firstBarTicks)) - _patternStart
                 };
-                var curveEnd = (int) Math.Round(Synchronizer.GetActualTicksFromTicks(endPoint.Item1 - _firstBarTicks)) - _patternStart;
+                var curveEnd = (int) Math.Round(_synchronizer.GetActualTicksFromTicks(endPoint.Item1 - _firstBarTicks)) - _patternStart;
                 
                 var tickStep = (double) (endPoint.Item1 - startPoint.Item1) / (curveEnd - aceCurve.Offset);
                 double tick = startPoint.Item1;
@@ -388,11 +382,11 @@ namespace AceStdio.Core
                 tick = Math.Max(_firstBarTicks, Math.Round(tick));
                 tickStep = (endPoint.Item1 - tick) / (curveEnd - aceCurve.Offset);
                 
-                var secondStep = Synchronizer.GetDurationSecsFromTicks(
+                var secondStep = _synchronizer.GetDurationSecsFromTicks(
                                      (int) tick - _firstBarTicks,
                                      endPoint.Item1 - _firstBarTicks)
                                  / (curveEnd - aceCurve.Offset);
-                var second = Synchronizer.GetActualSecsFromTicks((int) tick - _firstBarTicks) - patternStartSecond;
+                var second = _synchronizer.GetActualSecsFromTicks((int) tick - _firstBarTicks) - patternStartSecond;
                 
                 for (; second < leftBound; ++aceCurve.Offset, tick += tickStep, second += secondStep) { }
                 
@@ -428,9 +422,9 @@ namespace AceStdio.Core
                         return false;
                     }
                     var startSec = seg.First().Item1 >= _firstBarTicks
-                        ? Synchronizer.GetActualSecsFromTicks(seg.First().Item1 - _firstBarTicks) - patternStartSecond
+                        ? _synchronizer.GetActualSecsFromTicks(seg.First().Item1 - _firstBarTicks) - patternStartSecond
                         : 0;
-                    var endSec = Synchronizer.GetActualSecsFromTicks(seg.Last().Item1 - _firstBarTicks) - patternStartSecond;
+                    var endSec = _synchronizer.GetActualSecsFromTicks(seg.Last().Item1 - _firstBarTicks) - patternStartSecond;
                     return startSec <= rightBound && endSec >= leftBound;
                 });
 
@@ -438,19 +432,19 @@ namespace AceStdio.Core
             {
                 var startPoint = segment.BinaryFindLast(point =>
                                      point.Item1 >= _firstBarTicks
-                                     && Synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) <= patternStartSecond + leftBound)
+                                     && _synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) <= patternStartSecond + leftBound)
                                  ?? segment.First();
 
                 var endPoint = segment.BinaryFindFirst(point =>
                                    point.Item1 >= _firstBarTicks
-                                   && Synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) >= patternStartSecond + rightBound)
+                                   && _synchronizer.GetActualSecsFromTicks(point.Item1 - _firstBarTicks) >= patternStartSecond + rightBound)
                                ?? segment.Last();
                 
                 var aceCurve = new AceParamCurve
                 {
-                    Offset = (int) Math.Round(Synchronizer.GetActualTicksFromTicks(startPoint.Item1 - _firstBarTicks)) - _patternStart
+                    Offset = (int) Math.Round(_synchronizer.GetActualTicksFromTicks(startPoint.Item1 - _firstBarTicks)) - _patternStart
                 };
-                var curveEnd = (int)Math.Round(Synchronizer.GetActualTicksFromTicks(endPoint.Item1 - _firstBarTicks)) - _patternStart;
+                var curveEnd = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(endPoint.Item1 - _firstBarTicks)) - _patternStart;
                 
                 var tickStep = (double) (endPoint.Item1 - startPoint.Item1) / (curveEnd - aceCurve.Offset);
                 double tick = startPoint.Item1;
@@ -458,11 +452,11 @@ namespace AceStdio.Core
                 tick = Math.Max(_firstBarTicks, Math.Round(tick));
                 tickStep = (endPoint.Item1 - tick) / (curveEnd - aceCurve.Offset);
                 
-                var secondStep = Synchronizer.GetDurationSecsFromTicks(
+                var secondStep = _synchronizer.GetDurationSecsFromTicks(
                                      (int) tick - _firstBarTicks,
                                      endPoint.Item1 - _firstBarTicks)
                                  / (curveEnd - aceCurve.Offset);
-                var second = Synchronizer.GetActualSecsFromTicks((int) tick - _firstBarTicks) - patternStartSecond;
+                var second = _synchronizer.GetActualSecsFromTicks((int) tick - _firstBarTicks) - patternStartSecond;
                 
                 for (; second < leftBound; ++aceCurve.Offset, tick += tickStep, second += secondStep) { }
                 
@@ -486,7 +480,7 @@ namespace AceStdio.Core
             }
             if (offset > 0)
             {
-                return (int) Math.Round(Synchronizer.GetActualTicksFromTicks(offset));
+                return (int) Math.Round(_synchronizer.GetActualTicksFromTicks(offset));
             }
             var currentPos = _firstBarTicks;
             var actualPos = _firstBarTicks + offset;

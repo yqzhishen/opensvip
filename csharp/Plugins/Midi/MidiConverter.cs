@@ -1,8 +1,8 @@
-﻿using OpenSvip.Framework;
-using OpenSvip.Model;
-using FlutyDeer.MidiPlugin.Options;
-using Melanchall.DryWetMidi.Core;
+﻿using FlutyDeer.MidiPlugin.Options;
 using FlutyDeer.MidiPlugin.Utils;
+using Melanchall.DryWetMidi.Core;
+using OpenSvip.Framework;
+using OpenSvip.Model;
 
 namespace FlutyDeer.MidiPlugin.Stream
 {
@@ -15,7 +15,7 @@ namespace FlutyDeer.MidiPlugin.Stream
             return new MidiDecoder
             {
                 IsImportTimeSignatures = options.GetValueAsBoolean("importTimeSignatures", true),
-                IsImportLyrics = options.GetValueAsBoolean("importLyrics", false),
+                IsImportLyrics = options.GetValueAsBoolean("importLyrics", true),
                 MultiChannelOption = options.GetValueAsEnum("multiChannel", MultiChannelOption.First),
                 Channels = options.GetValueAsString("channels", "1")
             }.DecodeMidiFile(midiFile);
@@ -28,6 +28,7 @@ namespace FlutyDeer.MidiPlugin.Stream
                 IsExportLyrics = options.GetValueAsBoolean("exportLyrics", true),
                 Transpose = options.GetValueAsInteger("transpose", 0),
                 IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
+                IsUseLegacyPinyin = options.GetValueAsBoolean("isUseLegacyPinyin", false),
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
                 PPQ = options.GetValueAsInteger("ppq", 480),
                 PreShift = options.GetValueAsInteger("preShift", 0)

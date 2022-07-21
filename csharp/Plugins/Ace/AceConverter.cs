@@ -28,7 +28,10 @@ namespace AceStdio.Stream
             {
                 throw new InvalidDataException("Deserialized project content is null.");
             }
-            return new AceDecoder().DecodeProject(aceProject.Content);
+            return new AceDecoder
+            {
+                SampleInterval = Math.Max(0, options.GetValueAsInteger("curveSampleInterval", 5))
+            }.DecodeProject(aceProject.Content);
         }
 
         public void Save(string path, Project project, ConverterOptions options)
@@ -43,7 +46,6 @@ namespace AceStdio.Stream
                     BreathLength = Math.Max(0, options.GetValueAsInteger("breath", 600)),
                     MapStrengthTo = options.GetValueAsEnum("mapStrengthTo", StrengthMappingOption.Both),
                     SplitThreshold = 480 * Math.Max(0, options.GetValueAsInteger("splitThreshold", 8)),
-                    ConvertAudioTrack = options.GetValueAsBoolean("audio", true)
                 }.EncodeProject(project)
             };
             using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))

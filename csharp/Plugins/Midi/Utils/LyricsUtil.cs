@@ -36,7 +36,9 @@ namespace FlutyDeer.MidiPlugin.Utils
                 {
                     try
                     {
-                        string lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos).Select(e => ((LyricEvent)e.Event).Text).FirstOrDefault();
+                        string lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos)
+                                             .Select(e => ((LyricEvent)e.Event).Text)
+                                             .FirstOrDefault();
                         if (Regex.IsMatch(lyric, @"[a-zA-Z]"))
                         {
                             note.Lyric = "啊";
