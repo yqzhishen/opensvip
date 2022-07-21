@@ -15,10 +15,22 @@ namespace OxygenDioxide.UstxPlugin.Stream
     {
         public UProject EncodeProject(Project osProject)
         {
+            double bpm = 120.0;//如果对象没有给出曲速，则默认120
+            int beatPerBar = 4;//如果对象没有给出节拍号，则默认4/4
+            int beatUnit = 4;
+            if(osProject.SongTempoList.Count()>=1)
+            {
+                bpm = osProject.SongTempoList[0].BPM;//OpenUTAU不支持变速，这里采用音轨开头的bpm，曲速转换功能待开发
+            }
+            if(osProject.TimeSignatureList.Count()>=1)
+            {
+                beatPerBar = osProject.TimeSignatureList[0].Numerator;
+                beatUnit = osProject.TimeSignatureList[0].Denominator;
+            }
             UProject ustxProject = new UProject {
-                bpm = osProject.SongTempoList[0].BPM,//OpenUTAU不支持变速，因此这里采用音轨开头的bpm
-                beatPerBar = osProject.TimeSignatureList[0].Numerator,
-                beatUnit = osProject.TimeSignatureList[0].Denominator,
+                bpm = bpm,
+                beatPerBar = beatPerBar,
+                beatUnit = beatUnit,
                 voiceParts = new List<UVoicePart>(),
                 waveParts = new List<UWavePart>(),
                 ustxVersion = new System.Version("0.5")
