@@ -82,7 +82,7 @@ namespace FlutyDeer.LyricsPlugin
                 case OffsetPolicyOption.Timeline:
                     foreach(var line in lyricsFile.LyricLines)
                     {
-                        line.Time -= TimeSpan.FromMilliseconds(Offset);
+                        line.StartTime -= TimeSpan.FromMilliseconds(Offset);
                     }
                     break;
             }
@@ -100,7 +100,7 @@ namespace FlutyDeer.LyricsPlugin
             }
             var lyricLine = new LyricLine
             {
-                Time = time,
+                StartTime = time,
                 Lyric = lyric
             };
             lyricsFile.AddLyric(lyricLine);
