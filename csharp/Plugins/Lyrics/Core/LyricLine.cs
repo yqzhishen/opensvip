@@ -4,16 +4,16 @@ namespace FlutyDeer.LyricsPlugin
 {
     public class LyricLine
     {
-        public TimeSpan Time { get; set; }
+        public TimeSpan StartTime { get; set; }
         public string Lyric { get; set; } = "";
 
         public override string ToString()
         {
-            return $"[{Time:mm\\:ss\\.ff}]{Lyric}";
+            return $"[{StartTime:mm\\:ss\\.ff}]{Lyric}";
         }
         public LyricLine(TimeSpan time, string lyric)
         {
-            Time = time;
+            StartTime = time;
             Lyric = lyric;
         }
         

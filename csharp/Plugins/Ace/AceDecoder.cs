@@ -10,6 +10,8 @@ namespace AceStdio.Core
 {
     public class AceDecoder
     {
+        public bool KeepAllPronunciation { get; set; }
+        
         public int SampleInterval { get; set; }
 
         private List<AceTempo> _aceTempoList;
@@ -106,8 +108,16 @@ namespace AceStdio.Core
                         MergeCurves(pattern.Params.Energy, aceParams.Energy);
                         MergeCurves(pattern.Params.Tension, aceParams.Tension);
                     }
-                    
-                    singingTrack.NoteList = _aceNoteList.ConvertAll(DecodeNote);
+
+                    if (KeepAllPronunciation)
+                    {
+                        singingTrack.NoteList = _aceNoteList.ConvertAll(note => DecodeNote(note));
+                    }
+                    else
+                    {
+                        var pinyinSeries = PinyinUtils.GetPinyinSeries(_aceNoteList.Select(note => note.Lyrics));
+                        singingTrack.NoteList = _aceNoteList.Zip(pinyinSeries, DecodeNote).ToList();
+                    }
                     singingTrack.EditedParams = DecodeParams(aceParams);
                     track = singingTrack;
                     break;
@@ -132,16 +142,19 @@ namespace AceStdio.Core
             return track;
         }
 
-        private Note DecodeNote(AceNote aceNote)
+        private Note DecodeNote(AceNote aceNote, string pinyin = null)
         {
             var note = new Note
             {
                 KeyNumber = aceNote.Pitch,
                 StartPos = aceNote.Position,
                 Length = aceNote.Duration,
-                Lyric = aceNote.Lyrics,
-                Pronunciation = aceNote.Pronunciation
+                Lyric = aceNote.Lyrics
             };
+            if (pinyin == null || !aceNote.Lyrics.Contains('-') && aceNote.Pronunciation != pinyin)
+            {
+                note.Pronunciation = aceNote.Pronunciation;
+            }
             if (aceNote.BreathLength > 0)
             {
                 note.HeadTag = "V";

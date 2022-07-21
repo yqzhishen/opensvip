@@ -129,7 +129,7 @@ namespace FlutyDeer.GjgjPlugin
                 StartPos = noteStartPosition,
                 Length = gjNote.Duration,
                 KeyNumber = gjNote.KeyNumber,
-                Lyric = gjNote.Lyric.Replace("\r", "").Replace("\n", ""),
+                Lyric = gjNote.Lyric.Trim(),
                 Pronunciation = PinyinAndLyricUtil.DecodePronunciation(gjNote),
                 EditedPhones = DecodePhones(gjNote, noteStartPosition),
                 HeadTag = NoteHeadTagUtil.ToStringTag(gjNote.Style)
