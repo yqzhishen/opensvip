@@ -350,7 +350,14 @@ namespace FlutyDeer.GjgjPlugin
         /// <returns></returns>
         private int GetDenominator(int index)
         {
-            return gjProject.TempoMap.TimeSignatureList[index].Denominator;
+            if (gjProject.TempoMap.TimeSignatureList.Count > 0)
+            {
+                return gjProject.TempoMap.TimeSignatureList[index].Denominator;
+            }
+            else
+            {
+                return 4;
+            }
         }
 
         /// <summary>
@@ -360,7 +367,14 @@ namespace FlutyDeer.GjgjPlugin
         /// <returns></returns>
         private int GetNumerator(int index)
         {
-            return gjProject.TempoMap.TimeSignatureList[index].Numerator;
+            if (gjProject.TempoMap.TimeSignatureList.Count > 0)
+            {
+                return gjProject.TempoMap.TimeSignatureList[index].Numerator;
+            }
+            else
+            {
+                return 4;
+            }
         }
     }
 }
