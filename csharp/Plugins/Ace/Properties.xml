@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>ACE Stdio</Name>
-    <Version>0.6.0</Version>
+    <Version>0.6.1</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>ACE Studio 工程文件转换插件。本插件作为输出端时可转换全部数据，作为输入端时暂不支持转换伴奏偏移和除音高外的其他参数。&#x000a;本插件基于 GNU 通用公共许可证 v3.0（下称 GPL-3.0）开源。这意味着您不得将此插件的源码或二进制文件用于闭源商业软件开发；将源码或二进制文件二次分发（无论是否经过修改）时，您必须遵循同样的协议并免费提供一份源代码的副本。&#x000a;附加条款：未经作者明确同意，您不得将使用此插件转换得到的任何工程文件用于商业用途。&#x000a;本声明与 GPL-3.0 产生冲突时（附加条款除外），以 GPL-3.0 为准。</Descriptions>
@@ -13,6 +13,10 @@
     <LibraryPath>AceStdio\Plugin.Ace.dll</LibraryPath>
     <Converter>AceStdio.Stream.AceConverter</Converter>
     <InputOptions>
+        <Option Name="keepAllPronunciation" Type="boolean" Default="false">
+            <Notes>保留所有发音信息</Notes>
+            <Tips>ACE Studio 会给所有的音符添加发音。这对于大部分的汉字而言是一种冗余数据，因此默认情况下只会保留被修改过的发音。打开此选项后，将无条件保留所有的发音信息，但可能产生更大的文件体积。当源文件中包含非汉语演唱数据时，请将此选项打开。</Tips>
+        </Option>
         <Option Name="curveSampleInterval" Type="integer" Default="5">
             <Notes>参数点采样间隔</Notes>
             <Tips>单位为梯（四分音符长度为 480 梯）。默认情况下 acep 文件中的参数点采用非常密集的存储方式，适当提高采样间隔不会造成很大的精度损失，但可以得到更小的文件体积。设置为 0 或负值代表保持原有采样间隔。</Tips>

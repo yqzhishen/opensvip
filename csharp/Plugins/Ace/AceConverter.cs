@@ -30,6 +30,7 @@ namespace AceStdio.Stream
             }
             return new AceDecoder
             {
+                KeepAllPronunciation = options.GetValueAsBoolean("keepAllPronunciation"),
                 SampleInterval = Math.Max(0, options.GetValueAsInteger("curveSampleInterval", 5))
             }.DecodeProject(aceProject.Content);
         }
