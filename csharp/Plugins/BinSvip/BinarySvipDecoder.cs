@@ -108,11 +108,6 @@ namespace OpenSvip.Stream
             {
                 resultNote.EditedPhones = DecodePhones(phone);
             }
-            var vibrato = note.Vibrato;
-            if (vibrato != null)
-            {
-                resultNote.Vibrato = DecodeVibrato(note);
-            }
             return resultNote;
         }
         

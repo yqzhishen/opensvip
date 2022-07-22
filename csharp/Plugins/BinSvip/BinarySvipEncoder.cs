@@ -169,13 +169,6 @@ namespace OpenSvip.Stream
             {
                 resultNote.NotePhoneInfo = EncodePhones(note.EditedPhones);
             }
-            if (note.Vibrato == null)
-            {
-                return resultNote;
-            }
-            var (percent, vibrato) = EncodeVibrato(note.Vibrato);
-            resultNote.VibratoPercentInfo = percent;
-            resultNote.Vibrato = vibrato;
             return resultNote;
         }
         
