@@ -89,7 +89,7 @@
         <KeyBinding Gesture="Ctrl+E" Command="{x:Static local:MainWindow.ExportCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"/>
         <KeyBinding Gesture="Ctrl+Shift+E" Command="{x:Static local:MainWindow.BrowseAndExportCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}}"/>
         <KeyBinding Gesture="Ctrl+R" Command="{x:Static local:MainWindow.ResetCommand}" CommandParameter="{Binding}"/>
-        <KeyBinding Gesture="Ctrl+W" Command="{x:Static local:MainWindow.SwapPluginCommand}" CommandParameter="{Binding}"/>
+        <KeyBinding Gesture="Ctrl+Tab" Command="{x:Static local:MainWindow.SwapPluginCommand}" CommandParameter="{Binding}"/>
         <KeyBinding Gesture="Ctrl+P" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
         <KeyBinding Gesture="Ctrl+U" Command="{x:Static local:MainWindow.CheckUpdateCommand}"/>
         <KeyBinding Gesture="Ctrl+A" Command="{x:Static local:MainWindow.AboutCommand}" CommandParameter="{Binding}"/>
@@ -226,7 +226,7 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
-                        <MenuItem Header="上下交换(_W)" InputGestureText="Ctrl+W" Icon="{materialDesign:PackIcon Kind=SwapVertical, Size=18}" Command="{x:Static local:MainWindow.SwapPluginCommand}" CommandParameter="{Binding}"/>
+                        <MenuItem Header="上下交换(_W)" InputGestureText="Ctrl+Tab" Icon="{materialDesign:PackIcon Kind=SwapVertical, Size=18}" Command="{x:Static local:MainWindow.SwapPluginCommand}" CommandParameter="{Binding}"/>
                         <Separator Style="{StaticResource MenuItemSeparator}"/>
                         <MenuItem Header="安装插件(_P)..." InputGestureText="Ctrl+P" Icon="{materialDesign:PackIcon Kind=PuzzlePlusOutline}" Command="{x:Static local:MainWindow.InstallPluginCommand}" CommandParameter="{Binding}"/>
                         <MenuItem

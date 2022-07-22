@@ -88,7 +88,7 @@ namespace OpenSvip.GUI.Config
     {
         public const string ApplicationVersion = "1.4.1";
 
-        public const string OnlineDocuments = "https://openvpi.github.io";
+        public const string OnlineDocuments = "https://openvpi.github.io/docs/guide.html";
 
         public const string GitHubRepository = "https://github.com/yqzhishen/opensvip";
 
