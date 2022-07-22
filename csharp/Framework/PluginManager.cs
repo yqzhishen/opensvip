@@ -81,7 +81,7 @@ namespace OpenSvip.Framework
 
         public static Plugin[] GetAllPlugins()
         {
-            return Array.ConvertAll(Plugins.ToArray(), kv => kv.Value);
+            return Array.ConvertAll(Plugins.OrderBy(pair => pair.Key).ToArray(), kv => kv.Value);
         }
 
         public static Plugin ExtractPlugin(string path, out string folder)
