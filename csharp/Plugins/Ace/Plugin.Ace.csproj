@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AceConverter.cs" />
+    <Compile Include="AceCurveUtils.cs" />
     <Compile Include="AceDecoder.cs" />
     <Compile Include="AceEncoder.cs" />
     <Compile Include="AceModel.cs" />

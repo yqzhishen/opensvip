@@ -52,13 +52,15 @@ namespace AceStdio.Test
             {
                 @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\黏黏黏黏\黏黏黏黏.acep",
                 @"C:\Users\YQ之神\Desktop\test space\groups.acep",
-                @"C:\Users\YQ之神\Desktop\test.acep"
+                @"C:\Users\YQ之神\Desktop\test.acep",
+                @"C:\Users\YQ之神\Desktop\黏黏黏黏\黏黏黏黏.acep",
             };
             string[] dst =
             {
                 @"C:\Users\YQ之神\Desktop\黏黏黏黏.json",
                 @"C:\Users\YQ之神\Desktop\test space\groups.json",
-                @"C:\Users\YQ之神\Desktop\test.json"
+                @"C:\Users\YQ之神\Desktop\test.json",
+                @"C:\Users\YQ之神\Desktop\黏黏黏黏.json",
             };
             const int index = 0;
             var project = new AceConverter().Load(

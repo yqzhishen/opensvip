@@ -31,6 +31,10 @@ namespace AceStdio.Stream
             return new AceDecoder
             {
                 KeepAllPronunciation = options.GetValueAsBoolean("keepAllPronunciation"),
+                ImportTension = options.GetValueAsBoolean("importTension", true),
+                ImportEnergy = options.GetValueAsBoolean("importEnergy", true),
+                EnergyCoefficient = Math.Min(1.0, Math.Max(0,
+                    options.GetValueAsDouble("energyCoefficient", 0.5))),
                 SampleInterval = Math.Max(0, options.GetValueAsInteger("curveSampleInterval", 5))
             }.DecodeProject(aceProject.Content);
         }
