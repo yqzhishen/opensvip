@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Serilog;
 using YamlDotNet.Serialization;
 
 namespace OpenUtau.Core.Ustx {

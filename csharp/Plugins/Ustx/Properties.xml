@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
   <Name>ustx 转换插件</Name>
-  <Version>0.0.1</Version>
+  <Version>0.0.2</Version>
   <Author>Oxygen Dioxide</Author>
-  <HomePage>https://github.com/oxygen-dioxide</HomePage>
+  <HomePage>https://github.com/oxygen-dioxide/opensvip/issues</HomePage>
   <Descriptions>适用于 OpenSvip 的 ustx 格式转换插件。</Descriptions>
   <Requirements>无</Requirements>
   <Format>OpenUTAU 工程文件</Format>

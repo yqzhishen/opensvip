@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>SRT 字幕转换插件</Name>
+    <Version>0.0.1</Version>
+    <Author>笛鹿FlutyDeer</Author>
+    <HomePage>https://space.bilibili.com/386270936</HomePage>
+    <Descriptions>适用于 OpenSvip 的 SRT 字幕格式转换插件。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>SRT 字幕文件</Format>
+    <Suffix>srt</Suffix>
+    <Identifier>srt</Identifier>
+    <LibraryPath>Srt\FlutyDeer.SrtPlugin.dll</LibraryPath>
+    <Converter>FlutyDeer.SrtPlugin.Stream.SrtConverter</Converter>
+    <InputOptions/>
+	<OutputOptions>
+		<Option Name="offset" Type="integer" Default="0">
+			<Notes>偏移量</Notes>
+			<Tips>单位为毫秒，正值表示整体提前，负值相反。</Tips>
+		</Option>
+		<Option Name="splitBy" Type="enum" Default="both">
+			<Notes>歌词换行方式</Notes>
+			<EnumChoices>
+				<Choice Name="音符间隙和标点符号" Tag="both">
+					<Label>两个相邻的音符间距大于等于32分音符或遇到标点符号时另起新行。</Label>
+				</Choice>
+				<Choice Name="仅音符间隙" Tag="gap">
+					<Label>两个相邻的音符间距大于等于32分音符时另起新行。</Label>
+				</Choice>
+				<Choice Name="仅标点符号" Tag="symbol">
+					<Label>遇到标点符号时另起新行。</Label>
+				</Choice>
+			</EnumChoices>
+		</Option>
+		<Option Name="encoding" Type="enum" Default="UTF8">
+			<Notes>歌词文本编码</Notes>
+			<EnumChoices>
+				<Choice Name="ASCII" Tag="ASCII" />
+				<Choice Name="BigEndianUnicode" Tag="BigEndianUnicode" />
+				<Choice Name="Default" Tag="Default">
+					<Label>操作系统的当前 ANSI 代码页的编码。</Label>
+				</Choice>
+				<Choice Name="Unicode" Tag="Unicode" />
+				<Choice Name="UTF-32" Tag="UTF32" />
+				<Choice Name="UTF-7" Tag="UTF7" />
+				<Choice Name="UTF-8 BOM" Tag="UTF8BOM" />
+				<Choice Name="UTF-8" Tag="UTF8" />
+			</EnumChoices>
+		</Option>
+	</OutputOptions>
+</Plugin>

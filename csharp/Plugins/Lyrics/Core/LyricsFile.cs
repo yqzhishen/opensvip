@@ -44,7 +44,6 @@ namespace FlutyDeer.LyricsPlugin
         public void AddLyric(LyricLine line)
         {
             LyricLines.Add(line);
-            LyricLines.OrderBy(l => l.Time);
         }
         
         public void AddMeta(MetaInfoLine line)

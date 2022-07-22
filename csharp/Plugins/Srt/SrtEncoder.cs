@@ -1,50 +1,36 @@
-﻿using FlutyDeer.LyricsPlugin.Options;
-using FlutyDeer.LyricsPlugin.Utils;
-using Newtonsoft.Json;
+﻿using FlutyDeer.SrtPlugin.Options;
+using FlutyDeer.SrtPlugin.Utils;
 using OpenSvip.Library;
 using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FlutyDeer.LyricsPlugin
+namespace FlutyDeer.SrtPlugin
 {
-    public class LyricsEncoder
+    public class SrtEncoder
     {
-        public string Artist { get; set; }
-        
-        public string Title { get; set; }
-        
-        public string Album { get; set; }
-
-        public string By { get; set; }
-        
-        public int Offset { get; set; }
-
-        public OffsetPolicyOption OffsetPolicyOption { get; set; }
-
         public SplitByOption SplitByOption { get; set; }
 
         private Project osProject;
 
+        public int Offset { get; set; }
+
         private TimeSynchronizer timeSynchronizer;
-        
-        public LyricsFile EncodeProject(Project project)
+
+        public SrtFile EncodeProject(Project project)
         {
-            LyricsFile lyricsFile = new LyricsFile();
+            SrtFile srtFile = new SrtFile();
             osProject = project;
             timeSynchronizer = new TimeSynchronizer(osProject.SongTempoList);
             var firstBarTimeSignature = osProject.TimeSignatureList[0];
             var singsingTrack = osProject.TrackList.Where(t => t is SingingTrack).First() as SingingTrack;
             var noteList = singsingTrack.NoteList;
-            var buffer = new List<Tuple<int, string>>();
+            var buffer = new List<Note>();
             for (int i = 0; i < noteList.Count; i++)
             {
                 var note = noteList[i];
-                buffer.Add(new Tuple<int, string>(note.StartPos, note.Lyric));
+                buffer.Add(note);
                 int currentNoteEndPos = note.StartPos + note.Length;
                 bool commitFlag = false;
                 bool conditionSymbol = LyricsUtil.ContainsSymbol(note.Lyric);
@@ -67,43 +53,36 @@ namespace FlutyDeer.LyricsPlugin
                 }
                 if (commitFlag)
                 {
-                    CommitCurrentLyricLine(lyricsFile, buffer);
+                    CommitCurrentLyricLine(srtFile, buffer);
                 }
             }
-            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Artist, Artist));
-            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Title, Title));
-            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Album, Album));
-            lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.By, By));
-            switch (OffsetPolicyOption)
+            foreach (var line in srtFile.SrtItems)
             {
-                case OffsetPolicyOption.Meta:
-                    lyricsFile.AddMeta(new MetaInfoLine(MetaInfoType.Offset, Offset.ToString()));
-                    break;
-                case OffsetPolicyOption.Timeline:
-                    foreach(var line in lyricsFile.LyricLines)
-                    {
-                        line.StartTime -= TimeSpan.FromMilliseconds(Offset);
-                    }
-                    break;
+                line.StartTime -= TimeSpan.FromMilliseconds(Offset);
+                line.EndTime -= TimeSpan.FromMilliseconds(Offset);
             }
-            return lyricsFile;
+            return srtFile;
         }
 
-        private void CommitCurrentLyricLine(LyricsFile lyricsFile, List<Tuple<int, string>> buffer)
+        private void CommitCurrentLyricLine(SrtFile srtFile, List<Note> buffer)
         {
-            var time = GetTimeSpanFromTicks(buffer[0].Item1);
+            int startPos = buffer.First().StartPos;
+            int endPos = buffer.Last().StartPos + buffer.Last().Length;
+            var startTime = GetTimeSpanFromTicks(startPos);
+            var endTime = GetTimeSpanFromTicks(endPos);
             var lyric = "";
-            foreach (var item in buffer)
+            foreach (var note in buffer)
             {
-                var currentLyric = LyricsUtil.GetSymbolRemovedLyric(item.Item2);
+                var currentLyric = LyricsUtil.GetSymbolRemovedLyric(note.Lyric);
                 lyric += currentLyric;
             }
-            var lyricLine = new LyricLine
+            var srtItem = new SrtItem
             {
-                StartTime = time,
+                StartTime = startTime,
+                EndTime = endTime,
                 Lyric = lyric
             };
-            lyricsFile.AddLyric(lyricLine);
+            srtFile.Add(srtItem);
             buffer.Clear();
         }
 
