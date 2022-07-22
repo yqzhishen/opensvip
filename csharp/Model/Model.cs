@@ -74,6 +74,8 @@ namespace OpenSvip.Model
         public string Lyric { get; set; } = "";
         public string Pronunciation { get; set; }
         public Phones EditedPhones { get; set; }
+        
+        [Obsolete("此属性已弃用。所有与音高相关的数据都应存放于音高参数中。")]
         public Vibrato Vibrato { get; set; }
     }
 
@@ -82,7 +84,7 @@ namespace OpenSvip.Model
         public float HeadLengthInSecs { get; set; } = -1.0f;
         public float MidRatioOverTail { get; set; } = -1.0f;
     }
-
+    
     public class Vibrato
     {
         public float StartPercent { get; set; }
