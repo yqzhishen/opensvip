@@ -1,8 +1,15 @@
 # OpenUTAU ustx插件
+适用于[OpenSVIP](https://openvpi.github.io/home/)转换器的OpenUTAU ustx插件。
+
 作者：[Oxygen Dioxide](https://github.com/oxygen-dioxide)
 
-如果你发现了bug，请在[我的Github仓库](https://github.com/oxygen-dioxide/opensvip/issues)提出反馈
-## ustx输入
+如果你发现了bug，请在[我的Github仓库](https://github.com/oxygen-dioxide/opensvip/issues)提出反馈。
+
+## 下载
+[从Github下载](https://github.com/oxygen-dioxide/opensvip/releases)
+
+## 支持特性
+### ustx输入
 * 支持的数据：
   * 曲速、拍号
   * 音轨
@@ -11,7 +18,7 @@
   * 音高曲线
     * 锚点、手绘音高线、颤音，将合并转化。
 
-## ustx输出
+### ustx输出
 * 支持的数据：
   * 音轨、音符
   * 曲速、拍号

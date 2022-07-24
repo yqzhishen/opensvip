@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="util.cs" />
     <Compile Include="UstxDecoder.cs" />
     <Compile Include="OpenUtau.Core\Util\MusicMath.cs" />
     <Compile Include="OpenUtau.Core\Ustx\UCurve.cs" />
