@@ -338,7 +338,7 @@ namespace AceStdio.Core
             var basePitch = new BasePitchCurve(_noteList, _aceTempoList, _patternStart);
             var patternStartSecond = TimeUtils.TickToSecond(_patternStart, _aceTempoList);
             var leftBound = TimeUtils.TickToSecond(
-                                _patternStart + _noteList.First().Position - 240, _aceTempoList)
+                                Math.Max(0, _patternStart + _noteList.First().Position - 240), _aceTempoList)
                             - patternStartSecond;
             var rightBound = TimeUtils.TickToSecond(
                                  _patternStart + _noteList.Last().Position + _noteList.Last().Duration + 120, _aceTempoList) 
@@ -408,7 +408,7 @@ namespace AceStdio.Core
             var aceCurves = new List<AceParamCurve>();
             var patternStartSecond = TimeUtils.TickToSecond(_patternStart, _aceTempoList);
             var leftBound = TimeUtils.TickToSecond(
-                                _patternStart + _noteList.First().Position - 240, _aceTempoList)
+                                Math.Max(0, _patternStart + _noteList.First().Position - 240), _aceTempoList)
                             - patternStartSecond;
             var rightBound = TimeUtils.TickToSecond(
                                  _patternStart + _noteList.Last().Position + _noteList.Last().Duration + 120, _aceTempoList) 
