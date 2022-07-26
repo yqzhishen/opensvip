@@ -28,7 +28,7 @@ namespace SynthV.Model
             var res = new List<Tuple<long, double>>();
             for (var i = 0; i < obj.Length; i += 2)
             {
-                res.Add(new Tuple<long, double>((long) obj[i], (double) obj[i + 1]));
+                res.Add(new Tuple<long, double>(Convert.ToInt64(obj[i]), Convert.ToDouble(obj[i + 1])));
             }
             return res;
         }

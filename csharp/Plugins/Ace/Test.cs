@@ -1,4 +1,4 @@
-﻿#define IMPORT
+﻿#define EXPORT
 
 using System;
 using System.Collections.Generic;
@@ -80,6 +80,7 @@ namespace AceStdio.Test
                 @"E:\YQ数据空间\YQ实验室\实验室：XStudioSinger\少年弦\少年弦.json",
                 @"E:\YQ数据空间\YQ实验室\实验室：XStudioSinger\囍（官方示例）\囍（片段）.json",
                 @"C:\Users\YQ之神\Desktop\测试参数值域-svip.json",
+                @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\囍（片段）\囍（念白片段）.json"
             };
             string[] dst =
             {
@@ -88,8 +89,9 @@ namespace AceStdio.Test
                 @"E:\YQ数据空间\YQ实验室\实验室：XStudioSinger\少年弦\少年弦.acep",
                 @"E:\YQ数据空间\YQ实验室\实验室：XStudioSinger\囍（官方示例）\囍（片段）.acep",
                 @"C:\Users\YQ之神\Desktop\测试参数值域.acep",
+                @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\囍（片段）\囍（念白片段）.acep"
             };
-            const int index = 4;
+            const int index = 5;
             using (var stream = new FileStream(src[index], FileMode.Open, FileAccess.Read))
             using (var reader = new StreamReader(stream))
             {

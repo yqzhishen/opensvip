@@ -12,7 +12,7 @@ namespace OpenSvip.Tests
         public void TestSynthVLoad01()
         {
             new SynthVConverter().Load(
-                @"C:\Users\YQ之神\Desktop\【无参】破云来.svp",
+                @"C:\Users\YQ之神\Desktop\御守.json",
                 new ConverterOptions(new Dictionary<string, string>()));
         }
     }

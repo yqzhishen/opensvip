@@ -62,9 +62,16 @@ namespace OpenSvip.GUI
         private void CopyErrorMessageButton_Click(object sender, RoutedEventArgs e)
         {
             var task = (TaskViewModel)DataContext;
-            Clipboard.SetText(task.Error);
             var button = (Button)sender;
-            button.Content = "已复制";
+            try
+            {
+                Clipboard.SetText(task.Error);
+                button.Content = "已复制";
+            }
+            catch (Exception)
+            {
+                button.Content = "复制失败";
+            }
             new Thread(() =>
             {
                 Thread.Sleep(2000);

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>ACE Stdio</Name>
-    <Version>0.7.0</Version>
+    <Version>0.7.1</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>ACE Studio 工程文件转换插件。本插件作为输出端时可转换全部数据，作为输入端时暂不支持转换伴奏偏移和除音高外的其他参数。&#x000a;本插件基于 GNU 通用公共许可证 v3.0（下称 GPL-3.0）开源。这意味着您不得将此插件的源码或二进制文件用于闭源商业软件开发；将源码或二进制文件二次分发（无论是否经过修改）时，您必须遵循同样的协议并免费提供一份源代码的副本。&#x000a;附加条款：未经作者明确同意，您不得将使用此插件转换得到的任何工程文件用于商业用途。&#x000a;本声明与 GPL-3.0 产生冲突时（附加条款除外），以 GPL-3.0 为准。</Descriptions>
