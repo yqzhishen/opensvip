@@ -234,7 +234,7 @@ namespace AceStdio.Core
                     aceParams.Tension = aceParams.Tension.Plus(
                         aceParams.RealTension.Normalize(TensionNormalization),
                         1.0,
-                        x => x >= 0 ? x * 1.5 : x * 0.8);
+                        x => x >= 0 ? x * 0.5 : x * 0.3);
                 }
                 else
                 {
@@ -251,7 +251,7 @@ namespace AceStdio.Core
                     aceParams.Energy = aceParams.Energy.Plus(
                         aceParams.RealEnergy.Normalize(EnergyNormalization),
                         1.0,
-                        x => x >= 0 ? x * 1.5 : x * 0.8);
+                        x => x);
                 }
                 else
                 {
@@ -272,7 +272,6 @@ namespace AceStdio.Core
             };
             if (ImportTension && ImportEnergy)
             {
-                
                 parameters.Volume = DecodeParamCurve(
                     aceParams.Energy,
                     x =>

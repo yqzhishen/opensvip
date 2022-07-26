@@ -38,7 +38,7 @@ namespace AceStdio.Stream
                 SampleInterval = Math.Max(0, options.GetValueAsInteger("curveSampleInterval", 5)),
                 BreathNormalization = Math.Min(5.0, Math.Max(0, options.GetValueAsDouble("breathNormalization"))),
                 TensionNormalization = Math.Min(5.0, Math.Max(0, options.GetValueAsDouble("tensionNormalization"))),
-                EnergyNormalization = Math.Min(5.0, Math.Min(0, options.GetValueAsDouble("energyNormalization")))
+                EnergyNormalization = Math.Min(5.0, Math.Max(0, options.GetValueAsDouble("energyNormalization")))
             }.DecodeProject(aceProject.Content);
         }
 
