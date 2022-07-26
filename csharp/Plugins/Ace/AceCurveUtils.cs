@@ -63,6 +63,22 @@ namespace AceStdio.Utils
             return resultCurveList;
         }
 
+        /// <summary>
+        /// Min-Max 标准化至 [-radius, radius] 区间。
+        /// </summary>
+        public static List<AceParamCurve> Normalize(this List<AceParamCurve> curves, double radius)
+        {
+            if (!curves.Any())
+            {
+                return curves;
+            }
+            var min = curves.Min(curve => curve.Values.Min());
+            var max = curves.Max(curve => curve.Values.Max());
+            return Math.Abs(max - min) < 1e-6
+                ? curves.ConvertAll(curve => curve.Transform(x => 0))
+                : curves.ConvertAll(curve => curve.Transform(x => radius * (2 * (x - min) / (max - min) - 1)));
+        }
+
         private static AceParamCurve Transform(this AceParamCurve curve, Func<double, double> valueTransform)
         {
             return new AceParamCurve

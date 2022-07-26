@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>ACE Stdio</Name>
-    <Version>0.7.1</Version>
+    <Version>0.8.0</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>ACE Studio 工程文件转换插件。本插件作为输出端时可转换全部数据，作为输入端时暂不支持转换伴奏偏移和除音高外的其他参数。&#x000a;本插件基于 GNU 通用公共许可证 v3.0（下称 GPL-3.0）开源。这意味着您不得将此插件的源码或二进制文件用于闭源商业软件开发；将源码或二进制文件二次分发（无论是否经过修改）时，您必须遵循同样的协议并免费提供一份源代码的副本。&#x000a;附加条款：未经作者明确同意，您不得将使用此插件转换得到的任何工程文件用于商业用途。&#x000a;本声明与 GPL-3.0 产生冲突时（附加条款除外），以 GPL-3.0 为准。</Descriptions>
@@ -18,20 +18,32 @@
             <Tips>ACE Studio 会给所有的音符添加发音。这对于大部分的汉字而言是一种冗余数据，因此默认情况下只会保留被修改过的发音。打开此选项后，将无条件保留所有的发音信息，但可能产生更大的文件体积。当源文件中包含非汉语演唱数据时，请将此选项打开。</Tips>
         </Option>
         <Option Name="importTension" Type="boolean" Default="true">
-            <Notes>导入张力参数</Notes>
-            <Tips>打开后，张力参数将被映射至中介模型的力度通道。</Tips>
+            <Notes>导入张力包络</Notes>
+            <Tips>打开后，张力包络将被映射至中介模型的力度通道。</Tips>
         </Option>
         <Option Name="importEnergy" Type="boolean" Default="true">
-            <Notes>导入力度参数</Notes>
-            <Tips>打开后，将可以通过映射比例选项控制力度参数映射至中介模型的力度通道和音量通道的比例。</Tips>
+            <Notes>导入力度包络</Notes>
+            <Tips>打开后，将可以通过映射比例选项控制力度包络映射至中介模型的力度通道和音量通道的比例。</Tips>
         </Option>
         <Option Name="energyCoefficient" Type="double" Default="0.5">
             <Notes>力度-音量映射系数</Notes>
-            <Tips>由于 ACE Studio 力度参数对音量的影响较为显著，故提供此选项控制力度参数的映射系数。力度参数将被整体乘以此选项的值后映射到中介模型的音量通道，剩余的部分将被映射到力度通道。此选项接受 0~1.0 范围内的值。</Tips>
+            <Tips>由于 ACE Studio 力度参数对音量的影响较为显著，故提供此选项控制力度包络的映射系数。力度包络将被整体乘以此选项的值后映射到中介模型的音量通道，剩余的部分将被映射到力度通道。此选项接受 0~1.0 范围内的值。</Tips>
         </Option>
         <Option Name="curveSampleInterval" Type="integer" Default="5">
             <Notes>参数点采样间隔</Notes>
             <Tips>单位为梯（四分音符长度为 480 梯）。默认情况下 acep 文件中的参数点采用非常密集的存储方式，适当提高采样间隔不会造成很大的精度损失，但可以得到更小的文件体积。设置为 0 或负值代表保持原有采样间隔。</Tips>
+        </Option>
+        <Option Name="breathNormalization" Type="double" Default="0">
+            <Notes>气声实参标准化系数</Notes>
+            <Tips>此选项为高级选项。启用此选项后，气声实参将经过 Min-Max 标准化变换至 [-1.0, 1.0] 区间，并乘以此选项设定的系数后与气声包络合并。此选项接受 0~5.0 范围内的值，设定为 0 或负值时不会生效。建议使用固定笔刷固定全部参数后再启用此选项。</Tips>
+        </Option>
+        <Option Name="tensionNormalization" Type="double" Default="0">
+            <Notes>张力实参标准化系数</Notes>
+            <Tips>此选项为高级选项。打开“导入张力包络”开关并启用此选项后，张力实参将经过 Min-Max 标准化变换至 [-1.0, 1.0] 区间，并乘以此选项设定的系数后与张力包络进行合并。此选项接受 0~5.0 范围内的值，设定为 0 或负值时不会生效。建议使用固定笔刷固定全部参数后再启用此选项。</Tips>
+        </Option>
+        <Option Name="energyNormalization" Type="double" Default="0">
+            <Notes>力度实参标准化系数</Notes>
+            <Tips>此选项为高级选项。打开“导入力度包络”开关并启用此选项后，力度实参将经过 Min-Max 标准化变换至 [-1.0, 1.0] 区间，并乘以此选项设定的系数后与力度包络进行合并。此选项接受 0~5.0 范围内的值，设定为 0 或负值时不会生效。建议使用固定笔刷固定全部参数后再启用此选项。</Tips>
         </Option>
     </InputOptions>
     <OutputOptions>

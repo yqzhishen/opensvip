@@ -20,6 +20,12 @@ namespace AceStdio.Core
         public double EnergyCoefficient { get; set; }
 
         public int SampleInterval { get; set; }
+        
+        public double BreathNormalization { get; set; }
+        
+        public double TensionNormalization { get; set; }
+        
+        public double EnergyNormalization { get; set; }
 
         private int _contentVersion;
 
@@ -117,6 +123,18 @@ namespace AceStdio.Core
                         MergeCurves(pattern.Params.Gender, aceParams.Gender);
                         MergeCurves(pattern.Params.Energy, aceParams.Energy);
                         MergeCurves(pattern.Params.Tension, aceParams.Tension);
+                        if (BreathNormalization > 0)
+                        {
+                            MergeCurves(pattern.Params.RealBreath, aceParams.RealBreath);
+                        }
+                        if (TensionNormalization > 0)
+                        {
+                            MergeCurves(pattern.Params.RealTension, aceParams.RealTension);
+                        }
+                        if (EnergyNormalization > 0)
+                        {
+                            MergeCurves(pattern.Params.RealEnergy, aceParams.RealEnergy);
+                        }
                     }
 
                     if (KeepAllPronunciation)
@@ -191,7 +209,59 @@ namespace AceStdio.Core
                         : (x - middleValue) / (middleValue - lowerBound) * 1000)));
             }
             var oldVersionTransform = LinearTransform(0, 0.5, 1.0);
-            
+
+            if (BreathNormalization > 0)
+            {
+                if (_contentVersion >= 1)
+                {
+                    aceParams.Breath = aceParams.Breath.Plus(
+                        aceParams.RealBreath.Normalize(BreathNormalization),
+                        1.0,
+                        x => x >= 0 ? x * 1.5 : x * 0.8);
+                }
+                else
+                {
+                    aceParams.Breath = aceParams.Breath.Plus(
+                        aceParams.RealBreath.Normalize(BreathNormalization),
+                        0.5,
+                        x => x / 2);
+                }
+            }
+            if (TensionNormalization > 0)
+            {
+                if (_contentVersion >= 1)
+                {
+                    aceParams.Tension = aceParams.Tension.Plus(
+                        aceParams.RealTension.Normalize(TensionNormalization),
+                        1.0,
+                        x => x >= 0 ? x * 1.5 : x * 0.8);
+                }
+                else
+                {
+                    aceParams.Tension = aceParams.Tension.Plus(
+                        aceParams.RealTension.Normalize(TensionNormalization),
+                        0.5,
+                        x => x / 2);
+                }
+            }
+            if (EnergyNormalization > 0)
+            {
+                if (_contentVersion >= 1)
+                {
+                    aceParams.Energy = aceParams.Energy.Plus(
+                        aceParams.RealEnergy.Normalize(EnergyNormalization),
+                        1.0,
+                        x => x >= 0 ? x * 1.5 : x * 0.8);
+                }
+                else
+                {
+                    aceParams.Energy = aceParams.Energy.Plus(
+                        aceParams.RealEnergy.Normalize(EnergyNormalization),
+                        0.5,
+                        x => x / 2);
+                }
+            }
+
             var parameters = new Params
             {
                 Pitch = DecodePitchCurve(aceParams.PitchDelta),
