@@ -69,9 +69,11 @@ namespace AceStdio.Test
                 src[index],
                 new ConverterOptions(new Dictionary<string, string>
                 {
-                    {"breathNormalization", "0.6"},
-                    {"tensionNormalization", "0.6"},
-                    {"energyNormalization", "0.6"}
+                    /*
+                    {"breathNormalization", "zscore, 0, 5.0, 0.15, 0"},
+                    {"tensionNormalization", "zscore, 0, 10, 0.6, 0.2"},
+                    {"energyNormalization", "zscore, 0, 10, 0.6, 0.2"}
+                */
                 }));
             using (var stream = new FileStream(dst[index], FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream))

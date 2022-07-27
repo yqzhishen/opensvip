@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AceStdio.Model;
+using AceStdio.Options;
 using AceStdio.Param;
 using AceStdio.Utils;
 using OpenSvip.Library;
@@ -21,12 +22,12 @@ namespace AceStdio.Core
 
         public int SampleInterval { get; set; }
         
-        public double BreathNormalization { get; set; }
+        public NormalizationArgs BreathNormArgs { get; set; }
         
-        public double TensionNormalization { get; set; }
+        public NormalizationArgs TensionNormArgs { get; set; }
         
-        public double EnergyNormalization { get; set; }
-
+        public NormalizationArgs EnergyNormArgs { get; set; }
+        
         private int _contentVersion;
 
         private List<AceTempo> _aceTempoList;
@@ -123,15 +124,15 @@ namespace AceStdio.Core
                         MergeCurves(pattern.Params.Gender, aceParams.Gender);
                         MergeCurves(pattern.Params.Energy, aceParams.Energy);
                         MergeCurves(pattern.Params.Tension, aceParams.Tension);
-                        if (BreathNormalization > 0)
+                        if (BreathNormArgs.IsEnabled)
                         {
                             MergeCurves(pattern.Params.RealBreath, aceParams.RealBreath);
                         }
-                        if (TensionNormalization > 0)
+                        if (TensionNormArgs.IsEnabled)
                         {
                             MergeCurves(pattern.Params.RealTension, aceParams.RealTension);
                         }
-                        if (EnergyNormalization > 0)
+                        if (TensionNormArgs.IsEnabled)
                         {
                             MergeCurves(pattern.Params.RealEnergy, aceParams.RealEnergy);
                         }
@@ -210,53 +211,100 @@ namespace AceStdio.Core
             }
             var oldVersionTransform = LinearTransform(0, 0.5, 1.0);
 
-            if (BreathNormalization > 0)
+            // Normalize real breath
+            if (BreathNormArgs.IsEnabled)
             {
+                var normalized = aceParams.RealBreath
+                    .Exclude(x => x + 1e-3 < BreathNormArgs.LowerThreshold || x - 1e-3 > BreathNormArgs.UpperThreshold);
+                switch (BreathNormArgs.Method)
+                {
+                    case NormalizationMethod.ZScore:
+                        normalized = normalized.ZScoreNormalize(BreathNormArgs.Scale, BreathNormArgs.Bias);
+                        break;
+                    case NormalizationMethod.MinMax:
+                        normalized = normalized.MinMaxNormalize(BreathNormArgs.Scale, BreathNormArgs.Bias);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(BreathNormArgs.Method));
+                }
+                
                 if (_contentVersion >= 1)
                 {
                     aceParams.Breath = aceParams.Breath.Plus(
-                        aceParams.RealBreath.Normalize(BreathNormalization),
+                        normalized,
                         1.0,
                         x => x >= 0 ? x * 1.5 : x * 0.8);
                 }
                 else
                 {
                     aceParams.Breath = aceParams.Breath.Plus(
-                        aceParams.RealBreath.Normalize(BreathNormalization),
+                        normalized,
                         0.5,
                         x => x / 2);
                 }
             }
-            if (TensionNormalization > 0)
+            
+            // Normalize real tension
+            if (TensionNormArgs.IsEnabled)
             {
+                var normalized = aceParams.RealTension
+                    .Exclude(x => x < TensionNormArgs.LowerThreshold || x > TensionNormArgs.UpperThreshold);
+                switch (TensionNormArgs.Method)
+                {
+                    case NormalizationMethod.ZScore:
+                        normalized = normalized.ZScoreNormalize(TensionNormArgs.Scale, TensionNormArgs.Bias);
+                        break;
+                    case NormalizationMethod.MinMax:
+                        normalized = normalized.MinMaxNormalize(TensionNormArgs.Scale, TensionNormArgs.Bias);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(TensionNormArgs.Method));
+                }
+                
                 if (_contentVersion >= 1)
                 {
                     aceParams.Tension = aceParams.Tension.Plus(
-                        aceParams.RealTension.Normalize(TensionNormalization),
+                        normalized,
                         1.0,
                         x => x >= 0 ? x * 0.5 : x * 0.3);
                 }
                 else
                 {
                     aceParams.Tension = aceParams.Tension.Plus(
-                        aceParams.RealTension.Normalize(TensionNormalization),
+                        normalized,
                         0.5,
                         x => x / 2);
                 }
             }
-            if (EnergyNormalization > 0)
+            
+            // Normalize real energy
+            if (EnergyNormArgs.IsEnabled)
             {
+                var normalized = aceParams.RealEnergy
+                    .Exclude(x => x < EnergyNormArgs.LowerThreshold || x > EnergyNormArgs.UpperThreshold);
+                switch (EnergyNormArgs.Method)
+                {
+                    case NormalizationMethod.ZScore:
+                        normalized = normalized.ZScoreNormalize(EnergyNormArgs.Scale, EnergyNormArgs.Bias);
+                        break;
+                    case NormalizationMethod.MinMax:
+                        normalized = normalized.MinMaxNormalize(EnergyNormArgs.Scale, EnergyNormArgs.Bias);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(EnergyNormArgs.Method));
+                }
+                
                 if (_contentVersion >= 1)
                 {
                     aceParams.Energy = aceParams.Energy.Plus(
-                        aceParams.RealEnergy.Normalize(EnergyNormalization),
+                        normalized,
                         1.0,
                         x => x);
                 }
                 else
                 {
                     aceParams.Energy = aceParams.Energy.Plus(
-                        aceParams.RealEnergy.Normalize(EnergyNormalization),
+                        normalized,
                         0.5,
                         x => x / 2);
                 }

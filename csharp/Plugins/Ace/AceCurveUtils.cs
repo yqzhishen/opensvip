@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AceStdio.Model;
+using LinqStatistics;
 using OpenSvip.Library;
 
 namespace AceStdio.Utils
@@ -18,6 +19,7 @@ namespace AceStdio.Utils
             {
                 return self;
             }
+
             if (!self.Any())
             {
                 return others.ConvertAll(curve => curve.Transform(transform));
@@ -44,6 +46,7 @@ namespace AceStdio.Utils
                         resultCurve.Values[index++] = value;
                     }
                 }
+
                 foreach (var anotherCurve in others.Where(curve => curve.Offset >= start && curve.Offset < end))
                 {
                     var index = anotherCurve.Offset - start;
@@ -53,10 +56,12 @@ namespace AceStdio.Utils
                         {
                             resultCurve.Values[index] = defaultValue;
                         }
+
                         resultCurve.Values[index] += transform(value);
                         ++index;
                     }
                 }
+
                 resultCurveList.Add(resultCurve);
             }
 
@@ -64,19 +69,88 @@ namespace AceStdio.Utils
         }
 
         /// <summary>
-        /// Min-Max 标准化至 [-radius, radius] 区间。
+        /// 剔除符合 predicate 条件的参数点。
         /// </summary>
-        public static List<AceParamCurve> Normalize(this List<AceParamCurve> curves, double radius)
+        public static List<AceParamCurve> Exclude(this List<AceParamCurve> curves, Func<double, bool> predicate)
+        {
+            var result = new List<AceParamCurve>();
+            foreach (var curve in curves)
+            {
+                var buffer = new List<double>();
+                var pos = curve.Offset;
+                foreach (var value in curve.Values)
+                {
+                    ++pos;
+                    if (predicate(value))
+                    {
+                        if (buffer.Any())
+                        {
+                            result.Add(new AceParamCurve
+                            {
+                                Offset = pos - buffer.Count,
+                                Values = buffer
+                            });
+                            buffer = new List<double>();
+                        }
+                    }
+                    else
+                    {
+                        buffer.Add(value);
+                    }
+                }
+
+                if (buffer.Any())
+                {
+                    result.Add(new AceParamCurve
+                    {
+                        Offset = pos - buffer.Count,
+                        Values = buffer
+                    });
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Z-Score 标准化并缩放标准差为 d、平移均值为 b。
+        /// </summary>
+        public static List<AceParamCurve> ZScoreNormalize(this List<AceParamCurve> curves, double d = 1, double b = 0)
         {
             if (!curves.Any())
             {
                 return curves;
             }
-            var min = curves.Min(curve => curve.Values.Min());
-            var max = curves.Max(curve => curve.Values.Max());
-            return Math.Abs(max - min) < 1e-6
+
+            var points = curves.Aggregate(
+                    (IEnumerable<double>) Array.Empty<double>(),
+                    (current, next) => current.Concat(next.Values))
+                .ToArray();
+            var miu = points.Average();
+            var sigma = points.StandardDeviationP();
+            return curves.ConvertAll(curve => curve.Transform(x => (x - miu) / sigma * d + b));
+        }
+
+        /// <summary>
+        /// Min-Max 标准化至 [-r+b, r+b] 区间。
+        /// </summary>
+        public static List<AceParamCurve> MinMaxNormalize(this List<AceParamCurve> curves, double r = 1, double b = 0)
+        {
+            if (!curves.Any())
+            {
+                return curves;
+            }
+
+            var minmax = curves
+                .Aggregate(
+                    (IEnumerable<double>) Array.Empty<double>(),
+                    (current, next) => current.Concat(next.Values))
+                .MinMax();
+            var min = minmax.Min;
+            var max = minmax.Max;
+            return Math.Abs(max - min) < 1e-3
                 ? curves.ConvertAll(curve => curve.Transform(x => 0))
-                : curves.ConvertAll(curve => curve.Transform(x => radius * (2 * (x - min) / (max - min) - 1)));
+                : curves.ConvertAll(curve => curve.Transform(x => r * (2 * (x - min) / (max - min) - 1) + b));
         }
 
         private static AceParamCurve Transform(this AceParamCurve curve, Func<double, double> valueTransform)

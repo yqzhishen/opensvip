@@ -28,18 +28,45 @@ namespace AceStdio.Stream
             {
                 throw new InvalidDataException("Deserialized project content is null.");
             }
-            return new AceDecoder
+
+            var decoder = new AceDecoder
             {
                 KeepAllPronunciation = options.GetValueAsBoolean("keepAllPronunciation"),
                 ImportTension = options.GetValueAsBoolean("importTension", true),
                 ImportEnergy = options.GetValueAsBoolean("importEnergy", true),
                 EnergyCoefficient = Math.Min(1.0, Math.Max(0,
                     options.GetValueAsDouble("energyCoefficient", 0.5))),
-                SampleInterval = Math.Max(0, options.GetValueAsInteger("curveSampleInterval", 5)),
-                BreathNormalization = Math.Min(5.0, Math.Max(0, options.GetValueAsDouble("breathNormalization"))),
-                TensionNormalization = Math.Min(5.0, Math.Max(0, options.GetValueAsDouble("tensionNormalization"))),
-                EnergyNormalization = Math.Min(5.0, Math.Max(0, options.GetValueAsDouble("energyNormalization")))
-            }.DecodeProject(aceProject.Content);
+                SampleInterval = Math.Max(0, options.GetValueAsInteger("curveSampleInterval", 5))
+            };
+
+            if (NormalizationArgs.TryParse(options.GetValueAsString("breathNormalization", "none, 0, 10, 0, 0"), out var args))
+            {
+                decoder.BreathNormArgs = args;
+            }
+            else
+            {
+                Warnings.AddWarning("“气声实参标准化参数”格式错误，因此未生效。请阅读选项说明。", type: WarningTypes.Params);
+            }
+            
+            if (NormalizationArgs.TryParse(options.GetValueAsString("tensionNormalization", "none, 0, 10, 0, 0"), out args))
+            {
+                decoder.TensionNormArgs = args;
+            }
+            else
+            {
+                Warnings.AddWarning("“张力实参标准化参数”格式错误，因此未生效。请阅读选项说明。", type: WarningTypes.Params);
+            }
+            
+            if (NormalizationArgs.TryParse(options.GetValueAsString("energyNormalization", "none, 0, 10, 0, 0"), out args))
+            {
+                decoder.EnergyNormArgs = args;
+            }
+            else
+            {
+                Warnings.AddWarning("“力度实参标准化参数”格式错误，因此未生效。请阅读选项说明。", type: WarningTypes.Params);
+            }
+
+            return decoder.DecodeProject(aceProject.Content);
         }
 
         public void Save(string path, Project project, ConverterOptions options)
