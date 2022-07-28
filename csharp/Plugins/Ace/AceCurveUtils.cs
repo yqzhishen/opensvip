@@ -20,11 +20,6 @@ namespace AceStdio.Utils
                 return self;
             }
 
-            if (!self.Any())
-            {
-                return others.ConvertAll(curve => curve.Transform(transform));
-            }
-
             var resultRanges = Range.Create(self
                     .Concat(others)
                     .Select(curve => new Tuple<int, int>(curve.Offset, curve.Offset + curve.Values.Count))

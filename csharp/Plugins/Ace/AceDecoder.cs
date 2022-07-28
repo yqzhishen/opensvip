@@ -248,7 +248,7 @@ namespace AceStdio.Core
             if (TensionNormArgs.IsEnabled)
             {
                 var normalized = aceParams.RealTension
-                    .Exclude(x => x < TensionNormArgs.LowerThreshold || x > TensionNormArgs.UpperThreshold);
+                    .Exclude(x => x + 1e-3 < TensionNormArgs.LowerThreshold || x - 1e-3 > TensionNormArgs.UpperThreshold);
                 switch (TensionNormArgs.Method)
                 {
                     case NormalizationMethod.ZScore:
@@ -281,7 +281,7 @@ namespace AceStdio.Core
             if (EnergyNormArgs.IsEnabled)
             {
                 var normalized = aceParams.RealEnergy
-                    .Exclude(x => x < EnergyNormArgs.LowerThreshold || x > EnergyNormArgs.UpperThreshold);
+                    .Exclude(x => x + 1e-3 < EnergyNormArgs.LowerThreshold || x - 1e-3 > EnergyNormArgs.UpperThreshold);
                 switch (EnergyNormArgs.Method)
                 {
                     case NormalizationMethod.ZScore:
