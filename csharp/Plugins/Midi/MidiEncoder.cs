@@ -5,6 +5,7 @@ using OpenSvip.Model;
 using MidiTimeSignature = Melanchall.DryWetMidi.Interaction.TimeSignature;
 using FlutyDeer.MidiPlugin.Options;
 using FlutyDeer.MidiPlugin.Utils;
+using OpenSvip.Library;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -32,6 +33,8 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public bool IsRemoveSymbols { get; set; }
 
+        //public bool IsConstantTempo { get; set; }
+
         /// <summary>
         /// 拖拍前移补偿量，单位为梯。
         /// </summary>
@@ -46,6 +49,8 @@ namespace FlutyDeer.MidiPlugin
 
         private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
 
+        //private TimeSynchronizer synchronizer;
+
         /// <summary>
         /// 转换为 MIDI 文件。
         /// </summary>
@@ -53,8 +58,11 @@ namespace FlutyDeer.MidiPlugin
         /// <param name="path">输出路径。</param>
         public MidiFile EncodeMidiFile(Project project)
         {
-            MidiFile midiFile = new MidiFile();
             osProject = project;
+            //var originalTempoList = osProject.SongTempoList;
+            //var defaultTempo = osProject.SongTempoList[0].BPM;
+            //synchronizer = new TimeSynchronizer(originalTempoList, isAbsoluteTimeMode: IsConstantTempo, defaultTempo: defaultTempo);
+            MidiFile midiFile = new MidiFile();
             TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision((short)PPQ);
             midiFile.TimeDivision = timeDivision;//设置时基。
             //导出曲速和拍号
@@ -106,6 +114,7 @@ namespace FlutyDeer.MidiPlugin
                             IsUseLegacyPinyin = IsUseLegacyPinyin,
                             IsRemoveSymbols = IsRemoveSymbols,
                             SemivowelPreShift = PreShift,
+                            //IsConstantTempo = IsConstantTempo,
                             Transpose = Transpose
                         }.SingingTrackToMidiTrackChunk(singingTrack));
                         break;
