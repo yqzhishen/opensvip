@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
@@ -11,20 +13,27 @@ namespace OpenSvip.Stream
 {
     public class BinarySvipConverter : IProjectConverter
     {
-        
-        private static string libraryPath;
-        
+        private static readonly string[] _checkList =
+        {
+            "SingingTool.Const.dll",
+            "SingingTool.Library.dll",
+            "SingingTool.Model.dll",
+            "Newtonsoft.Json.dll"
+        };
+
+        private static readonly List<string> _libraryDirectories = new List<string>();
+
         public Project Load(string path, ConverterOptions options)
         {
-            libraryPath = FindLibrary();
-            AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
+            CheckForLibraries(options.GetValueAsString("libraryPath"));
+            AppDomain.CurrentDomain.AssemblyResolve += ExternalAssemblyResolveEventHandler;
             return DoLoad(path);
         }
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            libraryPath = FindLibrary();
-            AppDomain.CurrentDomain.AssemblyResolve += SingingToolResolveEventHandler;
+            CheckForLibraries(options.GetValueAsString("libraryPath"));
+            AppDomain.CurrentDomain.AssemblyResolve += ExternalAssemblyResolveEventHandler;
             DoSave(path, project, options);
         }
 
@@ -63,10 +72,14 @@ namespace OpenSvip.Stream
                 case BinarySvipVersions.SVIP7_0_0:
                     version = "SVIP7.0.0";
                     break;
+                case BinarySvipVersions.Automatic:
+                    if (version != "SVIP0.0.0")
+                    {
+                        break;
+                    }
+                    goto case BinarySvipVersions.SVIP6_0_0;
                 case BinarySvipVersions.SVIP6_0_0:
                     version = "SVIP6.0.0";
-                    break;
-                case BinarySvipVersions.Automatic:
                     break;
                 case BinarySvipVersions.Compatible:
                     version = "SVIP0.0.0";
@@ -86,21 +99,54 @@ namespace OpenSvip.Stream
             stream.Close();
         }
         
-        private static string FindLibrary()
+        private void CheckForLibraries(string specifiedDir = null)
         {
+            var foundLibraries = new HashSet<string>();
+            
+            if (!string.IsNullOrWhiteSpace(specifiedDir) && Directory.Exists(specifiedDir))
+            {
+                foundLibraries.UnionWith(Directory.GetFiles(specifiedDir).Select(Path.GetFileName));
+                _libraryDirectories.Add(specifiedDir);
+            }
+            
+            var selfDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (!string.IsNullOrEmpty(selfDir))
+            {
+                foundLibraries.UnionWith(Directory.GetFiles(selfDir).Select(Path.GetFileName));
+                _libraryDirectories.Add(selfDir);
+            }
+
             var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Classes\svipfile\shell\open\command");
             var value = key?.GetValue("").ToString().Split('"')[1];
-            if (!File.Exists(value))
+            var xstudioDir = Path.GetDirectoryName(value);
+            if (Directory.Exists(xstudioDir))
             {
-                throw new FileNotFoundException("未检测到已安装的 X Studio · 歌手软件。请查看插件依赖说明。");
+                foundLibraries.UnionWith(Directory.GetFiles(xstudioDir).Select(Path.GetFileName));
+                _libraryDirectories.Add(xstudioDir);
             }
-            return Path.GetDirectoryName(value);
+
+            if (!foundLibraries.IsSupersetOf(_checkList))
+            {
+                throw new FileNotFoundException("缺少必要的动态链接库，可能是因为未安装 X Studio · 歌手软件。请查看插件依赖说明。");
+            }
         }
 
-        private static Assembly SingingToolResolveEventHandler(object sender, ResolveEventArgs args)
+        private static Assembly ExternalAssemblyResolveEventHandler(object sender, ResolveEventArgs args)
         {
             var filename = args.Name.Split(',')[0];
-            return Assembly.LoadFrom(Path.Combine(libraryPath, filename + ".dll"));
+            foreach (var directory in _libraryDirectories)
+            {
+                try
+                {
+                    return Assembly.LoadFrom(Path.Combine(directory, filename + ".dll"));
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+            
+            throw new FileNotFoundException();
         }
     }
 }
