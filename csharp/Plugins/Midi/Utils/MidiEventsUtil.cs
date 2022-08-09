@@ -21,6 +21,8 @@ namespace FlutyDeer.MidiPlugin.Utils
         public bool IsUseLegacyPinyin { get; set; }
 
         public bool IsRemoveSymbols { get; set; }
+
+        public bool IsConstantTempo { get; set; }
         
         public int Transpose { get; set; }
 
@@ -59,6 +61,12 @@ namespace FlutyDeer.MidiPlugin.Utils
                 int index = 0;
                 foreach (var note in singingTrack.NoteList)
                 {
+                    var start = note.StartPos;
+                    var end = note.StartPos + note.Length;
+                    if (IsConstantTempo)
+                    {
+
+                    }
                     if(IsExportLyrics)
                     {
                         events.Add(new TimedEvent(new LyricEvent(GetLyric(note, index)), note.StartPos));

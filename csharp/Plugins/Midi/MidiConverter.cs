@@ -3,6 +3,7 @@ using FlutyDeer.MidiPlugin.Utils;
 using Melanchall.DryWetMidi.Core;
 using OpenSvip.Framework;
 using OpenSvip.Model;
+using System;
 
 namespace FlutyDeer.MidiPlugin.Stream
 {
@@ -11,7 +12,15 @@ namespace FlutyDeer.MidiPlugin.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            var midiFile = MidiFile.Read(path, RWSettingsUtil.GetReadingSettings(options));
+            MidiFile midiFile;
+            try
+            {
+                midiFile = MidiFile.Read(path, RWSettingsUtil.GetReadingSettings(options));
+            }
+            catch
+            {
+                throw new NotImplementedException("此 MIDI 文件可能不是标准 MIDI 文件、包含错误或损坏，请将“导入有错误或损坏的 MIDI 文件时”设置为“忽略错误”后重试。");
+            }
             return new MidiDecoder
             {
                 IsImportTimeSignatures = options.GetValueAsBoolean("importTimeSignatures", true),
@@ -30,6 +39,7 @@ namespace FlutyDeer.MidiPlugin.Stream
                 IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
                 IsUseLegacyPinyin = options.GetValueAsBoolean("isUseLegacyPinyin", false),
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
+                //IsConstantTempo = options.GetValueAsBoolean("constantTempo", false),
                 PPQ = options.GetValueAsInteger("ppq", 480),
                 PreShift = options.GetValueAsInteger("preShift", 0)
             }.EncodeMidiFile(project);

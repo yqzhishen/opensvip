@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>MIDI 转换插件</Name>
-    <Version>0.8.0</Version>
+    <Version>0.8.2</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 MIDI 格式转换插件。</Descriptions>
@@ -92,6 +92,14 @@
 				<Choice Name="UTF-8" Tag="UTF8" />
 			</EnumChoices>
 		</Option>
+		<!--<Option Name="constantTempo" Type="boolean" Default="false">
+			<Notes>将变速乐谱变换为恒速乐谱</Notes>
+			<Tips>启用此选项，软件会根据实际时间调整变速乐谱，使之成为单曲速乐谱，同时保持实际听感不变。对于不支持变速 MIDI 文件的软件，可以开启此选项。</Tips>
+		</Option>
+		<Option Name="tempo" Type="double" Default="120.0">
+			<Notes>使用此曲速重设变速音乐的时间轴</Notes>
+			<Tips>ACE Studio 目前不支持变速音乐，因此变速音乐将依据绝对时间转换为恒定曲速的音乐。本选项可设置用于对齐的曲速，建议设置为源工程文件中最主要的曲速。</Tips>
+		</Option>-->
 		<Option Name="transpose" Type="integer" Default="0">
 			<Notes>移调</Notes>
 		</Option>

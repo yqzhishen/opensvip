@@ -6,14 +6,14 @@ namespace FlutyDeer.MidiPlugin.Utils
 {
     public static class TempoListUtil
     {
-        public static List<SongTempo> DecodeSongTempoList(TempoMap tempoMap)
+        public static List<SongTempo> DecodeSongTempoList(TempoMap tempoMap, short PPQ)
         {
             List<SongTempo> songTempoList = new List<SongTempo>();
             var changes = tempoMap.GetTempoChanges();
             foreach (var change in changes)
             {
                 var tempo = change.Value;
-                var time = change.Time;
+                var time = change.Time * 480 / PPQ;
                 songTempoList.Add(new SongTempo
                 {
                     Position = (int)time,
