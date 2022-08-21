@@ -1,0 +1,78 @@
+﻿using CommandLine;
+using Json2DiffSinger.Stream;
+using Newtonsoft.Json;
+using OpenSvip.Framework;
+using OpenSvip.Model;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Text;
+
+namespace Json2DiffSinger.Console
+{
+    internal partial class Program
+    {
+        /// <summary>
+        /// 已弃用
+        /// </summary>
+        /// <param name="args"></param>
+        static void Main1(string[] args)
+        {
+            string inputPath;
+            string outputPath;
+            inputPath = args[0];
+            outputPath = args[1];
+            //inputPath = @"D:\X Studio 1.9 Pro\XStudioPro\Resource\Samples\云烟成雨.json";
+            //outputPath = @"D:\X Studio 1.9 Pro\XStudioPro\Resource\Samples\云烟成雨.txt";
+            var stream = new FileStream(
+                inputPath,
+                FileMode.Open,
+                FileAccess.Read);
+            var reader = new StreamReader(stream, Encoding.UTF8);
+            var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
+            stream.Close();
+            reader.Close();
+            new DiffSingerConverter().Save(outputPath, project, new ConverterOptions(new Dictionary<string, string>()));
+        }
+
+        public static int Main(string[] args)
+        {
+            return Parser.Default.ParseArguments<Arguments>(args)
+                .MapResult(
+                    (Arguments options) => ConvertFile(options),
+                    errors => 1);
+        }
+
+        private static int ConvertFile(Arguments options)
+        {
+
+            try
+            {
+                var stream = new FileStream(
+                options.InPath,
+                FileMode.Open,
+                FileAccess.Read);
+                var reader = new StreamReader(stream, Encoding.UTF8);
+                var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
+                stream.Close();
+                reader.Close();
+                new DiffSingerConverter().Save(options.OutPath, project, options.OutputOptions);
+                //System.Console.WriteLine("转换成功。");
+            }
+            catch (Exception e)
+            {
+                HandleError(e, ErrorTypes.Export);
+                return 3;
+            }
+            return 0;
+        }
+        private static void HandleError(Exception exception, ErrorTypes type)
+        {
+            var ty = typeof(ErrorTypes);
+            var situation = ty.GetField(ty.GetEnumName(type)).GetCustomAttribute<DescriptionAttribute>().Description;
+            System.Console.WriteLine($"{situation}发生错误。{exception.Message}\n{exception.StackTrace}");
+        }
+    }
+}
