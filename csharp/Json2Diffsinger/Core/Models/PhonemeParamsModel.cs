@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Json2DiffSinger.Core.Models
 {
-    public class PhonemeParamsModel
+    public class PhonemeParamsModel : AbstractParamsModel
     {
         [JsonProperty("text")]
         public string LyricText { get; set; } = "";

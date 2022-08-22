@@ -13,6 +13,12 @@
     <Converter>Json2DiffSinger.Stream.DiffSingerConverter</Converter>
     <InputOptions/>
 	<OutputOptions>
+		<Option Name="split" Type="boolean" Default="true">
+			<Notes>按音符间隔分段</Notes>
+		</Option>
+		<Option Name="seed" Type="integer" Default="-1">
+			<Notes>随机种子</Notes>
+		</Option>
 		<Option Name="mode" Type="enum" Default="autoPhoneme">
 			<Notes>参数模式</Notes>
 			<EnumChoices>

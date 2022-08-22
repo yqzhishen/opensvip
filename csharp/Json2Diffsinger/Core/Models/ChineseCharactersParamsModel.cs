@@ -2,7 +2,7 @@
 
 namespace Json2DiffSinger.Core.Models
 {
-    public class ChineseCharactersParamsModel
+    public class ChineseCharactersParamsModel : AbstractParamsModel
     {
         [JsonProperty("text")]
         public string LyricText { get; set; } = "";

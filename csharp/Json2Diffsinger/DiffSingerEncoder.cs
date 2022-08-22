@@ -1,4 +1,5 @@
 ﻿using Json2DiffSinger.Core.Converters;
+using Json2DiffSinger.Core.Models;
 using Json2DiffSinger.Options;
 using OpenSvip.Model;
 
@@ -21,9 +22,9 @@ namespace Json2DiffSinger
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        public string EncodeParams(Project project)
+        public AbstractParamsModel EncodeParams(Project project)
         {
-            string result = "";
+            AbstractParamsModel result = null;
             switch (InputModeOption)
             {
                 case ModeOption.Note://这个选项已经在 Properties.xml 注释掉了

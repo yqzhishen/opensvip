@@ -12,7 +12,7 @@ namespace Json2DiffSinger.Core.Converters
     public static class ChineseCharactersParamsEncoder
     {
         private static readonly bool IsCorrectRhythmIssues = false;
-        public static string Encode(Project project, bool isIntended)
+        public static ChineseCharactersParamsModel Encode(Project project, bool isIntended)
         {
             TimeSynchronizer synchronizer = new TimeSynchronizer(project.SongTempoList);
             int firstBarLength = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
@@ -34,14 +34,14 @@ namespace Json2DiffSinger.Core.Converters
                 double curActualStartInSecs = curStartInSecs;
                 double curActualEndInSecs = curEndInSecs;
                 if (note.EditedPhones != null
-                    && note.EditedPhones.HeadLengthInSecs != -1.0f
+                    && note.EditedPhones.HeadLengthInSecs >= 0
                     && IsCorrectRhythmIssues)
                 {
                     curActualStartInSecs -= note.EditedPhones.HeadLengthInSecs;
                 }
                 if (index < osNotes.Count - 1
                     && osNotes[index + 1].EditedPhones != null
-                    && osNotes[index + 1].EditedPhones.HeadLengthInSecs != -1.0f
+                    && osNotes[index + 1].EditedPhones.HeadLengthInSecs >= 0
                     && IsCorrectRhythmIssues)
                 {
                     var nextNote = osNotes[index + 1];
@@ -76,7 +76,6 @@ namespace Json2DiffSinger.Core.Converters
                 index++;
             }
 
-            string result;
             string inputText = "";
             string inputNote = "";
             string inputDuration = "";
@@ -106,13 +105,7 @@ namespace Json2DiffSinger.Core.Converters
                 NoteSequence = inputNote,
                 NoteDurationSequence = inputDuration
             };
-            var formatting = new Formatting();
-            if (isIntended)
-            {
-                formatting = Formatting.Indented;
-            }
-            result = JsonConvert.SerializeObject(model, formatting);
-            return result;
+            return model;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace Json2DiffSinger.Core.Converters
         /// 是否为自动音素模式。
         /// </summary>
         static bool isAutoPhoneme = true;
-        public static string Encode(Project project, bool isIntended, ModeOption mode)
+        public static AbstractParamsModel Encode(Project project, bool isIntended, ModeOption mode)
         {
             if (mode == ModeOption.ManualPhoneme)
             {
@@ -31,9 +31,9 @@ namespace Json2DiffSinger.Core.Converters
             }
             TimeSynchronizer synchronizer = new TimeSynchronizer(project.SongTempoList);
             int firstBarLength = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-            SingingTrack singingTrack = project.TrackList.Where(t => t is SingingTrack)
-                                                         .Select(t => (SingingTrack)t)
-                                                         .First();
+            SingingTrack singingTrack = project.TrackList
+                .OfType<SingingTrack>()
+                .First();
             List<Note> osNotes = singingTrack.NoteList;
             List<DsNote> dsNotes = new List<DsNote>();
             int prevEndInTicks = 0;
@@ -59,11 +59,11 @@ namespace Json2DiffSinger.Core.Converters
                 double curEndInSecs = synchronizer.GetActualSecsFromTicks(curEndInTicks);
                 double curActualStartInSecs = curStartInSecs;
                 double curActualEndInSecs = curEndInSecs;
-                if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs != -1.0f)
+                if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs >= 0)
                 {
                     curActualStartInSecs -= note.EditedPhones.HeadLengthInSecs;
                 }
-                if (index < osNotes.Count - 1 && osNotes[index + 1].EditedPhones != null && osNotes[index + 1].EditedPhones.HeadLengthInSecs != -1.0f)
+                if (index < osNotes.Count - 1 && osNotes[index + 1].EditedPhones != null && osNotes[index + 1].EditedPhones.HeadLengthInSecs >= 0)
                 {
                     var nextNote = osNotes[index + 1];
                     int nextStartInTicks = nextNote.StartPos;
@@ -181,11 +181,10 @@ namespace Json2DiffSinger.Core.Converters
                 prevPhoneme = dsPhoneme;
                 index++;
             }
-            var endRestPhoneme = new RestDsPhoneme(1.0f);
+            var endRestPhoneme = new RestDsPhoneme(0.05f);
             var endRestNote = new RestDsNote(endRestPhoneme);
             dsNotes.Add(endRestNote);
 
-            string result;
             string inputText = "";
             string phonemeSeq = "";
             string inputNoteSeq = "";
@@ -246,13 +245,7 @@ namespace Json2DiffSinger.Core.Converters
             //    $"note duration sequence\n{inputDurationSeq}\n\n" +
             //    $"is slur sequence\n{isSlurSeq}\n\n" +
             //    $"phoneme duration sequence\n{phonemeDurSeq}";
-            var formatting = new Formatting();
-            if (isIntended)
-            {
-                formatting = Formatting.Indented;
-            }
-            result = JsonConvert.SerializeObject(model, formatting);
-            return result;
+            return model;
         }
     }
 }
