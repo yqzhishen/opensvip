@@ -18,9 +18,9 @@ namespace FlutyDeer.MidiPlugin
 
         private static void Midi2Json()
         {
-            var project = new MidiConverter().Load(@"D:\测试\大钢琴.mid", new ConverterOptions(new Dictionary<string, string>()));
+            var project = new MidiConverter().Load(@"D:\编曲学习\不直白动物\不直白动物.mid", new ConverterOptions(new Dictionary<string, string>()));
             var stream = new FileStream(
-                @"D:\测试\大钢琴.json",
+                @"D:\编曲学习\不直白动物\不直白动物.json",
                 FileMode.Create,
                 FileAccess.Write);
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
