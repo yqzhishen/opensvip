@@ -20,7 +20,6 @@ namespace Json2DiffSinger.Utils
             {
                 foreach (var note in track.NoteList)
                 {
-                    var dur = synchronizer.GetDurationSecsFromTicks(note.StartPos, note.StartPos + note.Length);
                     var end = (int) Math.Round(synchronizer.GetActualTicksFromTicks(note.StartPos + note.Length));
                     note.StartPos = (int) Math.Round(synchronizer.GetActualTicksFromTicks(note.StartPos));
                     note.Length = end - note.StartPos;
