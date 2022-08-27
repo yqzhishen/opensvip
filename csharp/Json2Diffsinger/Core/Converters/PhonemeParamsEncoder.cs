@@ -16,10 +16,6 @@ namespace Json2DiffSinger.Core.Converters
     public static class PhonemeParamsEncoder
     {
         /// <summary>
-        /// 标准 MIDI 长度（不要动）。
-        /// </summary>
-        static readonly bool IsStandardMidiNoteLength = true;
-        /// <summary>
         /// 是否为自动音素模式。
         /// </summary>
         static bool isAutoPhoneme = true;
@@ -76,42 +72,27 @@ namespace Json2DiffSinger.Core.Converters
                     }
                 }
                 double gap;//音符间隙
-                if (IsStandardMidiNoteLength)
-                {
-                    gap = curStartInSecs - prevEndInSecs;
-                }
-                else
-                {
-                    gap = curActualStartInSecs - prevActualEndInSecs;
-                }
+                gap = curActualStartInSecs - prevActualEndInSecs;
                 if (gap > 0)//有间隙
                 {
                     if (gap < 0.5)//间隙很小，休止
                     {
                         var restPhoneme = new RestDsPhoneme((float)Math.Round(gap, 6));
-                        var restNote = new RestDsNote(restPhoneme);
+                        var restNote = new RestDsNote((float)(curEndInSecs - curStartInSecs), restPhoneme);
                         dsNotes.Add(restNote);
                         prevPhoneme = restPhoneme;
                     }
                     else if (gap < 1.0)//间隙适中，换气
                     {
                         var aspPhoneme = new AspirationDsPhoneme((float)Math.Round(gap, 6));
-                        var apsNote = new AspirationDsNote(aspPhoneme);
+                        var apsNote = new AspirationDsNote((float)(curEndInSecs - curStartInSecs), aspPhoneme);
                         dsNotes.Add(apsNote);
                         prevPhoneme = aspPhoneme;
                     }
                     else//间隙很大，休止
                     {
-                        //double aspDur = 0.5;//换气时长
-                        //var restPhoneme = new RestDsPhoneme((float)Math.Round(gap - aspDur, 6));
-                        //var restNote = new RestDsNote(restPhoneme);
-                        //dsNotes.Add(restNote);
-                        //var aspPhoneme = new AspirationDsPhoneme((float)Math.Round(aspDur, 6));
-                        //var apsNote = new AspirationDsNote(aspPhoneme);
-                        //dsNotes.Add(apsNote);
-                        //prevPhoneme = aspPhoneme;
                         var restPhoneme = new RestDsPhoneme((float)Math.Round(gap, 6));
-                        var restNote = new RestDsNote(restPhoneme);
+                        var restNote = new RestDsNote((float)(curEndInSecs - curStartInSecs), restPhoneme);
                         dsNotes.Add(restNote);
                         prevPhoneme = restPhoneme;
                     }
@@ -165,16 +146,8 @@ namespace Json2DiffSinger.Core.Converters
                     Lyric = LyricUtil.GetSymbolRemovedLyric(note.Lyric),
                     DsPhoneme = dsPhoneme,
                     NoteName = NoteNameConvert.ToNoteName(note.KeyNumber),
-                    //Duration = dsPhoneme.Consonant.Duration + dsPhoneme.Vowel.Duration
+                    Duration = (float)(curEndInSecs - curStartInSecs)
                 };
-                if (IsStandardMidiNoteLength)
-                {
-                    dsNote.Duration = (float)(curEndInSecs - curStartInSecs);
-                }
-                else
-                {
-                    dsNote.Duration = dsPhoneme.Consonant.Duration + dsPhoneme.Vowel.Duration;
-                }
                 dsNotes.Add(dsNote);
                 prevEndInTicks = curEndInTicks;
                 prevActualEndInSecs = curActualEndInSecs;
@@ -182,7 +155,7 @@ namespace Json2DiffSinger.Core.Converters
                 index++;
             }
             var endRestPhoneme = new RestDsPhoneme(0.05f);
-            var endRestNote = new RestDsNote(endRestPhoneme);
+            var endRestNote = new RestDsNote(0.05f, endRestPhoneme);
             dsNotes.Add(endRestNote);
 
             string inputText = "";

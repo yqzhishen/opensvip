@@ -96,12 +96,12 @@
         /// 实例化一个换气 AP 音符
         /// </summary>
         /// <param name="phoneme">音素参数</param>
-        public AspirationDsNote(AspirationDsPhoneme phoneme)
+        public AspirationDsNote(float duration, AspirationDsPhoneme phoneme)
         {
             Lyric = "AP";
             DsPhoneme = phoneme;
             NoteName = "rest";
-            Duration = phoneme.Vowel.Duration;
+            Duration = duration;
         }
     }
 
@@ -131,12 +131,12 @@
         /// 实例化一个休止 SP 音符
         /// </summary>
         /// <param name="phoneme">音素</param>
-        public RestDsNote(RestDsPhoneme phoneme)
+        public RestDsNote(float duration, RestDsPhoneme phoneme)
         {
             Lyric = "SP";
             DsPhoneme = phoneme;
             NoteName = "rest";
-            Duration = phoneme.Vowel.Duration;
+            Duration = duration;
         }
     }
 }
