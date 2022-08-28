@@ -132,7 +132,7 @@ namespace AceStdio.Core
                         {
                             MergeCurves(pattern.Params.RealTension, aceParams.RealTension);
                         }
-                        if (TensionNormArgs.IsEnabled)
+                        if (EnergyNormArgs.IsEnabled)
                         {
                             MergeCurves(pattern.Params.RealEnergy, aceParams.RealEnergy);
                         }
@@ -190,6 +190,7 @@ namespace AceStdio.Core
             }
             if (aceNote.ConsonantLength != null)
             {
+                // TODO: this may cause negative time coordinates, producing exception in TimeSynchronizer
                 note.EditedPhones = new Phones
                 {
                     HeadLengthInSecs = (float)
