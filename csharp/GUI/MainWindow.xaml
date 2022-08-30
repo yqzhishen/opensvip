@@ -344,6 +344,12 @@
             </Grid>
         </DataTemplate>
     </panuon:WindowXCaption.HeaderTemplate>
+    <Window.Resources>
+        <Style TargetType="materialDesign:Card">
+            <Setter Property="Focusable" Value="True"/>
+            <!--<Setter Property="FocusVisualStyle" Value="{x:Null}"/>-->
+        </Style>
+    </Window.Resources>
     <materialDesign:DialogHost x:Name="RootDialogHost" Identifier="RootDialogHost">
         <Grid>
             <Grid Visibility="Collapsed">
