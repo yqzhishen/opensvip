@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.MusicXml", "Plugins\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json2DiffSinger", "Json2Diffsinger\Json2DiffSinger.csproj", "{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Vsqx4", "Plugins\Vsqx4\Plugin.Vsqx4.csproj", "{061363F8-45CF-4606-842B-6718DC011669}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,10 @@ Global
 		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{061363F8-45CF-4606-842B-6718DC011669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{061363F8-45CF-4606-842B-6718DC011669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{061363F8-45CF-4606-842B-6718DC011669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{061363F8-45CF-4606-842B-6718DC011669}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
