@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>X Studio 3 工程转换插件</Name>
+    <Version>0.0.1</Version>
+    <Author>笛鹿FlutyDeer</Author>
+    <HomePage>https://space.bilibili.com/386270936</HomePage>
+    <Descriptions>适用于 OpenSvip 的 X Studio 3 工程格式转换插件。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>X Studio 3 工程文件</Format>
+    <Suffix>svip3</Suffix>
+    <Identifier>svip3</Identifier>
+    <LibraryPath>Svip3\FlutyDeer.Svip3Plugin.dll</LibraryPath>
+    <Converter>FlutyDeer.Svip3Plugin.Stream.Svip3Converter</Converter>
+    <InputOptions>
+    </InputOptions>
+    <OutputOptions>
+    </OutputOptions>
+</Plugin>
