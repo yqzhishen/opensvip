@@ -195,8 +195,12 @@ namespace Plugin.VSQX
                         var v = pt.Item2 < 0 ? pt.Item2 / 8192f : pt.Item2 / 8191f;
                         var semitone = pbsList.FindLast(tuple => tuple.Item1 <= t)?.Item2 ?? pbsDefaultVal;
                         var pit = (int) Math.Round(v * semitone * 100);
-                        pit += (track.NoteList.Find(x => x.StartPos <= t && x.StartPos + x.Length > t)?.KeyNumber ?? 0) * 100;
-
+                        var note = track.NoteList.Find(x => x.StartPos <= (t + partPosTickShift) && x.StartPos + x.Length > (t + partPosTickShift));
+                        var noteKeyNumber = note?.KeyNumber ?? 0;
+                        var f = track.NoteList[0];
+                        // Console.WriteLine($"time:{t,8} pit:{pit,5} noteKeyStartPos:{f.StartPos,8} noteKeyLength:{f.Length,8} noteKeyEndPos:{f.StartPos + f.Length,8} noteKeyNumber:{noteKeyNumber,4} pit:{pit + (noteKeyNumber * 100),5}");
+                        pit += noteKeyNumber * 100;
+                        pit += 50;//补偿
                         pitList[i] = new Tuple<int, int>(t, pit);
                     }
 
