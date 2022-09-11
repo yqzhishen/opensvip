@@ -19,7 +19,7 @@ namespace FlutyDeer.MidiPlugin.Stream
             }
             catch
             {
-                throw new NotImplementedException("此 MIDI 文件可能不是标准 MIDI 文件、包含错误或损坏，请将“导入有错误或损坏的 MIDI 文件时”设置为“忽略错误”后重试。");
+                throw new NotImplementedException("此文件可能不是 MIDI 文件，请检查导入格式是否有误。");
             }
             return new MidiDecoder
             {
@@ -37,9 +37,8 @@ namespace FlutyDeer.MidiPlugin.Stream
                 IsExportLyrics = options.GetValueAsBoolean("exportLyrics", true),
                 Transpose = options.GetValueAsInteger("transpose", 0),
                 IsUseCompatibleLyric = options.GetValueAsBoolean("compatibleLyric", false),
-                IsUseLegacyPinyin = options.GetValueAsBoolean("isUseLegacyPinyin", false),
                 IsRemoveSymbols = options.GetValueAsBoolean("removeSymbols", true),
-                //IsConstantTempo = options.GetValueAsBoolean("constantTempo", false),
+                //ConstantTempo = options.GetValueAsDouble("constantTempo", 120.0),
                 PPQ = options.GetValueAsInteger("ppq", 480),
                 PreShift = options.GetValueAsInteger("preShift", 0)
             }.EncodeMidiFile(project);

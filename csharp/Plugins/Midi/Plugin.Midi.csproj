@@ -85,13 +85,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Melanchall.DryWetMidi">
-      <Version>6.1.1</Version>
+      <Version>6.1.2</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="NPinyin">
-      <Version>0.2.6321.26573</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

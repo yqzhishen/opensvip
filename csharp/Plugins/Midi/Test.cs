@@ -12,8 +12,8 @@ namespace FlutyDeer.MidiPlugin
     {
         public static void Main(string[] args)
         {
-            Midi2Json();
-            //Json2Midi();
+            //Midi2Json();
+            Json2Midi();
         }
 
         private static void Midi2Json()
@@ -33,14 +33,14 @@ namespace FlutyDeer.MidiPlugin
         private static void Json2Midi()
         {
             var stream = new FileStream(
-                @"D:\Users\fluty\Downloads\test.json",
+                @"D:\测试\分割线（带词midi）.json",
                 FileMode.Open,
                 FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
             var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            new MidiConverter().Save(@"D:\Users\fluty\Downloads\test.mid", project, new ConverterOptions(new Dictionary<string, string>()));
+            new MidiConverter().Save(@"D:\测试\分割线（带词midi）.mid", project, new ConverterOptions(new Dictionary<string, string>()));
         }
     }
 }

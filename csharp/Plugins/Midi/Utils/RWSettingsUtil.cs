@@ -9,22 +9,20 @@ namespace FlutyDeer.MidiPlugin.Utils
         public static ReadingSettings GetReadingSettings(ConverterOptions options)
         {
             var lyricEncoding = options.GetValueAsEnum("lyricEncoding", LyricEncodingOption.UTF8);
-            var errorMidiFilePolicy = options.GetValueAsEnum("errorMidiFilePolicy", ErrorMidiFilePolicyOption.Abort);
-            ReadingSettings readingSettings = new ReadingSettings();
-            readingSettings.TextEncoding = EncodingUtil.GetEncoding(lyricEncoding);
-            if (errorMidiFilePolicy == ErrorMidiFilePolicyOption.Ignore)
+            ReadingSettings readingSettings = new ReadingSettings
             {
-                readingSettings.InvalidChannelEventParameterValuePolicy = InvalidChannelEventParameterValuePolicy.ReadValid;
-                readingSettings.InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore;
-                readingSettings.InvalidMetaEventParameterValuePolicy = InvalidMetaEventParameterValuePolicy.SnapToLimits;
-                readingSettings.MissedEndOfTrackPolicy = MissedEndOfTrackPolicy.Ignore;
-                readingSettings.NoHeaderChunkPolicy = NoHeaderChunkPolicy.Ignore;
-                readingSettings.NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore;
-                readingSettings.UnexpectedTrackChunksCountPolicy = UnexpectedTrackChunksCountPolicy.Ignore;
-                readingSettings.UnknownChannelEventPolicy = UnknownChannelEventPolicy.SkipStatusByteAndOneDataByte;
-                readingSettings.UnknownChunkIdPolicy = UnknownChunkIdPolicy.ReadAsUnknownChunk;
-                readingSettings.UnknownFileFormatPolicy = UnknownFileFormatPolicy.Ignore;
-            }
+                TextEncoding = EncodingUtil.GetEncoding(lyricEncoding),
+                InvalidChannelEventParameterValuePolicy = InvalidChannelEventParameterValuePolicy.ReadValid,
+                InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore,
+                InvalidMetaEventParameterValuePolicy = InvalidMetaEventParameterValuePolicy.SnapToLimits,
+                MissedEndOfTrackPolicy = MissedEndOfTrackPolicy.Ignore,
+                NoHeaderChunkPolicy = NoHeaderChunkPolicy.Ignore,
+                NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore,
+                UnexpectedTrackChunksCountPolicy = UnexpectedTrackChunksCountPolicy.Ignore,
+                UnknownChannelEventPolicy = UnknownChannelEventPolicy.SkipStatusByteAndOneDataByte,
+                UnknownChunkIdPolicy = UnknownChunkIdPolicy.ReadAsUnknownChunk,
+                UnknownFileFormatPolicy = UnknownFileFormatPolicy.Ignore
+            };
             return readingSettings;
         }
 

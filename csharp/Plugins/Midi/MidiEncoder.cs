@@ -26,7 +26,6 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public bool IsUseCompatibleLyric { get; set; }
 
-        public bool IsUseLegacyPinyin { get; set; }
 
         /// <summary>
         /// 是否移除歌词中的常见标点符号，默认为是。
@@ -44,6 +43,8 @@ namespace FlutyDeer.MidiPlugin
         /// PPQ默认为480。
         /// </summary>
         public int PPQ { get; set; }
+
+        //public double ConstantTempo { get; set; }
 
         private Project osProject;
 
@@ -111,7 +112,6 @@ namespace FlutyDeer.MidiPlugin
                         trackChunkList.Add(new MidiEventsUtil{
                             IsExportLyrics = IsExportLyrics,
                             IsUseCompatibleLyric = IsUseCompatibleLyric,
-                            IsUseLegacyPinyin = IsUseLegacyPinyin,
                             IsRemoveSymbols = IsRemoveSymbols,
                             SemivowelPreShift = PreShift,
                             //IsConstantTempo = IsConstantTempo,
