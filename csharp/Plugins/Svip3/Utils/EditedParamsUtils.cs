@@ -1,10 +1,5 @@
 ﻿using Google.Protobuf.Collections;
 using OpenSvip.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin.Utils
@@ -13,8 +8,14 @@ namespace FlutyDeer.Svip3Plugin.Utils
     {
         public Params Decode(RepeatedField<SingingPattern> patterns)
         {
-            var @params = new Params();
+            var @params = new Params
+            {
+                Pitch = PitchParamUtils.Decode(patterns),
+                Volume = CommonParamUtils.Decode(patterns),
+                Strength = CommonParamUtils.Decode(patterns)
+            };
             return @params;
         }
+
     }
 }

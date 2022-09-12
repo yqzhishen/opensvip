@@ -11,17 +11,11 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 Title = track.Name,
                 Mute = track.Mute,
                 Solo = track.Solo,
-                Volume = DecodeVolume(track.Volume),
+                Volume = MathUtils.ToLinearVolume(track.Volume),
                 Pan = DecodePan(track.Pan),
-                NoteList = new NoteListUtils().Decode(track.PatternList)
+                NoteList = new NoteListUtils().Decode(track.PatternList),
+                EditedParams = new EditedParamsUtils().Decode(track.PatternList)
             };
-        }
-
-        private double DecodeVolume(double gain)
-        {
-            return gain >= 0
-                ? Math.Min(gain / (20 * Math.Log10(4)) + 1.0, 2.0)
-                : Math.Pow(10, gain / 20.0);
         }
 
         private double DecodePan(double svip3Pan)

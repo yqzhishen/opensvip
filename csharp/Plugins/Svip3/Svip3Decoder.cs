@@ -11,7 +11,7 @@ namespace FlutyDeer.Svip3Plugin
             return new Project
             {
                 TimeSignatureList = TimeSignatureListUtils.Decode(model.BeatList),
-                SongTempoList = new TempoListUtils().Decode(model.TempoList),
+                SongTempoList = TempoListUtils.Decode(model.TempoList),
                 TrackList = new TrackListUtils().Decode(model.TrackList)
             };
         }

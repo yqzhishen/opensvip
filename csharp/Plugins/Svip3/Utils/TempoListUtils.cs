@@ -9,9 +9,11 @@ using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
-    public class TempoListUtils
+    public static class TempoListUtils
     {
-        public List<OpenSvip.Model.SongTempo> Decode(RepeatedField<Xstudio.Proto.SongTempo> tempos)
+        public static List<OpenSvip.Model.SongTempo> SongTempoList { get; set; }
+
+        public static List<OpenSvip.Model.SongTempo> Decode(RepeatedField<Xstudio.Proto.SongTempo> tempos)
         {
             var songTempoList = new List<OpenSvip.Model.SongTempo>();
             foreach (var tempo in tempos)
@@ -19,9 +21,10 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 songTempoList.Add(new OpenSvip.Model.SongTempo
                 {
                     Position = tempo.Pos,
-                    BPM = tempo.Tempo
+                    BPM = tempo.Tempo / 100.0f
                 });
             }
+            SongTempoList = songTempoList;
             return songTempoList;
         }
     }

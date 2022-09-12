@@ -9,7 +9,7 @@
     <Format>X Studio 3 工程文件</Format>
     <Suffix>svip3</Suffix>
     <Identifier>svip3</Identifier>
-    <LibraryPath>Svip3\FlutyDeer.Svip3Plugin.dll</LibraryPath>
+    <LibraryPath>Svip3\FlutyDeer.Svip3Plugin.exe</LibraryPath>
     <Converter>FlutyDeer.Svip3Plugin.Stream.Svip3Converter</Converter>
     <InputOptions>
     </InputOptions>

@@ -21,6 +21,11 @@ namespace FlutyDeer.Svip3Plugin.Utils
                         var singingTrack = new SingingTrackUtils().Decode(svip3SingingTrack);
                         trackList.Add(singingTrack);
                         break;
+                    case "AudioTrack":
+                        var svip3AudioTrack = svip3Track.Unpack<Xstudio.Proto.AudioTrack>();
+                        var instrumentalTrack = new AudioTrackUtils().Decode(svip3AudioTrack);
+                        trackList.Add(instrumentalTrack);
+                        break;
                 }
             }
             return trackList;
