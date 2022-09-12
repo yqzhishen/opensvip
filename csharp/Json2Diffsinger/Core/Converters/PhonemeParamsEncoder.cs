@@ -77,22 +77,22 @@ namespace Json2DiffSinger.Core.Converters
                 {
                     if (gap < 0.5)//间隙很小，休止
                     {
-                        var restPhoneme = new RestDsPhoneme((float)Math.Round(gap, 6));
-                        var restNote = new RestDsNote((float)(curEndInSecs - curStartInSecs), restPhoneme);
+                        var restPhoneme = new RestDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs, 6));
+                        var restNote = new RestDsNote((float)(curStartInSecs - prevEndInSecs), restPhoneme);
                         dsNotes.Add(restNote);
                         prevPhoneme = restPhoneme;
                     }
                     else if (gap < 1.0)//间隙适中，换气
                     {
-                        var aspPhoneme = new AspirationDsPhoneme((float)Math.Round(gap, 6));
-                        var apsNote = new AspirationDsNote((float)(curEndInSecs - curStartInSecs), aspPhoneme);
+                        var aspPhoneme = new AspirationDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs, 6));
+                        var apsNote = new AspirationDsNote((float)(curStartInSecs - prevEndInSecs), aspPhoneme);
                         dsNotes.Add(apsNote);
                         prevPhoneme = aspPhoneme;
                     }
                     else//间隙很大，休止
                     {
-                        var restPhoneme = new RestDsPhoneme((float)Math.Round(gap, 6));
-                        var restNote = new RestDsNote((float)(curEndInSecs - curStartInSecs), restPhoneme);
+                        var restPhoneme = new RestDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs, 6));
+                        var restNote = new RestDsNote((float)(curStartInSecs - prevEndInSecs), restPhoneme);
                         dsNotes.Add(restNote);
                         prevPhoneme = restPhoneme;
                     }
