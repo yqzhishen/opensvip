@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin
@@ -48,7 +50,7 @@ namespace FlutyDeer.Svip3Plugin
         private static void Read()
         {
             AppModel appModel;
-            string path = @"D:\测试\九张机\九张机.svip3";
+            string path = @"D:\测试\音量参数\音量参数.svip3";
 
             using (var input = File.OpenRead(path))
             {
@@ -60,11 +62,24 @@ namespace FlutyDeer.Svip3Plugin
             var singingTrack = firstTrack.Unpack<SingingTrack>();
             var patternList = singingTrack.PatternList;
             var pattern = patternList[0];
-            var notes = pattern.NoteList;
-            foreach(var note in notes)
+            int offset = pattern.RealPos;
+            int visibleLeft = pattern.PlayPos + offset;
+            int visibleRight = visibleLeft + pattern.PlayDur;
+            var note = pattern.NoteList.First();
+            //Console.WriteLine($"start{note.StartPos}");
+            //Console.WriteLine($"{offset},{visibleLeft},{visibleRight}");
+            Console.WriteLine(pattern.RealDur);
+            var volumeParam = pattern.EditedPowerLine;
+            foreach (var node in volumeParam)
             {
-                Console.Write(note.Lyric);
+                Console.Write($"({node.Pos},{node.Value})");
             }
+
+            //foreach (var track in tracks)
+            //{
+            //    var singTrack = track.Unpack<SingingTrack>();
+            //    Console.WriteLine($"\"{singTrack.AiSingerId}\": \"\",");
+            //}
 
             //using (var file = File.OpenRead(path))
             //{

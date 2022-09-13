@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>C:\Users\fluty\AppData\Local\OpenSvip\Plugins\Svip3\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -48,16 +48,29 @@
     <Compile Include="ProtoModel.cs" />
     <Compile Include="Svip3Converter.cs" />
     <Compile Include="Svip3Decoder.cs" />
+    <Compile Include="Svip3Encoder.cs" />
     <Compile Include="Svip3Model.g.cs" />
+    <Compile Include="Utils\AudioTrackUtils.cs" />
+    <Compile Include="Utils\CommonParamUtils.cs" />
     <Compile Include="Utils\EditedParamsUtils.cs" />
+    <Compile Include="Utils\EditedPhonesUtils.cs" />
+    <Compile Include="Utils\HeadTagUtils.cs" />
     <Compile Include="Utils\NoteListUtils.cs" />
+    <Compile Include="Utils\ParamCurveUtils.cs" />
+    <Compile Include="Utils\PatternUtils.cs" />
+    <Compile Include="Utils\PitchParamUtils.cs" />
+    <Compile Include="Utils\Singers.cs" />
     <Compile Include="Utils\SingingTrackUtils.cs" />
-    <Compile Include="Utils\TempoListUtils.cs" />
+    <Compile Include="Utils\TempoUtils.cs" />
     <Compile Include="Utils\TimeSignatureListUtils.cs" />
     <Compile Include="Utils\TrackListUtils.cs" />
+    <Compile Include="Utils\MathUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="SingerDict.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Google.Protobuf">

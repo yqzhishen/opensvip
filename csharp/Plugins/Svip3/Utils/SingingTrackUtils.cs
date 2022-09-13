@@ -1,12 +1,13 @@
-﻿using System;
+﻿using OpenSvip.Model;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
     public class SingingTrackUtils
     {
-        public OpenSvip.Model.SingingTrack Decode(Xstudio.Proto.SingingTrack track)
+        #region Decoding
+        public SingingTrack Decode(Xstudio.Proto.SingingTrack track)
         {
-            return new OpenSvip.Model.SingingTrack
+            return new SingingTrack
             {
                 Title = track.Name,
                 Mute = track.Mute,
@@ -14,13 +15,40 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 Volume = MathUtils.ToLinearVolume(track.Volume),
                 Pan = DecodePan(track.Pan),
                 NoteList = new NoteListUtils().Decode(track.PatternList),
-                EditedParams = new EditedParamsUtils().Decode(track.PatternList)
+                EditedParams = new EditedParamsUtils().Decode(track.PatternList),
+                AISingerName = Singers.GetName(track.AiSingerId)
             };
         }
 
-        private double DecodePan(double svip3Pan)
+        private double DecodePan(double pan)
         {
-            return svip3Pan / 10.0;
+            return pan / 10.0;
         }
+
+        #endregion
+
+        #region Encoding
+
+        public Xstudio.Proto.SingingTrack Encode(SingingTrack track)
+        {
+            var singingTrack = new Xstudio.Proto.SingingTrack
+            {
+                Name = track.Title,
+                Mute = track.Mute,
+                Solo = track.Solo,
+                Volume = MathUtils.ToDecibelVolume(track.Volume),
+                Pan = EncodePan(track.Pan),
+                Color = "#66CCFF"
+            };
+            singingTrack.PatternList.AddRange(PatternUtils.Encode(track));
+            return singingTrack;
+        }
+
+        private float EncodePan(double pan)
+        {
+            return (float)(pan * 10.0);
+        }
+
+        #endregion
     }
 }

@@ -6,6 +6,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
 {
     public class AudioTrackUtils
     {
+        #region Decoding
         public InstrumentalTrack Decode(AudioTrack track)
         {
             string audioFilePath = null;
@@ -31,6 +32,27 @@ namespace FlutyDeer.Svip3Plugin.Utils
         private double DecodePan(double svip3Pan)
         {
             return svip3Pan / 10.0;
+        }
+
+        #endregion
+
+        public AudioTrack Encode(InstrumentalTrack track)
+        {
+            var audioTrack = new AudioTrack
+            {
+                Name = track.Title,
+                Mute = track.Mute,
+                Solo = track.Solo,
+                Volume = MathUtils.ToDecibelVolume(track.Volume),
+                Pan = EncodePan(track.Pan)
+            };
+            audioTrack.PatternList.AddRange(PatternUtils.Encode(track));
+            return audioTrack;
+        }
+
+        private float EncodePan(double pan)
+        {
+            return (float)(pan * 10.0);
         }
     }
 }
