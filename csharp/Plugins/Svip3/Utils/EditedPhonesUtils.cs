@@ -1,17 +1,18 @@
-﻿using OpenSvip.Model;
+﻿using FlutyDeer.Svip3Plugin.Model;
+using OpenSvip.Model;
 using System;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
     public static class EditedPhonesUtils
     {
-        public static Phones Decode(Xstudio.Proto.Note note)
+        public static Phones Decode(Xs3Note note)
         {
-            if (note.ConsonantLen > 0)
+            if (note.ConsonantLength > 0)
             {
                 return new Phones
                 {
-                    HeadLengthInSecs = (float)(note.ConsonantLen / 480.0 * 60.0 / TempoUtils.SongTempoList[0].BPM)
+                    HeadLengthInSecs = (float)(note.ConsonantLength / 480.0 * 60.0 / TempoUtils.SongTempoList[0].BPM)
                 };
             }
             else
@@ -20,7 +21,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
             }
         }
 
-        public static int Encode(OpenSvip.Model.Note note)
+        public static int Encode(Note note)
         {
             int consonantLength = 0;
             if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs > 0)

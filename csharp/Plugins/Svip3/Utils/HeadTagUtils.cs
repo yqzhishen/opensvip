@@ -1,14 +1,16 @@
-﻿namespace FlutyDeer.Svip3Plugin.Utils
+﻿using FlutyDeer.Svip3Plugin.Model;
+
+namespace FlutyDeer.Svip3Plugin.Utils
 {
     public static class HeadTagUtils
     {
-        public static string Decode(Xstudio.Proto.Note note)
+        public static string Decode(Xs3Note note)
         {
-            if (note.HasSilLen)
+            if (note.SilLength > 0)
             {
                 return "0";
             }
-            else if (note.HasSpLen)
+            else if (note.SilLength > 0)
             {
                 return "V";
             }

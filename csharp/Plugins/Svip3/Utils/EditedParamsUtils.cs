@@ -1,12 +1,12 @@
-﻿using Google.Protobuf.Collections;
+﻿using FlutyDeer.Svip3Plugin.Model;
 using OpenSvip.Model;
-using Xstudio.Proto;
+using System.Collections.Generic;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
     public class EditedParamsUtils
     {
-        public Params Decode(RepeatedField<SingingPattern> patterns)
+        public Params Decode(List<Xs3SingingPattern> patterns)
         {
             var @params = new Params
             {

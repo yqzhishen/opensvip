@@ -1,13 +1,13 @@
-﻿using OpenSvip.Model;
+﻿using FlutyDeer.Svip3Plugin.Model;
+using OpenSvip.Model;
 using System.Linq;
-using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
     public class AudioTrackUtils
     {
         #region Decoding
-        public InstrumentalTrack Decode(AudioTrack track)
+        public InstrumentalTrack Decode(Xs3AudioTrack track)
         {
             string audioFilePath = null;
             int offset = 0;
@@ -15,14 +15,14 @@ namespace FlutyDeer.Svip3Plugin.Utils
             {
                 var firstPattern = track.PatternList[0];
                 audioFilePath = firstPattern.AudioFilePath;
-                offset = firstPattern.RealPos;
+                offset = firstPattern.OriginalStartPosition;
             }
             return new InstrumentalTrack
             {
                 Title = track.Name,
                 Mute = track.Mute,
                 Solo = track.Solo,
-                Volume = MathUtils.ToLinearVolume(track.Volume),
+                Volume = MathUtils.ToLinearVolume(track.Gain),
                 Pan = DecodePan(track.Pan),
                 AudioFilePath = audioFilePath,
                 Offset = offset
@@ -36,18 +36,18 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         #endregion
 
-        public AudioTrack Encode(InstrumentalTrack track)
+        public Xs3AudioTrack Encode(InstrumentalTrack track)
         {
-            var audioTrack = new AudioTrack
+            var Xs3AudioTrack = new Xs3AudioTrack
             {
                 Name = track.Title,
                 Mute = track.Mute,
                 Solo = track.Solo,
-                Volume = MathUtils.ToDecibelVolume(track.Volume),
+                Gain = MathUtils.ToDecibelVolume(track.Volume),
                 Pan = EncodePan(track.Pan)
             };
-            audioTrack.PatternList.AddRange(PatternUtils.Encode(track));
-            return audioTrack;
+            Xs3AudioTrack.PatternList.AddRange(PatternUtils.Encode(track));
+            return Xs3AudioTrack;
         }
 
         private float EncodePan(double pan)

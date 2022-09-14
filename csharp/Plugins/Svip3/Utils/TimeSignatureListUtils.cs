@@ -1,8 +1,7 @@
-﻿using Google.Protobuf.Collections;
+﻿using FlutyDeer.Svip3Plugin.Model;
 using OpenSvip.Model;
 using System.Collections.Generic;
 using System.Linq;
-using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
@@ -10,32 +9,31 @@ namespace FlutyDeer.Svip3Plugin.Utils
     {
         public static int FirstBarLength { get; set; }
 
-        public static List<TimeSignature> Decode(RepeatedField<SongBeat> beats)
+        public static List<TimeSignature> Decode(List<Xs3TimeSignature> signatures)
         {
             var list = new List<TimeSignature>();
-            foreach (var beat in beats)
+            foreach (var signature in signatures)
             {
                 list.Add(new TimeSignature
                 {
                     BarIndex = 0,//TODO: 梯到小节数的转换
-                    Numerator = beat.BeatSize.Numerator,
-                    Denominator = beat.BeatSize.Denominator
+                    Numerator = signature.Content.Numerator,
+                    Denominator = signature.Content.Denominator
                 });
             }
-            var signature = list.First();
-            FirstBarLength = 1920 * signature.Numerator / signature.Denominator;
+            var firstSignature = list.First();
+            FirstBarLength = 1920 * firstSignature.Numerator / firstSignature.Denominator;
             return list;
         }
 
-        public static RepeatedField<SongBeat> Encode(List<TimeSignature> signatures)
+        public static List<Xs3TimeSignature> Encode(List<TimeSignature> signatures)
         {
             var signature = signatures.First();
-            var field = new RepeatedField<SongBeat>
+            var list = new List<Xs3TimeSignature>
             {
-                new SongBeat
+                new Xs3TimeSignature
                 {
-                    Pos = 0,
-                    BeatSize = new BeatSize
+                    Content = new Xs3TimeSignatureContent
                     {
                         Numerator = signature.Numerator,
                         Denominator = signature.Denominator
@@ -43,7 +41,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 }
             };
             FirstBarLength = 1920 * signature.Numerator / signature.Denominator;
-            return field;
+            return list;
         }
     }
 }

@@ -1,56 +1,56 @@
-﻿using Google.Protobuf.Collections;
+﻿using FlutyDeer.Svip3Plugin.Model;
 using NAudio.Wave;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
     public static class PatternUtils
     {
-        public static Tuple<int, int> GetVisiableRange(SingingPattern pattern)
+        public static Tuple<int, int> GetVisiableRange(Xs3SingingPattern pattern)
         {
-            int left = pattern.PlayPos + pattern.RealPos;
-            int right = left + pattern.PlayDur;
+            int left = pattern.ClipPosition + pattern.OriginalStartPosition;
+            int right = left + pattern.ClippedDuration;
             return new Tuple<int, int>(left, right);
         }
 
 
         #region Encoding
-        public static RepeatedField<SingingPattern> Encode(OpenSvip.Model.SingingTrack track)
+        public static List<Xs3SingingPattern> Encode(SingingTrack track)
         {
-            return new RepeatedField<SingingPattern>
+            return new List<Xs3SingingPattern>
             {
                 EncodeSingingPattern(track)
             };
         }
 
-        private static SingingPattern EncodeSingingPattern(OpenSvip.Model.SingingTrack track)
+        private static Xs3SingingPattern EncodeSingingPattern(SingingTrack track)
         {
             var lastNote = track.NoteList.Last();
             int lastNoteEndPos = lastNote.StartPos + lastNote.Length;
-            var pattern = new SingingPattern
+            var pattern = new Xs3SingingPattern
             {
-                RealPos = 0,
-                PlayPos = 0,
-                RealDur = lastNoteEndPos,
-                PlayDur = lastNoteEndPos
+                OriginalStartPosition = 0,
+                ClipPosition = 0,
+                OriginalDuration = lastNoteEndPos,
+                ClippedDuration = lastNoteEndPos
             };
             pattern.NoteList.AddRange(new NoteListUtils().Encode(track.NoteList));
             return pattern;
         }
 
-        public static RepeatedField<AudioPattern> Encode(InstrumentalTrack track)
+        public static List<Xs3AudioPattern> Encode(InstrumentalTrack track)
         {
-            return new RepeatedField<AudioPattern>
+            return new List<Xs3AudioPattern>
             {
                 EncodeAudioPattern(track)
             };
         }
 
-        private static AudioPattern EncodeAudioPattern(InstrumentalTrack track)
+        private static Xs3AudioPattern EncodeAudioPattern(InstrumentalTrack track)
         {
             double audioDurationInSecs;
             var synchronizer = TempoUtils.Synchronizer;
@@ -61,21 +61,21 @@ namespace FlutyDeer.Svip3Plugin.Utils
                     audioDurationInSecs = reader.TotalTime.TotalSeconds;
                 }
                 int audioDurationInTicks = (int)Math.Round(synchronizer.GetActualTicksFromSecs(audioDurationInSecs));
-                var pattern = new AudioPattern
+                var pattern = new Xs3AudioPattern
                 {
-                    RealDur = audioDurationInTicks,
-                    PlayDur = audioDurationInTicks
+                    OriginalDuration = audioDurationInTicks,
+                    ClippedDuration = audioDurationInTicks
                 };
                 if (track.Offset >= 0)
                 {
-                    pattern.PlayPos = 0;
-                    pattern.RealPos = (int)Math.Round(synchronizer.GetActualTicksFromTicks(track.Offset));
+                    pattern.ClipPosition = 0;
+                    pattern.OriginalStartPosition = (int)Math.Round(synchronizer.GetActualTicksFromTicks(track.Offset));
                 }
                 else
                 {
-                    pattern.PlayDur = pattern.RealDur - track.Offset;
-                    pattern.PlayPos = track.Offset;
-                    pattern.RealPos = -track.Offset;
+                    pattern.ClipPosition = pattern.OriginalDuration - track.Offset;
+                    pattern.ClipPosition = track.Offset;
+                    pattern.OriginalStartPosition = -track.Offset;
                 }
                 return pattern;
             }

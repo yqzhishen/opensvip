@@ -1,15 +1,14 @@
-﻿using Google.Protobuf.Collections;
+﻿using FlutyDeer.Svip3Plugin.Model;
 using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Xstudio.Proto;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
     public static class PitchParamUtils
     {
-        public static ParamCurve Decode(RepeatedField<SingingPattern> patterns)
+        public static ParamCurve Decode(List<Xs3SingingPattern> patterns)
         {
             var curves = new List<ParamCurve>();
             foreach (var pattern in patterns)
@@ -23,16 +22,16 @@ namespace FlutyDeer.Svip3Plugin.Utils
             return pitchParamCurve;
         }
 
-        private static ParamCurve DecodePatternCurve(SingingPattern pattern)
+        private static ParamCurve DecodePatternCurve(Xs3SingingPattern pattern)
         {
             var curve = new ParamCurve();
-            int offset = pattern.RealPos + TimeSignatureListUtils.FirstBarLength;
+            int offset = pattern.OriginalStartPosition + TimeSignatureListUtils.FirstBarLength;
             var range = PatternUtils.GetVisiableRange(pattern);
-            var visiableNodes = pattern.EditedPitchLine.Where(n => n.Pos + offset >= range.Item1 + TimeSignatureListUtils.FirstBarLength
-                                                                   && n.Pos + offset <= range.Item2 + TimeSignatureListUtils.FirstBarLength);
+            var visiableNodes = pattern.PitchParam.Where(n => n.Position + offset >= range.Item1 + TimeSignatureListUtils.FirstBarLength
+                                                                   && n.Position + offset <= range.Item2 + TimeSignatureListUtils.FirstBarLength);
             foreach (var node in visiableNodes)
             {
-                int pos = node.Pos + offset;
+                int pos = node.Position + offset;
                 int value = node.Value != -1.0f
                     ? (int)(node.Value * 100 - 50)
                     : -100;

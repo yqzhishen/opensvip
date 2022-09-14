@@ -1,5 +1,6 @@
-﻿using Google.Protobuf.Collections;
+﻿using FlutyDeer.Svip3Plugin.Model;
 using OpenSvip.Library;
+using OpenSvip.Model;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,38 +8,37 @@ namespace FlutyDeer.Svip3Plugin.Utils
 {
     public static class TempoUtils
     {
-        public static List<OpenSvip.Model.SongTempo> SongTempoList { get; set; }
+        public static List<SongTempo> SongTempoList { get; set; }
 
         public static TimeSynchronizer Synchronizer { get; set; }
 
-        public static List<OpenSvip.Model.SongTempo> Decode(RepeatedField<Xstudio.Proto.SongTempo> tempos)
+        public static List<SongTempo> Decode(List<Xs3Tempo> tempos)
         {
-            var list = new List<OpenSvip.Model.SongTempo>();
+            var list = new List<SongTempo>();
             foreach (var tempo in tempos)
             {
-                list.Add(new OpenSvip.Model.SongTempo
+                list.Add(new SongTempo
                 {
-                    Position = tempo.Pos,
-                    BPM = tempo.Tempo / 100.0f
+                    Position =0,
+                    BPM = tempo.Tempo
                 });
             }
             SongTempoList = list;
             return list;
         }
 
-        public static RepeatedField<Xstudio.Proto.SongTempo> Encode(List<OpenSvip.Model.SongTempo> tempos)
+        public static List<Xs3Tempo> Encode(List<SongTempo> tempos)
         {
             var firstTempo = tempos.First();
-            var field = new RepeatedField<Xstudio.Proto.SongTempo>
+            var list = new List<Xs3Tempo>
             {
-                new Xstudio.Proto.SongTempo
+                new Xs3Tempo
                 {
-                    Pos = 0,
-                    Tempo = (int)(firstTempo.BPM * 100)
+                    Tempo = firstTempo.BPM
                 }
             };
             Synchronizer = new TimeSynchronizer(tempos);
-            return field;
+            return list;
         }
     }
 }
