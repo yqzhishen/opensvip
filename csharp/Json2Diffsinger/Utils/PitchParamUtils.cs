@@ -15,25 +15,43 @@ namespace Json2DiffSinger.Utils
         /// 将 OpenSvip 的音高曲线转换成 ds 的音高曲线
         /// </summary>
         /// <param name="curve">音高曲线</param>
+        /// <param name="end">终止位置，通常为最后一个音符的尾部位置</param>
         /// <param name="timeStep">步长</param>
         /// <returns></returns>
-        public static DsPitchParamCurve Encode(ParamCurve curve, float timeStep = 0.005f)
+        public static DsPitchParamCurve Encode(ParamCurve curve, int end, float timeStep = 0.005f)
         {
+            end += 1920;
             return new DsPitchParamCurve
             {
                 F0TimeStepSize = timeStep,
-                PointList = EncodePointList(curve.PointList)
+                PointList = EncodePointList(curve.PointList, end)
             };
         }
 
-        private static List<DsParamNode> EncodePointList(List<Tuple<int, int>> osPointList)
+        private static List<DsParamNode> EncodePointList(List<Tuple<int, int>> osPointList, int end)
         {
+            var validPoints = osPointList
+                .Where(p => p.Item1 - 10 >= 1920 && p.Item1 + 10 < end && p.Item2 >= 0)
+                .ToList();
+            if (!validPoints.Any())
+            {
+                return null;
+            }
+            var dsPointList = new List<DsParamNode>();
+            for (var pos = 1920; pos < end; pos += 5)
+            {
+                dsPointList.Add(new DsParamNode
+                {
+                    Time = pos / 1000.0,
+                    Value = ToneUtils.ToneToFreq(validPoints.ValueAt(pos) / 100.0)
+                });
+            }
+            /*
             var posList = new List<int>();
             foreach (var point in osPointList)
             {
                 posList.Add(point.Item1);
             }
-            var dsPointList = new List<DsParamNode>();
             int curveEndPos = -1;
             try
             {
@@ -41,7 +59,7 @@ namespace Json2DiffSinger.Utils
             }
             catch
             {
-
+                
             }
             if (curveEndPos < 0)
             {
@@ -58,26 +76,26 @@ namespace Json2DiffSinger.Utils
                     Value = freq
                 });
             }
+            */
             return dsPointList;
         }
-
-        private static int GetValueAt(int samplePos, List<Tuple<int, int>> osPointList, List<int> posList)
+        
+        private static double ValueAt(this List<Tuple<int, int>> segment, double ticks)
         {
-            var satisfiedPoints = osPointList.Where(p => p.Item1 == samplePos && p.Item2 != -100);
-            if (satisfiedPoints.Count() > 0)
+            var leftPoint = segment.BinaryFindLast(p => p.Item1 <= ticks);
+            if (leftPoint == null)
             {
-                return satisfiedPoints.First().Item2;
+                return segment.First().Item2;
             }
-            else
+
+            var rightPoint = segment.BinaryFindFirst(p => p.Item1 > ticks);
+            if (rightPoint == null)
             {
-                var leftPoint = osPointList.Where(p => p.Item1 < samplePos && p.Item2 != -100).Last();
-                var rightPoint = osPointList.Where(p => p.Item1 > samplePos && p.Item2 != -100).First();
-                int lp = leftPoint.Item1;
-                int lv = leftPoint.Item2;
-                int rp = rightPoint.Item1;
-                int rv = rightPoint.Item2;
-                return lv + (rv - lv) * (samplePos - lp) / (rp - lp);
+                return segment.Last().Item2;
             }
+
+            var ratio = (ticks - leftPoint.Item1) / (rightPoint.Item1 - leftPoint.Item1);
+            return (1 - ratio) * leftPoint.Item2 + ratio * rightPoint.Item2;
         }
     }
 }

@@ -12,9 +12,9 @@ namespace Json2DiffSinger.Utils
         /// </summary>
         /// <param name="tone">音高</param>
         /// <returns></returns>
-        public static float ToneToFreq(float tone)
+        public static double ToneToFreq(double tone)
         {
-            return (float)(440.0 * Math.Pow(2, (tone - 69.0) / 12.0));
+            return 440.0 * Math.Pow(2, (tone - 69.0) / 12.0);
         }
 
         /// <summary>
@@ -22,9 +22,9 @@ namespace Json2DiffSinger.Utils
         /// </summary>
         /// <param name="freq">频率</param>
         /// <returns></returns>
-        public static float FreqToTone(float freq)
+        public static double FreqToTone(double freq)
         {
-            return (float)(69.0 + 12.0 * Math.Log(freq / 440.0, 2));
+            return 69.0 + 12.0 * Math.Log(freq / 440.0, 2);
         }
     }
 }

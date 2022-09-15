@@ -1,4 +1,5 @@
-﻿using Json2DiffSinger.Core.Models;
+﻿using System;
+using Json2DiffSinger.Core.Models;
 using Json2DiffSinger.Options;
 using Json2DiffSinger.Utils;
 using OpenSvip.Library;
@@ -36,10 +37,11 @@ namespace Json2DiffSinger
             {
                 NoteList = NoteListUtils.Encode(osNotes, synchronizer)
             };
+            var totalDuration = (int) Math.Round(dsProject.NoteList.Sum(note => note.Duration) * 1000);
             if (PitchModeOption == PitchModeOption.Manual)
             {
-                var osPitchParamCuvre = singingTrack.EditedParams.Pitch;
-                dsProject.PitchParamCurve = PitchParamUtils.Encode(osPitchParamCuvre);
+                var osPitchParamCurve = singingTrack.EditedParams.Pitch;
+                dsProject.PitchParamCurve = PitchParamUtils.Encode(osPitchParamCurve, totalDuration);
             }
             var model = DsProject.ToParamModel(dsProject);
             if (PhonemeOption == PhonemeModeOption.Auto)

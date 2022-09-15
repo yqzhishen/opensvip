@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace Json2DiffSinger.Core.Models
 {
@@ -78,11 +78,10 @@ namespace Json2DiffSinger.Core.Models
             #region Serialize Pitch Parameter Curve
 
             var points = dsProject.PitchParamCurve.PointList;
-            var f0Sequence = new StringBuilder();
+            string f0Sequence = null;
             if (points != null)
-            foreach (var point in points)
             {
-                f0Sequence.Append($"{point.Value} ");
+                f0Sequence = string.Join(" ", points.Select(p => $"{p.Value:F1}"));
             }
 
             #endregion
@@ -96,7 +95,7 @@ namespace Json2DiffSinger.Core.Models
                 IsSlurSequence = isSlurSeq,
                 PhonemeDurationSequence = phonemeDurSeq,
                 F0TimeStepSize = dsProject.PitchParamCurve.F0TimeStepSize.ToString(),
-                F0Sequence = f0Sequence.ToString()
+                F0Sequence = f0Sequence
             };
         }
     }

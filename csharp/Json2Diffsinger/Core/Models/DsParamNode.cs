@@ -8,11 +8,11 @@
         /// <summary>
         /// 时间（秒）
         /// </summary>
-        public float Time { get; set; }
+        public double Time { get; set; }
 
         /// <summary>
         /// 值
         /// </summary>
-        public float Value { get; set; }
+        public double Value { get; set; }
     }
 }
