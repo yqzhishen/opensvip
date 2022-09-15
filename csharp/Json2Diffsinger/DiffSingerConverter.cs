@@ -55,6 +55,10 @@ namespace Json2DiffSinger.Stream
                     PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto),
                     PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto)
                 }.Encode(project);
+                if (seed >= 0)
+                {
+                    diffSingerParams.Seed = seed;
+                }
                 var formatted = options.GetValueAsBoolean("formatted", true);
                 using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
                 using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
