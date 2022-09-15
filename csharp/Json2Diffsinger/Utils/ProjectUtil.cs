@@ -24,6 +24,14 @@ namespace Json2DiffSinger.Utils
                     note.StartPos = (int) Math.Round(synchronizer.GetActualTicksFromTicks(note.StartPos));
                     note.Length = end - note.StartPos;
                 }
+
+                var firstBarTicks = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
+                for (var i = 0; i < track.EditedParams.Pitch.TotalPointsCount; i++)
+                {
+                    var (pos, val) = track.EditedParams.Pitch.PointList[i];
+                    pos = (int) Math.Round(synchronizer.GetActualTicksFromTicks(pos - firstBarTicks)) + 1920;
+                    track.EditedParams.Pitch.PointList[i] = new Tuple<int, int>(pos, val);
+                }
             }
 
             project.SongTempoList = new List<SongTempo>
@@ -31,6 +39,13 @@ namespace Json2DiffSinger.Utils
                 new SongTempo
                 {
                     BPM = tempo, Position = 0
+                }
+            };
+            project.TimeSignatureList = new List<TimeSignature>
+            {
+                new TimeSignature
+                {
+                    BarIndex = 0, Numerator = 4, Denominator = 4
                 }
             };
         }
@@ -67,6 +82,13 @@ namespace Json2DiffSinger.Utils
                     var prepareSpace = Math.Min(600, (int) (curSegInterval * 0.8));
                     var segNoteStartPos = buffer.First().StartPos;
                     buffer.ForEach(note => note.StartPos = note.StartPos - segNoteStartPos + prepareSpace);
+                    var pitchPoints = track.EditedParams.Pitch.PointList
+                        .Select(point => new Tuple<int, int>(point.Item1 - segNoteStartPos + prepareSpace, point.Item2))
+                        .Where(point =>
+                            point.Item1 >= 1920
+                            && point.Item1 - 1920 <= buffer.Last().StartPos + buffer.Last().Length + 50)
+                        .ToList();
+                    
                     curSegInterval = interval;
                     var segment = new Project
                     {
@@ -82,7 +104,14 @@ namespace Json2DiffSinger.Utils
                         {
                             new SingingTrack
                             {
-                                NoteList = buffer
+                                NoteList = buffer,
+                                EditedParams = new Params
+                                {
+                                    Pitch = new ParamCurve
+                                    {
+                                        PointList = pitchPoints
+                                    }
+                                }
                             }
                         }
                     };
