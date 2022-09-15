@@ -79,6 +79,7 @@ namespace Json2DiffSinger.Core.Models
 
             var points = dsProject.PitchParamCurve.PointList;
             var f0Sequence = new StringBuilder();
+            if (points != null)
             foreach (var point in points)
             {
                 f0Sequence.Append($"{point.Value} ");

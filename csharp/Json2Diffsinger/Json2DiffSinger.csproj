@@ -64,6 +64,8 @@
     <Compile Include="Options\PhonemeModeOption.cs" />
     <Compile Include="Core\Models\LowLevel\PhonemeParamsModel.cs" />
     <Compile Include="Options\PitchModeOption.cs" />
+    <Compile Include="Utils\AlgorithmUtils.cs" />
+    <Compile Include="Utils\CurveSegmentUtils.cs" />
     <Compile Include="Utils\LyricUtil.cs" />
     <Compile Include="Utils\NoteListUtils.cs" />
     <Compile Include="Utils\NoteNameConvert.cs" />

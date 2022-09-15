@@ -24,7 +24,7 @@ namespace Json2DiffSinger.Utils
         /// <returns></returns>
         public static float FreqToTone(float freq)
         {
-            return (float)(69.0 + 12 * Math.Log(freq / 440.0, 2));
+            return (float)(69.0 + 12.0 * Math.Log(freq / 440.0, 2));
         }
     }
 }
