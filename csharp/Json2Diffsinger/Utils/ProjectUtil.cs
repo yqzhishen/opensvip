@@ -126,6 +126,12 @@ namespace Json2DiffSinger.Utils
                 var prepareSpace = Math.Min(600, (int) (curSegInterval * 0.8));
                 var segNoteStartPos = buffer.First().StartPos;
                 buffer.ForEach(note => note.StartPos = note.StartPos - segNoteStartPos + prepareSpace);
+                var pitchPoints = track.EditedParams.Pitch.PointList
+                    .Select(point => new Tuple<int, int>(point.Item1 - segNoteStartPos + prepareSpace, point.Item2))
+                    .Where(point =>
+                        point.Item1 >= 1920
+                        && point.Item1 - 1920 <= buffer.Last().StartPos + buffer.Last().Length + 50)
+                    .ToList();
 
                 var segment = new Project
                 {
@@ -141,7 +147,14 @@ namespace Json2DiffSinger.Utils
                     {
                         new SingingTrack
                         {
-                            NoteList = buffer
+                            NoteList = buffer,
+                            EditedParams = new Params
+                            {
+                                Pitch = new ParamCurve
+                                {
+                                    PointList = pitchPoints
+                                }
+                            }
                         }
                     }
                 };
