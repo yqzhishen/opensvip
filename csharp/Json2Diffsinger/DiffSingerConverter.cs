@@ -15,13 +15,14 @@ namespace Json2DiffSinger.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("暂不支持读取 ds 参数文件");
         }
 
         public void Save(string path, Project project, ConverterOptions options)
         {
             var split = options.GetValueAsBoolean("split", true);
-            var mode = options.GetValueAsEnum("mode", ModeOption.AutoPhoneme);
+            var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto);
+            var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto);
             var seed = options.GetValueAsInteger("seed", -1);
             if (split)
             {
@@ -30,8 +31,9 @@ namespace Json2DiffSinger.Stream
                 {
                     var dsParams = new DiffSingerEncoder
                     {
-                        InputModeOption = mode
-                    }.EncodeParams(tuple.Item2);
+                        PhonemeOption = phonemeMode,
+                        PitchModeOption = pitchMode
+                    }.Encode(tuple.Item2);
                     dsParams.Offset = tuple.Item1;
                     if (seed >= 0)
                     {
@@ -50,8 +52,9 @@ namespace Json2DiffSinger.Stream
             {
                 var diffSingerParams = new DiffSingerEncoder
                 {
-                    InputModeOption = options.GetValueAsEnum("mode", ModeOption.AutoPhoneme)
-                }.EncodeParams(project);
+                    PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto),
+                    PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto)
+                }.Encode(project);
                 var formatted = options.GetValueAsBoolean("formatted", true);
                 using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
                 using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))

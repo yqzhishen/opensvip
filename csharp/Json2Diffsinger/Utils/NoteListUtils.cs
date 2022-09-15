@@ -1,53 +1,35 @@
 ﻿using Json2DiffSinger.Core.Models;
-using Json2DiffSinger.Options;
-using Json2DiffSinger.Utils;
-using Newtonsoft.Json;
 using OpenSvip.Library;
 using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Json2DiffSinger.Core.Converters
+namespace Json2DiffSinger.Utils
 {
     /// <summary>
-    /// 用于生成音素模式的 ds 参数。
+    /// 用于转换音符列表的工具。
     /// </summary>
-    public static class PhonemeParamsEncoder
+    public static class NoteListUtils
     {
         /// <summary>
-        /// 是否为自动音素模式。
+        /// 将 OpenSvip Model 的音符列表转换为 ds 音符列表
         /// </summary>
-        static bool isAutoPhoneme = true;
-        public static AbstractParamsModel Encode(Project project, bool isIntended, ModeOption mode)
+        /// <param name="osNotes"></param>
+        /// <param name="synchronizer"></param>
+        /// <returns></returns>
+        public static List<DsNote> Encode(List<Note> osNotes, TimeSynchronizer synchronizer)
         {
-            if (mode == ModeOption.ManualPhoneme)
-            {
-                isAutoPhoneme = false;
-            }
-            TimeSynchronizer synchronizer = new TimeSynchronizer(project.SongTempoList);
-            int firstBarLength = 1920 * project.TimeSignatureList[0].Numerator / project.TimeSignatureList[0].Denominator;
-            SingingTrack singingTrack = project.TrackList
-                .OfType<SingingTrack>()
-                .First();
-            List<Note> osNotes = singingTrack.NoteList;
             List<DsNote> dsNotes = new List<DsNote>();
             int prevEndInTicks = 0;
             double prevActualEndInSecs = 0;
             int index = 0;
             var prevPhoneme = new DsPhoneme();
+            InitPinyinUtils(osNotes);
             Tuple<string, string> splitedPinyin;
-            //将歌词导入 PinyinUtil 静态类并转为拼音，以便后面取出
-            List<string> lyricList = new List<string>();
-            lyricList.Clear();
             foreach (var note in osNotes)
             {
-                lyricList.Add(note.Lyric);
-            }
-            PinyinUtil.ClearAllPinyin();
-            PinyinUtil.AddPinyinFromLyrics(lyricList);
-            foreach (var note in osNotes)
-            {
+                #region Calculate Positions
+
                 double prevEndInSecs = synchronizer.GetActualSecsFromTicks(prevEndInTicks);
                 int curStartInTicks = note.StartPos;
                 int curEndInTicks = curStartInTicks + note.Length;
@@ -71,6 +53,11 @@ namespace Json2DiffSinger.Core.Converters
                         curActualEndInSecs -= curEndInSecs - nextActualStartInSecs;
                     }
                 }
+
+                #endregion
+
+                #region Fill Note Gap
+
                 double gap;//音符间隙
                 gap = curActualStartInSecs - prevActualEndInSecs;
                 if (gap > 0)//有间隙
@@ -97,6 +84,11 @@ namespace Json2DiffSinger.Core.Converters
                         prevPhoneme = restPhoneme;
                     }
                 }
+
+                #endregion
+
+                #region Convert OpenSvip Notes To DsNotes
+
                 var dsPhoneme = new DsPhoneme();
                 if (note.Lyric.Contains("-"))//转音
                 {
@@ -149,76 +141,43 @@ namespace Json2DiffSinger.Core.Converters
                     Duration = (float)(curEndInSecs - curStartInSecs)
                 };
                 dsNotes.Add(dsNote);
+
+                #endregion
+
                 prevEndInTicks = curEndInTicks;
                 prevActualEndInSecs = curActualEndInSecs;
                 prevPhoneme = dsPhoneme;
                 index++;
             }
+            InsertEndRestNote(dsNotes);
+            return dsNotes;
+        }
+
+        /// <summary>
+        /// 在句尾插入一个休止符
+        /// </summary>
+        /// <param name="dsNotes"></param>
+        private static void InsertEndRestNote(List<DsNote> dsNotes)
+        {
             var endRestPhoneme = new RestDsPhoneme(0.05f);
             var endRestNote = new RestDsNote(0.05f, endRestPhoneme);
             dsNotes.Add(endRestNote);
+        }
 
-            string inputText = "";
-            string phonemeSeq = "";
-            string inputNoteSeq = "";
-            string inputDurationSeq = "";
-            string isSlurSeq = "";
-            string phonemeDurSeq = "";
-            for (int i = 0; i < dsNotes.Count; i++)
+        /// <summary>
+        /// 初始化中文转工具
+        /// </summary>
+        /// <param name="osNotes"></param>
+        private static void InitPinyinUtils(List<Note> osNotes)
+        {
+            List<string> lyricList = new List<string>();
+            lyricList.Clear();
+            foreach (var note in osNotes)
             {
-                var curNote = dsNotes[i];
-                var dsPhoneme = curNote.DsPhoneme;
-                var consonant = dsPhoneme.Consonant;
-                var vowel = dsPhoneme.Vowel;
-                inputText += curNote.Lyric.Replace("-", "");
-                if (consonant.Phoneme != "")
-                {
-                    phonemeSeq += consonant.Phoneme + " ";
-                    phonemeDurSeq += consonant.Duration + " ";
-                    isSlurSeq += "0 ";
-                    inputDurationSeq += curNote.Duration + " ";
-                    //inputNoteSeq += consonant.NoteName + " ";
-                    inputNoteSeq += curNote.NoteName + " ";
-                }
-                phonemeSeq += vowel.Phoneme;
-                phonemeDurSeq += vowel.Duration;
-                inputNoteSeq += vowel.NoteName;
-                inputDurationSeq += curNote.Duration;
-                isSlurSeq += curNote.IsSlur ? "1" : "0";
-                if (i < dsNotes.Count - 1)
-                {
-                    if (!curNote.IsSlur)
-                    {
-                        inputText += " ";
-                    }
-                    inputNoteSeq += " ";
-                    inputDurationSeq += " ";
-                    isSlurSeq += " ";
-                    phonemeSeq += " ";
-                    phonemeDurSeq += " ";
-                }
+                lyricList.Add(note.Lyric);
             }
-
-            var model = new PhonemeParamsModel
-            {
-                LyricText = inputText,
-                PhonemeSequence = phonemeSeq,
-                NoteSequence = inputNoteSeq,
-                NoteDurationSequence = inputDurationSeq,
-                IsSlurSequence = isSlurSeq,
-                PhonemeDurationSequence = phonemeDurSeq
-            };
-            if (isAutoPhoneme)
-            {
-                model.PhonemeDurationSequence = null;
-            }
-            //result = $"text\n{inputText}\n\n" +
-            //    $"phoneme sequence\n{phonemeSeq}\n\n" +
-            //    $"note sequence\n{inputNoteSeq}\n\n" +
-            //    $"note duration sequence\n{inputDurationSeq}\n\n" +
-            //    $"is slur sequence\n{isSlurSeq}\n\n" +
-            //    $"phoneme duration sequence\n{phonemeDurSeq}";
-            return model;
+            PinyinUtil.ClearAllPinyin();
+            PinyinUtil.AddPinyinFromLyrics(lyricList);
         }
     }
 }

@@ -1,41 +1,52 @@
-﻿using Json2DiffSinger.Core.Converters;
-using Json2DiffSinger.Core.Models;
+﻿using Json2DiffSinger.Core.Models;
 using Json2DiffSinger.Options;
+using Json2DiffSinger.Utils;
+using OpenSvip.Library;
 using OpenSvip.Model;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Json2DiffSinger
 {
     public class DiffSingerEncoder
     {
         /// <summary>
-        /// 参数模式选项
+        /// 音素参数模式选项
         /// </summary>
-        public ModeOption InputModeOption {get;set;}
+        public PhonemeModeOption PhonemeOption {get;set;}
 
         /// <summary>
-        /// 格式化 JSON 代码选项
+        /// 音高参数模式选项
         /// </summary>
-        public bool IsFormatted {get;set;}
+        public PitchModeOption PitchModeOption {get;set;}
 
         /// <summary>
         /// 转为 ds 参数
         /// </summary>
         /// <param name="project"></param>
         /// <returns></returns>
-        public AbstractParamsModel EncodeParams(Project project)
+        public AbstractParamsModel Encode(Project project)
         {
-            AbstractParamsModel result = null;
-            switch (InputModeOption)
+            TimeSynchronizer synchronizer = new TimeSynchronizer(project.SongTempoList);
+            SingingTrack singingTrack = project.TrackList
+                .OfType<SingingTrack>()
+                .First();
+            List<Note> osNotes = singingTrack.NoteList;
+            var dsProject = new DsProject
             {
-                case ModeOption.Note://这个选项已经在 Properties.xml 注释掉了
-                    result = ChineseCharactersParamsEncoder.Encode(project, IsFormatted);
-                    break;
-                case ModeOption.ManualPhoneme://音素（有参）
-                case ModeOption.AutoPhoneme://音素（无参）
-                    result = PhonemeParamsEncoder.Encode(project, IsFormatted, InputModeOption);
-                    break;
+                NoteList = NoteListUtils.Encode(osNotes, synchronizer)
+            };
+            if (PitchModeOption == PitchModeOption.Manual)
+            {
+                var osPitchParamCuvre = singingTrack.EditedParams.Pitch;
+                dsProject.PitchParamCurve = PitchParamUtils.Encode(osPitchParamCuvre);
             }
-            return result;
+            var model = DsProject.ToParamModel(dsProject);
+            if (PhonemeOption == PhonemeModeOption.Auto)
+            {
+                model.PhonemeDurationSequence = null;
+            }
+            return model;
         }
     }
 }

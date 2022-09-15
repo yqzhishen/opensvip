@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>DiffSinger 参数转换插件</Name>
-    <Version>0.1.1</Version>
+    <Version>0.2.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>Json2DiffSinger 插件版。仅支持转换为 DiffSinger 合成参数。</Descriptions>
@@ -19,14 +19,21 @@
 		<Option Name="seed" Type="integer" Default="-1">
 			<Notes>随机种子</Notes>
 		</Option>
-		<Option Name="mode" Type="enum" Default="autoPhoneme">
-			<Notes>参数模式</Notes>
+		<Option Name="phonemeMode" Type="enum" Default="auto">
+			<Notes>音素参数模式</Notes>
 			<EnumChoices>
-				<!--<Choice Name="音符" Tag="note">
-				</Choice>-->
-				<Choice Name="音素（有参）" Tag="manualPhoneme">
+				<Choice Name="有参" Tag="manual">
 				</Choice>
-				<Choice Name="音素（无参）" Tag="autoPhoneme">
+				<Choice Name="无参" Tag="auto">
+				</Choice>
+			</EnumChoices>
+		</Option>
+		<Option Name="pitchMode" Type="enum" Default="auto">
+			<Notes>音高参数模式</Notes>
+			<EnumChoices>
+				<Choice Name="有参" Tag="manual">
+				</Choice>
+				<Choice Name="无参" Tag="auto">
 				</Choice>
 			</EnumChoices>
 		</Option>

@@ -54,21 +54,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console\Arguments.cs" />
-    <Compile Include="Core\Converters\ChineseCharactersParamsEncoder.cs" />
-    <Compile Include="Core\Models\ChineseCharactersParamsModel.cs" />
-    <Compile Include="Core\Models\AbstractParamsModel.cs" />
+    <Compile Include="Core\Models\DsPitchParamCurve.cs" />
+    <Compile Include="Core\Models\LowLevel\AbstractParamsModel.cs" />
+    <Compile Include="Core\Models\DsParamNode.cs" />
+    <Compile Include="Core\Models\DsProject.cs" />
     <Compile Include="DiffSingerConverter.cs" />
     <Compile Include="DiffSingerEncoder.cs" />
     <Compile Include="Core\Models\DsNote.cs" />
-    <Compile Include="Options\ModeOption.cs" />
-    <Compile Include="Core\Converters\PhonemeParamsEncoder.cs" />
-    <Compile Include="Core\Models\PhonemeParamsModel.cs" />
+    <Compile Include="Options\PhonemeModeOption.cs" />
+    <Compile Include="Core\Models\LowLevel\PhonemeParamsModel.cs" />
+    <Compile Include="Options\PitchModeOption.cs" />
     <Compile Include="Utils\LyricUtil.cs" />
+    <Compile Include="Utils\NoteListUtils.cs" />
     <Compile Include="Utils\NoteNameConvert.cs" />
     <Compile Include="Console\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\PitchParamUtils.cs" />
     <Compile Include="Utils\ProjectUtil.cs" />
     <Compile Include="Utils\PinyinUtil.cs" />
+    <Compile Include="Utils\ToneUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -93,5 +97,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
