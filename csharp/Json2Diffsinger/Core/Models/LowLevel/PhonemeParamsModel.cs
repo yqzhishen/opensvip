@@ -43,13 +43,13 @@ namespace Json2DiffSinger.Core.Models
         /// <summary>
         /// F0 步长
         /// </summary>
-        [JsonProperty("f0_timestep", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("f0_timestep")]
         public string F0TimeStepSize { get; set; }
 
         /// <summary>
         /// F0 序列
         /// </summary>
-        [JsonProperty("f0_seq", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        [JsonProperty("f0_seq")]
         public string F0Sequence { get; set; }
 
         /// <summary>

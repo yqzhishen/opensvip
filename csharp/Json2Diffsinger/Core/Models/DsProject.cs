@@ -79,7 +79,7 @@ namespace Json2DiffSinger.Core.Models
 
             var points = dsProject.PitchParamCurve.PointList;
             string f0Sequence = null;
-            if (points != null)
+            if (points != null && points.Any())
             {
                 f0Sequence = string.Join(" ", points.Select(p => $"{p.Value:F1}"));
             }
