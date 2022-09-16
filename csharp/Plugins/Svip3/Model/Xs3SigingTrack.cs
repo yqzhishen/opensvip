@@ -1,5 +1,4 @@
-﻿using FlutyDeer.Svip3Plugin.Proto;
-using ProtoBuf;
+﻿using ProtoBuf;
 using System.Collections.Generic;
 
 namespace FlutyDeer.Svip3Plugin.Model

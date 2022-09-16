@@ -1,5 +1,6 @@
 ﻿using FlutyDeer.Svip3Plugin.Model;
 using OpenSvip.Model;
+using System;
 using System.Collections.Generic;
 
 namespace FlutyDeer.Svip3Plugin.Utils
@@ -35,19 +36,22 @@ namespace FlutyDeer.Svip3Plugin.Utils
         public List<object> Encode(List<Track> tracks)
         {
             var list = new List<object>();
+            int colorIndex = new Random().Next(Constants.Colors.Count);
+            var color = Constants.Colors.GetColor(colorIndex);
             foreach (var track in tracks)
             {
                 switch (track)
                 {
                     case SingingTrack singingTrack:
-                        var svip3SingingTrack = new SingingTrackUtils().Encode(singingTrack);
+                        var svip3SingingTrack = new SingingTrackUtils().Encode(singingTrack, color);
                         list.Add(svip3SingingTrack);
                         break;
                     case InstrumentalTrack instrumentalTrack:
-                        var svip3AudioTrack = new AudioTrackUtils().Encode(instrumentalTrack);
+                        var svip3AudioTrack = new AudioTrackUtils().Encode(instrumentalTrack, color);
                         list.Add(svip3AudioTrack);
                         break;
                 }
+                colorIndex++;
             }
             return list;
         }

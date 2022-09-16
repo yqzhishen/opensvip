@@ -105,11 +105,11 @@ namespace FlutyDeer.Svip3Plugin.Model
                 Any resultAny;
                 switch (track)
                 {
-                    case Xs3SingingTrack pbSingingTrack:
-                        resultAny = Any.Pack(pbSingingTrack, Constants.TypeNames.SingingTrackTypeName);
+                    case Xs3SingingTrack singingTrack:
+                        resultAny = Any.Pack(singingTrack, Constants.TypeNames.SingingTrack);
                         break;
-                    case Xs3AudioTrack pbAudioTrack:
-                        resultAny = Any.Pack(pbAudioTrack, Constants.TypeNames.AudioTrackTypeName);
+                    case Xs3AudioTrack audioTrack:
+                        resultAny = Any.Pack(audioTrack, Constants.TypeNames.AudioTrack);
                         break;
                     default:
                         throw new NotImplementedException("类型错误");

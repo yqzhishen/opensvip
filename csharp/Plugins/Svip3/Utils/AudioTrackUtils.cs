@@ -36,18 +36,18 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         #endregion
 
-        public Xs3AudioTrack Encode(InstrumentalTrack track)
+        public Xs3AudioTrack Encode(InstrumentalTrack track, string color)
         {
-            var Xs3AudioTrack = new Xs3AudioTrack
+            return new Xs3AudioTrack
             {
                 Name = track.Title,
                 Mute = track.Mute,
                 Solo = track.Solo,
                 Gain = MathUtils.ToDecibelVolume(track.Volume),
-                Pan = EncodePan(track.Pan)
+                Pan = EncodePan(track.Pan),
+                PatternList = PatternUtils.Encode(track),
+                Color = color
             };
-            Xs3AudioTrack.PatternList.AddRange(PatternUtils.Encode(track));
-            return Xs3AudioTrack;
         }
 
         private float EncodePan(double pan)

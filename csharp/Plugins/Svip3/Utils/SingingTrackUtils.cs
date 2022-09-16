@@ -30,7 +30,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         #region Encoding
 
-        public Xs3SingingTrack Encode(SingingTrack track)
+        public Xs3SingingTrack Encode(SingingTrack track, string color)
         {
             var singingTrack = new Xs3SingingTrack
             {
@@ -39,7 +39,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 Solo = track.Solo,
                 Gain = MathUtils.ToDecibelVolume(track.Volume),
                 Pan = EncodePan(track.Pan),
-                Color = "#66CCFF"
+                Color = color
             };
             singingTrack.PatternList.AddRange(PatternUtils.Encode(track));
             return singingTrack;
