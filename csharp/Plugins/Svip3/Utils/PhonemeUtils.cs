@@ -4,7 +4,7 @@ using System;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
-    public static class EditedPhonesUtils
+    public static class PhonemeUtils
     {
         public static Phones Decode(Xs3Note note)
         {
@@ -21,7 +21,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
             }
         }
 
-        public static int Encode(Note note)
+        public static int EncodeLength(Note note)
         {
             int consonantLength = 0;
             if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs > 0)
@@ -32,6 +32,12 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 consonantLength = (int)Math.Round(TempoUtils.Synchronizer.GetActualTicksFromTicks(note.StartPos) - phoneStartInTicks);
             }
             return consonantLength;
+        }
+
+        public static bool EncodeBool(Note note)
+        {
+            return note.EditedPhones != null
+                && note.EditedPhones.HeadLengthInSecs > 0;
         }
     }
 }

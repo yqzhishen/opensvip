@@ -13,7 +13,10 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         public static float ToDecibelVolume(double volume)
         {
-            return (float)Math.Max(20 * Math.Log10(volume > 0.06 ? volume : 0.06), -24.0);
+            if (volume > 0)
+                return (float)Math.Max(20 * Math.Log10(volume > 0.01 ? volume : 0.01), -70.0);
+            else
+                return -70;//-infinity
         }
     }
 }

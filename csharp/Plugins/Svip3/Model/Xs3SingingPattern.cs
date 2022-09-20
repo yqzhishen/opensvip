@@ -37,15 +37,15 @@ namespace FlutyDeer.Svip3Plugin.Model
         public bool Mute { get; set; }
 
         [ProtoMember(8)]
-        public List<Xs3Note> NoteList { get; set; }
+        public List<Xs3Note> NoteList { get; set; } = new List<Xs3Note>();
 
         [ProtoMember(9)]
-        public List<Xs3ParamPoint> PitchParam { get; set; }
+        public List<Xs3ParamPoint> PitchParam { get; set; } = new List<Xs3ParamPoint>();
 
         [ProtoMember(10)]
-        public List<Xs3ParamPoint> VolumeParam { get; set; }
+        public List<Xs3ParamPoint> VolumeParam { get; set; } = new List<Xs3ParamPoint>();
 
         [ProtoMember(11)]
-        public List<Xs3ParamPoint> PowerParam { get; set; }
+        public List<Xs3ParamPoint> PowerParam { get; set; } = new List<Xs3ParamPoint>();
     }
 }

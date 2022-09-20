@@ -1,5 +1,6 @@
 ﻿using FlutyDeer.Svip3Plugin.Model;
 using OpenSvip.Model;
+using System.Linq;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
@@ -16,7 +17,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 Volume = MathUtils.ToLinearVolume(track.Gain),
                 Pan = DecodePan(track.Pan),
                 NoteList = new NoteListUtils().Decode(track.PatternList),
-                EditedParams = new EditedParamsUtils().Decode(track.PatternList),
+                EditedParams = new ParamsUtils().Decode(track.PatternList),
                 AISingerName = Singers.GetName(track.SingerId)
             };
         }
@@ -39,9 +40,11 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 Solo = track.Solo,
                 Gain = MathUtils.ToDecibelVolume(track.Volume),
                 Pan = EncodePan(track.Pan),
+                SingerId = Singers.GetUuid(track.AISingerName),
                 Color = color
             };
-            singingTrack.PatternList.AddRange(PatternUtils.Encode(track));
+            if (track != null && track.NoteList != null && track.NoteList.Any())
+                singingTrack.PatternList.AddRange(PatternUtils.Encode(track));
             return singingTrack;
         }
 

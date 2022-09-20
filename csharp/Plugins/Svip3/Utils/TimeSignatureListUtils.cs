@@ -16,7 +16,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
             {
                 list.Add(new TimeSignature
                 {
-                    BarIndex = 0,//TODO: 梯到小节数的转换
+                    BarIndex = 0,
                     Numerator = signature.Content.Numerator,
                     Denominator = signature.Content.Denominator
                 });

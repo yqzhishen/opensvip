@@ -1,11 +1,16 @@
 ﻿using ProtoBuf;
-using System.Collections.Generic;
 
 namespace FlutyDeer.Svip3Plugin.Model
 {
+    /// <summary>
+    /// XS 3 音频样式
+    /// </summary>
     [ProtoContract]
     public class Xs3AudioPattern
     {
+        /// <summary>
+        /// 名称
+        /// </summary>
         [ProtoMember(1)]
         public string Name { get; set; }
 
@@ -33,9 +38,15 @@ namespace FlutyDeer.Svip3Plugin.Model
         [ProtoMember(6)]
         public int ClippedDuration { get; set; }
 
+        /// <summary>
+        /// 静音
+        /// </summary>
         [ProtoMember(7)]
         public bool Mute { get; set; }
 
+        /// <summary>
+        /// 音频文件路径
+        /// </summary>
         [ProtoMember(8)]
         public string AudioFilePath { get; set; }
     }

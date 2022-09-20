@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
-    public class EditedParamsUtils
+    public class ParamsUtils
     {
         public Params Decode(List<Xs3SingingPattern> patterns)
         {

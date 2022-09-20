@@ -4,6 +4,7 @@ using OpenSvip.Framework;
 using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace FlutyDeer.Svip3Plugin.Utils
@@ -16,7 +17,6 @@ namespace FlutyDeer.Svip3Plugin.Utils
             int right = left + pattern.ClippedDuration;
             return new Tuple<int, int>(left, right);
         }
-
 
         #region Encoding
         public static List<Xs3SingingPattern> Encode(SingingTrack track)
@@ -31,15 +31,17 @@ namespace FlutyDeer.Svip3Plugin.Utils
         {
             var lastNote = track.NoteList.Last();
             int lastNoteEndPos = lastNote.StartPos + lastNote.Length;
-            var pattern = new Xs3SingingPattern
+            return new Xs3SingingPattern
             {
+                Name = "未命名",
                 OriginalStartPosition = 0,
                 ClipPosition = 0,
-                OriginalDuration = lastNoteEndPos,
-                ClippedDuration = lastNoteEndPos
+                OriginalDuration = lastNoteEndPos + 19200,
+                ClippedDuration = lastNoteEndPos + 1920,
+                Mute = false,
+                PitchParam = PitchParamUtils.Encode(track.EditedParams.Pitch),
+                NoteList = new NoteListUtils().Encode(track.NoteList)
             };
-            pattern.NoteList.AddRange(new NoteListUtils().Encode(track.NoteList));
-            return pattern;
         }
 
         public static List<Xs3AudioPattern> Encode(InstrumentalTrack track)
@@ -53,6 +55,11 @@ namespace FlutyDeer.Svip3Plugin.Utils
         private static Xs3AudioPattern EncodeAudioPattern(InstrumentalTrack track)
         {
             double audioDurationInSecs;
+                var pattern = new Xs3AudioPattern
+                {
+                    AudioFilePath = track.AudioFilePath,
+                    Name = Path.GetFileNameWithoutExtension(track.AudioFilePath)
+                };
             var synchronizer = TempoUtils.Synchronizer;
             try
             {
@@ -61,11 +68,8 @@ namespace FlutyDeer.Svip3Plugin.Utils
                     audioDurationInSecs = reader.TotalTime.TotalSeconds;
                 }
                 int audioDurationInTicks = (int)Math.Round(synchronizer.GetActualTicksFromSecs(audioDurationInSecs));
-                var pattern = new Xs3AudioPattern
-                {
-                    OriginalDuration = audioDurationInTicks,
-                    ClippedDuration = audioDurationInTicks
-                };
+                pattern.OriginalDuration = audioDurationInTicks;
+                pattern.ClippedDuration = audioDurationInTicks;
                 if (track.Offset >= 0)
                 {
                     pattern.ClipPosition = 0;
@@ -77,13 +81,12 @@ namespace FlutyDeer.Svip3Plugin.Utils
                     pattern.ClipPosition = track.Offset;
                     pattern.OriginalStartPosition = -track.Offset;
                 }
-                return pattern;
             }
             catch
             {
                 Warnings.AddWarning($"无法读取\"{track.AudioFilePath}\"。", type:WarningTypes.Others);
-                return null;
             }
+            return pattern;
         }
 
         #endregion

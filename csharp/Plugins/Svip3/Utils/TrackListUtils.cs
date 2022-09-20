@@ -37,7 +37,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
         {
             var list = new List<object>();
             int colorIndex = new Random().Next(Constants.Colors.Count);
-            var color = Constants.Colors.GetColor(colorIndex);
+            string color = Constants.Colors.GetColor(colorIndex);
             foreach (var track in tracks)
             {
                 switch (track)

@@ -15,7 +15,7 @@ namespace FlutyDeer.Svip3Plugin.Stream
         public void Save(string path, Project project, ConverterOptions options)
         {
             var model = new Svip3Encoder().Encode(project);
-            model.Wirte(path);
+            model.Write(path);
         }
     }
 }

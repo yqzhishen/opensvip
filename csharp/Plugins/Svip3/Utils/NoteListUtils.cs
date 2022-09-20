@@ -37,7 +37,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 Lyric = DecodeLyric(note),
                 Pronunciation = DecodePronunciation(note),
                 HeadTag = HeadTagUtils.Decode(note),
-                EditedPhones = EditedPhonesUtils.Decode(note)
+                EditedPhones = PhonemeUtils.Decode(note)
             };
         }
 
@@ -79,7 +79,8 @@ namespace FlutyDeer.Svip3Plugin.Utils
                 KeyIndex = note.KeyNumber,
                 Lyric = note.Lyric,
                 Pronunciation = note.Pronunciation,
-                ConsonantLength = EditedPhonesUtils.Encode(note),
+                ConsonantLength = PhonemeUtils.EncodeLength(note),
+                HasConsonant = PhonemeUtils.EncodeBool(note),
                 SilLength = HeadTagUtils.EncodeSilLen(note.HeadTag),
                 SpLength = HeadTagUtils.EncodeSpLen(note.HeadTag)
             };

@@ -58,13 +58,14 @@
     <Compile Include="Model\Svip3Model.cs" />
     <Compile Include="Proto\Any.cs" />
     <Compile Include="Proto\ProtoBufConvert.cs" />
+    <Compile Include="Proto\ProtoInt32MemberAttribute.cs" />
     <Compile Include="Svip3Converter.cs" />
     <Compile Include="Svip3Decoder.cs" />
     <Compile Include="Svip3Encoder.cs" />
     <Compile Include="Utils\AudioTrackUtils.cs" />
     <Compile Include="Utils\CommonParamUtils.cs" />
-    <Compile Include="Utils\EditedParamsUtils.cs" />
-    <Compile Include="Utils\EditedPhonesUtils.cs" />
+    <Compile Include="Utils\ParamsUtils.cs" />
+    <Compile Include="Utils\PhonemeUtils.cs" />
     <Compile Include="Utils\HeadTagUtils.cs" />
     <Compile Include="Utils\NoteListUtils.cs" />
     <Compile Include="Utils\ParamCurveUtils.cs" />

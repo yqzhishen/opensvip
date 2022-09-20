@@ -22,12 +22,26 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         public static int EncodeSilLen(string headTag)
         {
-            return headTag.Equals("0") ? 400 : 0;
+            if (headTag != null)
+            {
+                return headTag.Equals("0") ? 400 : 0;
+            }
+            else
+            {
+                return 0;
+            }
         }
 
         public static int EncodeSpLen(string headTag)
         {
-            return headTag.Equals("V") ? 400 : 0;
+            if (headTag != null)
+            {
+                return headTag.Equals("V") ? 400 : 0;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
