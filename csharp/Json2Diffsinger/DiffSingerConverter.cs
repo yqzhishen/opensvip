@@ -21,6 +21,8 @@ namespace Json2DiffSinger.Stream
         public void Save(string path, Project project, ConverterOptions options)
         {
             var split = options.GetValueAsBoolean("split", true);
+            options.GetValueAsEnum<DictionaryOption>("dictionary");  // Trigger exception with illegal input
+            var dictionary = options.GetValueAsString("dictionary");
             var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto);
             var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto);
             var seed = options.GetValueAsInteger("seed", -1);
@@ -31,6 +33,7 @@ namespace Json2DiffSinger.Stream
                 {
                     var dsParams = new DiffSingerEncoder
                     {
+                        Dictionary = dictionary,
                         PhonemeOption = phonemeMode,
                         PitchModeOption = pitchMode
                     }.Encode(tuple.Item2);

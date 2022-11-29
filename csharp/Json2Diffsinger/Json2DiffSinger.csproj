@@ -61,6 +61,7 @@
     <Compile Include="DiffSingerConverter.cs" />
     <Compile Include="DiffSingerEncoder.cs" />
     <Compile Include="Core\Models\DsNote.cs" />
+    <Compile Include="Options\DictionaryOption.cs" />
     <Compile Include="Options\PhonemeModeOption.cs" />
     <Compile Include="Core\Models\LowLevel\PhonemeParamsModel.cs" />
     <Compile Include="Options\PitchModeOption.cs" />
@@ -95,10 +96,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Dictionaries\opencpop-strict.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dictionaries\opencpop.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Properties.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -25,7 +25,6 @@ namespace Json2DiffSinger.Utils
             int index = 0;
             var prevPhoneme = new DsPhoneme();
             InitPinyinUtils(osNotes);
-            Tuple<string, string> splitedPinyin;
             foreach (var note in osNotes)
             {
                 #region Calculate Positions
@@ -104,21 +103,21 @@ namespace Json2DiffSinger.Utils
                     string pinyin = !string.IsNullOrEmpty(note.Pronunciation)
                         ? note.Pronunciation
                         : PinyinUtil.GetNotePinyin(note.Lyric, index);
-                    splitedPinyin = PinyinUtil.Split(pinyin);
-                    if (splitedPinyin.Item1 != "")//不是纯元音
+                    var (consonant, vowel) = PinyinUtil.Split(pinyin);
+                    if (consonant != "")//不是纯元音
                     {
                         string consonantNoteName = prevPhoneme.Vowel.Phoneme == "SP" || prevPhoneme.Vowel.Phoneme == "AP"
                             ? NoteNameConvert.ToNoteName(note.KeyNumber)
                             : prevPhoneme.Vowel.NoteName;
                         dsPhoneme.Consonant = new DsPhonemeItem
                         {
-                            Phoneme = splitedPinyin.Item1,
+                            Phoneme = consonant,
                             Duration = (float)Math.Round(curStartInSecs - curActualStartInSecs, 6),
                             NoteName = consonantNoteName
                         };
                         dsPhoneme.Vowel = new DsPhonemeItem
                         {
-                            Phoneme = splitedPinyin.Item2,
+                            Phoneme = vowel,
                             Duration = (float)Math.Round(curActualEndInSecs - curStartInSecs, 6),
                             NoteName = NoteNameConvert.ToNoteName(note.KeyNumber)
                         };
@@ -127,7 +126,7 @@ namespace Json2DiffSinger.Utils
                     {
                         dsPhoneme.Vowel = new DsPhonemeItem
                         {
-                            Phoneme = splitedPinyin.Item2,
+                            Phoneme = vowel,
                             Duration = (float)Math.Round(curActualEndInSecs - curActualStartInSecs, 6),
                             NoteName = NoteNameConvert.ToNoteName(note.KeyNumber)
                         };
