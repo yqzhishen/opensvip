@@ -56,6 +56,7 @@ namespace Json2DiffSinger.Stream
                 project.ResetTimeAxis();
                 var diffSingerParams = new DiffSingerEncoder
                 {
+                    Dictionary = dictionary,
                     PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto),
                     PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto)
                 }.Encode(project);
