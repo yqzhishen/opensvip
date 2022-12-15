@@ -28,7 +28,7 @@ namespace OpenSvip.Stream.Standalone
         {
             var version = Regex.IsMatch(project.Version, @"^SVIP\d\.\d\.\d$")
                 ? project.Version
-                : "SVIP" + SingingTool.Const.ToolConstValues.ProjectVersion;
+                : "SVIP" + "6.0.0";
             var model = new XStudio.AppModel();
             FirstBarTick = (int)Math.Round(1920.0 * project.TimeSignatureList[0].Numerator /
                                            project.TimeSignatureList[0].Denominator);

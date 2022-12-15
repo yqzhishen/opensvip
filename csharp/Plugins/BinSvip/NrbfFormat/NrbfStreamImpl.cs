@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 using System.Text;
 using XSAppModel.XStudio;
 
@@ -18,7 +19,7 @@ namespace XSAppModel.NrbfFormat
 
         private void copy_string(byte[] src, NrbfLibrary.xs_string* dst)
         {
-            int size = src.Length;
+            int size = src == null ? 0 : src.Length;
             dst->size = size;
             if (size == 0)
             {
@@ -38,11 +39,22 @@ namespace XSAppModel.NrbfFormat
 
         private void copy_string(string src, NrbfLibrary.xs_string* dst)
         {
+            if (String.IsNullOrEmpty(src))
+            {
+                copy_string(Array.Empty<byte>(), dst);
+                return;
+            }
+
             copy_string(Encoding.GetEncoding("UTF-8").GetBytes(src), dst);
         }
 
         private byte[] from_xs_string_bytes(NrbfLibrary.xs_string str)
         {
+            if (str.size == 0)
+            {
+                return Array.Empty<byte>();
+            }
+            
             byte[] bytes = new byte[str.size];
             {
                 var gch = GCHandle.Alloc(bytes, GCHandleType.Pinned);
