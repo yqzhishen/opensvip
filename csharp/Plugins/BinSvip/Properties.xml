@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>BinSvip</Name>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>原始二进制 .svip 文件转换插件。</Descriptions>
@@ -14,6 +14,10 @@
     <LibraryPath>BinSvip\Plugin.BinSvip.dll</LibraryPath>
     <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
     <InputOptions>
+        <Option Name="independentMode" Type="boolean" Default="false">
+            <Notes>使用不依赖X Studio官方库的策略</Notes>
+            <Tips>由于SVIP格式具有一定的特殊性，不依赖官方库的策略正处于测试环节。如果您开启了此策略，那么无需安装X Studio或指定其路径。</Tips>
+        </Option>
         <Option Name="libraryPath" Type="string" Default="">
             <Notes>X Studio 动态链接库路径</Notes>
             <Tips>您可以指定 X Studio · 歌手软件的安装路径或本插件运行所需的动态链接库的存放路径。在修改此选项前，请先阅读插件信息面板中的依赖说明。</Tips>
@@ -45,6 +49,10 @@
                     <Label>导出可使用任意版本 X Studio 打开的工程文件。&#x000A;警告：使用此选项保存后，音量、气声、性别、力度参数将无法被 X Studio 识别（数据没有丢失）。&#x000A;为了避免无法挽回的数据丢失，强烈建议不要使用 X Studio 修改和保存使用此选项导出的工程文件。若要重新将工程文件恢复至可安全编辑的状态，请选择保存为 SVIP 6.0.0 及以上版本。</Label>
                 </Choice>
             </EnumChoices>
+        </Option>
+        <Option Name="independentMode" Type="boolean" Default="false">
+            <Notes>使用不依赖X Studio官方库的策略</Notes>
+            <Tips>由于SVIP格式具有一定的特殊性，不依赖官方库的策略正处于测试环节。如果您开启了此策略，那么无需安装X Studio或指定其路径。</Tips>
         </Option>
         <Option Name="libraryPath" Type="string" Default="">
             <Notes>X Studio 动态链接库路径</Notes>
