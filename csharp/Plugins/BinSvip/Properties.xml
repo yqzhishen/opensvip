@@ -50,17 +50,9 @@
                 </Choice>
             </EnumChoices>
         </Option>
-        <Option Name="convertStrategy" Type="enum" Default="Official">
-            <Notes>指定格式转换策略</Notes>
-            <Tips>由于SVIP格式具有一定的特殊性，本插件提供了不同的转换策略。</Tips>
-            <EnumChoices>
-                <Choice Name="X Studio官方库" Tag="Official">
-                    <Label>使用X Studio歌手软件自带组件解析工程，需要系统安装X Studio歌手软件或指定其安装路径。</Label>
-                </Choice>
-                <Choice Name="QNrbfFormat" Tag="QNrbfFormat">
-                    <Label>使用模拟SVIP格式库解析，不依赖X Studio歌手软件，无需安装或指定路径。</Label>
-                </Choice>
-            </EnumChoices>
+        <Option Name="independentMode" Type="boolean" Default="false">
+            <Notes>使用不依赖X Studio官方库的策略</Notes>
+            <Tips>由于SVIP格式具有一定的特殊性，不依赖官方库的策略正处于测试环节。如果您开启了此策略，那么无需安装X Studio或指定其路径。</Tips>
         </Option>
         <Option Name="libraryPath" Type="string" Default="">
             <Notes>X Studio 动态链接库路径</Notes>
