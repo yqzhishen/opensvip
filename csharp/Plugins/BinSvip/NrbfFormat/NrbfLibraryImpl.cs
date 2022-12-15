@@ -1,9 +1,10 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace XSAppModel.NrbfFormat
 {
-
     internal static unsafe class NrbfLibraryImpl
     {
         /* Native methods */
@@ -22,12 +23,20 @@ namespace XSAppModel.NrbfFormat
 
         public static IntPtr DllPtr = IntPtr.Zero;
 
+        public static string DllPath = "";
+
 
         /* Load or free */
         public static void Init()
         {
+            // Find library
+            if (DllPath == "")
+            {
+                DllPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            }
+
             // Load library
-            DllPtr = LoadLibrary(DllName);
+            DllPtr = LoadLibrary(Path.Combine(DllPath, DllName));
             if (DllPtr == IntPtr.Zero)
             {
                 throw new DllNotFoundException($"Required library \"{DllName}\" not found.");
@@ -130,5 +139,4 @@ namespace XSAppModel.NrbfFormat
 
         public static qnrbf_xstudio_write_delegate qnrbf_xstudio_write_ptr = null;
     }
-
 }

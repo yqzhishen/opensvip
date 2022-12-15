@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using OpenSvip.Stream.Options;
 
 namespace OpenSvip.Stream
 {
@@ -26,8 +25,7 @@ namespace OpenSvip.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            if (options.GetValueAsEnum("convertStrategy", ConvertStrategy.Official) ==
-                ConvertStrategy.QNrbfFormat)
+            if (options.GetValueAsBoolean("independentMode"))
             {
                 return new Standalone.NrbfSvipConverter().Load(path, options);
             }
@@ -39,8 +37,7 @@ namespace OpenSvip.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            if (options.GetValueAsEnum("convertStrategy", ConvertStrategy.Official) ==
-                ConvertStrategy.QNrbfFormat)
+            if (options.GetValueAsBoolean("independentMode"))
             {
                 new Standalone.NrbfSvipConverter().Save(path, project, options);
                 return;

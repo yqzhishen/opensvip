@@ -23,6 +23,7 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,7 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
@@ -58,13 +60,25 @@
         <Compile Include="BinarySvipDecoder.cs" />
         <Compile Include="BinarySvipEncoder.cs" />
         <Compile Include="BinarySvipVersions.cs" />
-        <Compile Include="Options\ConvertStrategy.cs" />
+        <Compile Include="NrbfFormat\NrbfLibrary.cs" />
+        <Compile Include="NrbfFormat\NrbfLibraryImpl.cs" />
+        <Compile Include="NrbfFormat\NrbfStream.cs" />
+        <Compile Include="NrbfFormat\NrbfStreamImpl.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="BinarySvipConst.cs" />
         <Compile Include="Standalone\NrbfSvipConst.cs" />
         <Compile Include="Standalone\NrbfSvipConverter.cs" />
         <Compile Include="Standalone\NrbfSvipDecoder.cs" />
         <Compile Include="Standalone\NrbfSvipEncoder.cs" />
+        <Compile Include="XStudio\AppModel.cs" />
+        <Compile Include="XStudio\LineParam.cs" />
+        <Compile Include="XStudio\Note.cs" />
+        <Compile Include="XStudio\Overlappable.cs" />
+        <Compile Include="XStudio\ReverbPreset.cs" />
+        <Compile Include="XStudio\SongBeat.cs" />
+        <Compile Include="XStudio\SongTempo.cs" />
+        <Compile Include="XStudio\Track.cs" />
+        <Compile Include="XStudio\Vibrato.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
@@ -91,11 +105,22 @@
         <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
-      <ProjectReference Include="..\..\XSAppModel\XSAppModel.csproj">
-        <Project>{b226ce57-7473-4ce7-8b19-c3a0a22470f4}</Project>
-        <Name>XSAppModel</Name>
-      </ProjectReference>
     </ItemGroup>
+
+    <ItemGroup>
+        <ContentWithTargetPath Include="Libs\QNrbfFormat.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>QNrbfFormat.dll</TargetPath>
+        </ContentWithTargetPath>
+        <!--        <ContentWithTargetPath Include="Libs\Qt5Core.dll">-->
+        <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
+        <!--            <TargetPath>Qt5Core.dll</TargetPath>-->
+        <!--        </ContentWithTargetPath>-->
+
+        <None Include="Libs\QNrbfFormat.dll" />
+        <!--        <None Include="Libs\Qt5Core.dll" />-->
+    </ItemGroup>
+    
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
