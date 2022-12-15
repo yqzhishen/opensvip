@@ -8,7 +8,7 @@ namespace XSAppModel.NrbfFormat
     internal static unsafe class NrbfLibraryImpl
     {
         /* Native methods */
-        [DllImport("kernel32.dll")]
+        [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr LoadLibrary(string dllToLoad);
 
         [DllImport("kernel32.dll")]
@@ -16,6 +16,10 @@ namespace XSAppModel.NrbfFormat
 
         [DllImport("kernel32.dll")]
         public static extern bool FreeLibrary(IntPtr hModule);
+
+        [DllImport("kernel32.dll")]
+        public static extern int FormatMessage(int flag, ref IntPtr source, int msgid, int langid, ref string buf,
+            int size, ref IntPtr args);
 
 
         /* Library attributes */
@@ -35,14 +39,28 @@ namespace XSAppModel.NrbfFormat
                 DllPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             }
 
-            // Load library
-            DllPtr = LoadLibrary(Path.Combine(DllPath, DllName));
-            if (DllPtr == IntPtr.Zero)
+            string dll = Path.Combine(DllPath, DllName);
+            if (!File.Exists(dll))
             {
                 throw new DllNotFoundException($"Required library \"{DllName}\" not found.");
             }
 
+            // Load library
+            DllPtr = LoadLibrary(dll);
+            if (DllPtr == IntPtr.Zero)
+            {
+                int errCode = Marshal.GetLastWin32Error();
+                IntPtr ptr = IntPtr.Zero;
+                string msg = $"Required library \"{DllName}\" not valid.";
+                FormatMessage(0x1300, ref ptr, errCode, 0, ref msg, 255, ref ptr);
+                msg = msg.Trim().Replace("\r\n", "").Replace("%1", DllName);
+                throw new DllNotFoundException(msg);
+            }
+
             // Get function addresses
+            qnrbf_dll_init_ptr = GetFunctionEntry<plain_delegate>("qnrbf_dll_init");
+            qnrbf_dll_exit_ptr = GetFunctionEntry<plain_delegate>("qnrbf_dll_exit");
+            
             qnrbf_malloc_ptr = GetFunctionEntry<qnrbf_malloc_delegate>("qnrbf_malloc");
             qnrbf_free_ptr = GetFunctionEntry<qnrbf_free_delegate>("qnrbf_free");
             qnrbf_memcpy_ptr = GetFunctionEntry<qnrbf_memcpy_delegate>("qnrbf_memcpy");
@@ -66,6 +84,9 @@ namespace XSAppModel.NrbfFormat
             }
 
             // Unset function pointers
+            qnrbf_dll_init_ptr = null;
+            qnrbf_dll_exit_ptr = null;
+            
             qnrbf_malloc_ptr = null;
             qnrbf_free_ptr = null;
             qnrbf_memcpy_ptr = null;
@@ -97,6 +118,9 @@ namespace XSAppModel.NrbfFormat
 
         /* Allocator */
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void plain_delegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void* qnrbf_malloc_delegate(int size);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -120,7 +144,15 @@ namespace XSAppModel.NrbfFormat
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void qnrbf_xstudio_write_delegate(NrbfLibrary.qnrbf_xstudio_context* ctx);
+        
+        
+        /* You must call the following functions when loading or freeing this library,
+        * to make it thread-safe for your application.
+        */
+        public static plain_delegate qnrbf_dll_init_ptr = null;
 
+        public static plain_delegate qnrbf_dll_exit_ptr = null;
+        
         /* Allocator */
         public static qnrbf_malloc_delegate qnrbf_malloc_ptr = null;
 

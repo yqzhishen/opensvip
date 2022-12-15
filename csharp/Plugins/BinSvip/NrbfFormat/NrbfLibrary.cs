@@ -1,8 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace XSAppModel.NrbfFormat
 {
-
     internal static unsafe class NrbfLibrary
     {
         public enum xs_note_head_tag
@@ -198,21 +198,38 @@ namespace XSAppModel.NrbfFormat
             if (_referenceCount == 0)
             {
                 NrbfLibraryImpl.Init();
+                
+                // Init dll
+                qnrbf_dll_init();
             }
+
+            Console.WriteLine(_referenceCount);
 
             _referenceCount++;
         }
 
         public static void Unload()
         {
+            return;
             _referenceCount--;
             if (_referenceCount == 0)
             {
+                // Exit dll
+                qnrbf_dll_exit();
+                
                 NrbfLibraryImpl.Deinit();
             }
         }
 
-        /* The APIs are not thread-safe, please use only one instance at any time. */
+
+        /* You must call the following functions when loading or freeing this library,
+        * to make it thread-safe for your application.
+        */
+
+        public static void qnrbf_dll_init() => NrbfLibraryImpl.qnrbf_dll_init_ptr();
+
+        public static void qnrbf_dll_exit() => NrbfLibraryImpl.qnrbf_dll_exit_ptr();
+
 
         /* Allocator */
         public static void* qnrbf_malloc(int size) => NrbfLibraryImpl.qnrbf_malloc_ptr(size);
