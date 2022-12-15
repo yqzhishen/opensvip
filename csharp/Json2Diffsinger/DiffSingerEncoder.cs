@@ -29,8 +29,9 @@ namespace Json2DiffSinger
         /// 转为 ds 参数
         /// </summary>
         /// <param name="project"></param>
+        /// <param name="trailingSpace"></param>
         /// <returns></returns>
-        public AbstractParamsModel Encode(Project project)
+        public AbstractParamsModel Encode(Project project, float trailingSpace = 0.05f)
         {
             var currentPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "";
             var dictPath = Path.Combine(currentPath, "Dictionaries", $"{Dictionary}.txt");
@@ -42,7 +43,7 @@ namespace Json2DiffSinger
             List<Note> osNotes = singingTrack.NoteList;
             var dsProject = new DsProject
             {
-                NoteList = NoteListUtils.Encode(osNotes, synchronizer)
+                NoteList = NoteListUtils.Encode(osNotes, synchronizer, trailingSpace)
             };
             var totalDuration = (int)Math.Round(dsProject.NoteList.Sum(note => note.Duration) * 1000);
             if (PitchModeOption == PitchModeOption.Manual)

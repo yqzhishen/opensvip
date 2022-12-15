@@ -20,15 +20,15 @@ namespace Json2DiffSinger.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            var split = options.GetValueAsBoolean("split", true);
+            var splitLength = options.GetValueAsDouble("split", 5.0);
             options.GetValueAsEnum<DictionaryOption>("dictionary");  // Trigger exception with illegal input
-            var dictionary = options.GetValueAsString("dictionary");
+            var dictionary = options.GetValueAsString("dictionary");  // Get the actual value
             var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto);
             var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto);
             var seed = options.GetValueAsInteger("seed", -1);
-            if (split)
+            if (splitLength >= 0)
             {
-                var segments = project.SplitIntoSegments();
+                var segments = project.SplitIntoSegments(minLength: (int)(splitLength * 1000));
                 var series = segments.Select(tuple =>
                 {
                     var dsParams = new DiffSingerEncoder
@@ -36,7 +36,7 @@ namespace Json2DiffSinger.Stream
                         Dictionary = dictionary,
                         PhonemeOption = phonemeMode,
                         PitchModeOption = pitchMode
-                    }.Encode(tuple.Item2);
+                    }.Encode(tuple.Item2, tuple.Item3);
                     dsParams.Offset = tuple.Item1;
                     if (seed >= 0)
                     {
@@ -59,7 +59,7 @@ namespace Json2DiffSinger.Stream
                     Dictionary = dictionary,
                     PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto),
                     PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto)
-                }.Encode(project);
+                }.Encode(project, 0.5f);
                 if (seed >= 0)
                 {
                     diffSingerParams.Seed = seed;

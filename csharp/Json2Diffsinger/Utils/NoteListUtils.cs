@@ -16,8 +16,9 @@ namespace Json2DiffSinger.Utils
         /// </summary>
         /// <param name="osNotes"></param>
         /// <param name="synchronizer"></param>
+        /// <param name="trailingSpace"></param>
         /// <returns></returns>
-        public static List<DsNote> Encode(List<Note> osNotes, TimeSynchronizer synchronizer)
+        public static List<DsNote> Encode(List<Note> osNotes, TimeSynchronizer synchronizer, float trailingSpace = 0.05f)
         {
             List<DsNote> dsNotes = new List<DsNote>();
             int prevEndInTicks = 0;
@@ -148,7 +149,7 @@ namespace Json2DiffSinger.Utils
                 prevPhoneme = dsPhoneme;
                 index++;
             }
-            InsertEndRestNote(dsNotes);
+            InsertEndRestNote(dsNotes, trailingSpace);
             return dsNotes;
         }
 
@@ -156,10 +157,11 @@ namespace Json2DiffSinger.Utils
         /// 在句尾插入一个休止符
         /// </summary>
         /// <param name="dsNotes"></param>
-        private static void InsertEndRestNote(List<DsNote> dsNotes)
+        /// <param name="trailingSpace"></param>
+        private static void InsertEndRestNote(List<DsNote> dsNotes, float trailingSpace = 0.05f)
         {
-            var endRestPhoneme = new RestDsPhoneme(0.05f);
-            var endRestNote = new RestDsNote(0.05f, endRestPhoneme);
+            var endRestPhoneme = new RestDsPhoneme(trailingSpace);
+            var endRestNote = new RestDsNote(trailingSpace, endRestPhoneme);
             dsNotes.Add(endRestNote);
         }
 
