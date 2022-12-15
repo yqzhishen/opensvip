@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.Model;
+using OpenSvip.Stream.Options;
 
 namespace OpenSvip.Stream
 {
@@ -25,6 +26,12 @@ namespace OpenSvip.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
+            if (options.GetValueAsEnum("convertStrategy", ConvertStrategy.Official) ==
+                ConvertStrategy.QNrbfFormat)
+            {
+                return new Standalone.NrbfSvipConverter().Load(path, options);
+            }
+
             CheckForLibraries(options.GetValueAsString("libraryPath"));
             AppDomain.CurrentDomain.AssemblyResolve += ExternalAssemblyResolveEventHandler;
             return DoLoad(path);
@@ -32,6 +39,13 @@ namespace OpenSvip.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
+            if (options.GetValueAsEnum("convertStrategy", ConvertStrategy.Official) ==
+                ConvertStrategy.QNrbfFormat)
+            {
+                new Standalone.NrbfSvipConverter().Save(path, project, options);
+                return;
+            }
+
             CheckForLibraries(options.GetValueAsString("libraryPath"));
             AppDomain.CurrentDomain.AssemblyResolve += ExternalAssemblyResolveEventHandler;
             DoSave(path, project, options);
@@ -52,13 +66,14 @@ namespace OpenSvip.Stream
             }
             else
             {
-                model = (SingingTool.Model.AppModel) new BinaryFormatter().Deserialize(stream);
+                model = (SingingTool.Model.AppModel)new BinaryFormatter().Deserialize(stream);
                 stream.Close();
             }
+
             reader.Close();
             return new BinarySvipDecoder().DecodeProject(version, model);
         }
-        
+
         private void DoSave(string path, Project project, ConverterOptions options)
         {
             var (version, model) = new BinarySvipEncoder
@@ -77,6 +92,7 @@ namespace OpenSvip.Stream
                     {
                         break;
                     }
+
                     goto case BinarySvipVersions.SVIP6_0_0;
                 case BinarySvipVersions.SVIP6_0_0:
                     version = "SVIP6.0.0";
@@ -87,6 +103,7 @@ namespace OpenSvip.Stream
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+
             var index = Regex.Match(version, @"\d+\.\d+\.\d+").Groups[0].Index;
             var stream = new FileStream(path, FileMode.Create, FileAccess.Write);
             var writer = new BinaryWriter(stream);
@@ -98,17 +115,17 @@ namespace OpenSvip.Stream
             writer.Close();
             stream.Close();
         }
-        
+
         private void CheckForLibraries(string specifiedDir = null)
         {
             var foundLibraries = new HashSet<string>();
-            
+
             if (!string.IsNullOrWhiteSpace(specifiedDir) && Directory.Exists(specifiedDir))
             {
                 foundLibraries.UnionWith(Directory.GetFiles(specifiedDir).Select(Path.GetFileName));
                 _libraryDirectories.Add(specifiedDir);
             }
-            
+
             var selfDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if (!string.IsNullOrEmpty(selfDir))
             {
@@ -145,7 +162,7 @@ namespace OpenSvip.Stream
                     // ignored
                 }
             }
-            
+
             throw new FileNotFoundException();
         }
     }
