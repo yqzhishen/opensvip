@@ -1,13 +1,13 @@
 ﻿using System;
 using OpenSvip.Model;
 
-using XStudio = BinSvip.Standalone.Model;
+using StandaloneModel = BinSvip.Standalone.Model;
 
 namespace BinSvip.Standalone
 {
     public class StandaloneSvipDecoder
     {
-        public Project DecodeProject(string version, XStudio.AppModel model)
+        public Project DecodeProject(string version, StandaloneModel.AppModel model)
         {
             var project = new Project
             {
@@ -35,7 +35,7 @@ namespace BinSvip.Standalone
             return project;
         }
 
-        private SongTempo DecodeSongTempo(XStudio.SongTempo tempo)
+        private SongTempo DecodeSongTempo(StandaloneModel.SongTempo tempo)
         {
             return new SongTempo
             {
@@ -44,7 +44,7 @@ namespace BinSvip.Standalone
             };
         }
 
-        private TimeSignature DecodeTimeSignature(XStudio.SongBeat beat)
+        private TimeSignature DecodeTimeSignature(StandaloneModel.SongBeat beat)
         {
             return new TimeSignature
             {
@@ -54,12 +54,12 @@ namespace BinSvip.Standalone
             };
         }
 
-        private Track DecodeTrack(XStudio.ITrack track)
+        private Track DecodeTrack(StandaloneModel.ITrack track)
         {
             Track resultTrack;
             switch (track)
             {
-                case XStudio.SingingTrack singingTrack:
+                case StandaloneModel.SingingTrack singingTrack:
                     var sTrack = new SingingTrack
                     {
                         AISingerName = Singers.GetName(singingTrack.AISingerId),
@@ -73,7 +73,7 @@ namespace BinSvip.Standalone
                     sTrack.EditedParams = DecodeParams(singingTrack);
                     resultTrack = sTrack;
                     break;
-                case XStudio.InstrumentTrack instrumentTrack:
+                case StandaloneModel.InstrumentTrack instrumentTrack:
                     resultTrack = new InstrumentalTrack
                     {
                         AudioFilePath = instrumentTrack.InstrumentFilePath,
@@ -92,7 +92,7 @@ namespace BinSvip.Standalone
             return resultTrack;
         }
 
-        private Note DecodeNote(XStudio.Note note)
+        private Note DecodeNote(StandaloneModel.Note note)
         {
             var resultNote = new Note
             {
@@ -122,7 +122,7 @@ namespace BinSvip.Standalone
             return resultNote;
         }
 
-        private Phones DecodePhones(XStudio.NotePhoneInfo phone)
+        private Phones DecodePhones(StandaloneModel.NotePhoneInfo phone)
         {
             return new Phones
             {
@@ -131,7 +131,7 @@ namespace BinSvip.Standalone
             };
         }
 
-        private Vibrato DecodeVibrato(XStudio.Note note)
+        private Vibrato DecodeVibrato(StandaloneModel.Note note)
         {
             var vibrato = new Vibrato();
             var percent = note.VibratoPercentInfo;
@@ -153,7 +153,7 @@ namespace BinSvip.Standalone
             return vibrato;
         }
 
-        private Params DecodeParams(XStudio.SingingTrack track)
+        private Params DecodeParams(StandaloneModel.SingingTrack track)
         {
             var @params = new Params();
             if (track.editedPitchLine != null)
@@ -193,7 +193,7 @@ namespace BinSvip.Standalone
             return @params;
         }
 
-        private ParamCurve DecodeParamCurve(XStudio.LineParam line,
+        private ParamCurve DecodeParamCurve(StandaloneModel.LineParam line,
             Func<int, int> op = null)
         {
             var paramCurve = new ParamCurve();
