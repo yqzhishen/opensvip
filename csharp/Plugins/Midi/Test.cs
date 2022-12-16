@@ -18,9 +18,9 @@ namespace FlutyDeer.MidiPlugin
 
         private static void Midi2Json()
         {
-            var project = new MidiConverter().Load(@"D:\±àÇúÑ§Ï°\²»Ö±°×¶¯Îï\²»Ö±°×¶¯Îï.mid", new ConverterOptions(new Dictionary<string, string>()));
+            var project = new MidiConverter().Load(@"D:\ç¼–æ›²å­¦ä¹ \ä¸ç›´ç™½åŠ¨ç‰©\ä¸ç›´ç™½åŠ¨ç‰©.mid", new ConverterOptions(new Dictionary<string, string>()));
             var stream = new FileStream(
-                @"D:\±àÇúÑ§Ï°\²»Ö±°×¶¯Îï\²»Ö±°×¶¯Îï.json",
+                @"D:\ç¼–æ›²å­¦ä¹ \ä¸ç›´ç™½åŠ¨ç‰©\ä¸ç›´ç™½åŠ¨ç‰©.json",
                 FileMode.Create,
                 FileAccess.Write);
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
@@ -33,14 +33,14 @@ namespace FlutyDeer.MidiPlugin
         private static void Json2Midi()
         {
             var stream = new FileStream(
-                @"D:\²âÊÔ\·Ö¸îÏß£¨´ø´Êmidi£©.json",
+                @"D:\æµ‹è¯•\åˆ†å‰²çº¿ï¼ˆå¸¦è¯midiï¼‰.json",
                 FileMode.Open,
                 FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
             var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            new MidiConverter().Save(@"D:\²âÊÔ\·Ö¸îÏß£¨´ø´Êmidi£©.mid", project, new ConverterOptions(new Dictionary<string, string>()));
+            new MidiConverter().Save(@"D:\æµ‹è¯•\åˆ†å‰²çº¿ï¼ˆå¸¦è¯midiï¼‰.mid", project, new ConverterOptions(new Dictionary<string, string>()));
         }
     }
 }

@@ -19,9 +19,9 @@ namespace FlutyDeer.VogenPlugin
 
         private static void Vogen2Json()
         {
-            var project = new VogenConverter().Load(@"D:\±àÇúÑ§Ï°\²»Ö±°×¶¯Îï\²»Ö±°×¶¯Îï.mid", new ConverterOptions(new Dictionary<string, string>()));
+            var project = new VogenConverter().Load(@"D:\ç¼–æ›²å­¦ä¹ \ä¸ç›´ç™½åŠ¨ç‰©\ä¸ç›´ç™½åŠ¨ç‰©.mid", new ConverterOptions(new Dictionary<string, string>()));
             var stream = new FileStream(
-                @"D:\±àÇúÑ§Ï°\²»Ö±°×¶¯Îï\²»Ö±°×¶¯Îï.json",
+                @"D:\ç¼–æ›²å­¦ä¹ \ä¸ç›´ç™½åŠ¨ç‰©\ä¸ç›´ç™½åŠ¨ç‰©.json",
                 FileMode.Create,
                 FileAccess.Write);
             var writer = new StreamWriter(stream, new UTF8Encoding(false));
@@ -34,14 +34,14 @@ namespace FlutyDeer.VogenPlugin
         private static void Json2Vogen()
         {
             var stream = new FileStream(
-                @"D:\²âÊÔ\É¶°¡1.json",
+                @"D:\æµ‹è¯•\å•¥å•Š1.json",
                 FileMode.Open,
                 FileAccess.Read);
             var reader = new StreamReader(stream, Encoding.UTF8);
             var project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             stream.Close();
             reader.Close();
-            new VogenConverter().Save(@"D:\²âÊÔ\É¶°¡1.vog", project, new ConverterOptions(new Dictionary<string, string>()));
+            new VogenConverter().Save(@"D:\æµ‹è¯•\å•¥å•Š1.vog", project, new ConverterOptions(new Dictionary<string, string>()));
         }
     }
 }
