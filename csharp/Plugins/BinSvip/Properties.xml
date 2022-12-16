@@ -53,7 +53,7 @@
         </Option>
         <Option Name="independentMode" Type="boolean" Default="false">
             <Notes>使用不依赖X Studio官方库的策略</Notes>
-            <Tips>本策略正处于测试环节。</Tips>
+            <Tips>由于SVIP格式具有一定的特殊性，不依赖官方库的策略正处于测试环节。如果您开启了此策略，那么无需安装X Studio或指定其路径。</Tips>
         </Option>
         <Option Name="libraryPath" Type="string" Default="">
             <Notes>X Studio 动态链接库路径</Notes>
