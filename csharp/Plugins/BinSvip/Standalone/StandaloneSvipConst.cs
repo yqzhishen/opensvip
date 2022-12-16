@@ -1,16 +1,17 @@
-﻿using System.IO;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace BinSvip.Const
+namespace BinSvip.Standalone
 {
     public static class Singers
     {
         private static readonly Dictionary<string, string> SingerNames;
+
         static Singers()
         {
             var stream = new FileStream(
@@ -29,6 +30,7 @@ namespace BinSvip.Const
             {
                 return SingerNames[id];
             }
+
             return Regex.IsMatch(id, "[FM]\\d+") ? $"$({id})" : "";
         }
 
@@ -38,66 +40,68 @@ namespace BinSvip.Const
             {
                 return singer.Key;
             }
+
             return Regex.IsMatch(name, "\\$\\([FM]\\d+\\)") ? name.Substring(2, name.Length - 3) : "";
         }
     }
 
     public static class ReverbPresets
     {
-        private static readonly Dictionary<SingingTool.Library.Audio.ReverbPreset, string> Presets
-            = new Dictionary<SingingTool.Library.Audio.ReverbPreset, string>
-        {
-            { SingingTool.Library.Audio.ReverbPreset.NONE, "干声" },
-            { SingingTool.Library.Audio.ReverbPreset.DEFAULT, "浮光" },
-            { SingingTool.Library.Audio.ReverbPreset.SMALLHALL1, "午后" },
-            { SingingTool.Library.Audio.ReverbPreset.MEDIUMHALL1, "月光" },
-            { SingingTool.Library.Audio.ReverbPreset.LARGEHALL1, "水晶" },
-            { SingingTool.Library.Audio.ReverbPreset.SMALLROOM1, "汽水" },
-            { SingingTool.Library.Audio.ReverbPreset.MEDIUMROOM1, "夜莺" },
-            { SingingTool.Library.Audio.ReverbPreset.LONGREVERB2, "大梦" }
-        };
+        private static readonly Dictionary<Model.ReverbPreset, string> Presets
+            = new Dictionary<Model.ReverbPreset, string>
+            {
+                { Model.ReverbPreset.NONE, "干声" },
+                { Model.ReverbPreset.DEFAULT, "浮光" },
+                { Model.ReverbPreset.SMALLHALL1, "午后" },
+                { Model.ReverbPreset.MEDIUMHALL1, "月光" },
+                { Model.ReverbPreset.LARGEHALL1, "水晶" },
+                { Model.ReverbPreset.SMALLROOM1, "汽水" },
+                { Model.ReverbPreset.MEDIUMROOM1, "夜莺" },
+                { Model.ReverbPreset.LONGREVERB2, "大梦" }
+            };
 
-        public static string GetName(SingingTool.Library.Audio.ReverbPreset index)
+        public static string GetName(Model.ReverbPreset index)
         {
             return Presets.ContainsKey(index) ? Presets[index] : null;
         }
 
-        public static SingingTool.Library.Audio.ReverbPreset GetIndex(string name)
+        public static Model.ReverbPreset GetIndex(string name)
         {
             foreach (var preset in Presets.Where(preset => preset.Value.Equals(name)))
             {
                 return preset.Key;
             }
-            return SingingTool.Library.Audio.ReverbPreset.NONE;
+
+            return Model.ReverbPreset.NONE;
         }
     }
 
     public static class NoteHeadTags
     {
-        public static string GetName(SingingTool.Model.NoteHeadTag index)
+        public static string GetName(Model.NoteHeadTag index)
         {
             switch (index)
             {
-                case SingingTool.Model.NoteHeadTag.SilTag:
+                case Model.NoteHeadTag.SilTag:
                     return "0";
-                case SingingTool.Model.NoteHeadTag.SpTag:
+                case Model.NoteHeadTag.SpTag:
                     return "V";
-                case SingingTool.Model.NoteHeadTag.NoTag:
+                case Model.NoteHeadTag.NoTag:
                 default:
                     return null;
             }
         }
 
-        public static SingingTool.Model.NoteHeadTag GetIndex(string name)
+        public static Model.NoteHeadTag GetIndex(string name)
         {
             switch (name)
             {
                 case "0":
-                    return SingingTool.Model.NoteHeadTag.SilTag;
+                    return Model.NoteHeadTag.SilTag;
                 case "V":
-                    return SingingTool.Model.NoteHeadTag.SpTag;
+                    return Model.NoteHeadTag.SpTag;
                 default:
-                    return SingingTool.Model.NoteHeadTag.NoTag;
+                    return Model.NoteHeadTag.NoTag;
             }
         }
     }
