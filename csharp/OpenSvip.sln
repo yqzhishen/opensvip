@@ -39,7 +39,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Srt", "Plugins\Srt\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.MusicXml", "Plugins\MusicXml\Plugin.MusicXml.csproj", "{E3A16659-17BC-48AF-B27F-B678354ACDD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json2DiffSinger", "Json2Diffsinger\Json2DiffSinger.csproj", "{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json2DiffSinger", "Plugins\Json2Diffsinger\Json2DiffSinger.csproj", "{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Vsqx4", "Plugins\Vsqx4\Plugin.Vsqx4.csproj", "{061363F8-45CF-4606-842B-6718DC011669}"
 EndProject
