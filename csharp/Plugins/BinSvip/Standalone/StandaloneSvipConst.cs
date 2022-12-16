@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace OpenSvip.Stream.Standalone.Const
+namespace BinSvip.Standalone
 {
     public static class Singers
     {
@@ -47,61 +47,61 @@ namespace OpenSvip.Stream.Standalone.Const
 
     public static class ReverbPresets
     {
-        private static readonly Dictionary<XSAppModel.XStudio.ReverbPreset, string> Presets
-            = new Dictionary<XSAppModel.XStudio.ReverbPreset, string>
+        private static readonly Dictionary<Model.ReverbPreset, string> Presets
+            = new Dictionary<Model.ReverbPreset, string>
             {
-                { XSAppModel.XStudio.ReverbPreset.NONE, "干声" },
-                { XSAppModel.XStudio.ReverbPreset.DEFAULT, "浮光" },
-                { XSAppModel.XStudio.ReverbPreset.SMALLHALL1, "午后" },
-                { XSAppModel.XStudio.ReverbPreset.MEDIUMHALL1, "月光" },
-                { XSAppModel.XStudio.ReverbPreset.LARGEHALL1, "水晶" },
-                { XSAppModel.XStudio.ReverbPreset.SMALLROOM1, "汽水" },
-                { XSAppModel.XStudio.ReverbPreset.MEDIUMROOM1, "夜莺" },
-                { XSAppModel.XStudio.ReverbPreset.LONGREVERB2, "大梦" }
+                { Model.ReverbPreset.NONE, "干声" },
+                { Model.ReverbPreset.DEFAULT, "浮光" },
+                { Model.ReverbPreset.SMALLHALL1, "午后" },
+                { Model.ReverbPreset.MEDIUMHALL1, "月光" },
+                { Model.ReverbPreset.LARGEHALL1, "水晶" },
+                { Model.ReverbPreset.SMALLROOM1, "汽水" },
+                { Model.ReverbPreset.MEDIUMROOM1, "夜莺" },
+                { Model.ReverbPreset.LONGREVERB2, "大梦" }
             };
 
-        public static string GetName(XSAppModel.XStudio.ReverbPreset index)
+        public static string GetName(Model.ReverbPreset index)
         {
             return Presets.ContainsKey(index) ? Presets[index] : null;
         }
 
-        public static XSAppModel.XStudio.ReverbPreset GetIndex(string name)
+        public static Model.ReverbPreset GetIndex(string name)
         {
             foreach (var preset in Presets.Where(preset => preset.Value.Equals(name)))
             {
                 return preset.Key;
             }
 
-            return XSAppModel.XStudio.ReverbPreset.NONE;
+            return Model.ReverbPreset.NONE;
         }
     }
 
     public static class NoteHeadTags
     {
-        public static string GetName(XSAppModel.XStudio.NoteHeadTag index)
+        public static string GetName(Model.NoteHeadTag index)
         {
             switch (index)
             {
-                case XSAppModel.XStudio.NoteHeadTag.SilTag:
+                case Model.NoteHeadTag.SilTag:
                     return "0";
-                case XSAppModel.XStudio.NoteHeadTag.SpTag:
+                case Model.NoteHeadTag.SpTag:
                     return "V";
-                case XSAppModel.XStudio.NoteHeadTag.NoTag:
+                case Model.NoteHeadTag.NoTag:
                 default:
                     return null;
             }
         }
 
-        public static XSAppModel.XStudio.NoteHeadTag GetIndex(string name)
+        public static Model.NoteHeadTag GetIndex(string name)
         {
             switch (name)
             {
                 case "0":
-                    return XSAppModel.XStudio.NoteHeadTag.SilTag;
+                    return Model.NoteHeadTag.SilTag;
                 case "V":
-                    return XSAppModel.XStudio.NoteHeadTag.SpTag;
+                    return Model.NoteHeadTag.SpTag;
                 default:
-                    return XSAppModel.XStudio.NoteHeadTag.NoTag;
+                    return Model.NoteHeadTag.NoTag;
             }
         }
     }

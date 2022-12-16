@@ -1,7 +1,6 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace XSAppModel.NrbfFormat
+namespace BinSvip.Standalone.Nrbf
 {
     internal static unsafe class NrbfLibrary
     {
@@ -210,15 +209,14 @@ namespace XSAppModel.NrbfFormat
 
         public static void Unload()
         {
-            return;
-            _referenceCount--;
-            if (_referenceCount == 0)
-            {
-                // Exit dll
-                qnrbf_dll_exit();
-                
-                NrbfLibraryImpl.Deinit();
-            }
+            // _referenceCount--;
+            // if (_referenceCount == 0)
+            // {
+            //     // Exit dll
+            //     qnrbf_dll_exit();
+            //     
+            //     NrbfLibraryImpl.Deinit();
+            // }
         }
 
 

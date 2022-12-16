@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
-namespace OpenSvip.Const
+namespace BinSvip.Const
 {
     public static class Singers
     {

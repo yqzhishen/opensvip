@@ -1,12 +1,11 @@
 ﻿using System;
-using OpenSvip.Const;
 using OpenSvip.Model;
 
-using XStudio = XSAppModel.XStudio;
+using XStudio = BinSvip.Standalone.Model;
 
-namespace OpenSvip.Stream.Standalone
+namespace BinSvip.Standalone
 {
-    public class NrbfSvipDecoder
+    public class StandaloneSvipDecoder
     {
         public Project DecodeProject(string version, XStudio.AppModel model)
         {
@@ -64,7 +63,7 @@ namespace OpenSvip.Stream.Standalone
                     var sTrack = new SingingTrack
                     {
                         AISingerName = Singers.GetName(singingTrack.AISingerId),
-                        ReverbPreset = Const.ReverbPresets.GetName(singingTrack.reverbPreset)
+                        ReverbPreset = ReverbPresets.GetName(singingTrack.reverbPreset)
                     };
                     foreach (var note in singingTrack.noteList)
                     {
@@ -100,7 +99,7 @@ namespace OpenSvip.Stream.Standalone
                 StartPos = note.startPos,
                 Length = note.widthPos,
                 KeyNumber = note.keyIndex - 12,
-                HeadTag = Const.NoteHeadTags.GetName(note.headTag),
+                HeadTag = NoteHeadTags.GetName(note.headTag),
                 Lyric = note.lyric
             };
             if (!"".Equals(note.pronouncing))

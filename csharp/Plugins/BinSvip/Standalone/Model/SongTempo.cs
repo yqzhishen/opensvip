@@ -1,4 +1,4 @@
-﻿namespace XSAppModel.XStudio
+﻿namespace BinSvip.Standalone.Model
 {
 
     public class SongTempo : IOverlappable

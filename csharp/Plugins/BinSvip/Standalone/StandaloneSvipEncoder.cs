@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OpenSvip.Const;
 using OpenSvip.Library;
 using OpenSvip.Model;
-using XStudio = XSAppModel.XStudio;
+using XStudio = BinSvip.Standalone.Model;
 
-namespace OpenSvip.Stream.Standalone
+namespace BinSvip.Standalone
 {
-    public class NrbfSvipEncoder
+    public class StandaloneSvipEncoder
     {
         public string DefaultSinger { get; set; }
 
@@ -121,7 +120,7 @@ namespace OpenSvip.Stream.Standalone
                     var sTrack = new XStudio.SingingTrack
                     {
                         AISingerId = singerId,
-                        reverbPreset = Const.ReverbPresets.GetIndex(singingTrack.ReverbPreset)
+                        reverbPreset = ReverbPresets.GetIndex(singingTrack.ReverbPreset)
                     };
                     foreach (var note in singingTrack.NoteList)
                     {
@@ -167,7 +166,7 @@ namespace OpenSvip.Stream.Standalone
                 startPos = (int)Math.Round(Synchronizer.GetActualTicksFromTicks(note.StartPos)),
                 keyIndex = note.KeyNumber + 12,
                 lyric = note.Lyric,
-                headTag = Const.NoteHeadTags.GetIndex(note.HeadTag),
+                headTag = NoteHeadTags.GetIndex(note.HeadTag),
                 pronouncing = note.Pronunciation?.ToLower()
             };
             resultNote.widthPos = (int)Math.Round(

@@ -1,11 +1,12 @@
 ﻿using System;
+using BinSvip.Standalone.Model;
 
-namespace XSAppModel.NrbfFormat
+namespace BinSvip.Standalone.Nrbf
 {
 
     public class NrbfStream : IDisposable
     {
-        private bool _disposed = false;
+        private bool _disposed;
 
         public NrbfStream()
         {
@@ -39,7 +40,7 @@ namespace XSAppModel.NrbfFormat
         /// </summary>
         /// <param name="data">不包含版本号前缀的SVIP二进制数据</param>
         /// <returns>XStudio工程类</returns>
-        public XStudio.AppModel Read(byte[] data)
+        public AppModel Read(byte[] data)
         {
             return _impl.Read(data);
         }
@@ -49,7 +50,7 @@ namespace XSAppModel.NrbfFormat
         /// </summary>
         /// <param name="appModel">XStudio工程类</param>
         /// <returns>不包含版本号前缀的SVIP二进制数据</returns>
-        public byte[] Write(XStudio.AppModel appModel)
+        public byte[] Write(AppModel appModel)
         {
             return _impl.Write(appModel);
         }

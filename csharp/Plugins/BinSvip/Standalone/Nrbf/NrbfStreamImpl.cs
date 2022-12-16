@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using XSAppModel.XStudio;
+using BinSvip.Standalone.Model;
 
-namespace XSAppModel.NrbfFormat
+namespace BinSvip.Standalone.Nrbf
 {
     internal unsafe class NrbfStreamImpl
     {

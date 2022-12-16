@@ -1,23 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>BinSvip</Name>
-    <Version>1.2.1</Version>
-    <Author>YQ之神/至精至简</Author>
+    <Version>1.3.0</Version>
+    <Author>YQ之神</Author>
     <HomePage>https://space.bilibili.com/102844209</HomePage>
     <Descriptions>原始二进制 .svip 文件转换插件。</Descriptions>
-    <Requirements>        由于SVIP格式具有一定的特殊性，本插件包含默认策略与模拟策略两种策略。
-        默认策略：使用X Studio软件模块，系统中需要安装 X Studio，并设置为 .svip 文件默认打开方式；您也可以在高级选项中指定 X Studio 的安装路径或本插件运行所需的动态链接库的存放路径。建议使用 X Studio 2.0 或更高版本；最低可兼容 1.8 版本，但无法导入与导出力度参数。
-        模拟策略：完整实现了SVIP文件解析与写入的算法，对 X Studio 没有依赖，可以导出 X Studio 2.0 所包含的所有参数，最低兼容1.8版；如果开启此策略，那么无需安装 X Studio 或指定其路径。
-        关于本插件所依赖的 X Studio 相关动态链接库及相关路径的配置方式，请参阅插件市场中的说明文档。</Requirements>
+    <Requirements>若关闭“无依赖式读取”，则系统中需要安装 X Studio，并设置为 .svip 文件默认打开方式；您也可以在高级选项中指定 X Studio 的安装路径或本插件运行所需的动态链接库的存放路径。建议使用 X Studio 2.0 或更高版本；最低可兼容 1.8 版本，但无法导入与导出力度参数。关于本插件所依赖的 X Studio 相关动态链接库及相关路径的配置方式，请参阅插件市场中的说明文档。</Requirements>
     <Format>X Studio 工程文件</Format>
     <Suffix>svip</Suffix>
     <Identifier>svip</Identifier>
     <LibraryPath>BinSvip\Plugin.BinSvip.dll</LibraryPath>
-    <Converter>OpenSvip.Stream.BinarySvipConverter</Converter>
+    <Converter>BinSvip.Stream.BinarySvipConverter</Converter>
     <InputOptions>
-        <Option Name="independentMode" Type="boolean" Default="false">
-            <Notes>使用不依赖X Studio官方库的策略</Notes>
-            <Tips>本策略正处于测试环节。</Tips>
+        <Option Name="standalone" Type="boolean" Default="false">
+            <Notes>无依赖式读取（Beta）</Notes>
+            <Tips>贡献者：至精至简
+打开此选项后插件无需依赖 X Studio 动态链接库即可读取完整格式的工程文件。若使用此选项时出现转换异常，请关闭此选项后重试，并向开发者报告问题。</Tips>
         </Option>
         <Option Name="libraryPath" Type="string" Default="">
             <Notes>X Studio 动态链接库路径</Notes>
@@ -51,9 +49,10 @@
                 </Choice>
             </EnumChoices>
         </Option>
-        <Option Name="independentMode" Type="boolean" Default="false">
-            <Notes>使用不依赖X Studio官方库的策略</Notes>
-            <Tips>由于SVIP格式具有一定的特殊性，不依赖官方库的策略正处于测试环节。如果您开启了此策略，那么无需安装X Studio或指定其路径。</Tips>
+        <Option Name="standalone" Type="boolean" Default="false">
+            <Notes>无依赖式写入（Beta）</Notes>
+            <Tips>贡献者：至精至简
+打开此选项后插件无需依赖 X Studio 动态链接库即可写入完整格式的工程文件。若使用此选项时出现转换异常，请关闭选项重试，并向开发者报告问题。</Tips>
         </Option>
         <Option Name="libraryPath" Type="string" Default="">
             <Notes>X Studio 动态链接库路径</Notes>

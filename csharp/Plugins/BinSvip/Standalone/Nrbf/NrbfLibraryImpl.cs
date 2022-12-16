@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace XSAppModel.NrbfFormat
+namespace BinSvip.Standalone.Nrbf
 {
     internal static unsafe class NrbfLibraryImpl
     {
@@ -73,7 +73,7 @@ namespace XSAppModel.NrbfFormat
             qnrbf_xstudio_read_ptr = GetFunctionEntry<qnrbf_xstudio_read_delegate>("qnrbf_xstudio_read");
             qnrbf_xstudio_write_ptr = GetFunctionEntry<qnrbf_xstudio_write_delegate>("qnrbf_xstudio_write");
 
-            Console.WriteLine($"Successfully load library \"{DllName}\".");
+            // Console.WriteLine($"Successfully load library \"{DllName}\".");
         }
 
         public static void Deinit()
@@ -101,7 +101,7 @@ namespace XSAppModel.NrbfFormat
             FreeLibrary(DllPtr);
             DllPtr = IntPtr.Zero;
 
-            Console.WriteLine($"Successfully unload library \"{DllName}\".");
+            // Console.WriteLine($"Successfully unload library \"{DllName}\".");
         }
 
         private static T GetFunctionEntry<T>(string name) where T : Delegate

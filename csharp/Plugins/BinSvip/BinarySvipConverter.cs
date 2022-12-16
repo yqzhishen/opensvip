@@ -5,11 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
+using BinSvip.Standalone;
 using Microsoft.Win32;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 
-namespace OpenSvip.Stream
+namespace BinSvip.Stream
 {
     public class BinarySvipConverter : IProjectConverter
     {
@@ -25,9 +26,9 @@ namespace OpenSvip.Stream
 
         public Project Load(string path, ConverterOptions options)
         {
-            if (options.GetValueAsBoolean("independentMode"))
+            if (options.GetValueAsBoolean("standalone"))
             {
-                return new Standalone.NrbfSvipConverter().Load(path, options);
+                return new StandaloneSvipConverter().Load(path, options);
             }
 
             CheckForLibraries(options.GetValueAsString("libraryPath"));
@@ -37,9 +38,9 @@ namespace OpenSvip.Stream
 
         public void Save(string path, Project project, ConverterOptions options)
         {
-            if (options.GetValueAsBoolean("independentMode"))
+            if (options.GetValueAsBoolean("standalone"))
             {
-                new Standalone.NrbfSvipConverter().Save(path, project, options);
+                new StandaloneSvipConverter().Save(path, project, options);
                 return;
             }
 

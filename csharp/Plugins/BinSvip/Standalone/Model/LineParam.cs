@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace XSAppModel.XStudio
+namespace BinSvip.Standalone.Model
 {
 
     public class LineParamNode

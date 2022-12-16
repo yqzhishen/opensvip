@@ -60,25 +60,25 @@
         <Compile Include="BinarySvipDecoder.cs" />
         <Compile Include="BinarySvipEncoder.cs" />
         <Compile Include="BinarySvipVersions.cs" />
-        <Compile Include="NrbfFormat\NrbfLibrary.cs" />
-        <Compile Include="NrbfFormat\NrbfLibraryImpl.cs" />
-        <Compile Include="NrbfFormat\NrbfStream.cs" />
-        <Compile Include="NrbfFormat\NrbfStreamImpl.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="BinarySvipConst.cs" />
-        <Compile Include="Standalone\NrbfSvipConst.cs" />
-        <Compile Include="Standalone\NrbfSvipConverter.cs" />
-        <Compile Include="Standalone\NrbfSvipDecoder.cs" />
-        <Compile Include="Standalone\NrbfSvipEncoder.cs" />
-        <Compile Include="XStudio\AppModel.cs" />
-        <Compile Include="XStudio\LineParam.cs" />
-        <Compile Include="XStudio\Note.cs" />
-        <Compile Include="XStudio\Overlappable.cs" />
-        <Compile Include="XStudio\ReverbPreset.cs" />
-        <Compile Include="XStudio\SongBeat.cs" />
-        <Compile Include="XStudio\SongTempo.cs" />
-        <Compile Include="XStudio\Track.cs" />
-        <Compile Include="XStudio\Vibrato.cs" />
+        <Compile Include="Standalone\Model\AppModel.cs" />
+        <Compile Include="Standalone\Model\LineParam.cs" />
+        <Compile Include="Standalone\Model\Note.cs" />
+        <Compile Include="Standalone\Model\Overlappable.cs" />
+        <Compile Include="Standalone\Model\ReverbPreset.cs" />
+        <Compile Include="Standalone\Model\SongBeat.cs" />
+        <Compile Include="Standalone\Model\SongTempo.cs" />
+        <Compile Include="Standalone\Model\Track.cs" />
+        <Compile Include="Standalone\Model\Vibrato.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfLibrary.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfLibraryImpl.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfStream.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfStreamImpl.cs" />
+        <Compile Include="Standalone\StandaloneSvipConst.cs" />
+        <Compile Include="Standalone\StandaloneSvipConverter.cs" />
+        <Compile Include="Standalone\StandaloneSvipDecoder.cs" />
+        <Compile Include="Standalone\StandaloneSvipEncoder.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
@@ -91,6 +91,10 @@
       <Content Include="Properties.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+        <ContentWithTargetPath Include="Standalone\Nrbf\Libs\QNrbfFormat.dll" >
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>QNrbfFormat.dll</TargetPath>
+        </ContentWithTargetPath>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -105,20 +109,6 @@
         <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ContentWithTargetPath Include="Libs\QNrbfFormat.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <TargetPath>QNrbfFormat.dll</TargetPath>
-        </ContentWithTargetPath>
-        <!--        <ContentWithTargetPath Include="Libs\Qt5Core.dll">-->
-        <!--            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
-        <!--            <TargetPath>Qt5Core.dll</TargetPath>-->
-        <!--        </ContentWithTargetPath>-->
-
-        <None Include="Libs\QNrbfFormat.dll" />
-        <!--        <None Include="Libs\Qt5Core.dll" />-->
     </ItemGroup>
     
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

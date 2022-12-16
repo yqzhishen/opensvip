@@ -1,26 +1,16 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-using XSAppModel.NrbfFormat;
+using BinSvip.Stream;
+using BinSvip.Standalone.Nrbf;
 
-namespace OpenSvip.Stream.Standalone
+namespace BinSvip.Standalone
 {
-    public class NrbfSvipConverter
+    public class StandaloneSvipConverter : IProjectConverter
     {
         public Project Load(string path, ConverterOptions options)
-        {
-            return DoLoad(path);
-        }
-
-        public void Save(string path, Project project, ConverterOptions options)
-        {
-            DoSave(path, project, options);
-        }
-
-        private Project DoLoad(string path)
         {
             var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
             var reader = new BinaryReader(stream);
@@ -29,7 +19,7 @@ namespace OpenSvip.Stream.Standalone
 
             version += versionNumber; // Unused version
 
-            XSAppModel.XStudio.AppModel model;
+            Model.AppModel model;
 
             // Call native library
             {
@@ -46,12 +36,12 @@ namespace OpenSvip.Stream.Standalone
             }
             reader.Close();
             stream.Close();
-            return new NrbfSvipDecoder().DecodeProject(version, model);
+            return new StandaloneSvipDecoder().DecodeProject(version, model);
         }
 
-        private void DoSave(string path, Project project, ConverterOptions options)
+        public void Save(string path, Project project, ConverterOptions options)
         {
-            var (version, model) = new NrbfSvipEncoder()
+            var (version, model) = new StandaloneSvipEncoder
             {
                 DefaultSinger = options.GetValueAsString("singer", "陈水若"),
                 DefaultTempo = options.GetValueAsInteger("tempo", 60)
