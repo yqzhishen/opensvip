@@ -203,7 +203,7 @@ namespace XSAppModel.NrbfFormat
                 qnrbf_dll_init();
             }
 
-            Console.WriteLine(_referenceCount);
+            // Console.WriteLine($"Library ref cnt: {_referenceCount}");
 
             _referenceCount++;
         }
