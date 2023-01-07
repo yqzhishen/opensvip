@@ -35,7 +35,7 @@ namespace Json2DiffSinger.Utils
                 .ToList();
             if (!validPoints.Any())
             {
-                return null;
+                throw new Exception("源文件缺少音高参数，请使用 X Studio Pro 冻结音高参数后重试。");
             }
             var dsPointList = new List<DsParamNode>();
             for (var pos = 1920; pos < end; pos += 5)

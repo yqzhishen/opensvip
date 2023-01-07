@@ -1,4 +1,5 @@
 ﻿using Json2DiffSinger.Core.Models;
+using OpenSvip.Framework;
 using OpenSvip.Library;
 using OpenSvip.Model;
 using System;
@@ -38,9 +39,9 @@ namespace Json2DiffSinger.Utils
                 double curActualStartInSecs = curStartInSecs;
                 double curActualEndInSecs = curEndInSecs;
                 if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs >= 0)
-                {
                     curActualStartInSecs -= note.EditedPhones.HeadLengthInSecs;
-                }
+                else
+                    throw new Exception("源文件缺少音素参数，请使用 X Studio Pro 冻结音素参数后重试。");
                 if (index < osNotes.Count - 1 && osNotes[index + 1].EditedPhones != null && osNotes[index + 1].EditedPhones.HeadLengthInSecs >= 0)
                 {
                     var nextNote = osNotes[index + 1];
