@@ -5,11 +5,13 @@ using System.Collections.Generic;
 
 namespace FlutyDeer.Svip3Plugin.Utils
 {
-    public class TrackListUtils
+    public static class TrackListUtils
     {
+        public static int SongDuration { get; set; }
+
         #region Decoding
 
-        public List<Track> Decode(List<object> svip3Tracks)
+        public static List<Track> Decode(List<object> svip3Tracks)
         {
             var tracks = new List<Track>();
             foreach (var svip3Track in svip3Tracks)
@@ -33,7 +35,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         #region Encoding
 
-        public List<object> Encode(List<Track> tracks)
+        public static List<object> Encode(List<Track> tracks)
         {
             var list = new List<object>();
             int colorIndex = new Random().Next(Constants.Colors.Count);

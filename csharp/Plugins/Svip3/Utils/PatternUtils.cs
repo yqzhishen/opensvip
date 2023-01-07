@@ -31,6 +31,8 @@ namespace FlutyDeer.Svip3Plugin.Utils
         {
             var lastNote = track.NoteList.Last();
             int lastNoteEndPos = lastNote.StartPos + lastNote.Length;
+            if (lastNoteEndPos > TrackListUtils.SongDuration)
+                TrackListUtils.SongDuration = lastNoteEndPos + 1920;
             return new Xs3SingingPattern
             {
                 Name = "未命名",
@@ -55,11 +57,11 @@ namespace FlutyDeer.Svip3Plugin.Utils
         private static Xs3AudioPattern EncodeAudioPattern(InstrumentalTrack track)
         {
             double audioDurationInSecs;
-                var pattern = new Xs3AudioPattern
-                {
-                    AudioFilePath = track.AudioFilePath,
-                    Name = Path.GetFileNameWithoutExtension(track.AudioFilePath)
-                };
+            var pattern = new Xs3AudioPattern
+            {
+                AudioFilePath = track.AudioFilePath,
+                Name = Path.GetFileNameWithoutExtension(track.AudioFilePath)
+            };
             var synchronizer = TempoUtils.Synchronizer;
             try
             {
@@ -81,6 +83,9 @@ namespace FlutyDeer.Svip3Plugin.Utils
                     pattern.ClipPosition = track.Offset;
                     pattern.OriginalStartPosition = -track.Offset;
                 }
+                int patternEndPos = pattern.OriginalStartPosition + pattern.ClippedDuration;
+                if (patternEndPos > TrackListUtils.SongDuration)
+                    TrackListUtils.SongDuration = patternEndPos + 1920;
             }
             catch
             {

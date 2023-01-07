@@ -1,4 +1,5 @@
 ﻿using FlutyDeer.Svip3Plugin.Model;
+using OpenSvip.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -9,9 +10,9 @@ namespace FlutyDeer.Svip3Plugin.Utils
     {
         #region Decoding
 
-        public List<OpenSvip.Model.Note> Decode(List<Xs3SingingPattern> patterns)
+        public List<Note> Decode(List<Xs3SingingPattern> patterns)
         {
-            var noteList = new List<OpenSvip.Model.Note>();
+            var noteList = new List<Note>();
             foreach (var pattern in patterns)
             {
                 int offset = pattern.OriginalStartPosition;
@@ -27,9 +28,9 @@ namespace FlutyDeer.Svip3Plugin.Utils
             return noteList;
         }
 
-        private OpenSvip.Model.Note DecodeNote(Xs3Note note, int offset)
+        private Note DecodeNote(Xs3Note note, int offset)
         {
-            return new OpenSvip.Model.Note
+            return new Note
             {
                 StartPos = note.StartPosition + offset,
                 Length = note.Duration,
@@ -60,7 +61,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
 
         #region Encoding
 
-        public List<Xs3Note> Encode(List<OpenSvip.Model.Note> notes)
+        public List<Xs3Note> Encode(List<Note> notes)
         {
             var svip3Notes = new List<Xs3Note>();
             foreach (var note in notes)
@@ -70,7 +71,7 @@ namespace FlutyDeer.Svip3Plugin.Utils
             return svip3Notes;
         }
 
-        private Xs3Note EncodeNote(OpenSvip.Model.Note note)
+        private Xs3Note EncodeNote(Note note)
         {
             return new Xs3Note
             {

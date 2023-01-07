@@ -14,8 +14,8 @@ namespace FlutyDeer.Svip3Plugin
     {
         static void Main(string[] args)
         {
-            Write();
-            //Read();
+            //Write();
+            Read();
         }
 
         private static void Write()
@@ -45,11 +45,12 @@ namespace FlutyDeer.Svip3Plugin
                 @"D:\测试\xs音高参数转换测试.json",
                 @"D:\编曲学习\心疼哥哥\歌声合成工程\心疼哥哥（恢复性别）.json",
                 @"D:\测试\空工程.json",
-                @"F:\编曲学习\惊鹊\歌声合成工程2.0\惊鹊-主.json"
+                @"F:\编曲学习\惊鹊\歌声合成工程2.0\惊鹊-主.json",
+                @"D:\编曲学习\世界这么大还是遇见你\何畅-世界这么大还是遇见你6.0.json"
             };
             Project project;
             using (var stream = new FileStream(
-                paths[4],
+                paths[5],
                 FileMode.Open,
                 FileAccess.Read))
             using (var reader = new StreamReader(stream))
@@ -57,7 +58,7 @@ namespace FlutyDeer.Svip3Plugin
                 project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
             }
             new Svip3Converter().Save(
-                @"F:\编曲学习\惊鹊\歌声合成工程2.0\惊鹊-主.svip3",
+                @"D:\编曲学习\世界这么大还是遇见你\何畅-世界这么大还是遇见你6.0.svip3",
                 project,
                 new ConverterOptions(new Dictionary<string, string>()));
         }
@@ -70,9 +71,11 @@ namespace FlutyDeer.Svip3Plugin
                 @"D:\编曲学习\恋人心\恋人心.svip3",
                 @"D:\测试\音高参数\音高参数.svip3",
                 @"D:\测试\心疼哥哥（恢复性别）.svip3",
-                @"D:\测试\测试.svip3"
+                @"D:\测试\测试.svip3",
+                @"D:\编曲学习\世界这么大还是遇见你\何畅-世界这么大还是遇见你6.0.json",
+                @"D:\测试\玻璃做的少女.svip3"
             };
-            model = Svip3Model.Read(paths[3]);
+            model = Svip3Model.Read(paths.Last());
             Console.WriteLine(model.Version);
             var audioTrack = model.TrackList.OfType<Xs3AudioTrack>().First();
             var pattern = audioTrack.PatternList.First();
