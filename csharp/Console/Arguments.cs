@@ -57,4 +57,12 @@ namespace OpenSvip.Console
             HelpText = "指定要查看具体的插件标识符。", MetaValue = "ID")]
         public string Identifier { get; set; }
     }
+
+
+    [Verb("install-plugin", HelpText = "安装插件。")]
+    public class InstallPluginOptions
+    {
+        [Value(0, Required = true, HelpText = "插件文件路径", MetaValue = "FILE")]
+        public string Path { get; set; }
+    }
 }

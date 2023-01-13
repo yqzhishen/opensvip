@@ -92,7 +92,14 @@ namespace OpenSvip.Framework
             }
             Directory.CreateDirectory(TempPath);
             ZipFile.ExtractToDirectory(path, TempPath);
-            folder = Directory.EnumerateDirectories(TempPath).First();
+            
+            // iterate through all folders in TempPath unless not start with . or _
+            // this is for osx's __MACOSX and .DS_Store
+
+            folder = Directory.EnumerateDirectories(TempPath).First(
+                dir => !Path.GetFileName(dir).StartsWith(".") && !Path.GetFileName(dir).StartsWith("_")
+            );
+
             var propertiesPath = Path.Combine(folder, "Properties.xml");
             try
             {
