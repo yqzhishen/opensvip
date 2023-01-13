@@ -1,87 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{ECCAB774-03E8-4D22-B11B-A3C554658B25}</ProjectGuid>
-        <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>OpenSvip.Tests</RootNamespace>
-        <AssemblyName>OpenSvip.Tests</AssemblyName>
-        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Data" />
-        <Reference Include="System.Xml" />
-        <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb">
-            <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
-        </Reference>
-        <Reference Include="ToolGood.Words.Pinyin, Version=3.0.3.1, Culture=neutral, PublicKeyToken=d330f4fd115e6143, processorArchitecture=MSIL">
-          <HintPath>..\packages\ToolGood.Words.Pinyin.3.0.3.1\lib\net40\ToolGood.Words.Pinyin.dll</HintPath>
-        </Reference>
-    </ItemGroup>
-    <ItemGroup>
-        <Compile Include="LibraryTests.cs" />
-        <Compile Include="PinyinTests.cs" />
-        <Compile Include="PluginTests.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj">
-        <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
-        <Name>OpenSvip.Framework</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Library\OpenSvip.Library.csproj">
-        <Project>{c0982090-a08e-45b8-953a-6d1750a69cdd}</Project>
-        <Name>OpenSvip.Library</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Model\OpenSvip.Model.csproj">
-        <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
-        <Name>OpenSvip.Model</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Plugins\JsonSvip\Plugin.JsonSvip.csproj">
-        <Project>{b16a0b55-fef1-41a4-b83f-419a63b07bc1}</Project>
-        <Name>Plugin.JsonSvip</Name>
-      </ProjectReference>
-      <ProjectReference Include="..\Plugins\SynthV\Plugin.SynthV.csproj">
-        <Project>{052f5ea1-52f4-46be-aac3-7cd031e3cdde}</Project>
-        <Name>Plugin.SynthV</Name>
-      </ProjectReference>
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="packages.config" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-         Other similar extension points exist, see Microsoft.Common.targets.
-    <Target Name="BeforeBuild">
-    </Target>
-    <Target Name="AfterBuild">
-    </Target>
-    -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>OpenSvip.Tests</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ToolGood.Words.Pinyin" Version="3.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+    <PackageReference Include="coverlet.collector" Version="3.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Model\OpenSvip.Model.csproj" />
+    <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj" />
+    <ProjectReference Include="..\Library\OpenSvip.Library.csproj" />
+    <ProjectReference Include="..\Plugins\JsonSvip\Plugin.JsonSvip.csproj" />
+    <ProjectReference Include="..\Plugins\SynthV\Plugin.SynthV.csproj" />
+  </ItemGroup>
 </Project>
