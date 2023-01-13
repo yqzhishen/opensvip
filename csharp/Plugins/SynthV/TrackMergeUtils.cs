@@ -13,7 +13,7 @@ namespace SynthV.Utils
             var mainNoteList = track.NoteList;
             
             // calculate override range
-            var range = Range.Create();
+            var range = OpenSvip.Library.Range.Create();
             var mainLeftIndex = -1;
             var mainRightIndex = -1;
             for (var i = 0; i < noteList.Count; i++)
@@ -36,7 +36,7 @@ namespace SynthV.Utils
                 var end = mainRightNote == null || mainRightNote.StartPos >= noteList[i].StartPos + noteList[i].Length + 240
                     ? noteList[i].StartPos + noteList[i].Length + 120
                     : (noteList[i].StartPos + noteList[i].Length + mainRightNote.StartPos) / 2;
-                range |= Range.Create(new Tuple<int, int>(start, end));
+                range |= OpenSvip.Library.Range.Create(new Tuple<int, int>(start, end));
             }
             
             // override notes

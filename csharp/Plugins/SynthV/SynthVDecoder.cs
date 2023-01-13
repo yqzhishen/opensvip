@@ -278,7 +278,7 @@ namespace SynthV.Core
                             (int) Math.Round(point.Item2))),
                     DecodeInterpolation(InstantPitch.Mode));
             }
-            var range = Range
+            var range = OpenSvip.Library.Range
                 .Create(
                     NoteList.ConvertAll(note => new Tuple<int, int>(
                             DecodePosition(note.Onset),
@@ -296,7 +296,7 @@ namespace SynthV.Core
                     var noteEditedRange = NoteList
                         .Where(note => note.PitchEdited(regardDefaultVibratoAsUnedited, ImportInstantPitch))
                         .Aggregate(
-                            Range.Create(),
+                            OpenSvip.Library.Range.Create(),
                             (current, note) =>
                             {
                                 var startSecs =
@@ -304,7 +304,7 @@ namespace SynthV.Core
                                     - Math.Max(0.0, note.Attributes.TransitionOffset) - interval;
                                 var endSecs =
                                     Synchronizer.GetActualSecsFromTicks(DecodePosition(note.Onset + note.Duration)) + interval;
-                                return current.Union(Range.Create(new Tuple<int, int>(
+                                return current.Union(OpenSvip.Library.Range.Create(new Tuple<int, int>(
                                     (int) Math.Round(Synchronizer.GetActualTicksFromSecs(Math.Max(0, startSecs))),
                                     (int) Math.Round(Synchronizer.GetActualTicksFromSecs(endSecs)))));
                             });

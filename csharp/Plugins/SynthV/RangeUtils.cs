@@ -7,10 +7,10 @@ namespace SynthV.Utils
 {
     public static class RangeUtils
     {
-        public static Range EditedRange(this SVParamCurve curve, double defaultValue = 0.0)
+        public static OpenSvip.Library.Range EditedRange(this SVParamCurve curve, double defaultValue = 0.0)
         {
             const double tolerance = 1e-6;
-            var range = Range.Create();
+            var range = OpenSvip.Library.Range.Create();
             var points = curve.Points.ConvertAll(
                 point => new Tuple<int, double>(PositionToTicks(point.Item1), point.Item2));
             if (!points.Any())
@@ -19,11 +19,11 @@ namespace SynthV.Utils
             }
             if (points.Count == 1)
             {
-                return Math.Abs(points[0].Item2 - defaultValue) < tolerance ? range : Range.Create(new Tuple<int, int>(0, int.MaxValue / 2));
+                return Math.Abs(points[0].Item2 - defaultValue) < tolerance ? range : OpenSvip.Library.Range.Create(new Tuple<int, int>(0, int.MaxValue / 2));
             }
             if (Math.Abs(points[0].Item2 - defaultValue) > tolerance)
             {
-                range |= Range.Create(new Tuple<int, int>(0, points[0].Item1));
+                range |= OpenSvip.Library.Range.Create(new Tuple<int, int>(0, points[0].Item1));
             }
             var start = points[0].Item1;
             var end = points[0].Item1;
@@ -33,7 +33,7 @@ namespace SynthV.Utils
                 {
                     if (start < end)
                     {
-                        range |= Range.Create(new Tuple<int, int>(start, end));
+                        range |= OpenSvip.Library.Range.Create(new Tuple<int, int>(start, end));
                     }
                     start = points[i].Item1;
                 }
@@ -44,18 +44,18 @@ namespace SynthV.Utils
             }
             if (start < end)
             {
-                range |= Range.Create(new Tuple<int, int>(start, end));
+                range |= OpenSvip.Library.Range.Create(new Tuple<int, int>(start, end));
             }
             if (Math.Abs(points.Last().Item2 - defaultValue) > tolerance)
             {
-                range |= Range.Create(new Tuple<int, int>(points.Last().Item1, int.MaxValue / 2));
+                range |= OpenSvip.Library.Range.Create(new Tuple<int, int>(points.Last().Item1, int.MaxValue / 2));
             }
             return range;
         }
 
-        public static Range CoverRange(this SVNote note)
+        public static OpenSvip.Library.Range CoverRange(this SVNote note)
         {
-            return Range.Create(new Tuple<int, int>(
+            return OpenSvip.Library.Range.Create(new Tuple<int, int>(
                 PositionToTicks(note.Onset),
                 PositionToTicks(note.Onset + note.Duration)));
         }
