@@ -217,6 +217,9 @@ namespace OpenSvip.Console
             }
 
             PluginManager.InstallPlugin(plugin, folder);
+
+            System.Console.WriteLine($"插件“{plugin.Name}”安装成功。");
+
             return 0;
         }
     }
