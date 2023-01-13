@@ -22,10 +22,11 @@ namespace Json2DiffSinger.Stream
         {
             var splitLength = options.GetValueAsDouble("split", 5.0);
             options.GetValueAsEnum<DictionaryOption>("dictionary");  // Trigger exception with illegal input
-            var dictionary = options.GetValueAsString("dictionary");  // Get the actual value
+            var dictionary = options.GetValueAsString("dictionary", "opencpop-strict");  // Get the actual value
             var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto);
             var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto);
             var seed = options.GetValueAsInteger("seed", -1);
+
             if (splitLength >= 0)
             {
                 var segments = project.SplitIntoSegments(minLength: (int)(splitLength * 1000));

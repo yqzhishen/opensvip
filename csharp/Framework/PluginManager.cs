@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 namespace OpenSvip.Framework
 {
@@ -60,7 +61,17 @@ namespace OpenSvip.Framework
         public static IProjectConverter GetConverter(string identifier)
         {
             var plugin = GetPlugin(identifier);
-            var assembly = Assembly.LoadFrom(Path.Combine(PluginPath, plugin.LibraryPath));
+
+            // If osx or linux, remove .exe extension
+            var libraryPath = plugin.LibraryPath;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
+                RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                libraryPath = libraryPath.Replace(".exe", ".dll");
+            }
+
+            var assembly = Assembly.LoadFrom(Path.Combine(PluginPath, libraryPath));
             var type = assembly.GetType(plugin.Converter);
             return (IProjectConverter) Activator.CreateInstance(type);
         }
