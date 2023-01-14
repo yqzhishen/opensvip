@@ -21,6 +21,7 @@ namespace Json2DiffSinger.Stream
         public void Save(string path, Project project, ConverterOptions options)
         {
             var splitLength = options.GetValueAsDouble("split", 5.0);
+            var minInterval = options.GetValueAsInteger("minInterval", 400);
             options.GetValueAsEnum<DictionaryOption>("dictionary");  // Trigger exception with illegal input
             var dictionary = options.GetValueAsString("dictionary");  // Get the actual value
             var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto);
@@ -28,7 +29,7 @@ namespace Json2DiffSinger.Stream
             var seed = options.GetValueAsInteger("seed", -1);
             if (splitLength >= 0)
             {
-                var segments = project.SplitIntoSegments(minLength: (int)(splitLength * 1000));
+                var segments = project.SplitIntoSegments(minInterval, (int)(splitLength * 1000));
                 var series = segments.Select(tuple =>
                 {
                     var dsParams = new DiffSingerEncoder

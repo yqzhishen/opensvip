@@ -54,12 +54,12 @@ namespace Json2DiffSinger.Utils
         /// 按时间间隔将音符序列切割为多个分段。
         /// </summary>
         /// <param name="project"></param>
-        /// <param name="maxInterval">切割间隔阈值（毫秒）</param>
+        /// <param name="minInterval">切割间隔阈值（毫秒）</param>
         /// <param name="minLength">最短分段长度（毫秒）</param>
         /// <returns>IEnumerable of (offset, project, trailingSpace)</returns>
         public static IEnumerable<(double, Project, float)> SplitIntoSegments(
             this Project project,
-            int maxInterval = 500,
+            int minInterval = 400,
             int minLength = 5000)
         {
             var track = project.TrackList.OfType<SingingTrack>().FirstOrDefault();
@@ -82,7 +82,7 @@ namespace Json2DiffSinger.Utils
                 var prev = track.NoteList[i - 1];
                 var cur = track.NoteList[i];
                 var interval = cur.StartPos - prev.StartPos - prev.Length;
-                if (interval >= maxInterval && cur.StartPos - interval * 0.8 - curSegStart >= minLength)
+                if (interval >= minInterval && cur.StartPos - interval * 0.8 - curSegStart >= minLength)
                 {
                     var prepareSpace = Math.Min(600, (int)(curSegInterval * 0.8));
                     var trailingSpace = Math.Min(400, (int)(curSegInterval * 0.2));

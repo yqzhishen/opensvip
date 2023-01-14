@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>DiffSinger 参数转换插件</Name>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>Json2DiffSinger 插件版。仅支持转换为 DiffSinger 合成参数。</Descriptions>
@@ -17,6 +17,10 @@
 			<Notes>分段长度（秒）</Notes>
 			<Tips>此选项控制转换时的分段策略。当此选项值为负时，不进行分段；此选项值为 0 时，在所有音符间隔达到阈值处分段；此选项值为正时，可在分段的基础上控制每个分段的最小长度。
 设置合理的分段策略能够在合成时减少显存占用的同时最大化利用性能，并提升合成效果。</Tips>
+		</Option>
+		<Option Name="minInterval" Type="integer" Default="400">
+			<Notes>分段音符间隔（毫秒）</Notes>
+			<Tips>此选项控制分段时的音符间隔阈值。建议不小于 300 毫秒。</Tips>
 		</Option>
 		<Option Name="seed" Type="integer" Default="-1">
 			<Notes>随机种子</Notes>
