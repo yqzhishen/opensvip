@@ -59,7 +59,7 @@ namespace Json2DiffSinger.Utils
         /// <returns>IEnumerable of (offset, project, trailingSpace)</returns>
         public static IEnumerable<(double, Project, float)> SplitIntoSegments(
             this Project project,
-            int maxInterval = 300,
+            int maxInterval = 500,
             int minLength = 5000)
         {
             var track = project.TrackList.OfType<SingingTrack>().FirstOrDefault();
