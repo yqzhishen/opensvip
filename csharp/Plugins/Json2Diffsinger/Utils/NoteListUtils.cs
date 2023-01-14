@@ -61,29 +61,34 @@ namespace Json2DiffSinger.Utils
                 #region Fill Note Gap
 
                 double gap;//音符间隙
+                double minAspLen = 0.1;
+                double maxAspLen = 0.4;
                 gap = curActualStartInSecs - prevActualEndInSecs;
                 if (gap > 0)//有间隙
                 {
-                    if (gap < 0.5)//间隙很小，休止
+                    if (gap < minAspLen)//间隙很小，休止
                     {
                         var restPhoneme = new RestDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs, 6));
                         var restNote = new RestDsNote((float)(curStartInSecs - prevEndInSecs), restPhoneme);
                         dsNotes.Add(restNote);
                         prevPhoneme = restPhoneme;
                     }
-                    else if (gap < 1.0)//间隙适中，换气
+                    else if (gap < maxAspLen)//间隙适中，换气
                     {
                         var aspPhoneme = new AspirationDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs, 6));
                         var apsNote = new AspirationDsNote((float)(curStartInSecs - prevEndInSecs), aspPhoneme);
                         dsNotes.Add(apsNote);
                         prevPhoneme = aspPhoneme;
                     }
-                    else//间隙很大，休止
+                    else//间隙很大，换气
                     {
-                        var restPhoneme = new RestDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs, 6));
-                        var restNote = new RestDsNote((float)(curStartInSecs - prevEndInSecs), restPhoneme);
+                        var restPhoneme = new RestDsPhoneme((float)Math.Round(curActualStartInSecs - prevActualEndInSecs - maxAspLen, 6));
+                        var restNote = new RestDsNote((float)(curStartInSecs - prevEndInSecs - maxAspLen), restPhoneme);
                         dsNotes.Add(restNote);
-                        prevPhoneme = restPhoneme;
+                        var aspPhoneme = new AspirationDsPhoneme((float)Math.Round(maxAspLen, 6));
+                        var apsNote = new AspirationDsNote((float)(maxAspLen), aspPhoneme);
+                        dsNotes.Add(apsNote);
+                        prevPhoneme = aspPhoneme;
                     }
                 }
 
