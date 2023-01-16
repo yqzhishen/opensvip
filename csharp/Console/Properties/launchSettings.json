@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "OpenSvip.Console": {
-      "commandName": "Project",
-      "commandLineArgs": "plugins"
-    }
-  }
-}

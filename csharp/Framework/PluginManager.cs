@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Xml.Serialization;
+using System.Runtime.InteropServices;
 
 namespace OpenSvip.Framework
 {
@@ -60,7 +61,17 @@ namespace OpenSvip.Framework
         public static IProjectConverter GetConverter(string identifier)
         {
             var plugin = GetPlugin(identifier);
-            var assembly = Assembly.LoadFrom(Path.Combine(PluginPath, plugin.LibraryPath));
+
+            // If osx or linux, remove .exe extension
+            var libraryPath = plugin.LibraryPath;
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ||
+                RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                libraryPath = libraryPath.Replace(".exe", ".dll");
+            }
+
+            var assembly = Assembly.LoadFrom(Path.Combine(PluginPath, libraryPath));
             var type = assembly.GetType(plugin.Converter);
             return (IProjectConverter) Activator.CreateInstance(type);
         }
@@ -92,7 +103,14 @@ namespace OpenSvip.Framework
             }
             Directory.CreateDirectory(TempPath);
             ZipFile.ExtractToDirectory(path, TempPath);
-            folder = Directory.EnumerateDirectories(TempPath).First();
+            
+            // iterate through all folders in TempPath unless not start with . or _
+            // this is for osx's __MACOSX and .DS_Store
+
+            folder = Directory.EnumerateDirectories(TempPath).First(
+                dir => !Path.GetFileName(dir).StartsWith(".") && !Path.GetFileName(dir).StartsWith("_")
+            );
+
             var propertiesPath = Path.Combine(folder, "Properties.xml");
             try
             {

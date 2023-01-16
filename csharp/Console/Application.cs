@@ -13,10 +13,11 @@ namespace OpenSvip.Console
     {
         public static int Main(string[] args)
         {
-            return Parser.Default.ParseArguments<ConvertOptions, PluginsOptions>(args)
+            return Parser.Default.ParseArguments<ConvertOptions, PluginsOptions, InstallPluginOptions>(args)
                 .MapResult(
                     (ConvertOptions options) => ConvertFile(options),
                     (PluginsOptions options) => ManagePlugins(options),
+                    (InstallPluginOptions options) => InstallPlugin(options),
                     errors => 1);
         }
 
@@ -198,6 +199,28 @@ namespace OpenSvip.Console
                 }
             }
             System.Console.WriteLine("\n--------------------------------------------------\n");
+        }
+    
+        private static int InstallPlugin(InstallPluginOptions options)
+        {
+            var plugin = PluginManager.ExtractPlugin(options.Path, out var folder);
+
+            if (new Version(ConstValues.FrameworkVersion) < new Version(plugin.TargetFramework))
+            {
+                System.Console.WriteLine($"当前应用版本过旧，无法安装插件“{plugin.Name}”。请更新软件。");
+                return -1;
+            }
+
+            if (PluginManager.HasPlugin(plugin.Identifier)) {
+                System.Console.WriteLine($"已安装插件“{plugin.Name}”，无需重复安装。");
+                return -2;
+            }
+
+            PluginManager.InstallPlugin(plugin, folder);
+
+            System.Console.WriteLine($"插件“{plugin.Name}”安装成功。");
+
+            return 0;
         }
     }
 }

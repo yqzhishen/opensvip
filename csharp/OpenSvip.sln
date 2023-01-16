@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Model", "Model\OpenSvip.Model.csproj", "{F0CF4E57-33F4-4A63-A45F-69727058C24A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{3779DA9F-186C-4529-9FF6-56D0186D571C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.BinSvip", "Plugins\BinSvip\Plugin.BinSvip.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Framework", "Framework\OpenSvip.Framework.csproj", "{1A025CF4-6CE6-42F9-AD09-16E56D840D95}"
@@ -29,8 +25,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecodeMidi.Console", "Decod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Ace", "Plugins\Ace\Plugin.Ace.csproj", "{DE890A5D-8DC9-4008-9513-BBA8324990BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Tests", "Tests\OpenSvip.Tests.csproj", "{ECCAB774-03E8-4D22-B11B-A3C554658B25}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Ustx", "Plugins\Ustx\Plugin.Ustx.csproj", "{AD7E71A4-895A-49A2-9C13-ECA63D1852D8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Lyrics", "Plugins\Lyrics\Plugin.Lyrics.csproj", "{CED66EF4-8393-45BE-BF75-35476F840B2C}"
@@ -47,20 +41,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Svip3", "Plugins\Svi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.GUI", "GUI\OpenSvip.GUI.csproj", "{EBF57F98-939B-4371-A07F-0DE8A6D59B63}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Model", "Model\OpenSvip.Model.csproj", "{2FF30495-E8C1-4A4C-80A7-ADDAFDEACEA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{126547E9-EC49-4DF7-8CE6-7EAD21BF1535}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F0CF4E57-33F4-4A63-A45F-69727058C24A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0CF4E57-33F4-4A63-A45F-69727058C24A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0CF4E57-33F4-4A63-A45F-69727058C24A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0CF4E57-33F4-4A63-A45F-69727058C24A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3779DA9F-186C-4529-9FF6-56D0186D571C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3779DA9F-186C-4529-9FF6-56D0186D571C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3779DA9F-186C-4529-9FF6-56D0186D571C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3779DA9F-186C-4529-9FF6-56D0186D571C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -105,10 +95,6 @@ Global
 		{DE890A5D-8DC9-4008-9513-BBA8324990BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE890A5D-8DC9-4008-9513-BBA8324990BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE890A5D-8DC9-4008-9513-BBA8324990BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ECCAB774-03E8-4D22-B11B-A3C554658B25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ECCAB774-03E8-4D22-B11B-A3C554658B25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ECCAB774-03E8-4D22-B11B-A3C554658B25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ECCAB774-03E8-4D22-B11B-A3C554658B25}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AD7E71A4-895A-49A2-9C13-ECA63D1852D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AD7E71A4-895A-49A2-9C13-ECA63D1852D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD7E71A4-895A-49A2-9C13-ECA63D1852D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -141,6 +127,14 @@ Global
 		{EBF57F98-939B-4371-A07F-0DE8A6D59B63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBF57F98-939B-4371-A07F-0DE8A6D59B63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBF57F98-939B-4371-A07F-0DE8A6D59B63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FF30495-E8C1-4A4C-80A7-ADDAFDEACEA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FF30495-E8C1-4A4C-80A7-ADDAFDEACEA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FF30495-E8C1-4A4C-80A7-ADDAFDEACEA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FF30495-E8C1-4A4C-80A7-ADDAFDEACEA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{126547E9-EC49-4DF7-8CE6-7EAD21BF1535}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{126547E9-EC49-4DF7-8CE6-7EAD21BF1535}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{126547E9-EC49-4DF7-8CE6-7EAD21BF1535}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{126547E9-EC49-4DF7-8CE6-7EAD21BF1535}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,34 +1,20 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
-        <ImplicitUsings>disable</ImplicitUsings>
-        <Nullable>disable</Nullable>
-        <LangVersion>7.3</LangVersion>
-        <RootNamespace>OpenSvip.Console</RootNamespace>
-        <OutputType>Exe</OutputType>
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <Version>1.2.0</Version>
-        <AssemblyVersion>1.2.2.0</AssemblyVersion>
-        <FileVersion>1.2.2.0</FileVersion>
-    </PropertyGroup>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>OpenSvip.Console</AssemblyName>
+  </PropertyGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <DebugType>none</DebugType>
-    </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Model\OpenSvip.Model.csproj" />
+    <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj" />
+  </ItemGroup>
 
-    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <DebugType>full</DebugType>
-    </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
-      <PackageReference Include="NullLib.ConsoleTable" Version="1.0.3.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj" />
-      <ProjectReference Include="..\Library\OpenSvip.Library.csproj" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="NullLib.ConsoleTable" Version="1.0.3.2" />
+  </ItemGroup>
 </Project>

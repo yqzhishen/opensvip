@@ -11,7 +11,7 @@ namespace OpenSvip.Serialization
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var track = (Track) value;
+            var track = (Track)value;
             var dict = new Dictionary<string, object>
             {
                 {"Type", track.Type},
