@@ -34,7 +34,7 @@
 				<Choice Name="opencpop 扩展" Tag="opencpop-extension"/>
 			</EnumChoices>
 		</Option>
-		<Option Name="phonemeMode" Type="enum" Default="manual">
+		<!--<Option Name="phonemeMode" Type="enum" Default="manual">
 			<Notes>音素参数模式</Notes>
 			<EnumChoices>
 				<Choice Name="有参" Tag="manual">
@@ -51,7 +51,7 @@
 				<Choice Name="无参" Tag="auto">
 				</Choice>
 			</EnumChoices>
-		</Option>
+		</Option>-->
 		<Option Name="formatted" Type="boolean" Default="true">
 			<Notes>格式化 JSON 代码</Notes>
 		</Option>

@@ -24,8 +24,8 @@ namespace Json2DiffSinger.Stream
             var minInterval = options.GetValueAsInteger("minInterval", 400);
             options.GetValueAsEnum<DictionaryOption>("dictionary");  // Trigger exception with illegal input
             var dictionary = options.GetValueAsString("dictionary");  // Get the actual value
-            var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto);
-            var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto);
+            var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Manual);
+            var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Manual);
             var seed = options.GetValueAsInteger("seed", -1);
             if (splitLength >= 0)
             {
@@ -58,8 +58,8 @@ namespace Json2DiffSinger.Stream
                 var diffSingerParams = new DiffSingerEncoder
                 {
                     Dictionary = dictionary,
-                    PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Auto),
-                    PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Auto)
+                    PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Manual),
+                    PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Manual)
                 }.Encode(project, 0.5f);
                 if (seed >= 0)
                 {
