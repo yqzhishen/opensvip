@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>DiffSinger 参数转换插件</Name>
-    <Version>0.6.0</Version>
+    <Version>0.7.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>Json2DiffSinger 插件版。仅支持转换为 DiffSinger 合成参数。</Descriptions>
@@ -26,11 +26,12 @@
 			<Notes>随机种子</Notes>
 			<Tips>固定随机种子可以得到稳定可复现的合成效果。此选项设置非负值时生效。</Tips>
 		</Option>
-		<Option Name="dictionary" Type="enum" Default="opencpop-strict">
+		<Option Name="dictionary" Type="enum" Default="opencpop-extension">
 			<Notes>词典预设</Notes>
 			<EnumChoices>
 				<Choice Name="原版 opencpop" Tag="opencpop"/>
 				<Choice Name="严式 opencpop" Tag="opencpop-strict"/>
+				<Choice Name="opencpop 扩展" Tag="opencpop-extension"/>
 			</EnumChoices>
 		</Option>
 		<Option Name="phonemeMode" Type="enum" Default="manual">
