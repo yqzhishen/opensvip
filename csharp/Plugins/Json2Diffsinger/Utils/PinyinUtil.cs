@@ -1,4 +1,5 @@
 ﻿using OpenSvip.Library;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,9 +24,7 @@ namespace Json2DiffSinger.Utils
         {
             var contains = phonemeTable.TryGetValue(pinyin, out var phonemes);
             if (!contains || !phonemes.Any())
-            {
-                return ("", pinyin);
-            }
+                throw new Exception($"所选词典不包含发音“{pinyin}”，请检查发音或更换词典后重试。");
 
             return phonemes.Length < 2 ? ("", phonemes[0]) : (phonemes[0], phonemes[1]);
         }
