@@ -10,7 +10,10 @@ namespace Json2DiffSinger.Options
         Opencpop,
         [Description("opencpop-strict")]
         [DictionaryPath("opencpop-strict.txt")]
-        OpencpopStrict
+        OpencpopStrict,
+        [Description("opencpop-extension")]
+        [DictionaryPath("opencpop-extension.txt")]
+        OpencpopExtension
     }
 
     public class DictionaryPathAttribute : Attribute
