@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Plugin.Dspx.Model
 {
@@ -21,12 +22,12 @@ namespace Plugin.Dspx.Model
     public class DsParamCurve
     {
         [JsonProperty("type")]
-        public DsParamType Type { get; set; }
+        public string Type { get; set; }
 
-        protected DsParamCurve(DsParamType type)
-        {
-            Type = type;
-        }
+        //[JsonConverter(typeof(StringEnumConverter))]
+        //public DsParamType Type { get; set; }
+
+        protected DsParamCurve(string type) => Type = type;
     }
 
     public class DsParamFree : DsParamCurve
@@ -40,7 +41,8 @@ namespace Plugin.Dspx.Model
         [JsonProperty("values")]
         public List<int> Values { get; set; }
 
-        public DsParamFree() : base(DsParamType.Free)
+        //public DsParamFree() : base(DsParamType.Free)
+        public DsParamFree() : base("free")
         {
         }
     }
@@ -50,7 +52,8 @@ namespace Plugin.Dspx.Model
         [JsonProperty("nodes")]
         public List<DsParamNode> Nodes { get; set; }
 
-        public DsParamAnchor() : base(DsParamType.Anchor)
+        //public DsParamAnchor() : base(DsParamType.Anchor)
+        public DsParamAnchor() : base("anchor")
         {
         }
     }
@@ -64,24 +67,25 @@ namespace Plugin.Dspx.Model
         public int Value { get; set; }
 
         [JsonProperty("interp")]
-        public DsInterpolationType? Type { get; set; }
+        public string Type { get; set; }
+        //public DsInterpolationType? Type { get; set; }
     }
 
     public enum DsParamType
     {
-        [JsonProperty("free")]
+        [Description("free")]
         Free,
 
-        [JsonProperty("anchor")]
+        [Description("anchor")]
         Anchor
     }
 
     public enum DsInterpolationType
     {
-        [JsonProperty("linear")]
+        [Description("linear")]
         Linear,
 
-        [JsonProperty("hermite")]
+        [Description("hermite")]
         Hermite
     }
 }

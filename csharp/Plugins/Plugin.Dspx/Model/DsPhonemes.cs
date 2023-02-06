@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Plugin.Dspx.Model
 {
@@ -28,7 +29,8 @@ namespace Plugin.Dspx.Model
     public class DsPhoneme
     {
         [JsonProperty("type")]
-        public DsPhonemeType Type { get; set; }
+        public string Type { get; set; }
+        //public DsPhonemeType Type { get; set; }
 
         [JsonProperty("token")]
         public string Name { get; set; }
@@ -48,13 +50,13 @@ namespace Plugin.Dspx.Model
     /// </summary>
     public enum DsPhonemeType
     {
-        [JsonProperty("ahead")]
+        [Description("ahead")]
         Ahead,
 
-        [JsonProperty("normal")]
+        [Description("normal")]
         Normal,
 
-        [JsonProperty("final")]
+        [Description("final")]
         Final
     }
 }

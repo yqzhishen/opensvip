@@ -17,7 +17,8 @@ namespace Plugin.Dspx.Model
         [JsonProperty("sources")]
         public DsSources Sources { get; set; }
 
-        public DsSingingClip() : base(DsClipType.Singing)
+        //public DsSingingClip() : base(DsClipType.Singing)
+        public DsSingingClip() : base("singing")
         {
         }
     }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace Plugin.Dspx.Model
 {
@@ -10,8 +11,10 @@ namespace Plugin.Dspx.Model
     {
         #region Properties
 
+        //[JsonConverter(typeof(StringEnumConverter))]
+        //[JsonIgnore]
         [JsonProperty("type")]
-        public DsClipType Type { get; set; }
+        public string Type { get; set; }
 
         [JsonProperty("time")]
         public DsTime Time { get; set; }
@@ -32,7 +35,8 @@ namespace Plugin.Dspx.Model
 
         #region Constructors
 
-        protected DsClip(DsClipType type) => Type = type;
+        protected DsClip(string type) => Type = type;
+        //protected DsClip(DsClipType type) => Type = type;
 
         #endregion Constructors
     }
@@ -60,10 +64,10 @@ namespace Plugin.Dspx.Model
     /// </summary>
     public enum DsClipType
     {
-        [JsonProperty("audio")]
+        [Description("audio")]
         Audio,
 
-        [JsonProperty("singing")]
+        [Description("singing")]
         Singing
     }
 }

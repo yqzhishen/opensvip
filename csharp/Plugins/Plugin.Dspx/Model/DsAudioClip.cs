@@ -10,7 +10,8 @@ namespace Plugin.Dspx.Model
         [JsonProperty("path")]
         public string AudioFilePath { get; set; }
 
-        public DsAudioClip() : base(DsClipType.Audio)
+        //public DsAudioClip() : base(DsClipType.Audio)
+        public DsAudioClip() : base("audio")
         {
         }
     }

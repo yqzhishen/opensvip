@@ -9,7 +9,7 @@ namespace Plugin.Dspx.Model
     public class DsMetadata
     {
         [JsonProperty("version")]
-        public Version Version { get; set; }
+        public string Version { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }

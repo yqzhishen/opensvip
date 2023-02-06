@@ -37,9 +37,7 @@ namespace Plugin.Dspx.Model
         {
             using (var stream = new FileStream(path, FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream, new UTF8Encoding(false)))
-            {
-                writer.Write(JsonConvert.SerializeObject(stream));
-            }
+                writer.Write(JsonConvert.SerializeObject(this, Formatting.Indented));
         }
 
         #endregion Methods

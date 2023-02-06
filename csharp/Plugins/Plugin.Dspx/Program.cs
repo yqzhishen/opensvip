@@ -13,7 +13,7 @@ namespace Plugin.Dspx
         static void Main(string[] args)
         {
             var dspx = DspxModel.Read(@"D:\Users\fluty\Documents\GitHub\qsynthesis-docs\999. 临时文档\dspx-example.json");
-            Console.WriteLine(dspx);
+            dspx.Write(@"D:\Users\fluty\Documents\GitHub\qsynthesis-docs\999. 临时文档\dspx-example-out.json");
         }
     }
 }
