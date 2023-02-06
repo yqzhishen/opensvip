@@ -8,10 +8,10 @@ namespace Plugin.Dspx.Model
         public int Position { get; set; }
 
         [JsonProperty("length")]
-        public int Duration { get; set; }
+        public int Length { get; set; }
 
         [JsonProperty("keyNum")]
-        public int NoteNumber { get; set; }
+        public int KeyNumber { get; set; }
 
         [JsonProperty("lyric")]
         public string Lyric { get; set; }

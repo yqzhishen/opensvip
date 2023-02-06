@@ -3,7 +3,7 @@
 namespace Plugin.Dspx.Model
 {
     /// <summary>
-    /// 剪辑
+    /// 音轨区间
     /// </summary>
     public class DsClip
     {

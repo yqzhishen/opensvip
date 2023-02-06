@@ -48,7 +48,7 @@ namespace Plugin.Dspx.Model
     /// </summary>
     public enum DsPhonemeType
     {
-        [JsonProperty("head")]
+        [JsonProperty("ahead")]
         Head,
 
         [JsonProperty("normal")]
