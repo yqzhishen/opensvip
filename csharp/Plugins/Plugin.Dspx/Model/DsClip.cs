@@ -5,6 +5,7 @@ namespace Plugin.Dspx.Model
     /// <summary>
     /// 音轨区间
     /// </summary>
+    //[JsonConverter(typeof(ClipJsonConverter))]
     public class DsClip
     {
         #region Properties
@@ -31,10 +32,7 @@ namespace Plugin.Dspx.Model
 
         #region Constructors
 
-        protected DsClip(DsClipType type)
-        {
-            Type = type;
-        }
+        protected DsClip(DsClipType type) => Type = type;
 
         #endregion Constructors
     }

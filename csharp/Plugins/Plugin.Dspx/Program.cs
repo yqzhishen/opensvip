@@ -12,7 +12,7 @@ namespace Plugin.Dspx
     {
         static void Main(string[] args)
         {
-            var dspx = DspxModel.Read(args[0]);
+            var dspx = DspxModel.Read(@"D:\Users\fluty\Documents\GitHub\qsynthesis-docs\999. 临时文档\dspx-example.json");
             Console.WriteLine(dspx);
         }
     }

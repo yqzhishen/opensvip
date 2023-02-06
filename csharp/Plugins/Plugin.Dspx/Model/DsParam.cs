@@ -6,12 +6,15 @@ namespace Plugin.Dspx.Model
     public class DsParam
     {
         [JsonProperty("original")]
+        [JsonConverter(typeof(ParamCurveJsonConverter))]
         public List<DsParamCurve> Original { get; set; }
 
         [JsonProperty("edited")]
+        [JsonConverter(typeof(ParamCurveJsonConverter))]
         public List<DsParamCurve> Edited { get; set; }
 
         [JsonProperty("envelope")]
+        [JsonConverter(typeof(ParamCurveJsonConverter))]
         public List<DsParamCurve> Envelope { get; set; }
     }
 
@@ -61,7 +64,7 @@ namespace Plugin.Dspx.Model
         public int Value { get; set; }
 
         [JsonProperty("interp")]
-        public DsInterpolationType Type { get; set; }
+        public DsInterpolationType? Type { get; set; }
     }
 
     public enum DsParamType

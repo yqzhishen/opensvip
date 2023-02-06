@@ -15,6 +15,7 @@ namespace Plugin.Dspx.Model
         public DsTrackControl Control { get; set; }
 
         [JsonProperty("clips")]
+        [JsonConverter(typeof(ClipJsonConverter))]
         public List<DsClip> Clips { get; set; }
 
         [JsonProperty("extra")]

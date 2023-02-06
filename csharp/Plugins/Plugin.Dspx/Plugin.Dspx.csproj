@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\JsonConverter\ClipJsonConverter.cs" />
     <Compile Include="Model\DsAudioClip.cs" />
     <Compile Include="Model\DsClip.cs" />
     <Compile Include="Model\DsContent.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Model\DsTrack.cs" />
     <Compile Include="Model\DsVibrato.cs" />
     <Compile Include="Model\DsWorkspace.cs" />
+    <Compile Include="Model\JsonConverter\ParamCurveJsonConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
