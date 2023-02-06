@@ -54,6 +54,6 @@ namespace Plugin.Dspx.Model
         public int Position { get; set; }
 
         [JsonProperty("text")]
-        public int Text { get; set; }
+        public string Text { get; set; }
     }
 }
