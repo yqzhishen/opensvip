@@ -3,7 +3,7 @@
 namespace Plugin.Dspx.Model
 {
     /// <summary>
-    /// 波形剪辑
+    /// 波形区间
     /// </summary>
     public class DsAudioClip : DsClip
     {

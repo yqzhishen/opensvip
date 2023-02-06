@@ -11,7 +11,7 @@ namespace Plugin.Dspx.Model
         public int Length { get; set; }
 
         [JsonProperty("keyNum")]
-        public int NoteNumber { get; set; }
+        public int KeyNumber { get; set; }
 
         [JsonProperty("lyric")]
         public string Lyric { get; set; }
