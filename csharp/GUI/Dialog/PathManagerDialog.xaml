@@ -107,7 +107,8 @@
                             Visibility="{Binding Visibility, ElementName=PathListView}"
                             VerticalScrollBarVisibility="Auto"
                             PanningMode="VerticalOnly"
-                            MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=60}">
+                            MaxHeight="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Border}, Converter={StaticResource DoubleConstantSubConverter}, ConverterParameter=60}"
+                            Focusable="True">
                             <ItemsControl
                                 x:Name="PathListView"
                                 ItemsSource="{Binding CustomExportPaths}"

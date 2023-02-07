@@ -1,11 +1,9 @@
-using FlutyDeer.GjgjPlugin.Options;
-using NPinyin;
+using FlutyDeer.MidiPlugin.Options;
 using OpenSvip.Library;
 using OpenSvip.Model;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
-namespace FlutyDeer.GjgjPlugin.Utils
+namespace FlutyDeer.MidiPlugin.Utils
 {
     public static class PinyinAndLyricUtil
     {
@@ -27,7 +25,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
             pinyinList.Clear();
         }
 
-        public static string GetNotePinyin(string noteLyric, bool isUseLegacyPinyin, int index)
+        public static string GetNotePinyin(string noteLyric, int index)
         {
             string pinyin;
             if (noteLyric.Contains("-"))
@@ -36,14 +34,7 @@ namespace FlutyDeer.GjgjPlugin.Utils
             }
             else
             {
-                if (isUseLegacyPinyin)
-                {
-                    pinyin = Pinyin.GetPinyin(noteLyric).ToLower();
-                }
-                else
-                {
-                    pinyin = pinyinList[index];
-                }
+                pinyin = pinyinList[index];
                 return pinyin;
             }
         }

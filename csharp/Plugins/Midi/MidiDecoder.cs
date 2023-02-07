@@ -29,7 +29,7 @@ namespace FlutyDeer.MidiPlugin
             TempoMap tempoMap = midiFile.GetTempoMap();
             var osProject = new Project
             {
-                SongTempoList = TempoListUtil.DecodeSongTempoList(tempoMap),
+                SongTempoList = TempoListUtil.DecodeSongTempoList(tempoMap, PPQ),
                 TimeSignatureList = TimeSignatureListUtil.DecodeTimeSignatureList(tempoMap, IsImportTimeSignatures),
                 TrackList = DecodeTrackList(midiFile.GetTrackChunks())
             };
@@ -100,7 +100,7 @@ namespace FlutyDeer.MidiPlugin
 
                 if (IsImportLyrics)//需要导入歌词再从当前Chunk的事件里读取
                 {
-                    LyricsUtil.ImportLyricsFromTrackChunk(trackChunk, noteList);
+                    LyricsUtil.ImportLyricsFromTrackChunk(trackChunk, noteList, PPQ);
                 }
 
                 if (NoteOverlapUtil.IsOverlapedItemsExists(noteList))

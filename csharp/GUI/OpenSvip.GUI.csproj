@@ -1,250 +1,170 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4AB0AC4B-DAFE-4825-8CCD-7FB2C6151D99}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
-    <RootNamespace>OpenSvip.GUI</RootNamespace>
-    <AssemblyName>OpenSvip.GUI</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32bit>false</Prefer32bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>none</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32bit>false</Prefer32bit>
-  </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="netstandard" />
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="UIAutomationTypes" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="WindowsFormsIntegration" />
-  </ItemGroup>
-  <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="CancellableRadioButton.cs" />
-    <Compile Include="Dialog\AboutDialog.xaml.cs">
-      <DependentUpon>AboutDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="AsyncObservableCollection.cs" />
-    <Compile Include="Config\Configurations.cs" />
-    <Compile Include="Dialog\FileOverwriteDialog.xaml.cs">
-      <DependentUpon>FileOverwriteDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\PathManagerDialog.xaml.cs">
-      <DependentUpon>PathManagerDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\PluginDownloadDialog.xaml.cs">
-      <DependentUpon>PluginDownloadDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialog\UpdateCheckDialog.xaml.cs">
-      <DependentUpon>UpdateCheckDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DoubleNumericBox.cs" />
-    <Compile Include="IntegerNumericBox.cs" />
-    <Compile Include="Dialog\MessageDialog.xaml.cs">
-      <DependentUpon>MessageDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NumericBox.cs" />
-    <Compile Include="OptionTreeViewItem.xaml.cs">
-      <DependentUpon>OptionTreeViewItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PluginComboBoxItemTemplateSelector.cs" />
-    <Compile Include="PluginDetailsBoard.xaml.cs">
-      <DependentUpon>PluginDetailsBoard.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PluginInstaller.cs" />
-    <Compile Include="RelayCommand.cs" />
-    <Compile Include="RelayCommands.cs" />
-    <Compile Include="TaskListViewItem.xaml.cs">
-      <DependentUpon>TaskListViewItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UpdateChecker.cs" />
-    <Compile Include="ValueConverterGroup.cs" />
-    <Compile Include="ValueConverters.cs" />
-    <Compile Include="Dialog\YesNoDialog.xaml.cs">
-      <DependentUpon>YesNoDialog.xaml</DependentUpon>
-    </Compile>
-    <Page Include="Dialog\AboutDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\FileOverwriteDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\PathManagerDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\PluginDownloadDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialog\UpdateCheckDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ViewModels.cs" />
-    <Compile Include="ElementsHelper.cs" />
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Dialog\MessageDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="OptionTreeViewItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PluginDetailsBoard.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="ScrollBarDictionary.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="TaskListViewItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialog\YesNoDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.7.2 %28x86 和 x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj">
-      <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
-      <Name>OpenSvip.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Library\OpenSvip.Library.csproj">
-      <Project>{c0982090-a08e-45b8-953a-6d1750a69cdd}</Project>
-      <Name>OpenSvip.Library</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Model\OpenSvip.Model.csproj">
-      <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
-      <Name>OpenSvip.Model</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes">
-      <Version>4.5.0</Version>
-    </PackageReference>
-    <PackageReference Include="Panuon.UI.Silver">
-      <Version>2.2.20</Version>
-    </PackageReference>
-    <PackageReference Include="Samboy063.Tomlet">
-      <Version>3.1.3</Version>
-    </PackageReference>
-    <PackageReference Include="WindowsAPICodePack-Core">
-      <Version>1.1.2</Version>
-    </PackageReference>
-    <PackageReference Include="WindowsAPICodePack-Shell">
-      <Version>1.1.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+    <PropertyGroup>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+        <ProjectGuid>{EBF57F98-939B-4371-A07F-0DE8A6D59B63}</ProjectGuid>
+        <OutputType>WinExe</OutputType>
+        <RootNamespace>OpenSvip.GUI</RootNamespace>
+        <AssemblyName>OpenSvip.GUI</AssemblyName>
+        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+        <FileAlignment>512</FileAlignment>
+        <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+        <WarningLevel>4</WarningLevel>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <OutputPath>bin\Debug\</OutputPath>
+        <DefineConstants>DEBUG;TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <Prefer32bit>false</Prefer32bit>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+        <PlatformTarget>AnyCPU</PlatformTarget>
+        <DebugType>pdbonly</DebugType>
+        <Optimize>true</Optimize>
+        <OutputPath>bin\Release\</OutputPath>
+        <DefineConstants>TRACE</DefineConstants>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>4</WarningLevel>
+        <Prefer32bit>false</Prefer32bit>
+    </PropertyGroup>
+    <ItemGroup>
+        <Reference Include="MaterialDesignColors, Version=2.0.6.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+          <HintPath>..\packages\MaterialDesignColors.2.0.6\lib\net452\MaterialDesignColors.dll</HintPath>
+        </Reference>
+        <Reference Include="MaterialDesignThemes.Wpf, Version=4.5.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
+          <HintPath>..\packages\MaterialDesignThemes.4.5.0\lib\net452\MaterialDesignThemes.Wpf.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+        </Reference>
+        <Reference Include="Panuon.UI.Core, Version=2.2.6.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\Panuon.UI.Core.2.2.6\lib\net472\Panuon.UI.Core.dll</HintPath>
+        </Reference>
+        <Reference Include="Panuon.UI.Silver, Version=2.2.20.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\Panuon.UI.Silver.2.2.20\lib\net472\Panuon.UI.Silver.dll</HintPath>
+        </Reference>
+        <Reference Include="System" />
+        <Reference Include="System.Configuration" />
+        <Reference Include="System.Core" />
+        <Reference Include="System.Data" />
+        <Reference Include="System.Xml" />
+        <Reference Include="System.Xaml">
+            <RequiredTargetFramework>4.0</RequiredTargetFramework>
+        </Reference>
+        <Reference Include="System.Web" />
+        <Reference Include="System.Web.Extensions" />
+        <Reference Include="System.Windows.Forms" />
+        <Reference Include="Tomlet, Version=3.1.3.0, Culture=neutral, processorArchitecture=MSIL">
+          <HintPath>..\packages\Samboy063.Tomlet.3.1.3\lib\net35\Tomlet.dll</HintPath>
+        </Reference>
+        <Reference Include="WindowsBase" />
+        <Reference Include="PresentationCore" />
+        <Reference Include="PresentationFramework" />
+        <Reference Include="WindowsFormsIntegration" />
+    </ItemGroup>
+    <ItemGroup>
+        <ApplicationDefinition Include="App.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <SubType>Designer</SubType>
+        </ApplicationDefinition>
+        <Compile Include="RelayCommand.cs" />
+        <Compile Include="RelayCommands.cs" />
+        <Compile Include="TaskListViewItem.xaml.cs" />
+        <Compile Include="UpdateChecker.cs" />
+        <Compile Include="ValueConverterGroup.cs" />
+        <Compile Include="ValueConverters.cs" />
+        <Compile Include="ViewModels.cs" />
+        <Page Include="Dialog\AboutDialog.xaml" />
+        <Page Include="Dialog\FileOverwriteDialog.xaml" />
+        <Page Include="Dialog\MessageDialog.xaml" />
+        <Page Include="Dialog\PathManagerDialog.xaml" />
+        <Page Include="Dialog\PluginDownloadDialog.xaml" />
+        <Page Include="Dialog\UpdateCheckDialog.xaml" />
+        <Page Include="Dialog\YesNoDialog.xaml" />
+        <Page Include="MainWindow.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <SubType>Designer</SubType>
+        </Page>
+        <Compile Include="App.xaml.cs">
+            <DependentUpon>App.xaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Include="AsyncObservableCollection.cs" />
+        <Compile Include="CancellableRadioButton.cs" />
+        <Compile Include="Config\Configurations.cs" />
+        <Compile Include="Dialog\AboutDialog.xaml.cs" />
+        <Compile Include="Dialog\FileOverwriteDialog.xaml.cs" />
+        <Compile Include="Dialog\MessageDialog.xaml.cs" />
+        <Compile Include="Dialog\PathManagerDialog.xaml.cs" />
+        <Compile Include="Dialog\PluginDownloadDialog.xaml.cs" />
+        <Compile Include="Dialog\UpdateCheckDialog.xaml.cs" />
+        <Compile Include="Dialog\YesNoDialog.xaml.cs" />
+        <Compile Include="DoubleNumericBox.cs" />
+        <Compile Include="ElementsHelper.cs" />
+        <Compile Include="IntegerNumericBox.cs" />
+        <Compile Include="MainWindow.xaml.cs">
+            <DependentUpon>MainWindow.xaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Page Include="OptionTreeViewItem.xaml" />
+        <Page Include="PluginDetailsBoard.xaml" />
+        <Page Include="ScrollBarDictionary.xaml" />
+        <Page Include="TaskListViewItem.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Include="NumericBox.cs" />
+        <Compile Include="OptionTreeViewItem.xaml.cs" />
+        <Compile Include="PluginComboBoxItemTemplateSelector.cs" />
+        <Compile Include="PluginDetailsBoard.xaml.cs" />
+        <Compile Include="PluginInstaller.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs">
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Include="Properties\Resources.Designer.cs">
+            <AutoGen>True</AutoGen>
+            <DesignTime>True</DesignTime>
+            <DependentUpon>Resources.resx</DependentUpon>
+        </Compile>
+        <EmbeddedResource Include="Properties\Resources.resx">
+            <Generator>ResXFileCodeGenerator</Generator>
+            <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="App.config" />
+        <None Include="packages.config" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj">
+        <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
+        <Name>OpenSvip.Framework</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\Library\OpenSvip.Library.csproj">
+        <Project>{c0982090-a08e-45b8-953a-6d1750a69cdd}</Project>
+        <Name>OpenSvip.Library</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\Model\OpenSvip.Model.csproj">
+        <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
+        <Name>OpenSvip.Model</Name>
+      </ProjectReference>
+    </ItemGroup>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <Import Project="..\packages\MaterialDesignThemes.4.5.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.5.0\build\MaterialDesignThemes.targets')" />
+    <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+      <PropertyGroup>
+        <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
+      </PropertyGroup>
+      <Error Condition="!Exists('..\packages\MaterialDesignThemes.4.5.0\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MaterialDesignThemes.4.5.0\build\MaterialDesignThemes.targets'))" />
+    </Target>
 </Project>

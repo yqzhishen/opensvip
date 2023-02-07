@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -129,6 +128,7 @@ namespace OpenSvip.GUI.Dialog
             if (e.Key == Key.Enter)
             {
                 Keyboard.ClearFocus();
+                ElementsHelper.FindParent<ScrollViewer>((TextBox)sender).Focus();
             }
         }
 

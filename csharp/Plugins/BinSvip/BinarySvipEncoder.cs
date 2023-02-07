@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using OpenSvip.Const;
+using BinSvip.Const;
 using OpenSvip.Library;
 using OpenSvip.Model;
 
-namespace OpenSvip.Stream
+namespace BinSvip.Stream
 {
     public class BinarySvipEncoder
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace OpenSvip.Stream
+namespace BinSvip.Stream
 {
     public enum BinarySvipVersions
     {

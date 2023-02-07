@@ -1,9 +1,9 @@
 ﻿using System;
-using OpenSvip.Const;
+using BinSvip.Const;
 using OpenSvip.Model;
 using Note = OpenSvip.Model.Note;
 
-namespace OpenSvip.Stream
+namespace BinSvip.Stream
 {
     public class BinarySvipDecoder
     {

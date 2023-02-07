@@ -35,8 +35,15 @@ namespace OpenSvip.Framework
         [XmlElement] public string Suffix { get; set; }
         
         [XmlElement] public string Identifier { get; set; }
-        
-        [XmlElement] public string LibraryPath { get; set; }
+
+        [XmlIgnore] private string _libraryPath;
+
+        [XmlElement]
+        public string LibraryPath
+        {
+            get => _libraryPath;
+            set => _libraryPath = value.Replace('\\', '/');
+        }
         
         [XmlElement] public string Converter { get; set; }
         

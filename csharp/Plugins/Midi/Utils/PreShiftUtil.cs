@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NPinyin;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 
@@ -15,7 +14,7 @@ namespace FlutyDeer.MidiPlugin.Utils
             }
             for (int index = 0; index < noteList.Count; index++)//这种方式不好，以后再改。
             {
-                if (IsSemivowelNote(noteList[index]) && index > 0)//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
+                if (IsSemivowelNote(noteList[index].Lyric, index) && index > 0)//遇到半元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
                 {
                     int currentStartPos = noteList[index].StartPos;
                     int preShiftedStartPos = currentStartPos - PreShift;
@@ -34,7 +33,7 @@ namespace FlutyDeer.MidiPlugin.Utils
                         Warnings.AddWarning("前移量过大，将导致音符长度小于或等于零，已忽略。", $"歌词：{noteList[index - 1].Lyric}，长度：{noteList[index - 1].Length}", WarningTypes.Notes);
                     }
                 }
-                else if (IsVowelNote(noteList[index]) && index > 0)//遇到元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
+                else if (IsVowelNote(noteList[index].Lyric, index) && index > 0)//遇到元音音符，先减短前一个音符的长度（如果有），再提前自身起始位置并加长自身长度。
                 {
                     int currentStartPos = noteList[index].StartPos;
                     int preShiftedStartPos = currentStartPos - PreShift / 2;
@@ -59,24 +58,27 @@ namespace FlutyDeer.MidiPlugin.Utils
         /// <summary>
         /// 判断是否为半元音音符。
         /// </summary>
-        private static bool IsSemivowelNote(Note note)
+        private static bool IsSemivowelNote(string lyric, int index)
         {
-            string notePinyin = GetPinyin(note);
-            return notePinyin.StartsWith("y") || notePinyin.StartsWith("w");
+            string notePinyin = GetPinyin(lyric, index);
+            return notePinyin.StartsWith("y")
+                   || notePinyin.StartsWith("w");
         }
 
-        private static bool IsVowelNote(Note note)
+        private static bool IsVowelNote(string lyric, int index)
         {
-            string notePinyin = GetPinyin(note);
-            return notePinyin.StartsWith("a") || notePinyin.StartsWith("o") || notePinyin.StartsWith("e");
+            string notePinyin = GetPinyin(lyric, index);
+            return notePinyin.StartsWith("a")
+                   || notePinyin.StartsWith("o")
+                   || notePinyin.StartsWith("e");
         }
 
         /// <summary>
         /// 获取音符的拼音。
         /// </summary>
-        private static string GetPinyin(Note note)
+        public static string GetPinyin(string lyric, int index)
         {
-            return note.Pronunciation ?? Pinyin.GetPinyin(note.Lyric);
+            return PinyinAndLyricUtil.GetNotePinyin(lyric, index);
         }
     }
 }

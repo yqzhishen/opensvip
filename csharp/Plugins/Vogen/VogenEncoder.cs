@@ -44,8 +44,11 @@ namespace FlutyDeer.VogenPlugin
                 switch (track)
                 {
                     case SingingTrack singingTrack:
-                        vogTrackList.Add(EncodeSingingTrack(trackID, singingTrack));
-                        trackID++;
+                        if (singingTrack.NoteList.Count > 0)//Vogen不支持空轨道
+                        {
+                            vogTrackList.Add(EncodeSingingTrack(trackID, singingTrack));
+                            trackID++;
+                        }
                         break;
                     default:
                         break;
@@ -71,7 +74,10 @@ namespace FlutyDeer.VogenPlugin
             List<VogNote> vogNoteList = new List<VogNote>();
             foreach (var note in noteList)
             {
-                vogNoteList.Add(EncodeNote(note));
+                if (note.Length > 0)
+                {
+                    vogNoteList.Add(EncodeNote(note));
+                }
             }
             return vogNoteList;
         }

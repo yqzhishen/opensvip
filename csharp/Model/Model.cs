@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using OpenSvip.Serialization;
@@ -103,10 +104,27 @@ namespace OpenSvip.Model
         public ParamCurve Strength { get; set; } = new ParamCurve();
     }
 
-    public class ParamCurve
+    [JsonObject]
+    public class ParamCurve : IEnumerable<Tuple<int, int>>
     {
         public int TotalPointsCount => PointList.Count;
         [JsonConverter(typeof(PointListJsonConverter))]
         public List<Tuple<int, int>> PointList { get; set; } = new List<Tuple<int, int>>();
+
+        public IEnumerator<Tuple<int, int>> GetEnumerator()
+        {
+            return PointList.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public Tuple<int, int> this[int index]
+        {
+            get => PointList[index];
+            set => PointList[index] = value;
+        }
     }
 }

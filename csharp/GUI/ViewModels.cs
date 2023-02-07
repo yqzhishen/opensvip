@@ -511,9 +511,9 @@ namespace OpenSvip.GUI
             }
         }
 
-        public bool IsRelative => _pathValue == SOURCE_TAG || _pathValue.StartsWith(SOURCE_TAG + Path.PathSeparator) || _pathValue.StartsWith(SOURCE_TAG + '/');
+        public bool IsRelative => _pathValue == SOURCE_TAG || _pathValue.StartsWith(SOURCE_TAG + Path.DirectorySeparatorChar) || _pathValue.StartsWith(SOURCE_TAG + '/');
 
-        public string ActualValue => IsRelative ? _pathValue.Substring(SOURCE_TAG.Length).TrimStart(Path.PathSeparator, '/') : _pathValue;
+        public string ActualValue => IsRelative ? _pathValue.Substring(SOURCE_TAG.Length).TrimStart(Path.DirectorySeparatorChar, '/') : _pathValue;
     }
 
     public class UpdateViewModel : INotifyPropertyChanged

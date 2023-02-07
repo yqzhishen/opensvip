@@ -6,6 +6,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MaterialDesignThemes.Wpf;
 using OpenSvip.GUI.Dialog;
 
 namespace OpenSvip.GUI
@@ -25,6 +26,7 @@ namespace OpenSvip.GUI
             if (e.Key == Key.Enter)
             {
                 Keyboard.ClearFocus();
+                ElementsHelper.FindParent<Card>((TextBox)sender).Focus();
             }
         }
 

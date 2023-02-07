@@ -48,5 +48,20 @@ namespace OpenSvip.GUI
                 }).Start();
             }
         }
+
+        /*
+         * 以下代码用于移除所有元素的 FocusVisualStyle，即被 Focus 时周围出现的虚线框。
+         * 作者：Tromse
+         * 来源：https://stackoverflow.com/questions/1055670/deactivate-focusvisualstyle-globally
+         */
+        private void Application_StartUp(object sender, StartupEventArgs e)
+        {
+            EventManager.RegisterClassHandler(typeof(FrameworkElement), UIElement.GotFocusEvent, new RoutedEventHandler(RemoveFocusVisualStyle), true);
+        }
+
+        private static void RemoveFocusVisualStyle(object sender, RoutedEventArgs e)
+        {
+            ((FrameworkElement)sender).FocusVisualStyle = null;
+        }
     }
 }

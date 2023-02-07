@@ -1,8 +1,7 @@
-using FlutyDeer.GjgjPlugin.Utils;
+using FlutyDeer.MidiPlugin.Utils;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
-using NPinyin;
 using OpenSvip.Model;
 using System.Collections.Generic;
 using Note = OpenSvip.Model.Note;
@@ -18,9 +17,9 @@ namespace FlutyDeer.MidiPlugin.Utils
 
         public bool IsUseCompatibleLyric { get; set; }
 
-        public bool IsUseLegacyPinyin { get; set; }
-
         public bool IsRemoveSymbols { get; set; }
+
+        public bool IsConstantTempo { get; set; }
         
         public int Transpose { get; set; }
 
@@ -41,10 +40,6 @@ namespace FlutyDeer.MidiPlugin.Utils
         /// <returns>含有音符事件数组的 Track Chunk。</returns>
         public TrackChunk SingingTrackToMidiTrackChunk(SingingTrack singingTrack)
         {
-            PreShiftUtil.PreShiftSemivowelNotes(singingTrack.NoteList, SemivowelPreShift);
-            List<MidiEvent> midiEventList = new List<MidiEvent>();
-            midiEventList.Add(new SequenceTrackNameEvent(singingTrack.Title));//写入轨道名称
-            TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
             List<string> lyricList = new List<string>();
             lyricList.Clear();
             foreach (var note in singingTrack.NoteList)
@@ -53,12 +48,24 @@ namespace FlutyDeer.MidiPlugin.Utils
             }
             PinyinAndLyricUtil.ClearAllPinyin();
             PinyinAndLyricUtil.AddPinyin(lyricList);
+            PreShiftUtil.PreShiftSemivowelNotes(singingTrack.NoteList, SemivowelPreShift);
+            List<MidiEvent> midiEventList = new List<MidiEvent>
+            {
+                new SequenceTrackNameEvent(singingTrack.Title)//写入轨道名称
+            };
+            TrackChunk trackChunk = new TrackChunk(midiEventList.ToArray());
             using (var objectsManager = new TimedObjectsManager<TimedEvent>(trackChunk.Events))
             {
                 var events = objectsManager.Objects;
                 int index = 0;
                 foreach (var note in singingTrack.NoteList)
                 {
+                    var start = note.StartPos;
+                    var end = note.StartPos + note.Length;
+                    if (IsConstantTempo)
+                    {
+
+                    }
                     if(IsExportLyrics)
                     {
                         events.Add(new TimedEvent(new LyricEvent(GetLyric(note, index)), note.StartPos));
@@ -92,7 +99,7 @@ namespace FlutyDeer.MidiPlugin.Utils
                 }
                 if (IsUseCompatibleLyric)
                 {
-                    lyric = PinyinAndLyricUtil.GetNotePinyin(lyric, IsUseLegacyPinyin, index);
+                    lyric = PinyinAndLyricUtil.GetNotePinyin(lyric, index);
                 }
             }
             return lyric;

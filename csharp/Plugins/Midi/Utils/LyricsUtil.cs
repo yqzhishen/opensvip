@@ -27,7 +27,7 @@ namespace FlutyDeer.MidiPlugin.Utils
             return lyric;
         }
         
-        public static void ImportLyricsFromTrackChunk(TrackChunk trackChunk, List<Note> noteList)
+        public static void ImportLyricsFromTrackChunk(TrackChunk trackChunk, List<Note> noteList, short PPQ)
         {
             using (var objectsManager = new TimedObjectsManager<TimedEvent>(trackChunk.Events))
             {
@@ -36,9 +36,9 @@ namespace FlutyDeer.MidiPlugin.Utils
                 {
                     try
                     {
-                        string lyric = events.Where(e => e.Event is LyricEvent && e.Time == note.StartPos)
+                        string lyric = events.Where(e => e.Event is LyricEvent && e.Time * 480 / PPQ == note.StartPos)
                                              .Select(e => ((LyricEvent)e.Event).Text)
-                                             .FirstOrDefault();
+                                             .First();
                         if (Regex.IsMatch(lyric, @"[a-zA-Z]"))
                         {
                             note.Lyric = "啊";

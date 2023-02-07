@@ -5,6 +5,7 @@ using OpenSvip.Model;
 using MidiTimeSignature = Melanchall.DryWetMidi.Interaction.TimeSignature;
 using FlutyDeer.MidiPlugin.Options;
 using FlutyDeer.MidiPlugin.Utils;
+using OpenSvip.Library;
 
 namespace FlutyDeer.MidiPlugin
 {
@@ -25,12 +26,13 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public bool IsUseCompatibleLyric { get; set; }
 
-        public bool IsUseLegacyPinyin { get; set; }
 
         /// <summary>
         /// 是否移除歌词中的常见标点符号，默认为是。
         /// </summary>
         public bool IsRemoveSymbols { get; set; }
+
+        //public bool IsConstantTempo { get; set; }
 
         /// <summary>
         /// 拖拍前移补偿量，单位为梯。
@@ -42,9 +44,13 @@ namespace FlutyDeer.MidiPlugin
         /// </summary>
         public int PPQ { get; set; }
 
+        //public double ConstantTempo { get; set; }
+
         private Project osProject;
 
         private MidiEventsUtil midiEventsUtil = new MidiEventsUtil();
+
+        //private TimeSynchronizer synchronizer;
 
         /// <summary>
         /// 转换为 MIDI 文件。
@@ -53,8 +59,11 @@ namespace FlutyDeer.MidiPlugin
         /// <param name="path">输出路径。</param>
         public MidiFile EncodeMidiFile(Project project)
         {
-            MidiFile midiFile = new MidiFile();
             osProject = project;
+            //var originalTempoList = osProject.SongTempoList;
+            //var defaultTempo = osProject.SongTempoList[0].BPM;
+            //synchronizer = new TimeSynchronizer(originalTempoList, isAbsoluteTimeMode: IsConstantTempo, defaultTempo: defaultTempo);
+            MidiFile midiFile = new MidiFile();
             TicksPerQuarterNoteTimeDivision timeDivision = new TicksPerQuarterNoteTimeDivision((short)PPQ);
             midiFile.TimeDivision = timeDivision;//设置时基。
             //导出曲速和拍号
@@ -103,9 +112,9 @@ namespace FlutyDeer.MidiPlugin
                         trackChunkList.Add(new MidiEventsUtil{
                             IsExportLyrics = IsExportLyrics,
                             IsUseCompatibleLyric = IsUseCompatibleLyric,
-                            IsUseLegacyPinyin = IsUseLegacyPinyin,
                             IsRemoveSymbols = IsRemoveSymbols,
                             SemivowelPreShift = PreShift,
+                            //IsConstantTempo = IsConstantTempo,
                             Transpose = Transpose
                         }.SingingTrackToMidiTrackChunk(singingTrack));
                         break;

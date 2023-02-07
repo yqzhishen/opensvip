@@ -1,4 +1,4 @@
-﻿#define EXPORT
+﻿#define IMPORT
 
 using System;
 using System.Collections.Generic;
@@ -54,6 +54,8 @@ namespace AceStdio.Test
                 @"C:\Users\YQ之神\Desktop\test space\groups.acep",
                 @"C:\Users\YQ之神\Desktop\test.acep",
                 @"C:\Users\YQ之神\Desktop\黏黏黏黏\黏黏黏黏.acep",
+                @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\囍\囍_冻结参数.acep",
+                @"C:\Users\YQ之神\Desktop\御守转换3.acep",
             };
             string[] dst =
             {
@@ -61,11 +63,18 @@ namespace AceStdio.Test
                 @"C:\Users\YQ之神\Desktop\test space\groups.json",
                 @"C:\Users\YQ之神\Desktop\test.json",
                 @"C:\Users\YQ之神\Desktop\黏黏黏黏.json",
+                @"C:\Users\YQ之神\Desktop\囍.json",
+                @"C:\Users\YQ之神\Desktop\御守转换3.json",
             };
-            const int index = 0;
+            const int index = 5;
             var project = new AceConverter().Load(
                 src[index],
-                new ConverterOptions(new Dictionary<string, string>()));
+                new ConverterOptions(new Dictionary<string, string>
+                {
+                    //{"breathNormalization", "zscore, 0, 5.0, 0.15, 0"},
+                    {"tensionNormalization", "zscore, 1, 5, 0.55, 0"},
+                    //{"energyNormalization", "zscore, 0, 10, 0.6, 0.2"}
+                }));
             using (var stream = new FileStream(dst[index], FileMode.Create, FileAccess.Write))
             using (var writer = new StreamWriter(stream))
             {
@@ -80,7 +89,7 @@ namespace AceStdio.Test
                 @"E:\YQ数据空间\YQ实验室\实验室：XStudioSinger\少年弦\少年弦.json",
                 @"E:\YQ数据空间\YQ实验室\实验室：XStudioSinger\囍（官方示例）\囍（片段）.json",
                 @"C:\Users\YQ之神\Desktop\测试参数值域-svip.json",
-                @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\囍（片段）\囍（念白片段）.json"
+                @"E:\YQ数据空间\YQ实验室\实验室：AceStudio\囍（片段）\囍（念白片段）.json",
             };
             string[] dst =
             {

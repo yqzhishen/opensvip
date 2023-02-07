@@ -13,6 +13,7 @@ using System.Net;
 using System.Reflection;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Windows.Input;
+using MaterialDesignThemes.Wpf;
 using Microsoft.Win32;
 using OpenSvip.GUI.Config;
 using OpenSvip.GUI.Dialog;
@@ -683,6 +684,7 @@ namespace OpenSvip.GUI
             if (e.Key == Key.Enter)
             {
                 Keyboard.ClearFocus();
+                ElementsHelper.FindParent<Card>((TextBox)sender).Focus();
             }
         }
 

@@ -23,6 +23,7 @@
         <DefineConstants>DEBUG;TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,7 @@
         <DefineConstants>TRACE</DefineConstants>
         <ErrorReport>prompt</ErrorReport>
         <WarningLevel>4</WarningLevel>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
@@ -60,6 +62,23 @@
         <Compile Include="BinarySvipVersions.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="BinarySvipConst.cs" />
+        <Compile Include="Standalone\Model\AppModel.cs" />
+        <Compile Include="Standalone\Model\LineParam.cs" />
+        <Compile Include="Standalone\Model\Note.cs" />
+        <Compile Include="Standalone\Model\Overlappable.cs" />
+        <Compile Include="Standalone\Model\ReverbPreset.cs" />
+        <Compile Include="Standalone\Model\SongBeat.cs" />
+        <Compile Include="Standalone\Model\SongTempo.cs" />
+        <Compile Include="Standalone\Model\Track.cs" />
+        <Compile Include="Standalone\Model\Vibrato.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfLibrary.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfLibraryImpl.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfStream.cs" />
+        <Compile Include="Standalone\Nrbf\NrbfStreamImpl.cs" />
+        <Compile Include="Standalone\StandaloneSvipConst.cs" />
+        <Compile Include="Standalone\StandaloneSvipConverter.cs" />
+        <Compile Include="Standalone\StandaloneSvipDecoder.cs" />
+        <Compile Include="Standalone\StandaloneSvipEncoder.cs" />
     </ItemGroup>
     <ItemGroup>
       <None Include="App.config" />
@@ -72,6 +91,10 @@
       <Content Include="Properties.xml">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+        <ContentWithTargetPath Include="Standalone\Nrbf\Libs\QNrbfFormat.dll" >
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <TargetPath>QNrbfFormat.dll</TargetPath>
+        </ContentWithTargetPath>
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
@@ -87,6 +110,7 @@
         <Name>OpenSvip.Model</Name>
       </ProjectReference>
     </ItemGroup>
+    
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
