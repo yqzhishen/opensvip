@@ -10,6 +10,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
     {
         public static UProject EncodeProject(Project osProject)
         {
+            //曲速
             List<UTempo> tempos = osProject.SongTempoList
                 .Select(EncodeTempo)
                 .ToList();
@@ -22,18 +23,20 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 });
             }
 
+            //节拍
             List<UTimeSignature> ustxTimeSignatures = new List<UTimeSignature> { 
                 new UTimeSignature(0,4,4)
             };
             
             UProject ustxProject = new UProject {
                 tempos = tempos,
+                bpm = tempos[0].bpm,
                 timeSignatures = ustxTimeSignatures,
                 voiceParts = new List<UVoicePart>(),
                 waveParts = new List<UWavePart>(),
-                ustxVersion = new System.Version("0.5")
-                
+                ustxVersion = new System.Version("0.6")
             };
+            
             int trackNo = 0;
             ustxProject.tracks = new List<UTrack>();
             foreach (Track osTrack in osProject.TrackList)
@@ -56,7 +59,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
         {
             return new UTempo
             {
-                position = osTempo.Position,
+                position = Math.Max(osTempo.Position - 1920, 0),
                 bpm = osTempo.BPM
             };
         }
@@ -196,7 +199,6 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 }
             }
             part.curves.Add(pitd);
-            //#TODO：调试
         }
     }
 }

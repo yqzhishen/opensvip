@@ -22,6 +22,12 @@ namespace OxygenDioxide.UstxPlugin.Stream
             int index = 0;
             foreach (var note in uNotes)
             {
+                //如果和上一个音符之间断开，则断开部分的第一个采样点与上一音符连续
+                if(pitchStart + index * pitchInterval < note.position && index < pitches.Length && index>0)
+                {
+                    pitches[index] = pitches[index - 1];
+                    index++;
+                }
                 while (pitchStart + index * pitchInterval < note.End && index < pitches.Length)
                 {
                     pitches[index] = note.tone * 100;
@@ -70,25 +76,26 @@ namespace OxygenDioxide.UstxPlugin.Stream
                     pitchPoints.Add(new PitchPoint(note.End, note.tone * 100));
                 }
                 if (note == uNotes.First() && pitchPoints[0].X > pitchStart)
-                {
-                    pitchPoints.Insert(0, new PitchPoint(pitchStart, pitchPoints[0].Y));//如果整个段落开头有控制点没覆盖到的地方（以音素开头为准），则向前水平延伸
+                {//如果整个段落开头有控制点没覆盖到的地方（以音素开头为准），则向前水平延伸
+                    pitchPoints.Insert(0, new PitchPoint(pitchStart, pitchPoints[0].Y));
                 }
                 else if (pitchPoints[0].X > note.position)
-                {
-                    pitchPoints.Insert(0, new PitchPoint(note.position, pitchPoints[0].Y));//对于其他音符，则以卡拍点为准
+                {//对于其他音符，则以卡拍点为准
+                    pitchPoints.Insert(0, new PitchPoint(note.position, pitchPoints[0].Y));
                 }
                 if (pitchPoints.Last().X < note.End)
-                {
-                    pitchPoints.Add(new PitchPoint(note.End, pitchPoints.Last().Y));//如果整个段落结尾有控制点没覆盖到的地方，则向后水平延伸
+                {//如果整个段落结尾有控制点没覆盖到的地方，则向后水平延伸
+                    pitchPoints.Add(new PitchPoint(note.End, pitchPoints.Last().Y));
                 }
-                PitchPoint lastPoint = pitchPoints[0];//现在lastpoint是第一个控制点
-                index = Math.Max(0, (int)((lastPoint.X - pitchStart) / pitchInterval));//起点在采样音高线上的x坐标，以5tick为单位。如果第一个控制点在0前面，就从0开始，否则从第一个控制点开始
+                PitchPoint prevPoint = pitchPoints[0];//现在lastpoint是第一个控制点
+                //起点在采样音高线上的x坐标，以5tick为单位。如果第一个控制点在0前面，就从0开始，否则从第一个控制点开始
+                index = Math.Max(0, (int)((prevPoint.X - pitchStart) / pitchInterval));
                 foreach (var point in pitchPoints.Skip(1))
                 {//对每一段曲线
                     int x = pitchStart + index * pitchInterval;//起点在工程中的x坐标
-                    while (x < point.X && index < pitches.Length)
+                    while (x <= point.X && index < pitches.Length)
                     {//遍历采样音高点
-                        float pitch = (float)MusicMath.InterpolateShape(lastPoint.X, point.X, lastPoint.Y, point.Y, x, lastPoint.shape);//绝对音高。插值，正式将控制点转化为曲线！
+                        float pitch = (float)MusicMath.InterpolateShape(prevPoint.X, point.X, prevPoint.Y, point.Y, x, prevPoint.shape);//绝对音高。插值，正式将控制点转化为曲线！
                         float basePitch = prevNote != null && x < prevNote.End
                             ? prevNote.tone * 100
                             : note.tone * 100;//台阶基础音高
@@ -96,7 +103,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                         index++;
                         x += pitchInterval;
                     }
-                    lastPoint = point;
+                    prevPoint = point;
                 }
                 prevNote = note;
             }

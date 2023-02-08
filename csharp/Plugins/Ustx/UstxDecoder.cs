@@ -17,6 +17,11 @@ namespace OxygenDioxide.UstxPlugin.Stream
 
         public static SongTempo DecodeTempo(UTempo ustxTempo)
         {
+            int position = ustxTempo.position + 1920;
+            if (ustxTempo.position == 0)
+            {
+                position = 0;
+            }
             return new SongTempo
             {
                 Position = ustxTempo.position,
