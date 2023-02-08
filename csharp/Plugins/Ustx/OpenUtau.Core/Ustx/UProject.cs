@@ -1,10 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using YamlDotNet.Serialization;
 
 namespace OpenUtau.Core.Ustx 
 {
+    public class UTempo
+    {
+        public int position;
+        public double bpm;
+
+        public UTempo() { }
+        public UTempo(int position, double bpm)
+        {
+            this.position = position;
+            this.bpm = bpm;
+        }
+        public override string ToString() => $"{bpm}@{position}";
+    }
+
+    public class UTimeSignature
+    {
+        public int barPosition;
+        public int beatPerBar;
+        public int beatUnit;
+
+        public UTimeSignature() { }
+        public UTimeSignature(int barPosition, int beatPerBar, int beatUnit)
+        {
+            this.barPosition = barPosition;
+            this.beatPerBar = beatPerBar;
+            this.beatUnit = beatUnit;
+        }
+        public override string ToString() => $"{beatPerBar}/{beatUnit}@bar{barPosition}";
+    }
     public class UProject 
     {
         public string name = "New Project";
@@ -13,14 +41,16 @@ namespace OpenUtau.Core.Ustx
         public string cacheDir = "UCache";
         [YamlMember(SerializeAs = typeof(string))]
         public Version ustxVersion;
-
-        public double bpm = 120;
-        public int beatPerBar = 4;
-        public int beatUnit = 4;
         public int resolution = 480;
 
+        [Obsolete("Since ustx v0.6")] public double bpm = 120;
+        [Obsolete("Since ustx v0.6")] public int beatPerBar = 4;
+        [Obsolete("Since ustx v0.6")] public int beatUnit = 4;
+
         public Dictionary<string, UExpressionDescriptor> expressions = new Dictionary<string, UExpressionDescriptor>();
-        public List<UTrack> tracks = new List<UTrack>();
+        public List<UTimeSignature> timeSignatures;
+        public List<UTempo> tempos;
+        public List<UTrack> tracks;
 
         /// <summary>
         /// Transient field used for serialization.
@@ -31,6 +61,7 @@ namespace OpenUtau.Core.Ustx
         /// </summary>
         public List<UWavePart> waveParts;
 
+        /*
         public int MillisecondToTick(double ms)
         {
             return MusicMath.MillisecondToTick(ms, bpm, beatUnit, resolution);
@@ -39,6 +70,6 @@ namespace OpenUtau.Core.Ustx
         public double TickToMillisecond(double tick)
         {
             return MusicMath.TickToMillisecond(tick, bpm, beatUnit, resolution);
-        }
+        }*/
     }
 }

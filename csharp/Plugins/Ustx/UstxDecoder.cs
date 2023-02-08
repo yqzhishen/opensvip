@@ -1,43 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using OpenSvip.Model;
-
 using OpenUtau.Core.Ustx;
-using OpenUtau.Core;
-using Microsoft.SqlServer.Server;
 
 namespace OxygenDioxide.UstxPlugin.Stream
 {
-    public class UstxDecoder
+    public static class UstxDecoder
     {
-        LyricUtil lyricUtil = new LyricUtil();
-
+        
         //ustx音轨音量转绝对音量。ustx音轨音量以分贝存储（#TODO:待实测）。超过2的音量将被削到2
-        public double decodeVolume(double ustxVolume)
+        public static double DecodeVolume(double ustxVolume)
         {
             return Math.Min(Math.Pow(10, ustxVolume / 10), 2.0);
         }
 
-        public Project DecodeProject(UProject ustxProject)
+        public static SongTempo DecodeTempo(UTempo ustxTempo)
         {
-            //曲速：OpenUTAU每个工程只有一个曲速
-            List<SongTempo> songTempoList = new List<SongTempo>();
-            songTempoList.Add(new SongTempo {
-                Position = 0, 
-                BPM = (float)ustxProject.bpm
-            });
-            //节拍：OpenUTAU每个工程只有一个节拍
-            List<TimeSignature> timeSignatureList = new List<TimeSignature>();
-            timeSignatureList.Add(new TimeSignature {
-                Numerator=ustxProject.beatPerBar,
-                Denominator=ustxProject.beatUnit,
-            });
+            return new SongTempo
+            {
+                Position = ustxTempo.position,
+                BPM = (float)ustxTempo.bpm
+            };
+        }
+
+        public static Project DecodeProject(UProject ustxProject)
+        {
+            List<SongTempo> songTempoList;
+            //曲速
+            if (ustxProject.tempos == null)
+            {
+                ustxProject.tempos = new List<UTempo> { 
+                    new UTempo{
+                        position = 0,
+                        bpm = (float)ustxProject.bpm
+                    }
+                };
+            }
+            songTempoList = ustxProject.tempos
+                    .Select(DecodeTempo)
+                    .ToList();
+
+            //节拍：暂定4/4，待实测
+            if (ustxProject.timeSignatures == null)
+            {
+                ustxProject.timeSignatures = new List<UTimeSignature> {
+                    new UTimeSignature{
+                        barPosition = 0,
+                        beatPerBar = 4,
+                        beatUnit = 4,
+                    }
+                };
+            }
+            List<TimeSignature> timeSignatureList = new List<TimeSignature> {
+            new TimeSignature {
+                Numerator=4,
+                Denominator=4,
+                BarIndex = 0,
+            }};
             //音轨
-            List<Track> trackList = new List<Track>();
+            List<Track> trackList = ustxProject.tracks
+                .Select(x=>(Track)DecodeTrack(x))
+                .ToList();
             foreach(UTrack ustxTrack in ustxProject.tracks)
             {
                 SingingTrack osTrack = DecodeTrack(ustxTrack);
@@ -69,14 +93,14 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return osProject;
         }
-        public SingingTrack DecodeTrack(UTrack ustxTrack)
+        public static SingingTrack DecodeTrack(UTrack ustxTrack)
         {
             SingingTrack osTrack = new SingingTrack
             {
                 Title = "",
                 Mute = ustxTrack.Mute,
                 Solo = ustxTrack.Solo,
-                Volume = decodeVolume(ustxTrack.Volume),
+                Volume = DecodeVolume(ustxTrack.Volume),
                 Pan = 0,
                 AISingerName = ustxTrack.singer,
             };
@@ -90,7 +114,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             return osTrack;
         }
         //解析音符区段，同一个音轨上的所有音符区段合并为一个音轨
-        public void DecodeVoicePart(UVoicePart ustxVoicePart, SingingTrack osTrack, UProject ustxProject)
+        public static void DecodeVoicePart(UVoicePart ustxVoicePart, SingingTrack osTrack, UProject ustxProject)
         {
             int partOffset = ustxVoicePart.position;
             foreach (UNote ustxNote in ustxVoicePart.notes)
@@ -104,7 +128,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             }
         }
         //解析伴奏区段，每个伴奏区段独立转为一个伴奏音轨
-        public InstrumentalTrack DecodeWavePart(UWavePart ustxWavePart, UProject ustxProject)
+        public static InstrumentalTrack DecodeWavePart(UWavePart ustxWavePart, UProject ustxProject)
         {
             UTrack ustxTrack = ustxProject.tracks[ustxWavePart.trackNo];//所属音轨
             InstrumentalTrack osTrack = new InstrumentalTrack {
@@ -114,11 +138,11 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 Mute = ustxTrack.Mute,
                 Solo = ustxTrack.Solo,
                 Pan = 0,
-                Volume = decodeVolume(ustxTrack.Volume),
+                Volume = DecodeVolume(ustxTrack.Volume),
             };
             return osTrack;
         }
-        public Note DecodeNote(UNote ustxNote,int partOffset)
+        public static Note DecodeNote(UNote ustxNote,int partOffset)
         {
             string lyric = ustxNote.lyric;
             //OpenUTAU的连音符为+，多音节词可能还有+~、+4等形式，这里统一转为-
@@ -133,20 +157,19 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 KeyNumber = ustxNote.tone,
                 Lyric = lyric
             };
-            if(!(lyric.Length == 1 && lyricUtil.isHanzi(lyric[0])))//如果不是单个汉字，则Pronunciation里面也写一份
+            if(!(lyric.Length == 1 && LyricUtil.isHanzi(lyric[0])))//如果不是单个汉字，则Pronunciation里面也写一份
             {
                 osNote.Pronunciation = lyric;
             }
             return osNote;
         }
-        public List<Tuple<int,int>> DecodePitch(UVoicePart part, UProject project)
+        public static List<Tuple<int,int>> DecodePitch(UVoicePart part, UProject project)
         {
-            var pitchGenerator = new BasePitchGenerator();
-            int pitchStart = pitchGenerator.pitchStart;
-            int pitchInterval = pitchGenerator.pitchInterval;
-            int firstBarLength = 1920 * project.beatPerBar / project.beatUnit;
+            int pitchStart = BasePitchGenerator.pitchStart;
+            int pitchInterval = BasePitchGenerator.pitchInterval;
+            int firstBarLength = 1920;
 
-            float[] pitches = new BasePitchGenerator().BasePitch(part,project);//生成基础音高线
+            float[] pitches = BasePitchGenerator.BasePitch(part,project);//生成基础音高线
 
             var curve = part.curves.FirstOrDefault(c => c.abbr == "pitd");//PITD为手绘音高线差值。这里从ustx工程中尝试调取该参数
             if (curve != null && !curve.IsEmpty)

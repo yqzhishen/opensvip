@@ -18,11 +18,11 @@ namespace OxygenDioxide.UstxPlugin.Stream
             string text = File.ReadAllText(path, Encoding.UTF8);
             UProject ustxProject = Yaml.DefaultDeserializer.Deserialize<UProject>(text);
             //然后从UProject对象中提取出信息，生成Project对象
-            return new UstxDecoder().DecodeProject(ustxProject);
+            return UstxDecoder.DecodeProject(ustxProject);
         }
         public void Save(string path, Project project, ConverterOptions options)
         { 
-            UProject ustxProject = new UstxEncoder().EncodeProject(project);
+            UProject ustxProject = UstxEncoder.EncodeProject(project);
             string text = Yaml.DefaultSerializer.Serialize(ustxProject); 
             File.WriteAllText(path, text, new System.Text.UTF8Encoding(true));//编码：utf8 bom
         }

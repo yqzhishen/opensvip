@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OpenSvip.Model;
-
 using OpenUtau.Core.Ustx;
 using OpenUtau.Core;
-using Microsoft.SqlServer.Server;
 
 //根据音符、锚点和颤音，生成基础音高线
 namespace OxygenDioxide.UstxPlugin.Stream
 { 
-    public class BasePitchGenerator
+    public static class BasePitchGenerator
     {
-        public int pitchStart = 0;
-        public int pitchInterval = 5;
-        public float[] BasePitch(UVoicePart part, UProject project)
+        public static int pitchStart = 0;
+        public static int pitchInterval = 5;
+        public static float[] BasePitch(UVoicePart part, UProject project)
         {
+            var timeAxis = new TimeAxis();
+            timeAxis.BuildSegments(project);
             var uNotes = part.notes;//音符列表
             UNote prevNote = null;
 
@@ -39,18 +34,20 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 pitches[index] = pitches[index - 1];//结尾如果还有多余的地方，就用最后一个音符的音高填充
                 index++;
             }
-            foreach (var note in uNotes)
-            {//对每个音符
+            foreach (var note in uNotes)//对每个音符
+            {
                 if (note.vibrato.length <= 0)
                 {//如果音符的颤音长度<=0，则无颤音。颤音长度按毫秒存储
                     continue;
                 }
                 int startIndex = Math.Max(0, (int)Math.Ceiling((float)(note.position - pitchStart) / pitchInterval));//音符起点在采样音高线上的x坐标
                 int endIndex = Math.Min(pitches.Length, (note.End - pitchStart) / pitchInterval);//音符终点在采样音高线上的x坐标
-                for (int i = startIndex; i < endIndex; ++i)
+                //使用音符开头的曲速计算颤音周期
+                //float nPeriod = (float)(note.vibrato.period / note.DurationMs);
+                float nPeriod = (float)(note.vibrato.period / timeAxis.MsBetweenTickPos(note.position, note.End));
+                for (int i = startIndex; i < endIndex; ++i)//对每个采样点
                 {
                     float nPos = (float)(pitchStart + i * pitchInterval - note.position) / note.duration;//音符长度，单位为5tick
-                    float nPeriod = (float)project.MillisecondToTick(note.vibrato.period) / note.duration;//颤音长度，单位为5tick
                     var point = note.vibrato.Evaluate(nPos, nPeriod, note);//将音符长度颤音长度代入进去，求出带颤音的音高线
                     pitches[i] = point.Y * 100;
                 }
@@ -58,12 +55,16 @@ namespace OxygenDioxide.UstxPlugin.Stream
             foreach (var note in uNotes)
             {//对每个音符
                 var pitchPoints = note.pitch.data//音高控制点
-                    .Select(point => new PitchPoint(//OpenUTAU的控制点按毫秒存储（这个设计会导致修改曲速时出现混乱），这里先转成tick
-                        project.MillisecondToTick(point.X) + note.position,
-                        point.Y * 10 + note.tone * 100,
-                        point.shape))
+                    //OpenUTAU的控制点按毫秒存储（这个设计会导致修改曲速时出现混乱），这里先转成tick
+                    .Select(point => {
+                        double nodePosMs = timeAxis.TickPosToMsPos(part.position + note.position);
+                        return new PitchPoint(
+                               timeAxis.MsPosToTickPos(nodePosMs + point.X) - part.position,
+                               point.Y * 10 + note.tone * 100,
+                               point.shape);
+                    })
                     .ToList();
-                if (pitchPoints.Count == 0)
+                if (pitchPoints.Count() == 0)
                 {//如果没有控制点，则默认台阶形
                     pitchPoints.Add(new PitchPoint(note.position, note.tone * 100));
                     pitchPoints.Add(new PitchPoint(note.End, note.tone * 100));
@@ -102,20 +103,20 @@ namespace OxygenDioxide.UstxPlugin.Stream
             return pitches;
         }
     }
-    public class LyricUtil
+    public static class LyricUtil
     {
-        char[] unsupportedSymbolArray = { ',', '.', '?', '!', '，', '。', '？', '！' };
+        static char[] unsupportedSymbols = { ',', '.', '?', '!', '，', '。', '？', '！' };
 
         //判断字符是否为汉字
-        public bool isHanzi(char c)
+        public static bool isHanzi(char c)
         {
             return c >= 0x4e00 && c <= 0x9fbb;
         }
 
         //判断字符是否为xs支持的标点符号
-        public bool isPunctuation(char c)
+        public static bool isPunctuation(char c)
         {
-            return unsupportedSymbolArray.Contains(c);
+            return unsupportedSymbols.Contains(c);
         }
     }
 }

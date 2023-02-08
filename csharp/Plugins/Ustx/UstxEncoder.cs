@@ -1,44 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 using OpenSvip.Model;
-
 using OpenUtau.Core.Ustx;
-using OpenUtau.Core;
 
 namespace OxygenDioxide.UstxPlugin.Stream
 {
-    public class UstxEncoder
+    public static class UstxEncoder
     {
-        LyricUtil lyricUtil = new LyricUtil();
-
-        public UProject EncodeProject(Project osProject)
+        public static UProject EncodeProject(Project osProject)
         {
-            double bpm = 120.0;//如果对象没有给出曲速，则默认120
-            int beatPerBar = 4;//如果对象没有给出节拍号，则默认4/4
-            int beatUnit = 4;
-            if(osProject.SongTempoList.Count()>=1)
+            List<UTempo> tempos = osProject.SongTempoList
+                .Select(EncodeTempo)
+                .ToList();
+            if(tempos.Count==0)
             {
-                bpm = osProject.SongTempoList[0].BPM;//OpenUTAU不支持变速，这里采用音轨开头的bpm，曲速转换功能待开发
+                tempos.Add(new UTempo
+                {
+                    bpm = 120,
+                    position = 0,
+                });
             }
-            if(osProject.TimeSignatureList.Count()>=1)
-            {
-                beatPerBar = osProject.TimeSignatureList[0].Numerator;
-                beatUnit = osProject.TimeSignatureList[0].Denominator;
-            }
+
+            List<UTimeSignature> ustxTimeSignatures = new List<UTimeSignature> { 
+                new UTimeSignature(0,4,4)
+            };
+            
             UProject ustxProject = new UProject {
-                bpm = bpm,
-                beatPerBar = beatPerBar,
-                beatUnit = beatUnit,
+                tempos = tempos,
+                timeSignatures = ustxTimeSignatures,
                 voiceParts = new List<UVoicePart>(),
                 waveParts = new List<UWavePart>(),
                 ustxVersion = new System.Version("0.5")
                 
             };
             int trackNo = 0;
+            ustxProject.tracks = new List<UTrack>();
             foreach (Track osTrack in osProject.TrackList)
             {
                 ustxProject.tracks.Add(EncodeTrack(osTrack));
@@ -54,7 +51,17 @@ namespace OxygenDioxide.UstxPlugin.Stream
             }
             return ustxProject;
         }
-        public UTrack EncodeTrack(Track osTrack)
+
+        public static UTempo EncodeTempo(SongTempo osTempo)
+        {
+            return new UTempo
+            {
+                position = osTempo.Position,
+                bpm = osTempo.BPM
+            };
+        }
+
+        public static UTrack EncodeTrack(Track osTrack)
         {
             UTrack ustxTrack = new UTrack {
                 singer = "",
@@ -66,13 +73,17 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxTrack;
         }
-        public UVoicePart EncodeVoicePart(SingingTrack osTrack, int trackNo, UProject ustxProject)
+        public static UVoicePart EncodeVoicePart(SingingTrack osTrack, int trackNo, UProject ustxProject)
         {
             UVoicePart ustxVoicePart = new UVoicePart {
                 name = osTrack.Title,
                 trackNo = trackNo,
                 position = 0
             };
+            if (osTrack.NoteList.Count == 0)
+            {
+                return ustxVoicePart;
+            }
             int lastNoteEndPos = -480;//上一个音符的结束时间
             int lastNoteKeyNumber = 60;//上一个音符的音高
             //转换音符
@@ -87,7 +98,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
 
             return ustxVoicePart;
         }
-        public UWavePart EncodeWavePart(InstrumentalTrack osTrack, int trackNo)
+        public static UWavePart EncodeWavePart(InstrumentalTrack osTrack, int trackNo)
         {
             UWavePart ustxWavePart = new UWavePart
             {
@@ -99,7 +110,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxWavePart;
         }
-        public UNote EncodeNote(Note osNote,bool snapFirst,int lastNoteKeyNumber)
+        public static UNote EncodeNote(Note osNote,bool snapFirst,int lastNoteKeyNumber)
         {
             //snapFirst：是否与上一个音符挨着，挨着就是True
             //lastNoteKeyNumber：上一个音符的音高
@@ -117,7 +128,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             {
                 lyric = "+";
             }
-            if(lyric.Length==2 && lyricUtil.isHanzi(lyric[0]) && lyricUtil.isPunctuation(lyric[1]))//删除标点符号
+            if(lyric.Length==2 && LyricUtil.isHanzi(lyric[0]) && LyricUtil.isPunctuation(lyric[1]))//删除标点符号
             {
                 lyric = lyric.Remove(1);
             }
@@ -148,15 +159,14 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxNote;
         }
-        public void encodePitch(UVoicePart part, UProject project, List<Tuple<int, int>> osPitch)
+        public static void encodePitch(UVoicePart part, UProject project, List<Tuple<int, int>> osPitch)
         {
-            var pitchGenerator = new BasePitchGenerator();
-            int pitchStart = pitchGenerator.pitchStart;
-            int pitchInterval = pitchGenerator.pitchInterval;
+            int pitchStart = BasePitchGenerator.pitchStart;
+            int pitchInterval = BasePitchGenerator.pitchInterval;
 
-            float[] basePitch = new BasePitchGenerator().BasePitch(part, project);//生成基础音高线
+            float[] basePitch = BasePitchGenerator.BasePitch(part, project);//生成基础音高线
 
-            int firstBarLength = 1920 * project.beatPerBar / project.beatUnit;
+            int firstBarLength = 1920;
             int osPitchPointer = 0;//当前位于输入osPitch的第几个采样点
             UCurve pitd = new UCurve
             {
