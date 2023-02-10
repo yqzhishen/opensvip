@@ -131,7 +131,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             {
                 lyric = "+";
             }
-            if(lyric.Length==2 && LyricUtil.isHanzi(lyric[0]) && LyricUtil.isPunctuation(lyric[1]))//删除标点符号
+            if(lyric.Length==2 && LyricUtil.isPunctuation(lyric[1]))//删除标点符号
             {
                 lyric = lyric.Remove(1);
             }
