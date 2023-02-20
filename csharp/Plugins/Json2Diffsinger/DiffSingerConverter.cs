@@ -26,6 +26,7 @@ namespace Json2DiffSinger.Stream
             var dictionary = options.GetValueAsString("dictionary");  // Get the actual value
             var phonemeMode = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Manual);
             var pitchMode = options.GetValueAsEnum("pitchMode", PitchModeOption.Manual);
+            var isExportGender = options.GetValueAsBoolean("gender", true);
             var seed = options.GetValueAsInteger("seed", -1);
             if (splitLength >= 0)
             {
@@ -36,7 +37,8 @@ namespace Json2DiffSinger.Stream
                     {
                         Dictionary = dictionary,
                         PhonemeOption = phonemeMode,
-                        PitchModeOption = pitchMode
+                        PitchModeOption = pitchMode,
+                        IsExportGender = isExportGender,
                     }.Encode(tuple.Item2, tuple.Item3);
                     dsParams.Offset = tuple.Item1;
                     if (seed >= 0)
@@ -59,7 +61,8 @@ namespace Json2DiffSinger.Stream
                 {
                     Dictionary = dictionary,
                     PhonemeOption = options.GetValueAsEnum("phonemeMode", PhonemeModeOption.Manual),
-                    PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Manual)
+                    PitchModeOption = options.GetValueAsEnum("pitchMode", PitchModeOption.Manual),
+                    IsExportGender = isExportGender
                 }.Encode(project, 0.5f);
                 if (seed >= 0)
                 {

@@ -53,6 +53,18 @@ namespace Json2DiffSinger.Core.Models
         public string F0Sequence { get; set; }
 
         /// <summary>
+        /// 性别参数步长
+        /// </summary>
+        [JsonProperty("gender_timestep")]
+        public string GenderTimeStepSize { get; set; }
+
+        /// <summary>
+        /// 性别参数
+        /// </summary>
+        [JsonProperty("gender")]
+        public string GenderSequence { get; set; }
+
+        /// <summary>
         /// 输入模式
         /// </summary>
         [JsonProperty("input_type")]

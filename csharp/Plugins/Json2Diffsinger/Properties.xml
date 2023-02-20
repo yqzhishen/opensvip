@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>DiffSinger 参数转换插件</Name>
-    <Version>0.7.0</Version>
+    <Version>0.8.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>Json2DiffSinger 插件版。仅支持转换为 DiffSinger 合成参数。</Descriptions>
@@ -33,6 +33,9 @@
 				<Choice Name="严式 opencpop" Tag="opencpop-strict"/>
 				<Choice Name="opencpop 扩展" Tag="opencpop-extension"/>
 			</EnumChoices>
+		</Option>
+		<Option Name="gender" Type="boolean" Default="true">
+			<Notes>导出性别参数</Notes>
 		</Option>
 		<!--<Option Name="phonemeMode" Type="enum" Default="manual">
 			<Notes>音素参数模式</Notes>

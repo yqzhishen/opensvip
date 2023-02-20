@@ -3,14 +3,14 @@
 namespace Json2DiffSinger.Core.Models
 {
     /// <summary>
-    /// ds 音高参数曲线
+    /// ds 参数曲线
     /// </summary>
-    public class DsPitchParamCurve
+    public class DsParamCurve
     {
         /// <summary>
-        /// F0 步长
+        /// 步长
         /// </summary>
-        public float F0TimeStepSize { get; set; } = 0.005f;
+        public float StepSize { get; set; } = 0.005f;
 
         /// <summary>
         /// 参数点列表

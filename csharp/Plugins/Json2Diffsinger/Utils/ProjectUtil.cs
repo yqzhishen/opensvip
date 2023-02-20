@@ -32,6 +32,12 @@ namespace Json2DiffSinger.Utils
                     pos = (int) Math.Round(synchronizer.GetActualTicksFromTicks(pos - firstBarTicks)) + 1920;
                     track.EditedParams.Pitch.PointList[i] = new Tuple<int, int>(pos, val);
                 }
+                for (var i = 0; i < track.EditedParams.Gender.TotalPointsCount; i++)
+                {
+                    var (pos, val) = track.EditedParams.Gender.PointList[i];
+                    pos = (int)Math.Round(synchronizer.GetActualTicksFromTicks(pos - firstBarTicks)) + 1920;
+                    track.EditedParams.Gender.PointList[i] = new Tuple<int, int>(pos, val);
+                }
             }
 
             project.SongTempoList = new List<SongTempo>
@@ -94,6 +100,12 @@ namespace Json2DiffSinger.Utils
                             point.Item1 >= 1920
                             && point.Item1 - 1920 <= buffer.Last().StartPos + buffer.Last().Length + 50)
                         .ToList();
+                    var genderPoints = track.EditedParams.Gender.PointList
+                        .Select(point => new Tuple<int, int>(point.Item1 - segNoteStartPos + prepareSpace, point.Item2))
+                        .Where(point =>
+                            point.Item1 >= 1920
+                            && point.Item1 - 1920 <= buffer.Last().StartPos + buffer.Last().Length + 50)
+                        .ToList();
 
                     curSegStart = cur.StartPos - Math.Min(600, (int)(interval * 0.8));
                     curSegInterval = interval;
@@ -117,6 +129,10 @@ namespace Json2DiffSinger.Utils
                                     Pitch = new ParamCurve
                                     {
                                         PointList = pitchPoints
+                                    },
+                                    Gender = new ParamCurve
+                                    {
+                                        PointList = genderPoints
                                     }
                                 }
                             }
@@ -134,6 +150,12 @@ namespace Json2DiffSinger.Utils
                 var segNoteStartPos = buffer.First().StartPos;
                 buffer.ForEach(note => note.StartPos = note.StartPos - segNoteStartPos + prepareSpace);
                 var pitchPoints = track.EditedParams.Pitch.PointList
+                    .Select(point => new Tuple<int, int>(point.Item1 - segNoteStartPos + prepareSpace, point.Item2))
+                    .Where(point =>
+                        point.Item1 >= 1920
+                        && point.Item1 - 1920 <= buffer.Last().StartPos + buffer.Last().Length + 50)
+                    .ToList();
+                var genderPoints = track.EditedParams.Gender.PointList
                     .Select(point => new Tuple<int, int>(point.Item1 - segNoteStartPos + prepareSpace, point.Item2))
                     .Where(point =>
                         point.Item1 >= 1920
@@ -160,6 +182,10 @@ namespace Json2DiffSinger.Utils
                                 Pitch = new ParamCurve
                                 {
                                     PointList = pitchPoints
+                                },
+                                Gender = new ParamCurve
+                                {
+                                    PointList = genderPoints
                                 }
                             }
                         }
