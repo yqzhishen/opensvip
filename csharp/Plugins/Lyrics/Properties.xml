@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
     <Name>LRC 歌词转换插件</Name>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
     <Descriptions>适用于 OpenSvip 的 LRC 歌词格式转换插件。</Descriptions>
@@ -52,11 +52,22 @@
 				<Choice Name="仅标点符号" Tag="symbol">
 					<Label>遇到标点符号时另起新行。</Label>
 				</Choice>
+				<Choice Name="歌词文本" Tag="text">
+					<Label>依据歌词文本中的标记另起新行。当选中此选项时，工程文件中的拼音歌词也将会被匹配为对应的汉字。</Label>
+				</Choice>
 			</EnumChoices>
+		</Option>
+		<Option Name="lyricsText" Type="string" Default="">
+			<Notes>歌词文本</Notes>
+			<Tips>使用半角分号「;」来划分歌词行。</Tips>
 		</Option>
 		<Option Name="timeline" Type="boolean" Default="true">
 			<Notes>写入时间轴</Notes>
 			<Tips>如果需要无时间轴的歌词，关闭此选项即可。</Tips>
+		</Option>
+		<Option Name="autoInsertBlankLine" Type="integer" Default="4">
+			<Notes>自动插入空行的最小音符间隔</Notes>
+			<Tips>单位为拍。当两个音符间距超过该数值时，将会在它们之间添加空行，一般用于间奏等部分。设置为 -1 时将不自动插入空行。</Tips>
 		</Option>
 		<Option Name="encoding" Type="enum" Default="UTF8">
 			<Notes>歌词文本编码</Notes>
