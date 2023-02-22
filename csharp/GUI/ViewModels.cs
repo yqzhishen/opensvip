@@ -35,6 +35,8 @@ namespace OpenSvip.GUI
             Plugins = PluginManager.GetAllPlugins().ToList();
         }
 
+        public void DisableCheckForUpdatesOnStartUp() => CheckForUpdatesOnStartUp = false;
+
         private List<Plugin> _plugins;
 
         public List<Plugin> Plugins
@@ -355,6 +357,18 @@ namespace OpenSvip.GUI
             {
                 _checkForUpdates = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CheckForUpdates"));
+            }
+        }
+
+        private bool _checkForUpdatesOnStartUp;
+
+        public bool CheckForUpdatesOnStartUp
+        {
+            get => _checkForUpdatesOnStartUp;
+            set
+            {
+                _checkForUpdatesOnStartUp = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CheckForUpdatesOnStartUp"));
             }
         }
     }

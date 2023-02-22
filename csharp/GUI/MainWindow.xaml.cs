@@ -19,6 +19,7 @@ using OpenSvip.GUI.Config;
 using OpenSvip.GUI.Dialog;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace OpenSvip.GUI
 {
@@ -71,7 +72,8 @@ namespace OpenSvip.GUI
                 OverWriteOption = settings.OverwriteOption,
                 EnableMultiThreading = settings.EnableMultiThreading,
                 AppearanceThemes = settings.AppearanceTheme,
-                CheckForUpdates = settings.CheckForUpdates
+                CheckForUpdates = settings.CheckForUpdates,
+                CheckForUpdatesOnStartUp = settings.CheckForUpdatesOnStartUp
             };
             Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
@@ -98,6 +100,8 @@ namespace OpenSvip.GUI
                 Model.ExportPath.PathValue = settings.LastExportPath;
             }
             DataContext = Model;
+            if (Model.CheckForUpdatesOnStartUp)
+                BackgroundUpdateChecker.CheckPluginsUpdate();
         }
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
@@ -385,9 +389,11 @@ namespace OpenSvip.GUI
                         : null,
                     EnableMultiThreading = Model.EnableMultiThreading,
                     AppearanceTheme = Model.AppearanceThemes,
-                    CheckForUpdates = Model.CheckForUpdates
+                    CheckForUpdates = Model.CheckForUpdates,
+                    CheckForUpdatesOnStartUp = Model.CheckForUpdatesOnStartUp,
                 }
             }.SaveToFile();
+            ToastNotificationManagerCompat.Uninstall();//Uninstall toast notification.
             // Shutdown the application by force
             new Thread(() =>
             {

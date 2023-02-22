@@ -86,7 +86,7 @@ namespace OpenSvip.GUI.Config
 
     public static class Information
     {
-        public const string ApplicationVersion = "1.4.2";
+        public const string ApplicationVersion = "1.5.0";
 
         public const string OnlineDocuments = "https://openvpi.github.io/docs/guide.html";
 
@@ -130,6 +130,8 @@ namespace OpenSvip.GUI.Config
         public AppearanceThemes AppearanceTheme { get; set; } = AppearanceThemes.System;
 
         public bool CheckForUpdates { get; set; } = true;
+
+        public bool CheckForUpdatesOnStartUp { get; set;} = true;
     }
 
     public class PathConfig
