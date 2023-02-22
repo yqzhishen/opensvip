@@ -51,7 +51,7 @@ namespace CrSjimo.SvgPlugin {
                 TextSize = NoteHeight - 2 * PADDING,
                 InnerText = new Tuple<double, double>(
                     1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT + PADDING,
-                    (KeyRangeEnd - note.KeyNumber + 1) * NoteHeight - PADDING
+                    (KeyRangeEnd - note.KeyNumber + 1) * NoteHeight - PADDING * 1.5
                 ),
                 UpperText = new Tuple<double, double>(
                     1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT,
