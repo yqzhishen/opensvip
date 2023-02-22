@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+    <Name>Svg</Name>
+    <Version>1.0.0</Version>
+    <Author>CrSjimo</Author>
+    <HomePage>https://sjimo.dev/</HomePage>
+    <Descriptions>生成 SVG 格式的可视化音符图形。本插件只生成导入工程首条演唱轨的图形。</Descriptions>
+    <Requirements>无</Requirements>
+    <Format>可伸缩矢量图形</Format>
+    <Suffix>svg</Suffix>
+    <Identifier>svg</Identifier>
+    <LibraryPath>Svg\CrSjimo.SvgPlugin.dll</LibraryPath>
+    <Converter>CrSjimo.SvgPlugin.Stream.SvgConverter</Converter>
+    <InputOptions/>
+    <OutputOptions>
+        <Option Name="PixelPerBeat" Type="integer" Default="48">
+            <Notes>每拍长度</Notes>
+			<Tips>单位：像素。</Tips>
+        </Option>
+        <Option Name="NoteHeight" Type="integer" Default="24">
+            <Notes>音符高度</Notes>
+			<Tips>单位：像素。</Tips>
+        </Option>
+        <Option Name="NoteRound" Type="integer" Default="4">
+            <Notes>音符圆角</Notes>
+			<Tips>单位：像素。</Tips>
+        </Option>
+        <Option Name="NoteFillColor" Type="string" Default="#CCFFCC">
+            <Notes>音符填充颜色</Notes>
+			<Tips>CSS 颜色值，例如：#FF0000，#FF00007F，rgba(255,0,0,0.5) 等。</Tips>
+        </Option>
+        <Option Name="NoteStrokeColor" Type="string" Default="#006600">
+            <Notes>音符描边颜色</Notes>
+			<Tips>CSS 颜色值，例如：#FF0000，#FF00007F，rgba(255,0,0,0.5) 等。</Tips>
+        </Option>
+        <Option Name="NoteStrokeWidth" Type="integer" Default="1">
+            <Notes>音符描边宽度</Notes>
+			<Tips>单位：像素。</Tips>
+        </Option>
+        <Option Name="PitchStrokeColor" Type="string" Default="#99aa99">
+            <Notes>音高曲线描边颜色</Notes>
+			<Tips>CSS 颜色值，例如：#FF0000，#FF00007F，rgba(255,0,0,0.5) 等。</Tips>
+        </Option>
+        <Option Name="PitchStrokeWidth" Type="integer" Default="2">
+            <Notes>音高曲线描边宽度</Notes>
+			<Tips>单位：像素。</Tips>
+        </Option>
+        <Option Name="LyricPosition" Type="enum" Default="lower">
+			<Notes>歌词显示于</Notes>
+			<EnumChoices>
+				<Choice Name="音符内部" Tag="inner"/>
+				<Choice Name="音符上方" Tag="upper"/>
+				<Choice Name="音符下方" Tag="lower"/>
+			</EnumChoices>
+		</Option>
+        <Option Name="PronunciationPosition" Type="enum" Default="inner">
+			<Notes>拼音显示于</Notes>
+			<EnumChoices>
+				<Choice Name="音符内部" Tag="inner"/>
+				<Choice Name="音符上方" Tag="upper"/>
+				<Choice Name="音符下方" Tag="lower"/>
+			</EnumChoices>
+		</Option>
+        <Option Name="InnerTextColor" Type="string" Default="#000000">
+            <Notes>音符内部文本颜色</Notes>
+			<Tips>CSS 颜色值，例如：#FF0000，#FF00007F，rgba(255,0,0,0.5) 等。</Tips>
+        </Option>
+        <Option Name="SideTextColor" Type="string" Default="#000000">
+            <Notes>音符上下方文本颜色</Notes>
+			<Tips>CSS 颜色值，例如：#FF0000，#FF00007F，rgba(255,0,0,0.5) 等。</Tips>
+        </Option>
+    </OutputOptions>
+</Plugin>
