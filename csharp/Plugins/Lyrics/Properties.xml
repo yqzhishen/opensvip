@@ -4,7 +4,7 @@
     <Version>0.1.0</Version>
     <Author>笛鹿FlutyDeer</Author>
     <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>适用于 OpenSvip 的 LRC 歌词格式转换插件。</Descriptions>
+    <Descriptions>适用于 OpenSvip 的 LRC 歌词格式转换插件。&#x000A;&#x000A;贡献者：CrSjimo(https://github.com/CrSjimo)</Descriptions>
     <Requirements>无</Requirements>
     <Format>LRC 歌词文件</Format>
     <Suffix>lrc</Suffix>
