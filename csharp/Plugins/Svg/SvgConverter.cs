@@ -22,6 +22,7 @@ namespace CrSjimo.SvgPlugin.Stream {
                 SideTextColor = options.GetValueAsString("SideTextColor", "#000000"),
                 LyricPosition = options.GetValueAsEnum("LyricPosition", TextPosition.Lower),
                 PronunciationPosition = options.GetValueAsEnum("PronunciationPosition", TextPosition.Inner),
+                TextAlign = options.GetValueAsEnum("TextAlign", TextAlign.Left),
             }.Generate(project);
             svgFactory.Write(path);
         }

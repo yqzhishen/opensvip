@@ -49,6 +49,7 @@
         <Compile Include="SvgElements\PolyLine.cs" />
         <Compile Include="SvgElements\Text.cs" />
         <Compile Include="Options\TextPosition.cs" />
+        <Compile Include="Options\TextAlign.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>

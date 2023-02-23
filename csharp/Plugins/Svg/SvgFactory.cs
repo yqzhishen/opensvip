@@ -38,6 +38,7 @@ $@".note {{
 }}
 text {{
     font-size: {CoordinateHelper.getFontSize()}px;
+    text-anchor: {CoordinateHelper.getTextAnchor()};
 }}
 .inner {{
     fill: {innerTextColor};

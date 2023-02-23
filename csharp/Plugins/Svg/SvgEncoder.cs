@@ -16,6 +16,7 @@ namespace CrSjimo.SvgPlugin {
         public string SideTextColor { get; set; }
         public TextPosition LyricPosition { get; set; }
         public TextPosition PronunciationPosition { get; set; }
+        public TextAlign TextAlign { get; set; }
         public SvgFactory Generate(Project project) {
             var svgFactory = new SvgFactory();
             var coordinateHelper = new CoordinateHelper {
@@ -24,6 +25,7 @@ namespace CrSjimo.SvgPlugin {
                 LyricPosition = LyricPosition,
                 PronunciationPosition = PronunciationPosition,
                 PitchPositionOffset = project.TimeSignatureList[0].Numerator * 480,
+                TextAlign = TextAlign,
             };
             var track = project.TrackList.Find(delegate(Track trackIt) {
                 return trackIt is SingingTrack;

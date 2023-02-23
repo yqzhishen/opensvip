@@ -10,6 +10,7 @@ namespace CrSjimo.SvgPlugin {
         public int NoteHeight { get; set; }
         public TextPosition LyricPosition { get; set; }
         public TextPosition PronunciationPosition { get; set; }
+        public TextAlign TextAlign { get; set; }
         public int PitchPositionOffset;
         private int PositionRangeStart;
         private int PositionRangeEnd;
@@ -39,6 +40,18 @@ namespace CrSjimo.SvgPlugin {
         }
         
         public NotePositionParameters GetNotePositionParameters(Note note) {
+            double textX = 0;
+            switch(TextAlign) {
+                case TextAlign.Left:
+                    textX = 1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT + PADDING;
+                    break;
+                case TextAlign.Middle:
+                    textX = 1.0 * (note.StartPos + 0.5 * note.Length - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT;
+                    break;
+                case TextAlign.Right:
+                    textX = 1.0 * (note.StartPos + note.Length - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT - PADDING;
+                    break;
+            }
             return new NotePositionParameters {
                 Point1 = new Tuple<double, double>(
                     1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT,
@@ -50,15 +63,15 @@ namespace CrSjimo.SvgPlugin {
                 ),
                 TextSize = NoteHeight - 2 * PADDING,
                 InnerText = new Tuple<double, double>(
-                    1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT + PADDING,
+                    textX,
                     (KeyRangeEnd - note.KeyNumber + 1) * NoteHeight - PADDING * 1.5
                 ),
                 UpperText = new Tuple<double, double>(
-                    1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT + PADDING,
+                    textX,
                     (KeyRangeEnd - note.KeyNumber) * NoteHeight - PADDING
                 ),
                 LowerText = new Tuple<double, double>(
-                    1.0 * (note.StartPos - PositionRangeStart) * PixelPerBeat / TICKS_PER_BEAT + PADDING,
+                    textX,
                     (KeyRangeEnd - note.KeyNumber + 2) * NoteHeight - PADDING
                 ),
             };
@@ -77,6 +90,9 @@ namespace CrSjimo.SvgPlugin {
         }
         public int getFontSize() {
             return NoteHeight - 2 * PADDING;
+        }
+        public string getTextAnchor() {
+            return TextAlign == TextAlign.Left ? "start" : TextAlign == TextAlign.Middle ? "middle" : "end";
         }
     }
     public class NotePositionParameters {

@@ -63,6 +63,14 @@
 				<Choice Name="不显示" Tag="none"/>
 			</EnumChoices>
 		</Option>
+        <Option Name="TextAlign" Type="enum" Default="left">
+			<Notes>文字对齐</Notes>
+			<EnumChoices>
+				<Choice Name="左对齐" Tag="left"/>
+				<Choice Name="居中" Tag="middle"/>
+				<Choice Name="右对齐" Tag="right"/>
+			</EnumChoices>
+		</Option>
         <Option Name="InnerTextColor" Type="string" Default="#000000">
             <Notes>音符内部文本颜色</Notes>
 			<Tips>CSS 颜色值，例如：#FF0000，#FF00007F，rgba(255,0,0,0.5) 等。</Tips>
