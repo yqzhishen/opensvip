@@ -6,7 +6,7 @@
     <HomePage>https://sjimo.dev/</HomePage>
     <Descriptions>生成 SVG 格式的可视化音符图形。本插件只生成导入工程首条演唱轨的图形。</Descriptions>
     <Requirements>无</Requirements>
-    <Format>可伸缩矢量图形</Format>
+    <Format>可缩放矢量图形</Format>
     <Suffix>svg</Suffix>
     <Identifier>svg</Identifier>
     <LibraryPath>Svg\CrSjimo.SvgPlugin.dll</LibraryPath>
@@ -51,6 +51,7 @@
 				<Choice Name="音符内部" Tag="inner"/>
 				<Choice Name="音符上方" Tag="upper"/>
 				<Choice Name="音符下方" Tag="lower"/>
+				<Choice Name="不显示" Tag="none"/>
 			</EnumChoices>
 		</Option>
         <Option Name="PronunciationPosition" Type="enum" Default="inner">
@@ -59,6 +60,7 @@
 				<Choice Name="音符内部" Tag="inner"/>
 				<Choice Name="音符上方" Tag="upper"/>
 				<Choice Name="音符下方" Tag="lower"/>
+				<Choice Name="不显示" Tag="none"/>
 			</EnumChoices>
 		</Option>
         <Option Name="InnerTextColor" Type="string" Default="#000000">

@@ -44,15 +44,17 @@ text {{
 }}
 .side {{
     fill: {sideTextColor};
+    font-size: {Math.Max(CoordinateHelper.getFontSize() - 4, 10)}px;
 }}";
         }
-        private void DrawText(TextPosition position, string text, NotePositionParameters parameters) {
+        private void DrawText(TextPosition position, string text, NotePositionParameters parameters, bool pinyin) {
             switch(position) {
                 case TextPosition.Inner:
                     TextElements.Add(new Text {
                         X = parameters.InnerText.Item1,
                         Y = parameters.InnerText.Item2,
                         Position = position,
+                        Pinyin = pinyin,
                         Content = text,
                     });
                     break;
@@ -61,6 +63,7 @@ text {{
                         X = parameters.UpperText.Item1,
                         Y = parameters.UpperText.Item2,
                         Position = position,
+                        Pinyin = pinyin,
                         Content = text,
                     });
                     break;
@@ -69,6 +72,7 @@ text {{
                         X = parameters.LowerText.Item1,
                         Y = parameters.LowerText.Item2,
                         Position = position,
+                        Pinyin = pinyin,
                         Content = text,
                     });
                     break;
@@ -85,8 +89,8 @@ text {{
                 Height = parameters.Point2.Item2 - parameters.Point1.Item2,
                 R = NoteRound,
             });
-            DrawText(CoordinateHelper.LyricPosition, note.Lyric, parameters);
-            DrawText(CoordinateHelper.PronunciationPosition, note.Pronunciation, parameters);
+            DrawText(CoordinateHelper.LyricPosition, note.Lyric, parameters, false);
+            DrawText(CoordinateHelper.PronunciationPosition, note.Pronunciation, parameters, true);
         }
         public void DrawPitch(Tuple<int, int> pitchParamPoint) {
             if(pitchParamPoint.Item2 == -100) {
@@ -128,6 +132,9 @@ text {{
             }
             foreach(var textElement in TextElements) {
                 var text = svgFile.CreateElement("text", svgFile.DocumentElement.NamespaceURI);
+                var classNames = textElement.Position == TextPosition.Inner ? "inner" : "side";
+                if(textElement.Pinyin) classNames += " pinyin";
+                text.SetAttribute("class",classNames);
                 text.SetAttribute("x", textElement.X.ToString());
                 text.SetAttribute("y", textElement.Y.ToString());
                 text.InnerText = textElement.Content;
