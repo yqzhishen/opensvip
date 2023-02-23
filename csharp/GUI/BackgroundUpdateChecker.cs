@@ -28,7 +28,7 @@ namespace OpenSvip.GUI
                             && new Version(ConstValues.FrameworkVersion.Split(' ', '-')[0])
                             >= new Version(updateLog.RequiredFrameworkVersion.Split(' ', '-')[0]))
                         {
-                            var title = $"{plugin.Name} v{plugin.Version} 更新";
+                            var title = $"{plugin.Name} v{updateLog.Version} 更新";
                             var message = string.Join("\n", updateLog.Items);
                             Toast.ShowUpdateNotifyToast(title, message, plugin);
                         }
