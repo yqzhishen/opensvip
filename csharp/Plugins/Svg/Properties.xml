@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
-    <Name>Svg</Name>
-    <Version>1.0.0</Version>
+    <Name>SVG Visualizer</Name>
+    <Version>1.0.1</Version>
     <Author>CrSjimo</Author>
     <HomePage>https://sjimo.dev/</HomePage>
-    <Descriptions>生成 SVG 格式的可视化音符图形。本插件只生成导入工程首条演唱轨的图形。</Descriptions>
+    <Descriptions>生成 SVG 格式的可视化音符图形。</Descriptions>
+    <TargetFramework>1.4.2</TargetFramework>
     <Requirements>无</Requirements>
     <Format>可缩放矢量图形</Format>
     <Suffix>svg</Suffix>
@@ -13,6 +14,10 @@
     <Converter>CrSjimo.SvgPlugin.Stream.SvgConverter</Converter>
     <InputOptions/>
     <OutputOptions>
+        <Option Name="TrackIndex" Type="integer" Default="0">
+            <Notes>演唱轨序号</Notes>
+            <Tips>需要导出的演唱轨的序号，从 0 开始（伴奏轨不参与计数）。</Tips>
+        </Option>
         <Option Name="PixelPerBeat" Type="integer" Default="48">
             <Notes>每拍长度</Notes>
 			<Tips>单位：像素。</Tips>
