@@ -1,9 +1,10 @@
-using System;
+using System.Linq;
 using CrSjimo.SvgPlugin.Options;
 using OpenSvip.Model;
 
 namespace CrSjimo.SvgPlugin {
     public class SvgEncoder {
+        public int TrackIndex { get; set; }
         public int PixelPerBeat { get; set; }
         public int NoteHeight { get; set; }
         public int NoteRound { get; set; }
@@ -27,9 +28,10 @@ namespace CrSjimo.SvgPlugin {
                 PitchPositionOffset = project.TimeSignatureList[0].Numerator * 480,
                 TextAlign = TextAlign,
             };
-            var track = project.TrackList.Find(delegate(Track trackIt) {
-                return trackIt is SingingTrack;
-            }) as SingingTrack;
+            var track = (SingingTrack) project.TrackList
+                .Where(trackIt => trackIt is SingingTrack)
+                .Skip(TrackIndex)
+                .First();
             coordinateHelper.calculateRange(track);
             svgFactory.CoordinateHelper = coordinateHelper;
             svgFactory.ApplyStyle(

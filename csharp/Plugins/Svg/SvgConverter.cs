@@ -10,6 +10,7 @@ namespace CrSjimo.SvgPlugin.Stream {
         }
         public void Save(string path, Project project, ConverterOptions options) {
             var svgFactory = new SvgEncoder {
+                TrackIndex = options.GetValueAsInteger("TrackIndex"),
                 PixelPerBeat = options.GetValueAsInteger("PixelPerBeat", 48),
                 NoteHeight = options.GetValueAsInteger("NoteHeight", 24),
                 NoteRound = options.GetValueAsInteger("NoteRound", 4),
