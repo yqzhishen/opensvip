@@ -44,21 +44,45 @@ namespace OpenSvip.GUI
                 switch (action)
                 {
                     case "updateNow":
-                        new Thread(() =>
+                        Application.Current.Dispatcher.Invoke(delegate
                         {
-                            try
+                            if (((MainWindow)Current.MainWindow).WindowState == WindowState.Minimized)
+                                ((MainWindow)Current.MainWindow).WindowState = WindowState.Normal;
+                        });
+                        var type = args.Get("type");
+                        if (type == "plugin")
+                        {
+                            new Thread(() =>
                             {
-                                new UpdateChecker(args.Get("updateUri")).CheckForUpdate(out var updateLog, args.Get("version"));
-                                Application.Current.Dispatcher.Invoke(delegate
+                                try
                                 {
-                                    PluginDownloadDialog.CreateDialog(updateLog).ShowDialog();
-                                });
-                            }
-                            catch
+                                    new UpdateChecker(args.Get("updateUri")).CheckForUpdate(out var updateLog, args.Get("version"));
+                                    Application.Current.Dispatcher.Invoke(delegate
+                                    {
+                                        PluginDownloadDialog.CreateDialog(updateLog).ShowDialog();
+                                    });
+                                }
+                                catch
+                                {
+                                    // ignored
+                                }
+                            }).Start();
+                        }
+                        else
+                        {
+                            new Thread(() =>
                             {
-                                // ignored
-                            }
-                        }).Start();
+                                try
+                                {
+                                    if (new UpdateChecker().CheckForUpdate(out var updateLog))
+                                        UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
+                                }
+                                catch
+                                {
+                                    // ignored
+                                }
+                            }).Start();
+                        }
                         break;
                     case "dismiss":
                         //ignore
@@ -66,7 +90,7 @@ namespace OpenSvip.GUI
                     case "neverRemind":
                         Application.Current.Dispatcher.Invoke(delegate
                         {
-                            ((MainWindow)Current.MainWindow)?.Model.DisableCheckForUpdatesOnStartUp();
+                            ((MainWindow)Current.MainWindow)?.Model.DisableCheckForUpdates();
                         });
                         
                         ToastNotificationManagerCompat.Uninstall(); //Uninstall toast notification.

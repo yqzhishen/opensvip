@@ -72,8 +72,7 @@ namespace OpenSvip.GUI
                 OverWriteOption = settings.OverwriteOption,
                 EnableMultiThreading = settings.EnableMultiThreading,
                 AppearanceThemes = settings.AppearanceTheme,
-                CheckForUpdates = settings.CheckForUpdates,
-                CheckForUpdatesOnStartUp = settings.CheckForUpdatesOnStartUp
+                CheckForUpdates = settings.CheckForUpdates
             };
             Model.SelectedInputPluginIndex = settings.ImportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ImportPluginId));
             Model.SelectedOutputPluginIndex = settings.ExportPluginId == null ? -1 : Model.Plugins.FindIndex(plugin => plugin.Identifier.Equals(settings.ExportPluginId));
@@ -100,7 +99,7 @@ namespace OpenSvip.GUI
                 Model.ExportPath.PathValue = settings.LastExportPath;
             }
             DataContext = Model;
-            if (Model.CheckForUpdatesOnStartUp)
+            if (Model.CheckForUpdates)
                 BackgroundUpdateChecker.CheckPluginsUpdate();
         }
 
@@ -108,22 +107,23 @@ namespace OpenSvip.GUI
         {
             AddConverterTasks(Environment.GetCommandLineArgs().Skip(1).Where(File.Exists));
             if (Model.CheckForUpdates)
-            {
-                new Thread(() =>
-                {
-                    try
-                    {
-                        if (new UpdateChecker().CheckForUpdate(out var updateLog) && !Model.ExecutionInProgress)
-                        {
-                            UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
-                        }
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }).Start();
-            }
+                BackgroundUpdateChecker.CheckAppUpdate();
+            //{
+            //    new Thread(() =>
+            //    {
+            //        try
+            //        {
+            //            if (new UpdateChecker().CheckForUpdate(out var updateLog) && !Model.ExecutionInProgress)
+            //            {
+            //                UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
+            //            }
+            //        }
+            //        catch
+            //        {
+            //            // ignored
+            //        }
+            //    }).Start();
+            //}
         }
 
         private static void FileDropColorOpacityChange(IAnimatable element, double from, double to)
@@ -389,8 +389,7 @@ namespace OpenSvip.GUI
                         : null,
                     EnableMultiThreading = Model.EnableMultiThreading,
                     AppearanceTheme = Model.AppearanceThemes,
-                    CheckForUpdates = Model.CheckForUpdates,
-                    CheckForUpdatesOnStartUp = Model.CheckForUpdatesOnStartUp,
+                    CheckForUpdates = Model.CheckForUpdates
                 }
             }.SaveToFile();
             ToastNotificationManagerCompat.Uninstall();//Uninstall toast notification.

@@ -4,6 +4,7 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Windows.Threading;
 using OpenSvip.Framework;
+using Panuon.UI.Silver;
 
 namespace OpenSvip.GUI
 {
@@ -11,7 +12,22 @@ namespace OpenSvip.GUI
     {
         public static void CheckAppUpdate()
         {
-            
+            new Thread(() =>
+            {
+                try
+                {
+                    if (new UpdateChecker().CheckForUpdate(out var updateLog))
+                    {
+                        var title = $"OpenSVIP v{updateLog.Version} 更新";
+                        var message = string.Join("\n", updateLog.Items);
+                        Toast.ShowUpdateNotifyToast(title, message);
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+            }).Start();
         }
 
         public static void CheckPluginsUpdate()

@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.Notifications;
+using OpenSvip.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Toolkit.Uwp.Notifications;
-using OpenSvip.Framework;
-using OpenSvip.GUI.Config;
-using OpenSvip.Serialization;
 
 namespace OpenSvip.GUI
 {
@@ -62,8 +60,24 @@ namespace OpenSvip.GUI
             };
             var args = new List<Tuple<string, string>>
             {
+                new Tuple<string, string>("type", "plugin"),
                 new Tuple<string, string>("updateUri", plugin.UpdateUri),
                 new Tuple<string, string>("version", plugin.Version)
+            };
+            Show(title, message, buttons, "updateNow", args);
+        }
+
+        public static void ShowUpdateNotifyToast(string title, string message)
+        {
+            var buttons = new List<ToastActionButton>()
+            {
+                new ToastActionButton("立即更新", "updateNow"),
+                new ToastActionButton("下次再说", "dismiss"),
+                new ToastActionButton("不再提醒", "neverRemind")
+            };
+            var args = new List<Tuple<string, string>>
+            {
+                new Tuple<string, string>("type", "converter")
             };
             Show(title, message, buttons, "updateNow", args);
         }
