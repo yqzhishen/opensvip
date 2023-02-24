@@ -621,7 +621,7 @@ namespace SynthV.Core
             note.Length = DecodePosition(svNote.Onset + svNote.Duration) - note.StartPos; // avoid overlapping
             if (!string.IsNullOrEmpty(svNote.Phonemes))
             {
-                note.Lyric = "啊";
+                note.Lyric = svNote.Lyrics;
                 note.Pronunciation = PhonemeUtils.XsampaToPinyin(svNote.Phonemes);
             }
             else if (Regex.IsMatch(svNote.Lyrics, @"[a-zA-Z]"))
