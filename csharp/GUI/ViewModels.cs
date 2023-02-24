@@ -35,6 +35,8 @@ namespace OpenSvip.GUI
             Plugins = PluginManager.GetAllPlugins().ToList();
         }
 
+        public void DisableCheckForUpdates() => CheckForUpdates = false;
+
         private List<Plugin> _plugins;
 
         public List<Plugin> Plugins

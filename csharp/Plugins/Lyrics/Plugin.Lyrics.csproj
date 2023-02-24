@@ -37,6 +37,9 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="ToolGood.Words.Pinyin, Version=3.0.3.1, Culture=neutral, PublicKeyToken=d330f4fd115e6143, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ToolGood.Words.Pinyin.3.0.3.1\lib\net40\ToolGood.Words.Pinyin.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,6 +57,7 @@
     <Compile Include="LyricsEncoder.cs" />
     <Compile Include="Core\LyricsFile.cs" />
     <Compile Include="Core\Utils\LyricsUtil.cs" />
+    <Compile Include="Core\Utils\LyricsReference.cs" />
     <Compile Include="Core\MetaInfo\MetaInfoLine.cs" />
     <Compile Include="Core\MetaInfo\MetaInfoType.cs" />
     <Compile Include="Options\SplitByOption.cs" />

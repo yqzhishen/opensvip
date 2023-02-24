@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console\Arguments.cs" />
-    <Compile Include="Core\Models\DsPitchParamCurve.cs" />
+    <Compile Include="Core\Models\DsParamCurve.cs" />
     <Compile Include="Core\Models\LowLevel\AbstractParamsModel.cs" />
     <Compile Include="Core\Models\DsParamNode.cs" />
     <Compile Include="Core\Models\DsProject.cs" />
@@ -72,6 +72,7 @@
     <Compile Include="Utils\NoteNameConvert.cs" />
     <Compile Include="Console\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\GenderParamUtils.cs" />
     <Compile Include="Utils\PitchParamUtils.cs" />
     <Compile Include="Utils\ProjectUtil.cs" />
     <Compile Include="Utils\PinyinUtil.cs" />

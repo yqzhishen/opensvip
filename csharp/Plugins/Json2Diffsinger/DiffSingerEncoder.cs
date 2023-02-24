@@ -26,6 +26,11 @@ namespace Json2DiffSinger
         public PitchModeOption PitchModeOption { get; set; }
 
         /// <summary>
+        /// 性别参数选项
+        /// </summary>
+        public bool IsExportGender { get; set; }
+
+        /// <summary>
         /// 转为 ds 参数
         /// </summary>
         /// <param name="project"></param>
@@ -50,6 +55,12 @@ namespace Json2DiffSinger
             {
                 var osPitchParamCurve = singingTrack.EditedParams.Pitch;
                 dsProject.PitchParamCurve = PitchParamUtils.Encode(osPitchParamCurve, totalDuration);
+            }
+
+            if (IsExportGender)
+            {
+                var osGenderParamCurve = singingTrack.EditedParams.Gender;
+                dsProject.GenderParamCurve = GenderParamUtils.Encode(osGenderParamCurve, totalDuration);
             }
 
             var model = DsProject.ToParamModel(dsProject);

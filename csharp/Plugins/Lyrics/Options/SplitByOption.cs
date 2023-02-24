@@ -9,6 +9,8 @@ namespace FlutyDeer.LyricsPlugin.Options
         [Description("gap")]
         Gap,
         [Description("symbol")]
-        Symbol
+        Symbol,
+        [Description("text")]
+        Text,
     }
 }

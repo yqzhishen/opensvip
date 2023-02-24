@@ -1,9 +1,16 @@
 ﻿using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows;
+using Windows.Foundation.Collections;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Toolkit.Uwp.Notifications;
+using OpenSvip.GUI.Config;
+using OpenSvip.GUI.Dialog;
+using OpenSvip.Framework;
+using System;
 
 namespace OpenSvip.GUI
 {
@@ -23,6 +30,73 @@ namespace OpenSvip.GUI
         {
             base.OnStartup(e);
             DispatcherUnhandledException += App_DispatcherUnhandledException;
+            RunToastBackground();
+        }
+
+        private static void RunToastBackground()
+        {
+            // Listen to notification activation
+            ToastNotificationManagerCompat.OnActivated += toastArgs =>
+            {
+                var args = ToastArguments.Parse(toastArgs.Argument);
+                //var userInput = toastArgs.UserInput;
+                var action = args.Get("action");
+                switch (action)
+                {
+                    case "updateNow":
+                        Application.Current.Dispatcher.Invoke(delegate
+                        {
+                            if (((MainWindow)Current.MainWindow).WindowState == WindowState.Minimized)
+                                ((MainWindow)Current.MainWindow).WindowState = WindowState.Normal;
+                        });
+                        var type = args.Get("type");
+                        if (type == "plugin")
+                        {
+                            new Thread(() =>
+                            {
+                                try
+                                {
+                                    new UpdateChecker(args.Get("updateUri")).CheckForUpdate(out var updateLog, args.Get("version"));
+                                    Application.Current.Dispatcher.Invoke(delegate
+                                    {
+                                        PluginDownloadDialog.CreateDialog(updateLog).ShowDialog();
+                                    });
+                                }
+                                catch
+                                {
+                                    // ignored
+                                }
+                            }).Start();
+                        }
+                        else
+                        {
+                            new Thread(() =>
+                            {
+                                try
+                                {
+                                    if (new UpdateChecker().CheckForUpdate(out var updateLog))
+                                        UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
+                                }
+                                catch
+                                {
+                                    // ignored
+                                }
+                            }).Start();
+                        }
+                        break;
+                    case "dismiss":
+                        //ignore
+                        break;
+                    case "neverRemind":
+                        Application.Current.Dispatcher.Invoke(delegate
+                        {
+                            ((MainWindow)Current.MainWindow)?.Model.DisableCheckForUpdates();
+                        });
+                        
+                        ToastNotificationManagerCompat.Uninstall(); //Uninstall toast notification.
+                        break;
+                }
+            };
         }
 
         void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

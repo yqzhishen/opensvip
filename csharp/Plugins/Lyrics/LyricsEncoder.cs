@@ -28,6 +28,10 @@ namespace FlutyDeer.LyricsPlugin
 
         public SplitByOption SplitByOption { get; set; }
 
+        public string lyricsText { get; set; }
+
+        public int autoInsertBlankLine { get; set; }
+
         private Project osProject;
 
         private TimeSynchronizer timeSynchronizer;
@@ -41,14 +45,22 @@ namespace FlutyDeer.LyricsPlugin
             var singsingTrack = osProject.TrackList.Where(t => t is SingingTrack).First() as SingingTrack;
             var noteList = singsingTrack.NoteList;
             var buffer = new List<Tuple<int, string>>();
+            var lyricsBindedUnitSeries = new LyricsReference.LyricsBindedUnit[0];
+            if(SplitByOption == SplitByOption.Text) {
+                var lyricsNotePinyinSeries = new string[noteList.Count];
+                var lyricsReference = new LyricsReference(lyricsText);
+                lyricsBindedUnitSeries = lyricsReference.generateLyricBindedUnitSeries(noteList);
+            }
             for (int i = 0; i < noteList.Count; i++)
             {
                 var note = noteList[i];
-                buffer.Add(new Tuple<int, string>(note.StartPos, note.Lyric));
+                var lyricOfNote = SplitByOption == SplitByOption.Text ? lyricsBindedUnitSeries[i].hanzi : note.Lyric;
+                buffer.Add(new Tuple<int, string>(note.StartPos, lyricOfNote));
                 int currentNoteEndPos = note.StartPos + note.Length;
                 bool commitFlag = false;
                 bool conditionSymbol = LyricsUtil.ContainsSymbol(note.Lyric);
                 bool conditionGap = i < noteList.Count - 1 && noteList[i + 1].StartPos - currentNoteEndPos >= 60;
+                bool blankLineFlag = autoInsertBlankLine >= 0 && i < noteList.Count - 1 && noteList[i + 1].StartPos - currentNoteEndPos >= 480 * autoInsertBlankLine;
                 switch (SplitByOption)
                 {
                     case SplitByOption.Symbol:
@@ -60,13 +72,21 @@ namespace FlutyDeer.LyricsPlugin
                     case SplitByOption.Both:
                         commitFlag = conditionSymbol || conditionGap;
                         break;
+                    case SplitByOption.Text:
+                        commitFlag = lyricsBindedUnitSeries[i].positionInLine == LyricsReference.PositionInLine.END || (i < noteList.Count - 1 && lyricsBindedUnitSeries[i + 1].positionInLine == LyricsReference.PositionInLine.START);
+                        break;
                 }
                 if (i == noteList.Count - 1)
                 {
                     commitFlag = true;
                 }
+                commitFlag = commitFlag || blankLineFlag;
                 if (commitFlag)
                 {
+                    CommitCurrentLyricLine(lyricsFile, buffer);
+                }
+                if(blankLineFlag) {
+                    buffer.Add(new Tuple<int, string>(currentNoteEndPos, ""));
                     CommitCurrentLyricLine(lyricsFile, buffer);
                 }
             }

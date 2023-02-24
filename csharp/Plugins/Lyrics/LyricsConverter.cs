@@ -22,7 +22,9 @@ namespace FlutyDeer.LyricsPlugin.Stream
                 By = options.GetValueAsString("by"),
                 Offset = options.GetValueAsInteger("offset"),
                 OffsetPolicyOption = options.GetValueAsEnum("offsetPolicy", OffsetPolicyOption.Timeline),
-                SplitByOption = options.GetValueAsEnum("splitBy", SplitByOption.Both)
+                SplitByOption = options.GetValueAsEnum("splitBy", SplitByOption.Both),
+                lyricsText = options.GetValueAsString("lyricsText"),
+                autoInsertBlankLine = options.GetValueAsInteger("autoInsertBlankLine", 4)
             }.EncodeProject(project);
             var lyricEncoding = options.GetValueAsEnum("encoding", LyricEncodingOption.UTF8);
             var writingSettings = new WritingSettings

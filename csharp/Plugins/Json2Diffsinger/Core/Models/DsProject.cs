@@ -18,7 +18,12 @@ namespace Json2DiffSinger.Core.Models
         /// <summary>
         /// 音高参数
         /// </summary>
-        public DsPitchParamCurve PitchParamCurve { get; set; } = new DsPitchParamCurve();
+        public DsParamCurve PitchParamCurve { get; set; } = new DsParamCurve();
+
+        /// <summary>
+        /// 性别参数
+        /// </summary>
+        public DsParamCurve GenderParamCurve { get; set; } = new DsParamCurve();
 
         #endregion
 
@@ -77,11 +82,22 @@ namespace Json2DiffSinger.Core.Models
 
             #region Serialize Pitch Parameter Curve
 
-            var points = dsProject.PitchParamCurve.PointList;
+            var pitchPoints = dsProject.PitchParamCurve.PointList;
             string f0Sequence = null;
-            if (points != null && points.Any())
+            if (pitchPoints != null && pitchPoints.Any())
             {
-                f0Sequence = string.Join(" ", points.Select(p => $"{p.Value:F1}"));
+                f0Sequence = string.Join(" ", pitchPoints.Select(p => $"{p.Value:F1}"));
+            }
+
+            #endregion
+
+            #region Serialize Gender Parameter Curve
+
+            var genderPoints = dsProject.GenderParamCurve.PointList;
+            string genderSequence = null;
+            if (genderPoints != null && genderPoints.Any())
+            {
+                genderSequence = string.Join(" ", genderPoints.Select(p => $"{p.Value:F1}"));
             }
 
             #endregion
@@ -94,8 +110,10 @@ namespace Json2DiffSinger.Core.Models
                 NoteDurationSequence = inputDurationSeq,
                 IsSlurSequence = isSlurSeq,
                 PhonemeDurationSequence = phonemeDurSeq,
-                F0TimeStepSize = dsProject.PitchParamCurve.F0TimeStepSize.ToString(),
-                F0Sequence = f0Sequence
+                F0TimeStepSize = dsProject.PitchParamCurve.StepSize.ToString(),
+                F0Sequence = f0Sequence,
+                GenderTimeStepSize = dsProject.GenderParamCurve.StepSize.ToString(),
+                GenderSequence = genderSequence
             };
         }
     }

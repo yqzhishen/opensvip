@@ -15,13 +15,30 @@ namespace Json2DiffSinger.Console
     internal partial class Program
     {
 
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
-            return Parser.Default.ParseArguments<Arguments>(args)
-                .MapResult(
-                    (Arguments options) => ConvertFile(options),
-                    errors => 1);
+            string inPath = @"D:\测试\眉间雪（性别参数测试）.json";
+            string outPath = @"D:\测试\眉间雪（性别参数测试）.ds";
+
+            Project project;
+            using (var stream = File.OpenRead(inPath))
+            using (var reader = new StreamReader(stream))
+                project = JsonConvert.DeserializeObject<Project>(reader.ReadToEnd());
+            new DiffSingerConverter().Save(outPath,
+                                           project,
+                                           new ConverterOptions(new Dictionary<string, string>
+                                           {
+                                               { "dictionary", "opencpop-extension"}
+                                           }));
         }
+
+        //public static int Main(string[] args)
+        //{
+        //    return Parser.Default.ParseArguments<Arguments>(args)
+        //        .MapResult(
+        //            (Arguments options) => ConvertFile(options),
+        //            errors => 1);
+        //}
 
         private static int ConvertFile(Arguments options)
         {

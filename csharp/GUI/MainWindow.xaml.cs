@@ -19,6 +19,7 @@ using OpenSvip.GUI.Config;
 using OpenSvip.GUI.Dialog;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace OpenSvip.GUI
 {
@@ -98,28 +99,31 @@ namespace OpenSvip.GUI
                 Model.ExportPath.PathValue = settings.LastExportPath;
             }
             DataContext = Model;
+            if (Model.CheckForUpdates)
+                BackgroundUpdateChecker.CheckPluginsUpdate();
         }
 
         private void MainWindow_SourceInitialized(object sender, EventArgs e)
         {
             AddConverterTasks(Environment.GetCommandLineArgs().Skip(1).Where(File.Exists));
             if (Model.CheckForUpdates)
-            {
-                new Thread(() =>
-                {
-                    try
-                    {
-                        if (new UpdateChecker().CheckForUpdate(out var updateLog) && !Model.ExecutionInProgress)
-                        {
-                            UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
-                        }
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-                }).Start();
-            }
+                BackgroundUpdateChecker.CheckAppUpdate();
+            //{
+            //    new Thread(() =>
+            //    {
+            //        try
+            //        {
+            //            if (new UpdateChecker().CheckForUpdate(out var updateLog) && !Model.ExecutionInProgress)
+            //            {
+            //                UpdateCheckDialog.CreateDialog(updateLog).ShowDialog();
+            //            }
+            //        }
+            //        catch
+            //        {
+            //            // ignored
+            //        }
+            //    }).Start();
+            //}
         }
 
         private static void FileDropColorOpacityChange(IAnimatable element, double from, double to)
@@ -388,6 +392,7 @@ namespace OpenSvip.GUI
                     CheckForUpdates = Model.CheckForUpdates
                 }
             }.SaveToFile();
+            ToastNotificationManagerCompat.Uninstall();//Uninstall toast notification.
             // Shutdown the application by force
             new Thread(() =>
             {
