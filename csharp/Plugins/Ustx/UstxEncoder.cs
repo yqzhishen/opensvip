@@ -164,12 +164,26 @@ namespace OxygenDioxide.UstxPlugin.Stream
         }
         public static void encodePitch(UVoicePart part, UProject project, List<Tuple<int, int>> osPitch)
         {
+            int firstBarLength = 1920;
+
+            
             int pitchStart = BasePitchGenerator.pitchStart;
             int pitchInterval = BasePitchGenerator.pitchInterval;
-
             float[] basePitch = BasePitchGenerator.BasePitch(part, project);//生成基础音高线
+            int pitchEndX = basePitch.Count() * pitchInterval + firstBarLength + 1;
 
-            int firstBarLength = 1920;
+            //如果osPitch为空
+            if (osPitch == null || osPitch.Count == 0)
+            {
+                osPitch = new List<Tuple<int, int>>() { Tuple.Create(0, -1), Tuple.Create(pitchEndX, -1) };
+            }
+            //如果osPitch末尾不完整
+            if (osPitch.Last().Item1 < pitchEndX)
+            {
+                osPitch.Add(Tuple.Create(osPitch.Last().Item1, -1));
+                osPitch.Add(Tuple.Create(pitchEndX, -1));
+            }
+
             int osPitchPointer = 0;//当前位于输入osPitch的第几个采样点
             UCurve pitd = new UCurve
             {
@@ -190,7 +204,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 }
                 else//有实际曲线存在
                 {
-                    int x1 = osPitch[osPitchPointer].Item1-firstBarLength;
+                    int x1 = osPitch[osPitchPointer].Item1 - firstBarLength;
                     int x2 = osPitch[osPitchPointer+1].Item1 - firstBarLength;
                     int y1 = osPitch[osPitchPointer].Item2;
                     int y2 = osPitch[osPitchPointer+1].Item2;
