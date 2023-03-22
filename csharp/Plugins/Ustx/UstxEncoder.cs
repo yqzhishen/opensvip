@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using OpenSvip.Model;
 using OpenUtau.Core.Ustx;
+using OxygenDioxide.UstxPlugin.Utils;
 
 namespace OxygenDioxide.UstxPlugin.Stream
 {
@@ -122,7 +123,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             {
                 Y0=(lastNoteKeyNumber-osNote.KeyNumber)*10;
             }
-            string lyric = osNote.Lyric;
+            string lyric = LyricsUtil.GetSymbolRemovedLyric(osNote.Lyric);//去除标点符号
             if(osNote.Pronunciation != null)//如果有发音，则用发音
             {
                 lyric=osNote.Pronunciation;
