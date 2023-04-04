@@ -11,9 +11,19 @@ namespace OxygenDioxide.UstxPlugin.Stream
     {
         public static UProject EncodeProject(Project osProject)
         {
+            //节拍
+            List<UTimeSignature> ustxTimeSignatures = osProject.TimeSignatureList
+                .Select(EncodeTimeSignature)
+                .ToList();
+            if (ustxTimeSignatures.Count == 0)
+            {
+                ustxTimeSignatures.Add(new UTimeSignature(0, 4, 4));
+            }
+            var firstBarLength = 1920 * ustxTimeSignatures[0].beatPerBar / ustxTimeSignatures[0].beatUnit;
+
             //曲速
             List<UTempo> tempos = osProject.SongTempoList
-                .Select(EncodeTempo)
+                .Select(x=>EncodeTempo(x,firstBarLength))
                 .ToList();
             if(tempos.Count==0)
             {
@@ -24,11 +34,6 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 });
             }
 
-            //节拍
-            List<UTimeSignature> ustxTimeSignatures = new List<UTimeSignature> { 
-                new UTimeSignature(0,4,4)
-            };
-            
             UProject ustxProject = new UProject {
                 tempos = tempos,
                 bpm = tempos[0].bpm,
@@ -45,7 +50,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 ustxProject.tracks.Add(EncodeTrack(osTrack));
                 if(osTrack.Type=="Singing")//合成音轨
                 {
-                    ustxProject.voiceParts.Add(EncodeVoicePart((SingingTrack)osTrack,trackNo,ustxProject));
+                    ustxProject.voiceParts.Add(EncodeVoicePart((SingingTrack)osTrack,trackNo,ustxProject,firstBarLength));
                 }
                 else//伴奏音轨
                 {
@@ -56,12 +61,22 @@ namespace OxygenDioxide.UstxPlugin.Stream
             return ustxProject;
         }
 
-        public static UTempo EncodeTempo(SongTempo osTempo)
+        public static UTempo EncodeTempo(SongTempo osTempo, int firstBarLength = 1920)
         {
             return new UTempo
             {
-                position = Math.Max(osTempo.Position - 1920, 0),
+                position = Math.Max(osTempo.Position - firstBarLength, 0),
                 bpm = osTempo.BPM
+            };
+        }
+
+        public static UTimeSignature EncodeTimeSignature(TimeSignature osTimeSignature)
+        {
+            return new UTimeSignature
+            {
+                barPosition = osTimeSignature.BarIndex,
+                beatPerBar = osTimeSignature.Numerator,
+                beatUnit = osTimeSignature.Denominator
             };
         }
 
@@ -77,7 +92,8 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxTrack;
         }
-        public static UVoicePart EncodeVoicePart(SingingTrack osTrack, int trackNo, UProject ustxProject)
+        
+        public static UVoicePart EncodeVoicePart(SingingTrack osTrack, int trackNo, UProject ustxProject, int firstBarLength = 1920)
         {
             UVoicePart ustxVoicePart = new UVoicePart {
                 name = osTrack.Title,
@@ -98,10 +114,11 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 lastNoteKeyNumber = osNote.KeyNumber;
             }
             //转换音高曲线
-            encodePitch(ustxVoicePart, ustxProject, osTrack.EditedParams.Pitch.PointList);
+            EncodePitch(ustxVoicePart, ustxProject, osTrack.EditedParams.Pitch.PointList, firstBarLength);
 
             return ustxVoicePart;
         }
+        
         public static UWavePart EncodeWavePart(InstrumentalTrack osTrack, int trackNo)
         {
             UWavePart ustxWavePart = new UWavePart
@@ -114,6 +131,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxWavePart;
         }
+        
         public static UNote EncodeNote(Note osNote,bool snapFirst,int lastNoteKeyNumber)
         {
             //snapFirst：是否与上一个音符挨着，挨着就是True
@@ -163,11 +181,9 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return ustxNote;
         }
-        public static void encodePitch(UVoicePart part, UProject project, List<Tuple<int, int>> osPitch)
-        {
-            int firstBarLength = 1920;
-
-            
+        
+        public static void EncodePitch(UVoicePart part, UProject project, List<Tuple<int, int>> osPitch, int firstBarLength = 1920)
+        {        
             int pitchStart = BasePitchGenerator.pitchStart;
             int pitchInterval = BasePitchGenerator.pitchInterval;
             float[] basePitch = BasePitchGenerator.BasePitch(part, project);//生成基础音高线
