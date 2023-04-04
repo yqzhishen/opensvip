@@ -28,10 +28,9 @@ namespace CrSjimo.SvgPlugin {
                 PitchPositionOffset = project.TimeSignatureList[0].Numerator * 480,
                 TextAlign = TextAlign,
             };
-            var track = (SingingTrack) project.TrackList
+            var track = (SingingTrack)project.TrackList
                 .Where(trackIt => trackIt is SingingTrack)
-                .Skip(TrackIndex)
-                .First();
+                .ElementAt(TrackIndex);
             coordinateHelper.calculateRange(track);
             svgFactory.CoordinateHelper = coordinateHelper;
             svgFactory.ApplyStyle(
