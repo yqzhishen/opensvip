@@ -59,6 +59,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OpenUtau.Core\Ustx\UTrack.cs" />
     <Compile Include="UstxEncoder.cs" />
+    <Compile Include="Utils\LyricsUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
