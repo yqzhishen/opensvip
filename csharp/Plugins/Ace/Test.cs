@@ -30,21 +30,30 @@ namespace AceStdio.Test
         {
             var srcPath = @"D:\Test\Param\小小.acep";
             var dstPath = @"D:\Test\Param\小小test.json";
-            AceProjectTest projectData;
-            using (var stream = File.OpenRead(srcPath))
-            using (var reader = new StreamReader(stream))
-                projectData = JsonConvert.DeserializeObject<AceProjectTest>(reader.ReadToEnd());
-            var contentString = projectData.Content;
-            var rawContent = Convert.FromBase64String(contentString);
-            // Span<byte> decompressed;
-            // using (var decompressor = new Decompressor())
-            //     decompressed = decompressor.Unwrap(rawContent);
-            // using (var file = File.Create(dstPath))
-            //     file.Write(decompressed.ToArray(), 0, decompressed.Length);
-            using (var input = new MemoryStream(rawContent))
-            using (var output = File.OpenWrite(dstPath))
-            using (var decompressor = new DecompressionStream(input))
-                decompressor.CopyTo(output);
+            var dstOsPath = @"D:\Test\Param\小小opensvip.json";
+            
+            var prj = new AceConverter().Load(
+                srcPath,
+                new ConverterOptions(new Dictionary<string, string>()));
+            using (var stream = new FileStream(dstOsPath, FileMode.Create, FileAccess.Write))
+            using (var writer = new StreamWriter(stream))
+                writer.Write(JsonConvert.SerializeObject(prj));
+            
+            // AceProjectTest projectData;
+            // using (var stream = File.OpenRead(srcPath))
+            // using (var reader = new StreamReader(stream))
+            //     projectData = JsonConvert.DeserializeObject<AceProjectTest>(reader.ReadToEnd());
+            // var contentString = projectData.Content;
+            // var rawContent = Convert.FromBase64String(contentString);
+            // // Span<byte> decompressed;
+            // // using (var decompressor = new Decompressor())
+            // //     decompressed = decompressor.Unwrap(rawContent);
+            // // using (var file = File.Create(dstPath))
+            // //     file.Write(decompressed.ToArray(), 0, decompressed.Length);
+            // using (var input = new MemoryStream(rawContent))
+            // using (var output = File.OpenWrite(dstPath))
+            // using (var decompressor = new DecompressionStream(input))
+            //     decompressor.CopyTo(output);
             
             return 0;
 #if BUILD

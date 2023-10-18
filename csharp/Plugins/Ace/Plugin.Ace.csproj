@@ -94,6 +94,7 @@
     <Compile Include="Test.cs" Condition=" '$(Configuration)' == 'Debug' " />
     <Compile Include="TimeUtils.cs" />
     <Compile Include="TracksJsonConverter.cs" />
+    <Compile Include="ZstdJsonConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Properties.xml">

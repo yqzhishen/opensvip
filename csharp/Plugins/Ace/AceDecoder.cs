@@ -78,7 +78,7 @@ namespace AceStdio.Core
                 case AceVocalTrack aceVocalTrack:
                     var singingTrack = new SingingTrack
                     {
-                        AISingerName = aceVocalTrack.Singer
+                        AISingerName = aceVocalTrack.Singer.Name
                     };
 
                     _aceNoteList = new List<AceNote>();
@@ -180,22 +180,31 @@ namespace AceStdio.Core
                 Length = aceNote.Duration,
                 Lyric = aceNote.Lyrics
             };
-            if (pinyin == null || !aceNote.Lyrics.Contains('-') && aceNote.Pronunciation != pinyin)
-            {
-                note.Pronunciation = aceNote.Pronunciation;
-            }
+            // if (pinyin == null || !aceNote.Lyrics.Contains('-') && aceNote.Pronunciation != pinyin)
+            // {
+            //     note.Pronunciation = aceNote.Pronunciation;
+            // }
             if (aceNote.BreathLength > 0)
             {
                 note.HeadTag = "V";
             }
-            if (aceNote.ConsonantLength != null)
+            // if (aceNote.ConsonantLength != null)
+            // {
+            //     // TODO: this may cause negative time coordinates, producing exception in TimeSynchronizer
+            //     note.EditedPhones = new Phones
+            //     {
+            //         HeadLengthInSecs = (float)
+            //             (_synchronizer.GetActualSecsFromTicks(note.StartPos)
+            //              - _synchronizer.GetActualSecsFromTicks(note.StartPos - aceNote.ConsonantLength.Value))
+            //     };
+            // }
+            if (aceNote.HeadConsonants != null && aceNote.HeadConsonants.Any())
             {
-                // TODO: this may cause negative time coordinates, producing exception in TimeSynchronizer
                 note.EditedPhones = new Phones
                 {
                     HeadLengthInSecs = (float)
                         (_synchronizer.GetActualSecsFromTicks(note.StartPos)
-                         - _synchronizer.GetActualSecsFromTicks(note.StartPos - aceNote.ConsonantLength.Value))
+                         - _synchronizer.GetActualSecsFromTicks(note.StartPos - aceNote.HeadConsonants.First()))
                 };
             }
             return note;

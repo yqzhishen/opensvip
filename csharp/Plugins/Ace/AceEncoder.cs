@@ -104,7 +104,7 @@ namespace AceStdio.Core
                 case SingingTrack singingTrack:
                     var aceVocalTrack = new AceVocalTrack
                     {
-                        Singer = AceSingers.GetId(singingTrack.AISingerName) > 0 ? singingTrack.AISingerName : DefaultSinger
+                        // Singer = AceSingers.GetId(singingTrack.AISingerName) > 0 ? singingTrack.AISingerName : DefaultSinger
                     };
 
                     if (!singingTrack.NoteList.Any())
@@ -227,18 +227,18 @@ namespace AceStdio.Core
             
             if (!note.Lyric.Contains("-"))
             {
-                aceNote.Pronunciation = note.Pronunciation ?? pinyin;
+                // aceNote.Pronunciation = note.Pronunciation ?? pinyin;
             }
             else
             {
                 aceNote.Lyrics = "-";
-                aceNote.Pronunciation = "-";
+                // aceNote.Pronunciation = "-";
             }
             if (note.EditedPhones != null && note.EditedPhones.HeadLengthInSecs >= 0)
             {
                 var phoneStartInSecs = _synchronizer.GetActualSecsFromTicks(note.StartPos) - note.EditedPhones.HeadLengthInSecs;
                 var phoneStartInTicks = _synchronizer.GetActualTicksFromSecs(phoneStartInSecs);
-                aceNote.ConsonantLength = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(note.StartPos) - phoneStartInTicks);
+                // aceNote.ConsonantLength = (int)Math.Round(_synchronizer.GetActualTicksFromTicks(note.StartPos) - phoneStartInTicks);
             }
             if (note.HeadTag == "V" && BreathLength > 0)
             {
@@ -251,15 +251,15 @@ namespace AceStdio.Core
 
         private int GetActualLagCompensation(AceNote note)
         {
-            if (Regex.IsMatch(note.Pronunciation, "^[yw].*"))
-            {
-                return note.ConsonantLength ?? LagCompensation;
-            }
-
-            if (Regex.IsMatch(note.Pronunciation, "^[aoe]|(ri).*"))
-            {
-                return note.ConsonantLength ?? LagCompensation / 2;
-            }
+            // if (Regex.IsMatch(note.Pronunciation, "^[yw].*"))
+            // {
+            //     return note.ConsonantLength ?? LagCompensation;
+            // }
+            //
+            // if (Regex.IsMatch(note.Pronunciation, "^[aoe]|(ri).*"))
+            // {
+            //     return note.ConsonantLength ?? LagCompensation / 2;
+            // }
             return 0;
         }
 
@@ -271,7 +271,7 @@ namespace AceStdio.Core
                 var actualShift = Math.Min(noteList[0].Position, firstShift);
                 noteList[0].Position -= actualShift;
                 noteList[0].Duration += actualShift;
-                noteList[0].ConsonantLength = null;
+                // noteList[0].ConsonantLength = null;
             }
             
             for (var i = 1; i < noteList.Count; ++i)
@@ -283,7 +283,7 @@ namespace AceStdio.Core
                     noteList[i].Position - actualShift - noteList[i-1].Position);
                 noteList[i].Position -= actualShift;
                 noteList[i].Duration += actualShift;
-                noteList[i].ConsonantLength = null;
+                // noteList[i].ConsonantLength = null;
             }
         }
 

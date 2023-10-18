@@ -12,6 +12,7 @@ namespace AceStdio.Model
 
         [JsonProperty("content")]
         // [JsonConverter(typeof(CryptoJsonConverter))]
+        [JsonConverter(typeof(ZstdJsonConverter))]
         public AceContent Content { get; set; } = new AceContent();
 
         [JsonProperty("debugInfo")] public AceDebug DebugInfo { get; set; } = new AceDebug();
