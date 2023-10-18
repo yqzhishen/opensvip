@@ -3,21 +3,50 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.MemoryMappedFiles;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Text;
 using AceStdio.Model;
 using AceStdio.Resources;
 using AceStdio.Stream;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OpenSvip.Framework;
 using OpenSvip.Model;
-
+using ZstdSharp;
 
 namespace AceStdio.Test
 {
+    class AceProjectTest
+    {
+        [JsonProperty("content")]
+        public string Content { get; set; } = "";
+    }
+
     public static class Test
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
+            var srcPath = @"D:\Test\Param\小小.acep";
+            var dstPath = @"D:\Test\Param\小小test.json";
+            AceProjectTest projectData;
+            using (var stream = File.OpenRead(srcPath))
+            using (var reader = new StreamReader(stream))
+                projectData = JsonConvert.DeserializeObject<AceProjectTest>(reader.ReadToEnd());
+            var contentString = projectData.Content;
+            var rawContent = Convert.FromBase64String(contentString);
+            // Span<byte> decompressed;
+            // using (var decompressor = new Decompressor())
+            //     decompressed = decompressor.Unwrap(rawContent);
+            // using (var file = File.Create(dstPath))
+            //     file.Write(decompressed.ToArray(), 0, decompressed.Length);
+            using (var input = new MemoryStream(rawContent))
+            using (var output = File.OpenWrite(dstPath))
+            using (var decompressor = new DecompressionStream(input))
+                decompressor.CopyTo(output);
+            
+            return 0;
 #if BUILD
             var aceProject = new AceProject();
             aceProject.Content.TempoList.Add(new AceTempo
