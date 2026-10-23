@@ -1,10 +1,6 @@
-## 项目 Releases 迁移公告
-
-由于需求的变更，本项目在创立之初的架构可能在未来无法满足需要，因此我们未来会重写底层框架，开发更加通用强大的歌声合成工程处理接口，探索全新的调音工作流。目前本项目的日常更新以及未来框架的搭建均会在组织账号 [@openvpi](https://github.com/openvpi) 下进行，届时也将欢迎更多开发者的加入，敬请关注。
-
-项目成果现已公测：[B站专栏](https://www.bilibili.com/read/cv16468227)
-
-日常发行版更新已移至：[OpenVPI 主页](https://openvpi.github.io/)
+> [!CAUTION]
+>  ## 项目停止运营公告
+> 本项目发布页和存储桶已下线，不再对外提供下载，如有需求请关注功能更完善、架构更现代化、跨平台的工程格式转换器：[LibreSVIP](https://github.com/SoulMelody/LibreSVIP)
 
 # OpenSVIP
 
