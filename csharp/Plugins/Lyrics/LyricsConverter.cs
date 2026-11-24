@@ -6,7 +6,7 @@ using System;
 
 namespace FlutyDeer.LyricsPlugin.Stream
 {
-    internal class LyricsConverter : IProjectConverter
+    public class LyricsConverter : IProjectConverter
     {
         public Project Load(string path, ConverterOptions options)
         {

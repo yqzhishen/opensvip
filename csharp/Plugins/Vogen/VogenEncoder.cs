@@ -1,9 +1,5 @@
 ﻿using OpenSvip.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using FlutyDeer.VogenPlugin.Model;
 using NPinyin;
 
@@ -25,7 +21,7 @@ namespace FlutyDeer.VogenPlugin
                 BPM = osProject.SongTempoList[0].BPM,
                 TimeSignature = GetTimeSignature(osProject.TimeSignatureList[0]),
                 InstrumentalOffset = 0,
-                TrackList = EncodeTrackList()
+                PhraseList = EncodeTrackList()
             };
             return vogenProject;
         }
@@ -35,9 +31,9 @@ namespace FlutyDeer.VogenPlugin
             return timeSignature.Numerator + "/" + timeSignature.Denominator;
         }
 
-        private List<VogTrack> EncodeTrackList()
+        private List<VogPhrase> EncodeTrackList()
         {
-            List<VogTrack> vogTrackList = new List<VogTrack>();
+            List<VogPhrase> vogTrackList = new List<VogPhrase>();
             int trackID = 0;
             foreach (var track in osProject.TrackList)
             {
@@ -57,9 +53,9 @@ namespace FlutyDeer.VogenPlugin
             return vogTrackList;
         }
 
-        private VogTrack EncodeSingingTrack(int trackID, SingingTrack singingTrack)
+        private VogPhrase EncodeSingingTrack(int trackID, SingingTrack singingTrack)
         {
-            VogTrack vogTrack = new VogTrack
+            VogPhrase vogTrack = new VogPhrase
             {
                 TrackName = "utt-" + trackID,
                 SingerName = Singer,

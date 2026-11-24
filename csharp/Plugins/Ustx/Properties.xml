@@ -12,21 +12,24 @@
   <LibraryPath>ustx\OxygenDioxide.UstxPlugin.dll</LibraryPath>
   <Converter>OxygenDioxide.UstxPlugin.Stream.UstxConverter</Converter>
   <InputOptions>
-    <!--（尚未实现）
+    
     <Option Name="importPitch" Type="enum" Default="Full">
       <Notes>音高线导入模式</Notes>
       <EnumChoices>
         <Choice Name="全部导入" Tag="Full" >
           <Label>ustx文件中的所有音高线都将以绝对音高形式转入目标文件中，包括锚点、手绘、颤音与默认音高线。如果已在OpenUTAU中进行大量音高编辑，或使用了锚点与颤音，建议选择此项</Label>
         </Choice>
+        <!--（尚未实现）
         <Choice Name="仅导入已手绘的音高线" Tag="EditedOnly" >
           <Label>ustx文件中，仅手绘的音高线区域会转入目标文件中，包括这些区域的颤音。未修改区域为目标引擎的默认音高线。可能导致音高线不连续。如果只在OpenUTAU中进行了少量音高编辑，建议选择此项</Label>
         </Choice>
+        </Option>-->
         <Choice Name="不导入" Tag="None" >
           <Label>输出的文件中将完全不包含音高信息</Label>
         </Choice>
       </EnumChoices>
-    </Option>-->
+    </Option>
+    
   </InputOptions>
   <OutputOptions>
   </OutputOptions>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+  <Name>Dv 转换插件</Name>
+  <Version>0.1.0</Version>
+  <Author>Oxygen Dioxide</Author>
+  <HomePage>https://github.com/oxygen-dioxide/opensvip/issues</HomePage>
+  <Descriptions>适用于 OpenSvip 的 dv 格式转换插件。</Descriptions>
+  <Requirements>无</Requirements>
+  <Format>DeepVocal 工程文件</Format>
+  <Suffix>dv</Suffix>
+  <Identifier>dv</Identifier>
+  <LibraryPath>dv\OxygenDioxide.DvPlugin.dll</LibraryPath>
+  <Converter>OxygenDioxide.DvPlugin.Stream.DvConverter</Converter>
+  <InputOptions>
+  </InputOptions>
+  <OutputOptions>
+  </OutputOptions>
+</Plugin>

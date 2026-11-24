@@ -619,20 +619,7 @@ namespace SynthV.Core
                 KeyNumber = svNote.Pitch
             };
             note.Length = DecodePosition(svNote.Onset + svNote.Duration) - note.StartPos; // avoid overlapping
-            if (!string.IsNullOrEmpty(svNote.Phonemes))
-            {
-                note.Lyric = svNote.Lyrics;
-                note.Pronunciation = PhonemeUtils.XsampaToPinyin(svNote.Phonemes);
-            }
-            else if (Regex.IsMatch(svNote.Lyrics, @"[a-zA-Z]"))
-            {
-                note.Lyric = "啊";
-                note.Pronunciation = svNote.Lyrics;
-            }
-            else
-            {
-                note.Lyric = svNote.Lyrics;
-            }
+            note.Lyric = svNote.Lyrics;
             return note;
         }
 

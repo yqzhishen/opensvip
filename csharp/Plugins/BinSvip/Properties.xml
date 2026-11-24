@@ -12,15 +12,6 @@
     <LibraryPath>BinSvip\Plugin.BinSvip.dll</LibraryPath>
     <Converter>BinSvip.Stream.BinarySvipConverter</Converter>
     <InputOptions>
-        <Option Name="standalone" Type="boolean" Default="false">
-            <Notes>无依赖式读取（Beta）</Notes>
-            <Tips>贡献者：至精至简
-打开此选项后插件无需依赖 X Studio 动态链接库即可读取完整格式的工程文件。若使用此选项时出现转换异常，请关闭此选项后重试，并向开发者报告问题。</Tips>
-        </Option>
-        <Option Name="libraryPath" Type="string" Default="">
-            <Notes>X Studio 动态链接库路径</Notes>
-            <Tips>您可以指定 X Studio · 歌手软件的安装路径或本插件运行所需的动态链接库的存放路径。在修改此选项前，请先阅读插件信息面板中的依赖说明。</Tips>
-        </Option>
     </InputOptions>
     <OutputOptions>
         <Option Name="singer" Type="string" Default="陈水若">
@@ -48,15 +39,6 @@
                     <Label>导出可使用任意版本 X Studio 打开的工程文件。&#x000A;警告：使用此选项保存后，音量、气声、性别、力度参数将无法被 X Studio 识别（数据没有丢失）。&#x000A;为了避免无法挽回的数据丢失，强烈建议不要使用 X Studio 修改和保存使用此选项导出的工程文件。若要重新将工程文件恢复至可安全编辑的状态，请选择保存为 SVIP 6.0.0 及以上版本。</Label>
                 </Choice>
             </EnumChoices>
-        </Option>
-        <Option Name="standalone" Type="boolean" Default="false">
-            <Notes>无依赖式写入（Beta）</Notes>
-            <Tips>贡献者：至精至简
-打开此选项后插件无需依赖 X Studio 动态链接库即可写入完整格式的工程文件。若使用此选项时出现转换异常，请关闭选项重试，并向开发者报告问题。</Tips>
-        </Option>
-        <Option Name="libraryPath" Type="string" Default="">
-            <Notes>X Studio 动态链接库路径</Notes>
-            <Tips>您可以指定 X Studio · 歌手软件的安装路径或本插件运行所需的动态链接库的存放路径。在修改此选项前，请先阅读插件信息面板中的依赖说明。</Tips>
         </Option>
     </OutputOptions>
 </Plugin>

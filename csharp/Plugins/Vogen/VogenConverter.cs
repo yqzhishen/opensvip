@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using FlutyDeer.VogenPlugin.Model;
+using FlutyDeer.VogenPlugin.Options;
 
 namespace FlutyDeer.VogenPlugin.Stream
 {
@@ -22,7 +22,10 @@ namespace FlutyDeer.VogenPlugin.Stream
             stream.Close();
             reader.Close();
             File.Delete(chartJsonPath);
-            return new VogenDecoder().DecodeProject(vogenProject);
+            return new VogenDecoder()
+            {
+                MergePhrase = options.GetValueAsEnum("mergePhrase", MergePhraseOption.Auto)
+            }.DecodeProject(vogenProject);
         }
 
         public void Save(string path, Project project, ConverterOptions options)

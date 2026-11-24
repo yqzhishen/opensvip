@@ -15,6 +15,9 @@
 		<Option Name="importLyrics" Type="boolean" Default="true">
 			<Notes>导入歌词</Notes>
 		</Option>
+		<Option Name="defaultLyric" Type="string" Default="a">
+			<Notes>默认歌词</Notes>
+		</Option>
 		<Option Name="lyricEncoding" Type="enum" Default="UTF8">
 			<Notes>歌词文本编码</Notes>
 			<Tips>除非歌词出现乱码，否则不应更改此设置。</Tips>
@@ -35,7 +38,7 @@
 			<Notes>导入拍号</Notes>
 			<Tips>关闭此选项，拍号设置为4/4。</Tips>
 		</Option>
-		<Option Name="multiChannel" Type="enum" Default="first">
+		<Option Name="multiChannel" Type="enum" Default="split">
 			<Notes>通道处理方式</Notes>
 			<EnumChoices>
 				<Choice Name="仅导入首条通道" Tag="first" />

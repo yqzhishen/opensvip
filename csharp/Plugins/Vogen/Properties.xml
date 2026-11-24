@@ -1,21 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Plugin>
-    <Name>Vogen 工程转换插件</Name>
-    <Version>0.4.1</Version>
-    <Author>笛鹿FlutyDeer</Author>
-    <HomePage>https://space.bilibili.com/386270936</HomePage>
-    <Descriptions>适用于 OpenSvip 的 Vogen 工程格式转换插件。</Descriptions>
-    <Requirements>无</Requirements>
-    <Format>Vogen 工程文件</Format>
-    <Suffix>vog</Suffix>
-    <Identifier>vog</Identifier>
-    <LibraryPath>Vogen\FlutyDeer.VogenPlugin.dll</LibraryPath>
-    <Converter>FlutyDeer.VogenPlugin.Stream.VogenConverter</Converter>
-    <InputOptions/>
-	<OutputOptions>
-		<Option Name="singer" Type="string" Default="Doaz">
-			<Notes>歌手</Notes>
-			<Tips>请输入完整无误的歌手英文名字。</Tips>
-		</Option>
-	</OutputOptions>
+  <Name>Vogen 工程转换插件</Name>
+  <Version>0.4.1</Version>
+  <Author>笛鹿FlutyDeer</Author>
+  <HomePage>https://space.bilibili.com/386270936</HomePage>
+  <Descriptions>适用于 OpenSvip 的 Vogen 工程格式转换插件。</Descriptions>
+  <Requirements>无</Requirements>
+  <Format>Vogen 工程文件</Format>
+  <Suffix>vog</Suffix>
+  <Identifier>vog</Identifier>
+  <LibraryPath>Vogen\FlutyDeer.VogenPlugin.dll</LibraryPath>
+  <Converter>FlutyDeer.VogenPlugin.Stream.VogenConverter</Converter>
+  <InputOptions>
+    <Option Name="mergePhrase" Type="enum" Default="Auto">
+      <Notes>合并乐句</Notes>
+      <Tips>Vogen的工程文件以乐句为单位存储，乐句之间可重叠，每个乐句可设置不同的歌手。</Tips>
+      <EnumChoices>
+        <Choice Name="合并为单个音轨" Tag="All" >
+          <Label>将同一歌手的所有乐句合并为一个音轨</Label>
+        </Choice>
+        <Choice Name="自动合并" Tag="Auto" >
+          <Label>将同一歌手的乐句自动合并为无音符重叠的音轨。</Label>
+        </Choice>
+        <Choice Name="不合并" Tag="None" >
+          <Label>每个乐句一个音轨</Label>
+        </Choice>
+      </EnumChoices>
+    </Option>
+  </InputOptions>
+  <OutputOptions>
+    <Option Name="singer" Type="string" Default="Doaz">
+      <Notes>歌手</Notes>
+      <Tips>请输入完整无误的歌手英文名字。</Tips>
+    </Option>
+  </OutputOptions>
 </Plugin>

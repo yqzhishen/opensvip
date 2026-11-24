@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Plugin>
+  <Name>ust 转换插件</Name>
+  <Version>0.1.0</Version>
+  <Author>Oxygen Dioxide</Author>
+  <HomePage>https://github.com/oxygen-dioxide/opensvip/issues</HomePage>
+  <Descriptions>适用于 OpenSvip 的 ust 格式转换插件。</Descriptions>
+  <Requirements>无</Requirements>
+  <Format>UTAU 工程文件</Format>
+  <Suffix>ust</Suffix>
+  <Identifier>ust</Identifier>
+  <LibraryPath>ust\OxygenDioxide.UstPlugin.dll</LibraryPath>
+  <Converter>OxygenDioxide.UstPlugin.Stream.UstConverter</Converter>
+  <InputOptions>
+  </InputOptions>
+  <OutputOptions>
+    <Option Name="TrackIndex" Type="integer" Default="0">
+      <Notes>演唱轨序号</Notes>
+      <Tips>需要导出的演唱轨的序号，从 0 开始（伴奏轨不参与计数）。</Tips>
+    </Option>
+  </OutputOptions>
+</Plugin>

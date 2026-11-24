@@ -1,126 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FE326AD0-5B40-42B6-9958-9D6C5F830935}</ProjectGuid>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FlutyDeer.MidiPlugin</RootNamespace>
     <AssemblyName>FlutyDeer.MidiPlugin</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
     <StartupObject />
+    <AssemblyTitle>MIDI 转换插件</AssemblyTitle>
+    <Description>适用于 OpenSvip 的 MIDI 格式转换插件。</Description>
+    <Company>笛鹿FlutyDeer</Company>
+    <Product>MIDI 转换插件</Product>
+    <Copyright>Copyright ©  2022 笛鹿FlutyDeer</Copyright>
+    <AssemblyVersion>0.9.0.0</AssemblyVersion>
+    <FileVersion>0.9.0.0</FileVersion>
+    <NeutralLanguage>zh-Hans</NeutralLanguage>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="FSharp.Core, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\FSharp.Core.6.0.2\lib\netstandard2.0\FSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Protobuf, Version=3.17.3.0, Culture=neutral, PublicKeyToken=a7d26565bac4d604, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Google.Protobuf.3.17.3\lib\net45\Google.Protobuf.dll</HintPath>
-    </Reference>
-    <Reference Include="Melanchall.DryWetMidi, Version=6.1.3.0, Culture=neutral, PublicKeyToken=83d0ffad275219ad, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Melanchall.DryWetMidi.6.1.3\lib\net45\Melanchall.DryWetMidi.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib" />
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Protobuf.FSharp, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Protobuf.FSharp.0.2.0\lib\netstandard2.0\Protobuf.FSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Buffers.4.4.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Memory.4.5.3\lib\netstandard2.0\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Numerics.Vectors.4.4.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="MidiConverter.cs" />
-    <Compile Include="MidiDecoder.cs" />
-    <Compile Include="MidiEncoder.cs" />
-    <Compile Include="Options\ErrorMidiFilePolicyOption.cs" />
-    <Compile Include="Options\LyricEncodingOption.cs" />
-    <Compile Include="Options\LyricsAndPinyinOption.cs" />
-    <Compile Include="Options\MultiChannelOption.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Test.cs" />
-    <Compile Include="Utils\EncodingUtil.cs" />
-    <Compile Include="Utils\LyricsUtil.cs" />
-    <Compile Include="Utils\MidiEventsUtil.cs" />
-    <Compile Include="Utils\MultiChannelUtil.cs" />
-    <Compile Include="Utils\NoteOverlapUtil.cs" />
-    <Compile Include="Utils\PinyinAndLyricUtil.cs" />
-    <Compile Include="Utils\PreShiftUtil.cs" />
-    <Compile Include="Utils\RWSettingsUtil.cs" />
-    <Compile Include="Utils\TempoListUtil.cs" />
-    <Compile Include="Utils\TimeSignatureListUtil.cs" />
-  </ItemGroup>
   <ItemGroup>
     <Content Include="Properties.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <PackageReference Include="Melanchall.DryWetMidi"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj">
-      <Project>{1a025cf4-6ce6-42f9-ad09-16e56d840d95}</Project>
-      <Name>OpenSvip.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Library\OpenSvip.Library.csproj">
-      <Project>{c0982090-a08e-45b8-953a-6d1750a69cdd}</Project>
-      <Name>OpenSvip.Library</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Model\OpenSvip.Model.csproj">
-      <Project>{f0cf4e57-33f4-4a63-a45f-69727058c24a}</Project>
-      <Name>OpenSvip.Model</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\Framework\OpenSvip.Framework.csproj" />
+    <ProjectReference Include="..\..\Library\OpenSvip.Library.csproj" />
+    <ProjectReference Include="..\..\Model\OpenSvip.Model.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\Melanchall.DryWetMidi.6.1.3\build\Melanchall.DryWetMidi.targets" Condition="Exists('..\..\packages\Melanchall.DryWetMidi.6.1.3\build\Melanchall.DryWetMidi.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\Melanchall.DryWetMidi.6.1.3\build\Melanchall.DryWetMidi.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Melanchall.DryWetMidi.6.1.3\build\Melanchall.DryWetMidi.targets'))" />
-  </Target>
 </Project>

@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenSvip.Model;
-using OpenUtau.Core.Ustx;
+using OxygenDioxide.UstxPlugin.Ustx;
+using OxygenDioxide.UstxPlugin.Utils;
+using OxygenDioxide.UstxPlugin.Options;
 
 namespace OxygenDioxide.UstxPlugin.Stream
 {
-    public static class UstxDecoder
+    public class UstxDecoder
     {
-        
+        public ImportPitchOption ImportPitch { get; set; }
+
         //ustx音轨音量转绝对音量。ustx音轨音量以分贝存储（#TODO:待实测）。超过2的音量将被削到2
         public static double DecodeVolume(double ustxVolume)
         {
@@ -29,7 +32,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
         }
 
-        public static Project DecodeProject(UProject ustxProject)
+        public Project DecodeProject(UProject ustxProject)
         {
             List<SongTempo> songTempoList;
             //曲速
@@ -46,7 +49,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                     .Select(DecodeTempo)
                     .ToList();
 
-            //节拍：暂定4/4，待实测
+            //节拍：默认4/4
             if (ustxProject.timeSignatures == null)
             {
                 ustxProject.timeSignatures = new List<UTimeSignature> {
@@ -80,9 +83,12 @@ namespace OxygenDioxide.UstxPlugin.Stream
             //由于OpenUTAU中伴奏音轨和合成音轨一视同仁，需要将伴奏音轨转成的空音轨删除
             trackList = trackList.FindAll(tr => ((SingingTrack)tr).NoteList.Count > 0);
             //音高曲线封尾
-            foreach(Track osTrack in trackList)
+            if (ImportPitchOption.None != ImportPitch)
             {
-                ((SingingTrack)osTrack).EditedParams.Pitch.PointList.Add(new Tuple<int, int>(1073741823,-1));
+                foreach (Track osTrack in trackList)
+                {
+                    ((SingingTrack)osTrack).EditedParams.Pitch.PointList.Add(new Tuple<int, int>(1073741823, -1));
+                }
             }
             //转换伴奏区段
             foreach(UWavePart ustxWavePart in ustxProject.waveParts)
@@ -98,7 +104,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             };
             return osProject;
         }
-        public static SingingTrack DecodeTrack(UTrack ustxTrack)
+        public SingingTrack DecodeTrack(UTrack ustxTrack)
         {
             SingingTrack osTrack = new SingingTrack
             {
@@ -109,28 +115,33 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 Pan = 0,
                 AISingerName = ustxTrack.singer,
             };
-            osTrack.EditedParams.Pitch = new ParamCurve
+            if (ImportPitchOption.None != ImportPitch)
             {
-                PointList = new List<Tuple<int, int>>
+                osTrack.EditedParams.Pitch = new ParamCurve
+                {
+                    PointList = new List<Tuple<int, int>>
                 {
                     new Tuple<int, int>(-192000,-100),
                 }
-            };
+                };
+            }
             return osTrack;
         }
         //解析音符区段，同一个音轨上的所有音符区段合并为一个音轨
-        public static void DecodeVoicePart(UVoicePart ustxVoicePart, SingingTrack osTrack, UProject ustxProject)
+        public void DecodeVoicePart(UVoicePart ustxVoicePart, SingingTrack osTrack, UProject ustxProject)
         {
             int partOffset = ustxVoicePart.position;
             foreach (UNote ustxNote in ustxVoicePart.notes)
             {
-                osTrack.NoteList.Add(DecodeNote(ustxNote,partOffset));
+                osTrack.NoteList.Add(DecodeNote(ustxNote, partOffset));
             }
-            osTrack.EditedParams.Pitch.PointList.AddRange(DecodePitch(ustxVoicePart, ustxProject));
-            if(osTrack.Title=="")
-            {
-                osTrack.Title = ustxVoicePart.name;//音轨名称采用第一个区段的名称
+            if (ImportPitchOption.None != ImportPitch){
+                osTrack.EditedParams.Pitch.PointList.AddRange(DecodePitch(ustxVoicePart, ustxProject));
             }
+            if (osTrack.Title == "")
+                {
+                    osTrack.Title = ustxVoicePart.name;//音轨名称采用第一个区段的名称
+                }
         }
         //解析伴奏区段，每个伴奏区段独立转为一个伴奏音轨
         public static InstrumentalTrack DecodeWavePart(UWavePart ustxWavePart, UProject ustxProject)
@@ -162,7 +173,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
                 KeyNumber = ustxNote.tone,
                 Lyric = lyric
             };
-            if(!(lyric.Length == 1 && LyricUtil.isHanzi(lyric[0])))//如果不是单个汉字，则Pronunciation里面也写一份
+            if(!(lyric.Length == 1 && LyricsUtil.isHanzi(lyric[0])))//如果不是单个汉字，则Pronunciation里面也写一份
             {
                 osNote.Pronunciation = lyric;
             }

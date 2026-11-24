@@ -22,13 +22,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommandLineParser" Version="2.9.0-preview1" />
-      <PackageReference Include="NullLib.ConsoleTable" Version="1.0.3.2" />
+      <PackageReference Include="CommandLineParser"/>
+      <PackageReference Include="NullLib.ConsoleTable"/>
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Framework\OpenSvip.Framework.csproj" />
-      <ProjectReference Include="..\Library\OpenSvip.Library.csproj" />
     </ItemGroup>
 
 </Project>

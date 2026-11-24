@@ -1,27 +1,38 @@
-﻿using OpenSvip.Model;
-using System;
+﻿using FlutyDeer.VogenPlugin.Model;
+using FlutyDeer.VogenPlugin.Options;
+using OpenSvip.Model;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FlutyDeer.VogenPlugin.Model;
 
 namespace FlutyDeer.VogenPlugin
 {
     public class VogenDecoder
     {
-        private VogenProject vogProject;
+        public MergePhraseOption MergePhrase { get; set; }
 
         public Project DecodeProject(VogenProject originalProject)
         {
-            vogProject = originalProject;
+            var vogProject = originalProject;
+            string strTimeSignature = vogProject.TimeSignature;
+            string[] strTimeSignatureArray = strTimeSignature.Split('/');
+            TimeSignature timeSignature = new TimeSignature
+            {
+                Numerator = int.Parse(strTimeSignatureArray[0]),
+                Denominator = int.Parse(strTimeSignatureArray[1])
+            };
+            SongTempo tempo = new SongTempo
+            {
+                Position = 0,
+                BPM = vogProject.BPM
+            };
+
             Project osProject = new Project
             {
                 Version = "SVIP7.0.0",
-                SongTempoList = DecodeSongTempoList(),
-                TimeSignatureList = DecodeTimeSignatureList()
+                SongTempoList = new List<SongTempo> { tempo },
+                TimeSignatureList = new List<TimeSignature> { timeSignature }
             };
-            osProject.TrackList = DecodeTrackList(osProject);
+            osProject.TrackList = DecodeTrackList(vogProject);
             return osProject;
         }
 
@@ -29,48 +40,69 @@ namespace FlutyDeer.VogenPlugin
         /// 转换演唱轨和伴奏轨。
         /// </summary>
         /// <returns></returns>
-        private List<Track> DecodeTrackList(Project project)
+        private List<Track> DecodeTrackList(VogenProject vogProject)
         {
-            List<Track> trackList = new List<Track>();
-            trackList.AddRange(DecodeSingingTracks(project));
-            return trackList;
+            return GroupPhrase(vogProject.PhraseList)
+                .Select(PhrasesToTrack)
+                .ToList();
         }
 
-        private List<Track> DecodeSingingTracks(Project project)
+        private int EndPos(VogPhrase phrase)
         {
-            List<Track> singingTrackList = new List<Track>();
-            for (int index = 0; index < vogProject.TrackList.Count; index++)
-            {
-                Track track = new SingingTrack
-                {
-                    Title = vogProject.TrackList[index].SingerName,
-                    Mute = false,
-                    Solo = false,
-                    Volume = 0.7,
-                    Pan = 0.0,
-                    AISingerName = GetDefaultAISingerName(),
-                    ReverbPreset = GetDefaultReverbPreset(),
-                    NoteList = DecodeNoteList(index, project)
-                };
-                singingTrackList.Add(track);
+            if (phrase.NoteList.Count == 0) {
+                return -1;
             }
-            return singingTrackList;
+            var lastNote = phrase.NoteList.Last();
+            return lastNote.StartPosition + lastNote.Duration;
         }
 
-        /// <summary>
-        /// 转换音符列表。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="project">OpenSvip工程。</param>
-        /// <returns></returns>
-        private List<Note> DecodeNoteList(int singingTrackIndex, Project project)
+        private List<List<VogPhrase>> GroupPhrasesWithinSinger(IEnumerable<VogPhrase> naiveGroup)
         {
-            List<Note> noteList = new List<Note>();
-            for (int noteIndex = 0; noteIndex < vogProject.TrackList[singingTrackIndex].NoteList.Count; noteIndex++)
+            switch (MergePhrase)
             {
-                noteList.Add(DecodeNote(singingTrackIndex, noteIndex, project));
+                case MergePhraseOption.All:
+                    return new List<List<VogPhrase>> { naiveGroup.ToList() };
+                case MergePhraseOption.Auto:
+                    var groups = new List<List<VogPhrase>>();
+                    foreach (var phrase in naiveGroup) {
+                        var startPos = phrase.NoteList[0].StartPosition;
+                        var destination = groups
+                            .FirstOrDefault(group => EndPos(group.Last()) < startPos);
+                        if (destination == null) { 
+                            destination = new List<VogPhrase>();
+                            groups.Add(destination);
+                        }
+                        destination.Add(phrase);
+                    }
+                    return groups;
+                default:
+                    return naiveGroup
+                        .Select(phrase => new List<VogPhrase> { phrase })
+                        .ToList();
             }
-            return noteList;
+        }
+
+        private List<List<VogPhrase>> GroupPhrase(List<VogPhrase> phraseList)
+        {
+            return phraseList
+                .GroupBy(p => p.SingerName + " " + p.RomScheme)
+                .SelectMany(GroupPhrasesWithinSinger)
+                .ToList();
+        }
+
+        private Track PhrasesToTrack(List<VogPhrase> phrases)
+        {
+            return new SingingTrack
+            {
+                Title = phrases.FirstOrDefault()?.SingerName ?? "",
+                Mute = false,
+                Solo = false,
+                Volume = 0.7,
+                Pan = 0.0,
+                AISingerName = GetDefaultAISingerName(),
+                ReverbPreset = GetDefaultReverbPreset(),
+                NoteList = phrases.SelectMany(ph => ph.NoteList.Select(DecodeNote)).ToList(),
+            };
         }
 
         /// <summary>
@@ -79,41 +111,17 @@ namespace FlutyDeer.VogenPlugin
         /// <param name="singingTrackIndex">演唱轨索引。</param>
         /// <param name="noteIndex">音符索引。</param>
         /// <returns></returns>
-        private Note DecodeNote(int singingTrackIndex, int noteIndex, Project project)
+        private Note DecodeNote(VogNote vogNote)
         {
             Note note = new Note
             {
-                StartPos = DecodeNoteStartPosition(singingTrackIndex, noteIndex, project),
-                Length = vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].Duration,
-                KeyNumber = vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].KeyNumber,
-                Lyric = vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].Lyric,
-                Pronunciation = DecodePronunciation(singingTrackIndex, noteIndex),
+                StartPos = vogNote.StartPosition,
+                Length = vogNote.Duration,
+                KeyNumber = vogNote.KeyNumber,
+                Lyric = vogNote.Lyric,
+                Pronunciation = vogNote.Pronunciation,
             };
             return note;
-        }
-
-        /// <summary>
-        /// 转换音符起始位置。
-        /// </summary>
-        /// <param name="singingTrackIndex">演唱轨索引。</param>
-        /// <param name="noteIndex">音符索引。</param>
-        /// <param name="project">OpenSvip工程。</param>
-        /// <returns></returns>
-        private int DecodeNoteStartPosition(int singingTrackIndex, int noteIndex, Project project)
-        {
-            return vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].StartPosition;
-        }
-
-        /// <summary>
-        /// 转换音符读音。
-        /// </summary>
-        /// <param name="singingTrackIndex"></param>
-        /// <param name="noteIndex"></param>
-        /// <returns></returns>
-        private string DecodePronunciation(int singingTrackIndex, int noteIndex)
-        {
-            string pronunciation = vogProject.TrackList[singingTrackIndex].NoteList[noteIndex].Pronunciation;
-            return pronunciation;
         }
 
         /// <summary>
@@ -133,50 +141,5 @@ namespace FlutyDeer.VogenPlugin
         {
             return "陈水若";
         }
-
-        private List<TimeSignature> DecodeTimeSignatureList()
-        {
-            List<TimeSignature> timeSignatureList = new List<TimeSignature>();
-            timeSignatureList.Add(DecodeTimeSignature());
-            return timeSignatureList;
-        }
-
-        private TimeSignature DecodeTimeSignature()
-        {
-            string strTimeSignature = vogProject.TimeSignature;
-            string[] strTimeSignatureArray = strTimeSignature.Split('/');
-            TimeSignature timeSignature = new TimeSignature
-            {
-                Numerator = int.Parse(strTimeSignatureArray[0]),
-                Denominator = int.Parse(strTimeSignatureArray[1])
-            };
-            return timeSignature;
-        }
-
-        /// <summary>
-        /// 转换曲速列表。
-        /// </summary>
-        /// <returns></returns>
-        private List<SongTempo> DecodeSongTempoList()
-        {
-            List<SongTempo> songTempoList = new List<SongTempo>();
-            songTempoList.Add(DecodeSongTempo());
-            return songTempoList;
-        }
-
-        /// <summary>
-        /// 转换曲速标记。
-        /// </summary>
-        /// <returns></returns>
-        private SongTempo DecodeSongTempo()
-        {
-            SongTempo songTempo = new SongTempo
-            {
-                Position = 0,
-                BPM = vogProject.BPM
-            };
-            return songTempo;
-        }
-        
     }
 }

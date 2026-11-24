@@ -8,7 +8,7 @@ namespace FlutyDeer.VogenPlugin.Model
         [JsonProperty("timeSig0")]public string TimeSignature { get; set; }
         [JsonProperty("bpm0")]public float BPM { get; set; }
         [JsonProperty("accomOffset")] public int InstrumentalOffset { get; set; }
-        [JsonProperty("utts")]public List<VogTrack> TrackList { get; set; }
+        [JsonProperty("utts")]public List<VogPhrase> PhraseList { get; set; }
     }
 
     public class VogNote
@@ -20,7 +20,7 @@ namespace FlutyDeer.VogenPlugin.Model
         [JsonProperty("dur")]public int Duration { get; set; }
     }
 
-    public class VogTrack
+    public class VogPhrase
     {
         [JsonProperty("name")]public string TrackName { get; set; }
         [JsonProperty("singerId")]public string SingerName { get; set; }

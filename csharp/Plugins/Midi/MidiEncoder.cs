@@ -22,6 +22,11 @@ namespace FlutyDeer.MidiPlugin
         public bool IsExportLyrics { get; set; }
 
         /// <summary>
+        /// 默认歌词。
+        /// </summary>
+        public string DefaultLyric { get; set; }
+
+        /// <summary>
         /// 是否使用歌词兼容性模式，默认为否。
         /// </summary>
         public bool IsUseCompatibleLyric { get; set; }

@@ -1,9 +1,7 @@
-﻿using NPinyin;
-using OpenSvip.Model;
+﻿using OpenSvip.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.International.Converters.PinYinConverter;
 
 namespace FlutyDeer.Y77Plugin
 {
@@ -57,7 +55,7 @@ namespace FlutyDeer.Y77Plugin
         {
             Y77Note y77Note = new Y77Note
             {
-                Pinyin = GetNotePinyin(note),
+                Pinyin = note.Pronunciation,
                 Lyric = note.Lyric,
                 KeyNumber = 88 - note.KeyNumber,
                 PitchParam = EncodePitchParam(singingTrack.EditedParams.Pitch, note)
@@ -65,31 +63,6 @@ namespace FlutyDeer.Y77Plugin
             y77Note.StartPosition = note.StartPos / 30;
             y77Note.Length = (note.StartPos + note.Length) / 30 - y77Note.StartPosition;
             return y77Note;
-        }
-
-        /// <summary>
-        /// 转换音符的拼音。
-        /// </summary>
-        /// <returns>将歌词转为拼音。</returns>
-        private string GetNotePinyin(Note note)
-        {
-            string origin = note.Pronunciation;
-            if (origin == null)
-            {
-                string lyric = note.Lyric;
-                if (lyric.Length > 1)
-                {
-                    foreach (var symbol in SymbolList.SymbolToRemoveList())
-                    {
-                        lyric = lyric.Replace(symbol, "");
-                    }
-                }
-                return Pinyin.GetPinyin(lyric);
-            }
-            else
-            {
-                return origin;
-            }
         }
 
         private List<int> EncodePitchParam(ParamCurve pitchParamCurve, Note note)

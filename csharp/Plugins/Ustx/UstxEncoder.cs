@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using OpenSvip.Model;
-using OpenUtau.Core.Ustx;
+using OxygenDioxide.UstxPlugin.Ustx;
 using OxygenDioxide.UstxPlugin.Utils;
 
 namespace OxygenDioxide.UstxPlugin.Stream
@@ -150,7 +150,7 @@ namespace OxygenDioxide.UstxPlugin.Stream
             {
                 lyric = "+";
             }
-            if(lyric.Length==2 && LyricUtil.isPunctuation(lyric[1]))//删除标点符号
+            if(lyric.Length==2 && LyricsUtil.isPunctuation(lyric[1]))//删除标点符号
             {
                 lyric = lyric.Remove(1);
             }

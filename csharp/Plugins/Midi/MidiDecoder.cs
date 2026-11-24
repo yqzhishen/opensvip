@@ -14,6 +14,8 @@ namespace FlutyDeer.MidiPlugin
     {
         public bool IsImportLyrics { get; set; }
 
+        public string DefaultLyric { get; set; }
+
         public MultiChannelOption MultiChannelOption { get; set; }
 
         public string Channels { get; set; }
@@ -74,7 +76,10 @@ namespace FlutyDeer.MidiPlugin
             return singingTrackList;
         }
 
-        private void ImportTracks(List<Track> singingTrackList, TrackChunk trackChunk, List<Melanchall.DryWetMidi.Interaction.Note> midiNoteList)
+        private void ImportTracks(
+            List<Track> singingTrackList,
+            TrackChunk trackChunk,
+            List<Melanchall.DryWetMidi.Interaction.Note> midiNoteList)
         {
             string trackName = "演唱轨";
             var midiEvents = trackChunk.Events;
@@ -93,7 +98,7 @@ namespace FlutyDeer.MidiPlugin
                         StartPos = (int)(midiNote.Time * 480 / PPQ),
                         Length = (int)(midiNote.Length * 480 / PPQ),
                         KeyNumber = midiNote.NoteNumber,
-                        Lyric = "啊",
+                        Lyric = DefaultLyric,
                         Pronunciation = null
                     });
                 }

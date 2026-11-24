@@ -1,5 +1,4 @@
-﻿using FlutyDeer.MusicXml.Core;
-using FlutyDeer.MusicXml.Stream;
+﻿using FlutyDeer.MusicXml.Stream;
 using OpenSvip.Framework;
 using OpenSvip.Model;
 using System;
@@ -11,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace FlutyDeer.MusicXml
 {
-    internal class MusicXmlConverter : IProjectConverter
+    public class MusicXmlConverter : IProjectConverter
     {
         public Project Load(string path, ConverterOptions options)
         {

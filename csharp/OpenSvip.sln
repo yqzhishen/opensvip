@@ -2,53 +2,53 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Model", "Model\OpenSvip.Model.csproj", "{F0CF4E57-33F4-4A63-A45F-69727058C24A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Model", "Model\OpenSvip.Model.csproj", "{F0CF4E57-33F4-4A63-A45F-69727058C24A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Console", "Console\OpenSvip.Console.csproj", "{3779DA9F-186C-4529-9FF6-56D0186D571C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.BinSvip", "Plugins\BinSvip\Plugin.BinSvip.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.BinSvip", "Plugins\BinSvip\Plugin.BinSvip.csproj", "{E36D37FC-A83E-40E7-A7CF-5D366653A7DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Framework", "Framework\OpenSvip.Framework.csproj", "{1A025CF4-6CE6-42F9-AD09-16E56D840D95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Framework", "Framework\OpenSvip.Framework.csproj", "{1A025CF4-6CE6-42F9-AD09-16E56D840D95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.JsonSvip", "Plugins\JsonSvip\Plugin.JsonSvip.csproj", "{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.JsonSvip", "Plugins\JsonSvip\Plugin.JsonSvip.csproj", "{B16A0B55-FEF1-41A4-B83F-419A63B07BC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.SynthV", "Plugins\SynthV\Plugin.SynthV.csproj", "{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.SynthV", "Plugins\SynthV\Plugin.SynthV.csproj", "{052F5EA1-52F4-46BE-AAC3-7CD031E3CDDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Library", "Library\OpenSvip.Library.csproj", "{C0982090-A08E-45B8-953A-6D1750A69CDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenSvip.Library", "Library\OpenSvip.Library.csproj", "{C0982090-A08E-45B8-953A-6D1750A69CDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Gjgj", "Plugins\Gjgj\Plugin.Gjgj.csproj", "{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Gjgj", "Plugins\Gjgj\Plugin.Gjgj.csproj", "{643E7EED-85E2-4FD6-99AF-9EAA718CF5FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Vogen", "Plugins\Vogen\Plugin.Vogen.csproj", "{2094D048-0F25-4052-A24E-B4783CB0E5E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Vogen", "Plugins\Vogen\Plugin.Vogen.csproj", "{2094D048-0F25-4052-A24E-B4783CB0E5E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Y77", "Plugins\Y77\Plugin.Y77.csproj", "{3B5FB653-3637-47CE-B3FD-E184419A058E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Y77", "Plugins\Y77\Plugin.Y77.csproj", "{3B5FB653-3637-47CE-B3FD-E184419A058E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Midi", "Plugins\Midi\Plugin.Midi.csproj", "{FE326AD0-5B40-42B6-9958-9D6C5F830935}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Midi", "Plugins\Midi\Plugin.Midi.csproj", "{FE326AD0-5B40-42B6-9958-9D6C5F830935}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DecodeMidi.Console", "DecodeMidi.Console\DecodeMidi.Console.csproj", "{B9A66731-A69A-4BF8-A602-AC049C71BD15}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Ace", "Plugins\Ace\Plugin.Ace.csproj", "{DE890A5D-8DC9-4008-9513-BBA8324990BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Ace", "Plugins\Ace\Plugin.Ace.csproj", "{DE890A5D-8DC9-4008-9513-BBA8324990BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.Tests", "Tests\OpenSvip.Tests.csproj", "{ECCAB774-03E8-4D22-B11B-A3C554658B25}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Ustx", "Plugins\Ustx\Plugin.Ustx.csproj", "{AD7E71A4-895A-49A2-9C13-ECA63D1852D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Ustx", "Plugins\Ustx\Plugin.Ustx.csproj", "{AD7E71A4-895A-49A2-9C13-ECA63D1852D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Lyrics", "Plugins\Lyrics\Plugin.Lyrics.csproj", "{CED66EF4-8393-45BE-BF75-35476F840B2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Lyrics", "Plugins\Lyrics\Plugin.Lyrics.csproj", "{CED66EF4-8393-45BE-BF75-35476F840B2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Srt", "Plugins\Srt\Plugin.Srt.csproj", "{4D661193-C60D-4025-823C-525FBA0E243E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Srt", "Plugins\Srt\Plugin.Srt.csproj", "{4D661193-C60D-4025-823C-525FBA0E243E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.MusicXml", "Plugins\MusicXml\Plugin.MusicXml.csproj", "{E3A16659-17BC-48AF-B27F-B678354ACDD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.MusicXml", "Plugins\MusicXml\Plugin.MusicXml.csproj", "{E3A16659-17BC-48AF-B27F-B678354ACDD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Json2DiffSinger", "Plugins\Json2Diffsinger\Json2DiffSinger.csproj", "{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Vsqx4", "Plugins\Vsqx4\Plugin.Vsqx4.csproj", "{061363F8-45CF-4606-842B-6718DC011669}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Vsqx4", "Plugins\Vsqx4\Plugin.Vsqx4.csproj", "{061363F8-45CF-4606-842B-6718DC011669}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Svip3", "Plugins\Svip3\Plugin.Svip3.csproj", "{D55C0B10-F23E-49A2-BC36-5A118C0ED07E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Svip3", "Plugins\Svip3\Plugin.Svip3.csproj", "{D55C0B10-F23E-49A2-BC36-5A118C0ED07E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenSvip.GUI", "GUI\OpenSvip.GUI.csproj", "{EBF57F98-939B-4371-A07F-0DE8A6D59B63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Dspx", "Plugins\Plugin.Dspx\Plugin.Dspx.csproj", "{ACC96407-AC8E-49E4-98E4-FEF4C78AB7D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Plugin.Dspx", "Plugins\Dspx\Plugin.Dspx.csproj", "{ACC96407-AC8E-49E4-98E4-FEF4C78AB7D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrSjimo.SvgPlugin", "Plugins\Svg\CrSjimo.SvgPlugin.csproj", "{B42E3F46-F4EC-4B5B-911D-7683AF821F17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrSjimo.SvgPlugin", "Plugins\Svg\CrSjimo.SvgPlugin.csproj", "{B42E3F46-F4EC-4B5B-911D-7683AF821F17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Ust", "Plugins\Ust\Plugin.Ust.csproj", "{1263E7A1-03AD-10FD-7B9F-6B82A4BAE382}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin.Dv", "Plugins\Dv\Plugin.Dv.csproj", "{23D62E05-30F5-D92F-2AFF-8B5D70EB6638}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,10 +100,6 @@ Global
 		{FE326AD0-5B40-42B6-9958-9D6C5F830935}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE326AD0-5B40-42B6-9958-9D6C5F830935}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE326AD0-5B40-42B6-9958-9D6C5F830935}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9A66731-A69A-4BF8-A602-AC049C71BD15}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DE890A5D-8DC9-4008-9513-BBA8324990BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DE890A5D-8DC9-4008-9513-BBA8324990BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE890A5D-8DC9-4008-9513-BBA8324990BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -128,10 +124,6 @@ Global
 		{E3A16659-17BC-48AF-B27F-B678354ACDD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3A16659-17BC-48AF-B27F-B678354ACDD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3A16659-17BC-48AF-B27F-B678354ACDD0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BDBBCE8A-6E4A-41BC-840C-DEC3BB411FD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{061363F8-45CF-4606-842B-6718DC011669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{061363F8-45CF-4606-842B-6718DC011669}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{061363F8-45CF-4606-842B-6718DC011669}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -152,6 +144,14 @@ Global
 		{B42E3F46-F4EC-4B5B-911D-7683AF821F17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B42E3F46-F4EC-4B5B-911D-7683AF821F17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B42E3F46-F4EC-4B5B-911D-7683AF821F17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1263E7A1-03AD-10FD-7B9F-6B82A4BAE382}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1263E7A1-03AD-10FD-7B9F-6B82A4BAE382}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1263E7A1-03AD-10FD-7B9F-6B82A4BAE382}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1263E7A1-03AD-10FD-7B9F-6B82A4BAE382}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23D62E05-30F5-D92F-2AFF-8B5D70EB6638}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23D62E05-30F5-D92F-2AFF-8B5D70EB6638}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23D62E05-30F5-D92F-2AFF-8B5D70EB6638}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23D62E05-30F5-D92F-2AFF-8B5D70EB6638}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

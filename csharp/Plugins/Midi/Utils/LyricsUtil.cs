@@ -32,26 +32,14 @@ namespace FlutyDeer.MidiPlugin.Utils
             using (var objectsManager = new TimedObjectsManager<TimedEvent>(trackChunk.Events))
             {
                 var events = objectsManager.Objects;
+                var lyricsDict = events
+                    .Where(e => e.Event is LyricEvent)
+                    .ToDictionary(e => e.Time * 480 / PPQ, e => ((LyricEvent)e.Event).Text);
                 foreach (var note in noteList)
                 {
-                    try
+                    if (lyricsDict.ContainsKey(note.StartPos))
                     {
-                        string lyric = events.Where(e => e.Event is LyricEvent && e.Time * 480 / PPQ == note.StartPos)
-                                             .Select(e => ((LyricEvent)e.Event).Text)
-                                             .First();
-                        if (Regex.IsMatch(lyric, @"[a-zA-Z]"))
-                        {
-                            note.Lyric = "啊";
-                            note.Pronunciation = lyric;
-                        }
-                        else
-                        {
-                            note.Lyric = lyric;
-                        }
-                    }
-                    catch
-                    {
-                        note.Lyric = "啊";
+                        note.Lyric = lyricsDict[note.StartPos];
                     }
                 }
             }

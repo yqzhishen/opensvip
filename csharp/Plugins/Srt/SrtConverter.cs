@@ -6,7 +6,7 @@ using System;
 
 namespace FlutyDeer.SrtPlugin.Stream
 {
-    internal class SrtConverter : IProjectConverter
+    public class SrtConverter : IProjectConverter
     {
         public Project Load(string path, ConverterOptions options)
         {
